@@ -1,0 +1,118 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-ecto-green: var(--ecto-green);
+  --color-lingot-lime: var(--lingot-lime);
+  --color-eel-light: var(--eel-light);
+  --color-macaw-blue: var(--macaw-blue);
+  --color-eel-dark-blue: var(--eel-dark-blue);
+  --color-midnight: var(--midnight);
+  --color-graphite: var(--graphite);
+  --color-ash: var(--ash);
+  --color-charcoal: var(--charcoal);
+  --color-paper: #ffffff;
+  --font-sans: var(--font-nunito);
+  --font-display: var(--font-baloo);
+  --radius-xl: 0.75rem;
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #3c3c3c;
+  --primary: #58cc02;
+  --primary-foreground: #ffffff;
+  --muted: #f7f7f7;
+  --muted-foreground: #777777;
+  --border: #e5e5e5;
+  --ecto-green: #58cc02;
+  --lingot-lime: #a5ed6e;
+  --eel-light: #d7ffb8;
+  --macaw-blue: #1cb0f6;
+  --eel-dark-blue: #042c60;
+  --midnight: #000437;
+  --graphite: #3c3c3c;
+  --ash: #777777;
+  --charcoal: #4b4b4b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-nunito), "Arial Rounded MT Bold", ui-sans-serif,
+    system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: var(--eel-light);
+  color: var(--eel-dark-blue);
+}
+
+:focus-visible {
+  outline: none;
+}
+
+.font-display {
+  font-family: var(--font-baloo), var(--font-nunito), ui-sans-serif, system-ui,
+    sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+.text-pretty {
+  text-wrap: pretty;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

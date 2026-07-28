@@ -1,0 +1,207 @@
+import { sql } from "drizzle-orm";
+import {
+  check,
+  date,
+  index,
+  integer,
+  pgTable,
+  text,
+  timestamp,
+  unique,
+  uuid,
+} from "drizzle-orm/pg-core";
+
+export const users = pgTable(
+  "users",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    email: text("email").notNull(),
+    displayName: text("display_name").notNull(),
+    nativeLanguage: text("native_language").default("vi").notNull(),
+    targetLanguage: text("target_language").default("en").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [unique("users_email_unique").on(table.email)],
+).enableRLS();
+
+export const decks = pgTable(
+  "decks",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    slug: text("slug").notNull(),
+    title: text("title").notNull(),
+    description: text("description").notNull(),
+    level: text("level").notNull(),
+    sortOrder: integer("sort_order").default(0).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    unique("decks_slug_unique").on(table.slug),
+    index("decks_level_sort_order_idx").on(table.level, table.sortOrder),
+    check("decks_sort_order_check", sql`${table.sortOrder} >= 0`),
+  ],
+).enableRLS();
+
+export const words = pgTable(
+  "words",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    deckId: uuid("deck_id")
+      .notNull()
+      .references(() => decks.id, { onDelete: "cascade" }),
+    term: text("term").notNull(),
+    translation: text("translation").notNull(),
+    phonetic: text("phonetic").notNull(),
+    partOfSpeech: text("part_of_speech").notNull(),
+    exampleSentence: text("example_sentence").notNull(),
+    exampleTranslation: text("example_translation").notNull(),
+    sortOrder: integer("sort_order").default(0).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    unique("words_deck_term_unique").on(table.deckId, table.term),
+    index("words_deck_sort_order_idx").on(table.deckId, table.sortOrder),
+    check("words_sort_order_check", sql`${table.sortOrder} >= 0`),
+  ],
+).enableRLS();
+
+export const wordProgress = pgTable(
+  "word_progress",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    wordId: uuid("word_id")
+      .notNull()
+      .references(() => words.id, { onDelete: "cascade" }),
+    status: text("status").default("new").notNull(),
+    mastery: integer("mastery").default(0).notNull(),
+    intervalDays: integer("interval_days").default(0).notNull(),
+    correctCount: integer("correct_count").default(0).notNull(),
+    incorrectCount: integer("incorrect_count").default(0).notNull(),
+    lastReviewedAt: timestamp("last_reviewed_at", { withTimezone: true }),
+    nextReviewAt: timestamp("next_review_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    unique("word_progress_user_word_unique").on(table.userId, table.wordId),
+    index("word_progress_word_id_idx").on(table.wordId),
+    index("word_progress_user_review_idx").on(
+      table.userId,
+      table.status,
+      table.nextReviewAt,
+    ),
+    check(
+      "word_progress_status_check",
+      sql`${table.status} in ('new', 'learning', 'mastered')`,
+    ),
+    check(
+      "word_progress_mastery_check",
+      sql`${table.mastery} between 0 and 100`,
+    ),
+    check(
+      "word_progress_interval_check",
+      sql`${table.intervalDays} >= 0`,
+    ),
+    check(
+      "word_progress_counts_check",
+      sql`${table.correctCount} >= 0 and ${table.incorrectCount} >= 0`,
+    ),
+  ],
+).enableRLS();
+
+export const studySessions = pgTable(
+  "study_sessions",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    deckId: uuid("deck_id").references(() => decks.id, {
+      onDelete: "set null",
+    }),
+    mode: text("mode").default("flashcards").notNull(),
+    reviewedCount: integer("reviewed_count").default(0).notNull(),
+    correctCount: integer("correct_count").default(0).notNull(),
+    xpEarned: integer("xp_earned").default(0).notNull(),
+    durationSeconds: integer("duration_seconds").default(0).notNull(),
+    startedAt: timestamp("started_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    unique("study_sessions_user_started_unique").on(
+      table.userId,
+      table.startedAt,
+    ),
+    index("study_sessions_deck_id_idx").on(table.deckId),
+    check(
+      "study_sessions_counts_check",
+      sql`${table.reviewedCount} >= 0 and ${table.correctCount} >= 0 and ${table.correctCount} <= ${table.reviewedCount}`,
+    ),
+    check(
+      "study_sessions_totals_check",
+      sql`${table.xpEarned} >= 0 and ${table.durationSeconds} >= 0`,
+    ),
+  ],
+).enableRLS();
+
+export const dailyActivity = pgTable(
+  "daily_activity",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    activityDate: date("activity_date", { mode: "string" }).notNull(),
+    reviewedCount: integer("reviewed_count").default(0).notNull(),
+    learnedCount: integer("learned_count").default(0).notNull(),
+    correctCount: integer("correct_count").default(0).notNull(),
+    xpEarned: integer("xp_earned").default(0).notNull(),
+    studySeconds: integer("study_seconds").default(0).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    unique("daily_activity_user_date_unique").on(
+      table.userId,
+      table.activityDate,
+    ),
+    check(
+      "daily_activity_totals_check",
+      sql`${table.reviewedCount} >= 0 and ${table.learnedCount} >= 0 and ${table.correctCount} >= 0 and ${table.xpEarned} >= 0 and ${table.studySeconds} >= 0`,
+    ),
+  ],
+).enableRLS();

@@ -1,0 +1,46 @@
+{
+  "name": "vocabloom",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "node --experimental-strip-types --test src/lib/study.test.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "node --env-file=.env.local node_modules/drizzle-kit/bin.cjs migrate",
+    "db:seed": "node --env-file=.env.local --import tsx scripts/seed.ts",
+    "db:studio": "node --env-file=.env.local node_modules/drizzle-kit/bin.cjs studio",
+    "db:verify": "node --env-file=.env.local --experimental-strip-types scripts/verify-db.ts",
+    "db:reset-public": "node --env-file=.env.local --experimental-strip-types scripts/reset-public.ts --reset"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "drizzle-kit": "^0.31.10",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "16.2.10",
+    "tsx": "^4.23.0",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@radix-ui/react-progress": "^1.1.12",
+    "@tailwindcss/postcss": "4.3.2",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "drizzle-orm": "0.45.2",
+    "framer-motion": "12.42.2",
+    "lucide-react": "^1.24.0",
+    "next": "16.2.10",
+    "postgres": "3.4.9",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "recharts": "3.9.2",
+    "tailwind-merge": "^3.6.0",
+    "tailwindcss": "4.3.2"
+  }
+}
