@@ -91,7 +91,7 @@ async function seed() {
     const [demoUser] = await tx
       .insert(users)
       .values({
-        email: "demo@vocabloom.vn",
+        email: process.env.DEMO_USER_EMAIL ?? "demo@vocabloom.vn",
         displayName: "Minh Anh",
       })
       .onConflictDoUpdate({

@@ -3,8 +3,9 @@ import postgres from "postgres";
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) throw new Error("DATABASE_URL is required.");
 
+const isLocal = /localhost|127\.0\.0\.1/.test(connectionString);
 const sql = postgres(connectionString, {
-  ssl: "require",
+  ssl: isLocal ? false : "require",
   max: 1,
   connect_timeout: 20,
 });
@@ -19,13 +20,16 @@ try {
     union all select 'daily_activity', count(*)::int from public.daily_activity
     order by table_name
   `;
+  const [{ hasAnon }] = await sql<{ hasAnon: boolean }[]>`
+    select exists(select 1 from pg_roles where rolname = 'anon') as "hasAnon"
+  `;
   const security = await sql<
-    { table_name: string; rls_enabled: boolean; anon_can_select: boolean }[]
+    { table_name: string; rls_enabled: boolean; anon_can_select: boolean | null }[]
   >`
     select
       c.relname as table_name,
       c.relrowsecurity as rls_enabled,
-      has_table_privilege('anon', format('%I.%I', n.nspname, c.relname), 'select') as anon_can_select
+      case when ${hasAnon} then has_table_privilege('anon', format('%I.%I', n.nspname, c.relname), 'select') else null end as anon_can_select
     from pg_class c
     join pg_namespace n on n.oid = c.relnamespace
     where n.nspname = 'public' and c.relkind = 'r'

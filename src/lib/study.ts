@@ -32,6 +32,16 @@ export function computeNextReview(
   };
 }
 
+export function isDueForReview(
+  progress: { status: "new" | "learning" | "mastered"; nextReviewAt: string | null },
+  now: Date,
+) {
+  if (progress.status === "new" || !progress.nextReviewAt) return true;
+
+  const nextReviewAt = Date.parse(progress.nextReviewAt);
+  return !Number.isFinite(nextReviewAt) || nextReviewAt <= now.getTime();
+}
+
 export function summarizeSession(ratings: Rating[], total: number) {
   const again = ratings.filter((rating) => rating === "again").length;
   const hard = ratings.filter((rating) => rating === "hard").length;

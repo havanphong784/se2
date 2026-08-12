@@ -16,7 +16,11 @@ export function getDb(): Database | null {
   }
 
   if (!database) {
-    client = postgres(connectionString);
+    const isLocal = /localhost|127\.0\.0\.1/.test(connectionString);
+    client = postgres(connectionString, {
+      ssl: isLocal ? false : "require",
+      connect_timeout: 20,
+    });
     database = drizzle(client, { schema });
   }
 

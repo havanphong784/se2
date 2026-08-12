@@ -11,6 +11,7 @@ export type VocabularyWord = {
   status: WordStatus;
   mastery: number;
   intervalDays: number;
+  nextReviewAt: string | null;
 };
 
 export type VocabularyDeck = {
@@ -53,6 +54,7 @@ const word = (
   status,
   mastery,
   intervalDays,
+  nextReviewAt: status === "new" ? null : new Date(0).toISOString(),
 });
 
 export const DEMO_DECKS: VocabularyDeck[] = [
@@ -372,6 +374,6 @@ export function deckProgress(deck: VocabularyDeck) {
     mastered,
     learning,
     fresh: deck.words.length - mastered - learning,
-    percent: Math.round((completed / deck.words.length) * 100),
+    percent: deck.words.length === 0 ? 0 : Math.round((completed / deck.words.length) * 100),
   };
 }

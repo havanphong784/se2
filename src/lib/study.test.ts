@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 const studyModule = "./study.ts";
-const { computeNextReview, summarizeSession } = (await import(
+const { computeNextReview, isDueForReview, summarizeSession } = (await import(
   studyModule
 )) as typeof import("./study");
 
@@ -25,6 +25,22 @@ test("computeNextReview schedules new and repeated cards", () => {
     intervalDays: 0,
     nextReviewAt: new Date("2026-07-12T00:10:00.000Z"),
   });
+});
+
+test("isDueForReview honors status and review date", () => {
+  assert.equal(isDueForReview({ status: "new", nextReviewAt: null }, now), true);
+  assert.equal(
+    isDueForReview({ status: "learning", nextReviewAt: "2026-07-11T23:59:00.000Z" }, now),
+    true,
+  );
+  assert.equal(
+    isDueForReview({ status: "mastered", nextReviewAt: "2026-07-13T00:00:00.000Z" }, now),
+    false,
+  );
+  assert.equal(
+    isDueForReview({ status: "learning", nextReviewAt: "not-a-date" }, now),
+    true,
+  );
 });
 
 test("summarizeSession reports rating counts and completion", () => {
