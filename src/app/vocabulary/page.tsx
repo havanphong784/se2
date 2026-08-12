@@ -7,7 +7,7 @@ import { VocabularyLibrary } from "@/components/vocabulary-library";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { getDecksResult } from "@/lib/data";
-import { isDueForReview } from "@/lib/study";
+import { createStudyQueue, isDueForReview } from "@/lib/study";
 
 export const metadata: Metadata = { title: "Học từ vựng" };
 
@@ -16,11 +16,12 @@ export default async function VocabularyPage() {
   const decks = decksResult.data;
   const words = decks.flatMap((deck) => deck.words);
   const now = new Date();
-  const due = words.filter((word) => isDueForReview(word, now)).length;
+  const totalDue = words.filter((word) => isDueForReview(word, now)).length;
   const mastered = words.filter((word) => word.status === "mastered").length;
   const dueDeck = decks.find((deck) =>
     deck.words.some((word) => isDueForReview(word, now)),
   );
+  const sessionSize = dueDeck ? createStudyQueue(dueDeck.words, now).length : 0;
 
   return (
     <div className="mx-auto w-full max-w-[1200px] px-5 py-8 md:px-8 lg:py-10">
@@ -49,7 +50,7 @@ export default async function VocabularyPage() {
               href={`/vocabulary/practice?deck=${dueDeck.slug}`}
               className={buttonVariants({ size: "lg", className: "w-full sm:w-auto" })}
             >
-              Ôn {due} từ hôm nay <ArrowRight />
+              Ôn {sessionSize} từ trong “{dueDeck.title}” <ArrowRight />
             </Link>
           ) : (
             <span
@@ -80,8 +81,8 @@ export default async function VocabularyPage() {
             <Sparkles className="size-5" />
           </span>
           <div>
-            <p className="text-xs font-extrabold uppercase tracking-[0.08em] text-ash">Đang học</p>
-            <p className="mt-0.5 text-xl font-extrabold text-eel-dark-blue tabular-nums">{due} từ</p>
+            <p className="text-xs font-extrabold uppercase tracking-[0.08em] text-ash">Đến hạn hôm nay</p>
+            <p className="mt-0.5 text-xl font-extrabold text-eel-dark-blue tabular-nums">{totalDue} từ</p>
           </div>
         </div>
         <div className="flex items-center gap-4 border-t-2 border-[#eeeeee] py-5 sm:border-t-0 sm:px-5">

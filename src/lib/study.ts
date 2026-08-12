@@ -9,6 +9,33 @@ export type StudyProgress = {
 
 export type WordStatus = "new" | "learning" | "mastered";
 
+export const MAX_SESSION_CARDS = 20;
+export const MAX_NEW_CARDS_PER_SESSION = 5;
+export const MAX_CARD_PRESENTATIONS = 3;
+
+export type ReviewCard = {
+  status: WordStatus;
+  nextReviewAt: string | null;
+};
+
+export function createStudyQueue<T extends ReviewCard>(
+  cards: T[],
+  now: Date,
+  maxCards = MAX_SESSION_CARDS,
+  maxNewCards = MAX_NEW_CARDS_PER_SESSION,
+) {
+  const dueCards = cards.filter((card) => isDueForReview(card, now));
+  const reviews = dueCards
+    .filter((card) => card.status !== "new")
+    .sort(compareReviewPriority);
+  const fresh = dueCards
+    .filter((card) => card.status === "new")
+    .sort(compareReviewPriority)
+    .slice(0, Math.max(0, maxNewCards));
+
+  return [...reviews, ...fresh].slice(0, Math.max(0, maxCards));
+}
+
 export function computeMastery(currentMastery: number, rating: Rating) {
   const mastery = Math.max(0, Math.min(100, currentMastery));
 

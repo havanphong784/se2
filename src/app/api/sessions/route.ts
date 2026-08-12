@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { getDb, isDatabaseCoolingDown, markDatabaseFailure } from "@/db";
 import { dailyActivity, decks, studySessions, words } from "@/db/schema";
 import { getDemoUser, isUuid } from "@/lib/server-data";
+import { MAX_CARD_PRESENTATIONS } from "@/lib/study";
 
 export const runtime = "nodejs";
 
@@ -102,9 +103,9 @@ export async function POST(request: Request) {
     if (!deck.length) {
       return NextResponse.json({ message: "Không tìm thấy bộ từ." }, { status: 404 });
     }
-    if (reviewedCount > deck[0].wordCount) {
+    if (reviewedCount > deck[0].wordCount * MAX_CARD_PRESENTATIONS) {
       return NextResponse.json(
-        { message: "Số từ đã ôn vượt quá số từ trong bộ." },
+        { message: "Số lượt ôn vượt quá giới hạn của bộ từ." },
         { status: 400 },
       );
     }

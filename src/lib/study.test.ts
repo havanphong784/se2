@@ -4,6 +4,7 @@ import test from "node:test";
 const studyModule = "./study.ts";
 const {
   compareReviewPriority,
+  createStudyQueue,
   computeMastery,
   computeNextReview,
   computeWordStatus,
@@ -65,6 +66,53 @@ test("compareReviewPriority sorts status first and oldest due date within a stat
   assert.deepEqual(
     cards.sort(compareReviewPriority).map((card) => card.id),
     ["learning-older", "learning-newer", "new", "mastered"],
+  );
+});
+
+test("createStudyQueue prioritizes reviews and limits new cards", () => {
+  const cards = [
+    ...Array.from({ length: 18 }, (_, index) => ({
+      id: `review-${index}`,
+      status: "learning" as const,
+      nextReviewAt: new Date(now.getTime() - index * 60_000).toISOString(),
+    })),
+    ...Array.from({ length: 10 }, (_, index) => ({
+      id: `new-${index}`,
+      status: "new" as const,
+      nextReviewAt: null,
+    })),
+    {
+      id: "future",
+      status: "mastered" as const,
+      nextReviewAt: "2026-07-13T00:00:00.000Z",
+    },
+  ];
+
+  const queue = createStudyQueue(cards, now);
+  assert.equal(queue.length, 20);
+  assert.equal(queue.filter((card) => card.status === "new").length, 2);
+  assert.equal(queue[0].id, "review-17");
+  assert.equal(queue.some((card) => card.id === "future"), false);
+});
+
+test("createStudyQueue admits at most five new cards when review load is low", () => {
+  const cards = [
+    {
+      id: "review",
+      status: "learning" as const,
+      nextReviewAt: "2026-07-11T00:00:00.000Z",
+    },
+    ...Array.from({ length: 9 }, (_, index) => ({
+      id: `new-${index}`,
+      status: "new" as const,
+      nextReviewAt: null,
+    })),
+  ];
+
+  const queue = createStudyQueue(cards, now);
+  assert.deepEqual(
+    queue.map((card) => card.id),
+    ["review", "new-0", "new-1", "new-2", "new-3", "new-4"],
   );
 });
 

@@ -21,8 +21,9 @@ import { Progress } from "@/components/ui/progress";
 import type { DataSource } from "@/lib/data";
 import type { VocabularyDeck, VocabularyWord } from "@/lib/demo-data";
 import {
-  compareReviewPriority,
-  isDueForReview,
+  computeNextReview,
+  createStudyQueue,
+  MAX_CARD_PRESENTATIONS,
   summarizeSession,
   type Rating,
 } from "@/lib/study";
@@ -30,27 +31,30 @@ import { cn } from "@/lib/utils";
 
 const ratingMeta: Record<
   Rating,
-  { label: string; hint: string; color: string; shortcut: string }
+  { label: string; color: string; shortcut: string }
 > = {
   again: {
     label: "Chưa nhớ",
-    hint: "10 phút",
     color: "border-[#ff8f8f] border-b-[#d95f5f] text-[#c43e3e] hover:bg-[#fff7f7]",
     shortcut: "1",
   },
   hard: {
     label: "Hơi khó",
-    hint: "1 ngày",
     color: "border-[#ffd66b] border-b-[#d9a82e] text-[#9b6b00] hover:bg-[#fffaf0]",
     shortcut: "2",
   },
   good: {
     label: "Đã nhớ",
-    hint: "3 ngày",
     color: "border-ecto-green border-b-[#46a302] text-[#438f0e] hover:bg-[#f7fff1]",
     shortcut: "3",
   },
 };
+
+function formatReviewDelay(intervalDays: number, rating: Rating) {
+  if (rating === "again") return "10 phút";
+  const next = computeNextReview({ intervalDays }, rating, new Date());
+  return `${next.intervalDays} ngày`;
+}
 
 function speak(term: string) {
   if (!("speechSynthesis" in window)) return;
@@ -80,13 +84,11 @@ export function StudySession({
   dataSource?: DataSource;
 }) {
   const [queueCreatedAt] = useState(() => new Date());
-  const queue = useMemo(
-    () =>
-      deck.words
-        .filter((item) => isDueForReview(item, queueCreatedAt))
-        .sort(compareReviewPriority),
+  const initialQueue = useMemo(
+    () => createStudyQueue(deck.words, queueCreatedAt),
     [deck.words, queueCreatedAt],
   );
+  const [queue, setQueue] = useState(initialQueue);
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [ratings, setRatings] = useState<Rating[]>([]);
@@ -96,7 +98,8 @@ export function StudySession({
   const [startedAt, setStartedAt] = useState(() => Date.now());
   const [sessionId, setSessionId] = useState(() => crypto.randomUUID());
   const cardRef = useRef<HTMLButtonElement>(null);
-  const learnedCountRef = useRef(0);
+  const learnedWordIdsRef = useRef(new Set<string>());
+  const repeatCountsRef = useRef(new Map<string, number>());
   const syncFailedRef = useRef(false);
   const word = queue[index];
   const progress = finished ? 100 : Math.round((index / queue.length) * 100);
@@ -122,7 +125,7 @@ export function StudySession({
           sessionId,
           deckId: deck.id,
           reviewedCount: summary.reviewed,
-          learnedCount: learnedCountRef.current,
+          learnedCount: learnedWordIdsRef.current.size,
           correctCount: summary.hard + summary.good,
           durationSeconds,
         }),
@@ -143,6 +146,7 @@ export function StudySession({
     const nextRatings = [...ratings, rating];
     setRatings(nextRatings);
     saveLocalRating(word, rating);
+    let repeatedWord = word;
 
     try {
       const response = await fetch("/api/progress", {
@@ -154,9 +158,24 @@ export function StudySession({
           intervalDays: word.intervalDays,
         }),
       });
-      const result = (await response.json()) as { persisted?: boolean; status?: string };
+      const result = (await response.json()) as {
+        persisted?: boolean;
+        status?: VocabularyWord["status"];
+        mastery?: number;
+        intervalDays?: number;
+        nextReviewAt?: string;
+      };
       if (!response.ok || result.persisted !== true) throw new Error("Không thể lưu tiến độ");
-      if (word.status === "new" && result.status !== "new") learnedCountRef.current += 1;
+      repeatedWord = {
+        ...word,
+        status: result.status ?? word.status,
+        mastery: result.mastery ?? word.mastery,
+        intervalDays: result.intervalDays ?? word.intervalDays,
+        nextReviewAt: result.nextReviewAt ?? word.nextReviewAt,
+      };
+      if (word.status === "new" && result.status !== "new") {
+        learnedWordIdsRef.current.add(word.id);
+      }
       setSaveError(null);
     } catch {
       syncFailedRef.current = true;
@@ -164,7 +183,17 @@ export function StudySession({
     }
 
     await new Promise((resolve) => window.setTimeout(resolve, 120));
-    if (index === queue.length - 1) {
+    let nextQueue = queue;
+    if (rating === "again") {
+      const repeatCount = repeatCountsRef.current.get(word.id) ?? 0;
+      if (repeatCount < MAX_CARD_PRESENTATIONS - 1) {
+        repeatCountsRef.current.set(word.id, repeatCount + 1);
+        nextQueue = [...queue, repeatedWord];
+        setQueue(nextQueue);
+      }
+    }
+
+    if (index === nextQueue.length - 1) {
       await finishSession(nextRatings);
     } else {
       setIndex((current) => current + 1);
@@ -174,6 +203,7 @@ export function StudySession({
   }
 
   function restart() {
+    setQueue(initialQueue);
     setIndex(0);
     setFlipped(false);
     setRatings([]);
@@ -182,7 +212,8 @@ export function StudySession({
     setSaveError(null);
     setStartedAt(Date.now());
     setSessionId(crypto.randomUUID());
-    learnedCountRef.current = 0;
+    learnedWordIdsRef.current.clear();
+    repeatCountsRef.current.clear();
     syncFailedRef.current = false;
   }
 
@@ -425,7 +456,7 @@ export function StudySession({
                       >
                         <span className="block text-sm sm:text-[15px]">{meta.label}</span>
                         <span className="mt-1 block text-[11px] opacity-70 sm:text-xs">
-                          {meta.hint} · phím {meta.shortcut}
+                          {formatReviewDelay(word.intervalDays, rating)} · phím {meta.shortcut}
                         </span>
                       </button>
                     );
