@@ -9,17 +9,38 @@
 - Framer Motion + Recharts
 - PostgreSQL/Supabase + Drizzle ORM
 
-## Chạy local
+## Chạy local với PostgreSQL
 
 ```bash
 pnpm install
-Copy-Item .env.example .env.local
+docker compose up -d postgres
+cp .env.example .env.local       # Windows PowerShell: Copy-Item .env.example .env.local
 pnpm db:migrate
 pnpm db:seed
+pnpm db:verify
 pnpm dev
 ```
 
-Mở `http://localhost:3000`.
+Mở `http://localhost:3000`. `.env.example` trỏ tới PostgreSQL local được khai báo trong `compose.yaml`.
+
+## Chạy với Supabase
+
+Đặt `DATABASE_URL` trong `.env.local` thành direct URL hoặc pooler URL hiện còn hoạt động của project Supabase, sau đó chạy:
+
+```bash
+pnpm db:migrate
+pnpm db:seed
+pnpm db:verify
+pnpm dev
+```
+
+Kết nối từ xa tự bật SSL. Direct hostname của Supabase có thể không truy cập được trên một số mạng; trong trường hợp đó hãy lấy pooler URL mới nhất từ trang cấu hình project. Không commit `.env.local` hoặc đưa mật khẩu database vào log, ảnh chụp hay tài liệu.
+
+## Chế độ demo và mất kết nối
+
+- Không khai báo `DATABASE_URL`: ứng dụng chạy ở chế độ demo chỉ đọc, hiển thị dữ liệu mẫu và không ghi tiến độ lên máy chủ.
+- Có `DATABASE_URL` nhưng database không truy cập được: các trang đọc vẫn hiển thị dữ liệu mẫu kèm cảnh báo; API ghi trả lỗi và không tuyên bố dữ liệu đã được lưu.
+- Khi thấy cảnh báo mất kết nối, kiểm tra URL, mạng và chạy `pnpm db:verify`. Một URL Supabase cũ hoặc project đã tạm dừng cần được thay bằng URL hiện tại.
 
 ## Database
 

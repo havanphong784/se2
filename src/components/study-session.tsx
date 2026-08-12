@@ -14,9 +14,11 @@ import {
 } from "lucide-react";
 
 import { BrandName } from "@/components/brand-mark";
+import { DataSourceNotice } from "@/components/data-source-notice";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import type { DataSource } from "@/lib/data";
 import type { VocabularyDeck, VocabularyWord } from "@/lib/demo-data";
 import {
   compareReviewPriority,
@@ -70,7 +72,13 @@ function saveLocalRating(word: VocabularyWord, rating: Rating) {
   }
 }
 
-export function StudySession({ deck }: { deck: VocabularyDeck }) {
+export function StudySession({
+  deck,
+  dataSource = "database",
+}: {
+  deck: VocabularyDeck;
+  dataSource?: DataSource;
+}) {
   const [queueCreatedAt] = useState(() => new Date());
   const queue = useMemo(
     () =>
@@ -230,6 +238,12 @@ export function StudySession({ deck }: { deck: VocabularyDeck }) {
           </span>
         </div>
       </header>
+
+      {dataSource !== "database" && (
+        <div className="mx-auto max-w-[940px] px-4 pt-5 sm:px-6">
+          <DataSourceNotice source={dataSource} />
+        </div>
+      )}
 
       <AnimatePresence mode="wait">
         {finished ? (

@@ -1,7 +1,7 @@
 import { eq, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
-import { getDb } from "@/db";
+import { getDb, isDatabaseCoolingDown, markDatabaseFailure } from "@/db";
 import { wordProgress, words } from "@/db/schema";
 import { getDemoUser, isUuid } from "@/lib/server-data";
 import {
@@ -27,7 +27,6 @@ export async function POST(request: Request) {
   if (
     !body ||
     typeof wordId !== "string" ||
-    !isUuid(wordId) ||
     typeof body.rating !== "string" ||
     !ratings.includes(body.rating as Rating)
   ) {
@@ -50,7 +49,29 @@ export async function POST(request: Request) {
 
   if (!db) {
     const next = computeNextReview({ intervalDays: offlineInterval }, rating, now);
-    return NextResponse.json({ ...next, persisted: false });
+    return NextResponse.json({
+      ...next,
+      persisted: false,
+      reason: "database_not_configured",
+    });
+  }
+
+  if (!isUuid(wordId)) {
+    return NextResponse.json(
+      { message: "Dữ liệu đánh giá không hợp lệ." },
+      { status: 400 },
+    );
+  }
+
+  if (isDatabaseCoolingDown()) {
+    return NextResponse.json(
+      {
+        message: "Cơ sở dữ liệu đang tạm thời không truy cập được.",
+        persisted: false,
+        reason: "database_unavailable",
+      },
+      { status: 503 },
+    );
   }
 
   try {
@@ -133,7 +154,14 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ ...saved, persisted: true });
   } catch (error) {
-    console.error("Unable to save word progress.", error);
-    return NextResponse.json({ message: "Không thể lưu tiến độ lúc này." }, { status: 503 });
+    markDatabaseFailure(error);
+    return NextResponse.json(
+      {
+        message: "Không thể lưu tiến độ lúc này.",
+        persisted: false,
+        reason: "database_unavailable",
+      },
+      { status: 503 },
+    );
   }
 }

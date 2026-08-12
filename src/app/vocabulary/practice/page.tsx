@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { StudySession } from "@/components/study-session";
-import { getDeck, getDecks } from "@/lib/data";
+import { getDeckResult, getDecksResult } from "@/lib/data";
 
 export const metadata: Metadata = { title: "Phiên học từ vựng" };
 
@@ -12,10 +12,13 @@ export default async function PracticePage({
   searchParams: Promise<{ deck?: string }>;
 }) {
   const requestedSlug = (await searchParams).deck;
-  const deck = requestedSlug
-    ? await getDeck(requestedSlug)
-    : (await getDecks())[0] ?? null;
+  const deckResult = requestedSlug
+    ? await getDeckResult(requestedSlug)
+    : await getDecksResult().then((result) => ({
+        ...result,
+        data: result.data[0] ?? null,
+      }));
 
-  if (!deck) notFound();
-  return <StudySession deck={deck} />;
+  if (!deckResult.data) notFound();
+  return <StudySession deck={deckResult.data} dataSource={deckResult.source} />;
 }

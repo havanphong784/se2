@@ -1,7 +1,7 @@
 import { eq, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
-import { getDb } from "@/db";
+import { getDb, isDatabaseCoolingDown, markDatabaseFailure } from "@/db";
 import { dailyActivity, decks, studySessions, words } from "@/db/schema";
 import { getDemoUser, isUuid } from "@/lib/server-data";
 
@@ -39,7 +39,6 @@ export async function POST(request: Request) {
     typeof sessionId !== "string" ||
     !isUuid(sessionId) ||
     typeof deckId !== "string" ||
-    !isUuid(deckId) ||
     reviewedCount === null ||
     learnedCount === null ||
     correctCount === null ||
@@ -57,7 +56,29 @@ export async function POST(request: Request) {
   const xpEarned = correctCount * 8 + (reviewedCount - correctCount) * 2;
   const db = getDb();
   if (!db) {
-    return NextResponse.json({ persisted: false, xpEarned });
+    return NextResponse.json({
+      persisted: false,
+      xpEarned,
+      reason: "database_not_configured",
+    });
+  }
+
+  if (!isUuid(deckId)) {
+    return NextResponse.json(
+      { message: "Dữ liệu phiên học không hợp lệ." },
+      { status: 400 },
+    );
+  }
+
+  if (isDatabaseCoolingDown()) {
+    return NextResponse.json(
+      {
+        message: "Cơ sở dữ liệu đang tạm thời không truy cập được.",
+        persisted: false,
+        reason: "database_unavailable",
+      },
+      { status: 503 },
+    );
   }
 
   try {
@@ -139,7 +160,14 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ persisted: true, xpEarned, duplicate: !inserted });
   } catch (error) {
-    console.error("Unable to save study session.", error);
-    return NextResponse.json({ message: "Không thể lưu phiên học lúc này." }, { status: 503 });
+    markDatabaseFailure(error);
+    return NextResponse.json(
+      {
+        message: "Không thể lưu phiên học lúc này.",
+        persisted: false,
+        reason: "database_unavailable",
+      },
+      { status: 503 },
+    );
   }
 }

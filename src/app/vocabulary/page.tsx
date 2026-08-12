@@ -2,16 +2,18 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, BookOpenText, Brain, Clock3, Sparkles } from "lucide-react";
 
+import { DataSourceNotice } from "@/components/data-source-notice";
 import { VocabularyLibrary } from "@/components/vocabulary-library";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
-import { getDecks } from "@/lib/data";
+import { getDecksResult } from "@/lib/data";
 import { isDueForReview } from "@/lib/study";
 
 export const metadata: Metadata = { title: "Học từ vựng" };
 
 export default async function VocabularyPage() {
-  const decks = await getDecks();
+  const decksResult = await getDecksResult();
+  const decks = decksResult.data;
   const words = decks.flatMap((deck) => deck.words);
   const now = new Date();
   const due = words.filter((word) => isDueForReview(word, now)).length;
@@ -22,6 +24,7 @@ export default async function VocabularyPage() {
 
   return (
     <div className="mx-auto w-full max-w-[1200px] px-5 py-8 md:px-8 lg:py-10">
+      <DataSourceNotice source={decksResult.source} />
       <header className="grid gap-6 border-b-2 border-[#eeeeee] pb-8 lg:grid-cols-[1fr_auto] lg:items-end">
         <div>
           <Badge className="mb-3">

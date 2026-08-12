@@ -10,6 +10,7 @@ import {
   Trophy,
 } from "lucide-react";
 
+import { DataSourceNotice } from "@/components/data-source-notice";
 import { LearningPath } from "@/components/learning-path";
 import { WordGardenIllustration } from "@/components/word-garden-illustration";
 import { WeeklyChart } from "@/components/weekly-chart";
@@ -17,15 +18,16 @@ import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { getActivity, getDecks } from "@/lib/data";
+import { getLearningData } from "@/lib/data";
 import { isDueForReview } from "@/lib/study";
 import { cn } from "@/lib/utils";
 
 export default async function DashboardPage() {
-  const [decks, activity] = await Promise.all([getDecks(), getActivity()]);
+  const learning = await getLearningData();
+  const { decks, activity } = learning.data;
   const allWords = decks.flatMap((deck) => deck.words);
   const mastered = allWords.filter((word) => word.status === "mastered").length;
-  const learning = allWords.filter((word) => word.status === "learning").length;
+  const learningCount = allWords.filter((word) => word.status === "learning").length;
   const today = activity.at(-1);
   const dailyGoal = 10;
   const reviewedToday = today?.reviewed ?? 0;
@@ -45,6 +47,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="mx-auto w-full max-w-[1200px] px-5 py-8 md:px-8 lg:py-10">
+      <DataSourceNotice source={learning.source} />
       <header className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <Badge variant="blue" className="mb-3">
@@ -127,7 +130,7 @@ export default async function DashboardPage() {
                 <span className="flex items-center gap-2 font-bold text-charcoal">
                   <Sparkles className="size-5 text-macaw-blue" /> Đang học
                 </span>
-                <strong className="tabular-nums text-eel-dark-blue">{learning} từ</strong>
+                <strong className="tabular-nums text-eel-dark-blue">{learningCount} từ</strong>
               </div>
               <div className="flex items-center justify-between py-2">
                 <span className="flex items-center gap-2 font-bold text-charcoal">
