@@ -41,11 +41,22 @@ try {
     where schema_name in ('auth', 'storage', 'realtime', 'extensions')
     order by schema_name
   `;
+  const [ownership] = await sql<
+    { system_decks: number; owned_decks: number; orphaned_decks: number }[]
+  >`
+    select
+      count(*) filter (where d.owner_id is null)::int as system_decks,
+      count(*) filter (where d.owner_id is not null)::int as owned_decks,
+      count(*) filter (where d.owner_id is not null and u.id is null)::int as orphaned_decks
+    from public.decks d
+    left join public.users u on u.id = d.owner_id
+  `;
 
   console.log(
     JSON.stringify(
       {
         counts,
+        ownership,
         security,
         managedSchemas: managedSchemas.map((row) => row.schema_name),
       },

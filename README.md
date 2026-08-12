@@ -42,6 +42,25 @@ Kết nối từ xa tự bật SSL. Direct hostname của Supabase có thể kh�
 - Có `DATABASE_URL` nhưng database không truy cập được: các trang đọc vẫn hiển thị dữ liệu mẫu kèm cảnh báo; API ghi trả lỗi và không tuyên bố dữ liệu đã được lưu.
 - Khi thấy cảnh báo mất kết nối, kiểm tra URL, mạng và chạy `pnpm db:verify`. Một URL Supabase cũ hoặc project đã tạm dừng cần được thay bằng URL hiện tại.
 
+## Import từ vựng
+
+Tại `/vocabulary`, chọn **Nhập từ vựng**. Import yêu cầu database hoạt động và tạo dữ liệu trong bộ cá nhân; bộ hệ thống chỉ đọc. Từ trùng trong cùng bộ được bỏ qua nên tiến độ cũ không bị thay đổi.
+
+CSV cần header `term,translation`; có thể thêm `phonetic,partOfSpeech,exampleSentence,exampleTranslation`:
+
+```csv
+term,translation,phonetic,partOfSpeech,exampleSentence,exampleTranslation
+hello,xin chào,/həˈləʊ/,thán từ,"Hello, friend.","Xin chào, bạn."
+```
+
+JSON là một mảng object với cùng tên trường:
+
+```json
+[{ "term": "hello", "translation": "xin chào" }]
+```
+
+Giới hạn: 2 MiB và 2.000 dòng mỗi tệp. Chỉ `term` và `translation` bắt buộc.
+
 ## Database
 
 Các lệnh database đọc `DATABASE_URL` từ `.env.local`:

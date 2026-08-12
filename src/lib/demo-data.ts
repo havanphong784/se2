@@ -21,6 +21,7 @@ export type VocabularyDeck = {
   description: string;
   level: string;
   emoji: string;
+  ownership?: "system" | "personal";
   words: VocabularyWord[];
 };
 

@@ -8,6 +8,7 @@ import {
   text,
   timestamp,
   unique,
+  uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
 
@@ -33,6 +34,9 @@ export const decks = pgTable(
   "decks",
   {
     id: uuid("id").defaultRandom().primaryKey(),
+    ownerId: uuid("owner_id").references(() => users.id, {
+      onDelete: "restrict",
+    }),
     slug: text("slug").notNull(),
     title: text("title").notNull(),
     description: text("description").notNull(),
@@ -46,7 +50,13 @@ export const decks = pgTable(
       .notNull(),
   },
   (table) => [
-    unique("decks_slug_unique").on(table.slug),
+    uniqueIndex("decks_system_slug_unique")
+      .on(table.slug)
+      .where(sql`${table.ownerId} is null`),
+    uniqueIndex("decks_owner_slug_unique")
+      .on(table.ownerId, table.slug)
+      .where(sql`${table.ownerId} is not null`),
+    index("decks_owner_sort_order_idx").on(table.ownerId, table.sortOrder),
     index("decks_level_sort_order_idx").on(table.level, table.sortOrder),
     check("decks_sort_order_check", sql`${table.sortOrder} >= 0`),
   ],

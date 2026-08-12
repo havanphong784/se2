@@ -1,3 +1,5 @@
+import { sql } from "drizzle-orm";
+
 import { closeDb, getDb } from "../src/db";
 import {
   dailyActivity,
@@ -107,6 +109,7 @@ async function seed() {
       const [deck] = await tx
         .insert(decks)
         .values({
+          ownerId: null,
           slug: deckSeed.slug,
           title: deckSeed.title,
           description: deckSeed.description,
@@ -115,7 +118,9 @@ async function seed() {
         })
         .onConflictDoUpdate({
           target: decks.slug,
+          targetWhere: sql`${decks.ownerId} is null`,
           set: {
+            ownerId: null,
             title: deckSeed.title,
             description: deckSeed.description,
             level: deckSeed.level,

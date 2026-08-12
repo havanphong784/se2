@@ -15,6 +15,13 @@
       "when": 1784173966555,
       "tag": "0001_small_red_hulk",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1786553403274,
+      "tag": "0002_careful_the_executioner",
+      "breakpoints": true
     }
   ]
 }

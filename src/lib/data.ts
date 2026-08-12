@@ -1,4 +1,4 @@
-import { and, asc, eq, gte } from "drizzle-orm";
+import { and, asc, eq, gte, isNull, or } from "drizzle-orm";
 
 import {
   getDb,
@@ -73,6 +73,7 @@ async function loadDecks(
   const rows = await db
     .select({
       deckId: decks.id,
+      deckOwnerId: decks.ownerId,
       deckSlug: decks.slug,
       deckTitle: decks.title,
       deckDescription: decks.description,
@@ -97,7 +98,8 @@ async function loadDecks(
         ? and(eq(wordProgress.wordId, words.id), eq(wordProgress.userId, user.id))
         : eq(wordProgress.id, "00000000-0000-0000-0000-000000000000"),
     )
-    .orderBy(asc(decks.sortOrder), asc(words.sortOrder));
+    .where(user ? or(isNull(decks.ownerId), eq(decks.ownerId, user.id)) : isNull(decks.ownerId))
+    .orderBy(asc(decks.sortOrder), asc(decks.slug), asc(words.sortOrder), asc(words.term));
 
   const fallbackEmoji = new Map(DEMO_DECKS.map((deck) => [deck.slug, deck.emoji]));
   const loadedDecks = new Map<string, VocabularyDeck>();
@@ -111,6 +113,7 @@ async function loadDecks(
         description: row.deckDescription,
         level: row.deckLevel,
         emoji: fallbackEmoji.get(row.deckSlug) ?? "🌱",
+        ownership: row.deckOwnerId ? "personal" : "system",
         words: [],
       });
     }

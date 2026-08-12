@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, BookOpenText, Brain, Clock3, Sparkles } from "lucide-react";
+import { ArrowRight, BookOpenText, Brain, Clock3, FileUp, Sparkles } from "lucide-react";
 
 import { DataSourceNotice } from "@/components/data-source-notice";
 import { VocabularyLibrary } from "@/components/vocabulary-library";
@@ -37,24 +37,32 @@ export default async function VocabularyPage() {
             Học theo chủ đề, nghe phát âm và ôn đúng lúc bằng phương pháp lặp lại ngắt quãng.
           </p>
         </div>
-        {dueDeck ? (
+        <div className="flex flex-col gap-3 sm:flex-row">
           <Link
-            href={`/vocabulary/practice?deck=${dueDeck.slug}`}
-            className={buttonVariants({ size: "lg", className: "w-full sm:w-auto" })}
+            href="/vocabulary/import"
+            className={buttonVariants({ variant: "secondary", size: "lg", className: "w-full sm:w-auto" })}
           >
-            Ôn {due} từ hôm nay <ArrowRight />
+            <FileUp /> Nhập từ vựng
           </Link>
-        ) : (
-          <span
-            className={buttonVariants({
-              variant: "secondary",
-              size: "lg",
-              className: "w-full cursor-default sm:w-auto",
-            })}
-          >
-            Chưa có từ đến hạn
-          </span>
-        )}
+          {dueDeck ? (
+            <Link
+              href={`/vocabulary/practice?deck=${dueDeck.slug}`}
+              className={buttonVariants({ size: "lg", className: "w-full sm:w-auto" })}
+            >
+              Ôn {due} từ hôm nay <ArrowRight />
+            </Link>
+          ) : (
+            <span
+              className={buttonVariants({
+                variant: "secondary",
+                size: "lg",
+                className: "w-full cursor-default sm:w-auto",
+              })}
+            >
+              Chưa có từ đến hạn
+            </span>
+          )}
+        </div>
       </header>
 
       <section aria-label="Tóm tắt tiến độ" className="grid border-b-2 border-[#eeeeee] sm:grid-cols-3">
