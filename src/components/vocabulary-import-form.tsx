@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { CheckCircle2, Download, FileUp, Loader2 } from "lucide-react";
 
@@ -40,6 +40,7 @@ export function VocabularyImportForm({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<Success | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   async function selectFile(selected: File | null) {
     setFile(selected);
@@ -77,6 +78,13 @@ export function VocabularyImportForm({
       const result = (await response.json()) as Success & { error?: { message?: string } };
       if (!response.ok) throw new Error(result.error?.message ?? "Không thể nhập từ vựng.");
       setSuccess(result);
+      setFile(null);
+      setPreview(null);
+      setFormat("csv");
+      setTitle("");
+      setDescription("");
+      setLevel("Tự chọn");
+      if (fileInputRef.current) fileInputRef.current.value = "";
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Không thể nhập từ vựng.");
     } finally {
@@ -115,6 +123,7 @@ export function VocabularyImportForm({
           </div>
         </div>
         <Input
+          ref={fileInputRef}
           type="file"
           accept=".csv,.json,text/csv,application/json"
           disabled={!available || submitting}
