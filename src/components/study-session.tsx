@@ -18,7 +18,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import type { VocabularyDeck, VocabularyWord } from "@/lib/demo-data";
-import { isDueForReview, summarizeSession, type Rating } from "@/lib/study";
+import {
+  compareReviewPriority,
+  isDueForReview,
+  summarizeSession,
+  type Rating,
+} from "@/lib/study";
 import { cn } from "@/lib/utils";
 
 const ratingMeta: Record<
@@ -67,13 +72,13 @@ function saveLocalRating(word: VocabularyWord, rating: Rating) {
 
 export function StudySession({ deck }: { deck: VocabularyDeck }) {
   const [queueCreatedAt] = useState(() => new Date());
-  const queue = useMemo(() => {
-    const due = deck.words.filter((item) => isDueForReview(item, queueCreatedAt));
-    return due.sort((a, b) => {
-      const priority = { learning: 0, new: 1, mastered: 2 };
-      return priority[a.status] - priority[b.status];
-    });
-  }, [deck.words, queueCreatedAt]);
+  const queue = useMemo(
+    () =>
+      deck.words
+        .filter((item) => isDueForReview(item, queueCreatedAt))
+        .sort(compareReviewPriority),
+    [deck.words, queueCreatedAt],
+  );
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [ratings, setRatings] = useState<Rating[]>([]);

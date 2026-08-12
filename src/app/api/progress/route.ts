@@ -4,7 +4,12 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { wordProgress, words } from "@/db/schema";
 import { getDemoUser, isUuid } from "@/lib/server-data";
-import { computeNextReview, type Rating } from "@/lib/study";
+import {
+  computeMastery,
+  computeNextReview,
+  computeWordStatus,
+  type Rating,
+} from "@/lib/study";
 
 export const runtime = "nodejs";
 
@@ -70,17 +75,28 @@ export async function POST(request: Request) {
         : rating === "hard"
           ? sql`greatest(1, ceil(${wordProgress.intervalDays} * 1.5)::integer)`
           : sql`case when ${wordProgress.intervalDays} = 0 then 1 when ${wordProgress.intervalDays} = 1 then 3 else ${wordProgress.intervalDays} * 2 end`;
-    const masteryDelta = rating === "again" ? -15 : rating === "hard" ? 6 : 16;
-    const masteryExpression = sql`greatest(0, least(100, ${wordProgress.mastery} + ${masteryDelta}))`;
-    const statusExpression = sql`case when ${masteryExpression} >= 80 then 'mastered' when ${masteryExpression} > 0 then 'learning' else 'new' end`;
+    const masteryExpression =
+      rating === "again"
+        ? sql`case
+            when ${wordProgress.mastery} >= 80 then ${wordProgress.mastery} - 10
+            when ${wordProgress.mastery} >= 60 then ${wordProgress.mastery} - 20
+            else greatest(0, ${wordProgress.mastery} - 30)
+          end`
+        : sql`least(100, ${wordProgress.mastery} + ${rating === "hard" ? 6 : 16})`;
+    const statusExpression = sql`case
+      when ${masteryExpression} >= 80 then 'mastered'
+      when ${wordProgress.status} = 'mastered' and ${masteryExpression} >= 60 then 'mastered'
+      when ${masteryExpression} > 0 then 'learning'
+      else 'new'
+    end`;
     const nextReviewExpression =
       rating === "again"
         ? sql`${now.toISOString()}::timestamptz + interval '10 minutes'`
         : sql`${now.toISOString()}::timestamptz + (${intervalExpression} * interval '1 day')`;
 
     const initialNext = computeNextReview({ intervalDays: 0 }, rating, now);
-    const initialMastery = Math.max(0, masteryDelta);
-    const initialStatus = initialMastery >= 80 ? "mastered" : initialMastery > 0 ? "learning" : "new";
+    const initialMastery = computeMastery(0, rating);
+    const initialStatus = computeWordStatus("new", initialMastery);
 
     const [saved] = await db
       .insert(wordProgress)
