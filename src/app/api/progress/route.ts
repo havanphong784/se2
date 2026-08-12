@@ -1,9 +1,15 @@
-import { and, eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 import { getDb } from "@/db";
-import { users, wordProgress } from "@/db/schema";
-import { computeNextReview, type Rating } from "@/lib/study";
+import { wordProgress, words } from "@/db/schema";
+import { getDemoUser, isUuid } from "@/lib/server-data";
+import {
+  computeMastery,
+  computeNextReview,
+  computeWordStatus,
+  type Rating,
+} from "@/lib/study";
 
 export const runtime = "nodejs";
 
@@ -17,9 +23,11 @@ const ratings: Rating[] = ["again", "hard", "good"];
 
 export async function POST(request: Request) {
   const body = (await request.json().catch(() => null)) as ProgressPayload | null;
+  const wordId = body?.wordId;
   if (
     !body ||
-    typeof body.wordId !== "string" ||
+    typeof wordId !== "string" ||
+    !isUuid(wordId) ||
     typeof body.rating !== "string" ||
     !ratings.includes(body.rating as Rating)
   ) {
@@ -32,81 +40,100 @@ export async function POST(request: Request) {
   const db = getDb();
   const now = new Date();
   const rating = body.rating as Rating;
-  const fallbackInterval =
-    typeof body.intervalDays === "number" ? Math.max(0, body.intervalDays) : 0;
+  const offlineInterval =
+    typeof body.intervalDays === "number" &&
+    Number.isFinite(body.intervalDays) &&
+    Number.isInteger(body.intervalDays) &&
+    body.intervalDays >= 0
+      ? body.intervalDays
+      : 0;
 
   if (!db) {
-    const next = computeNextReview({ intervalDays: fallbackInterval }, rating, now);
+    const next = computeNextReview({ intervalDays: offlineInterval }, rating, now);
     return NextResponse.json({ ...next, persisted: false });
   }
 
-  const email = process.env.DEMO_USER_EMAIL ?? "demo@vocabloom.vn";
-  const [user] = await db
-    .select({ id: users.id })
-    .from(users)
-    .where(eq(users.email, email))
-    .limit(1);
+  try {
+    const [user, word] = await Promise.all([
+      getDemoUser(db),
+      db.select({ id: words.id }).from(words).where(eq(words.id, wordId)).limit(1),
+    ]);
 
-  if (!user) {
-    return NextResponse.json(
-      { message: "Hãy chạy pnpm db:seed trước khi lưu tiến độ." },
-      { status: 503 },
-    );
-  }
+    if (!user) {
+      return NextResponse.json(
+        { message: "Hãy chạy pnpm db:seed trước khi lưu tiến độ." },
+        { status: 503 },
+      );
+    }
+    if (!word.length) {
+      return NextResponse.json({ message: "Không tìm thấy từ cần ôn." }, { status: 404 });
+    }
 
-  const [current] = await db
-    .select()
-    .from(wordProgress)
-    .where(
-      and(
-        eq(wordProgress.userId, user.id),
-        eq(wordProgress.wordId, body.wordId),
-      ),
-    )
-    .limit(1);
+    const intervalExpression =
+      rating === "again"
+        ? sql`0`
+        : rating === "hard"
+          ? sql`greatest(1, ceil(${wordProgress.intervalDays} * 1.5)::integer)`
+          : sql`case when ${wordProgress.intervalDays} = 0 then 1 when ${wordProgress.intervalDays} = 1 then 3 else ${wordProgress.intervalDays} * 2 end`;
+    const masteryExpression =
+      rating === "again"
+        ? sql`case
+            when ${wordProgress.mastery} >= 80 then ${wordProgress.mastery} - 10
+            when ${wordProgress.mastery} >= 60 then ${wordProgress.mastery} - 20
+            else greatest(0, ${wordProgress.mastery} - 30)
+          end`
+        : sql`least(100, ${wordProgress.mastery} + ${rating === "hard" ? 6 : 16})`;
+    const statusExpression = sql`case
+      when ${masteryExpression} >= 80 then 'mastered'
+      when ${wordProgress.status} = 'mastered' and ${masteryExpression} >= 60 then 'mastered'
+      when ${masteryExpression} > 0 then 'learning'
+      else 'new'
+    end`;
+    const nextReviewExpression =
+      rating === "again"
+        ? sql`${now.toISOString()}::timestamptz + interval '10 minutes'`
+        : sql`${now.toISOString()}::timestamptz + (${intervalExpression} * interval '1 day')`;
 
-  const next = computeNextReview(
-    { intervalDays: current?.intervalDays ?? fallbackInterval },
-    rating,
-    now,
-  );
-  const mastery = Math.max(
-    0,
-    Math.min(
-      100,
-      (current?.mastery ?? 0) + (rating === "again" ? -15 : rating === "hard" ? 6 : 16),
-    ),
-  );
-  const status = mastery >= 80 ? "mastered" : mastery > 0 ? "learning" : "new";
+    const initialNext = computeNextReview({ intervalDays: 0 }, rating, now);
+    const initialMastery = computeMastery(0, rating);
+    const initialStatus = computeWordStatus("new", initialMastery);
 
-  await db
-    .insert(wordProgress)
-    .values({
-      userId: user.id,
-      wordId: body.wordId,
-      status,
-      mastery,
-      intervalDays: next.intervalDays,
-      correctCount: rating === "again" ? 0 : 1,
-      incorrectCount: rating === "again" ? 1 : 0,
-      lastReviewedAt: now,
-      nextReviewAt: next.nextReviewAt,
-    })
-    .onConflictDoUpdate({
-      target: [wordProgress.userId, wordProgress.wordId],
-      set: {
-        status,
-        mastery,
-        intervalDays: next.intervalDays,
-        correctCount:
-          (current?.correctCount ?? 0) + (rating === "again" ? 0 : 1),
-        incorrectCount:
-          (current?.incorrectCount ?? 0) + (rating === "again" ? 1 : 0),
+    const [saved] = await db
+      .insert(wordProgress)
+      .values({
+        userId: user.id,
+        wordId,
+        status: initialStatus,
+        mastery: initialMastery,
+        intervalDays: initialNext.intervalDays,
+        correctCount: rating === "again" ? 0 : 1,
+        incorrectCount: rating === "again" ? 1 : 0,
         lastReviewedAt: now,
-        nextReviewAt: next.nextReviewAt,
-        updatedAt: now,
-      },
-    });
+        nextReviewAt: initialNext.nextReviewAt,
+      })
+      .onConflictDoUpdate({
+        target: [wordProgress.userId, wordProgress.wordId],
+        set: {
+          status: statusExpression,
+          mastery: masteryExpression,
+          intervalDays: intervalExpression,
+          correctCount: sql`${wordProgress.correctCount} + ${rating === "again" ? 0 : 1}`,
+          incorrectCount: sql`${wordProgress.incorrectCount} + ${rating === "again" ? 1 : 0}`,
+          lastReviewedAt: now,
+          nextReviewAt: nextReviewExpression,
+          updatedAt: now,
+        },
+      })
+      .returning({
+        intervalDays: wordProgress.intervalDays,
+        nextReviewAt: wordProgress.nextReviewAt,
+        mastery: wordProgress.mastery,
+        status: wordProgress.status,
+      });
 
-  return NextResponse.json({ ...next, mastery, status, persisted: true });
+    return NextResponse.json({ ...saved, persisted: true });
+  } catch (error) {
+    console.error("Unable to save word progress.", error);
+    return NextResponse.json({ message: "Không thể lưu tiến độ lúc này." }, { status: 503 });
+  }
 }

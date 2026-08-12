@@ -2,9 +2,14 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 const studyModule = "./study.ts";
-const { computeNextReview, summarizeSession } = (await import(
-  studyModule
-)) as typeof import("./study");
+const {
+  compareReviewPriority,
+  computeMastery,
+  computeNextReview,
+  computeWordStatus,
+  isDueForReview,
+  summarizeSession,
+} = (await import(studyModule)) as typeof import("./study");
 
 const now = new Date("2026-07-12T00:00:00.000Z");
 
@@ -25,6 +30,60 @@ test("computeNextReview schedules new and repeated cards", () => {
     intervalDays: 0,
     nextReviewAt: new Date("2026-07-12T00:10:00.000Z"),
   });
+});
+
+test("isDueForReview honors status and review date", () => {
+  assert.equal(isDueForReview({ status: "new", nextReviewAt: null }, now), true);
+  assert.equal(isDueForReview({ status: "learning", nextReviewAt: null }, now), true);
+  assert.equal(isDueForReview({ status: "mastered", nextReviewAt: null }, now), false);
+  assert.equal(
+    isDueForReview({ status: "learning", nextReviewAt: "2026-07-11T23:59:00.000Z" }, now),
+    true,
+  );
+  assert.equal(
+    isDueForReview({ status: "mastered", nextReviewAt: "2026-07-11T23:59:00.000Z" }, now),
+    true,
+  );
+  assert.equal(
+    isDueForReview({ status: "mastered", nextReviewAt: "2026-07-13T00:00:00.000Z" }, now),
+    false,
+  );
+  assert.equal(
+    isDueForReview({ status: "learning", nextReviewAt: "not-a-date" }, now),
+    false,
+  );
+});
+
+test("compareReviewPriority sorts status first and oldest due date within a status", () => {
+  const cards = [
+    { id: "mastered", status: "mastered" as const, nextReviewAt: "2026-07-01T00:00:00.000Z" },
+    { id: "learning-newer", status: "learning" as const, nextReviewAt: "2026-07-11T00:00:00.000Z" },
+    { id: "new", status: "new" as const, nextReviewAt: null },
+    { id: "learning-older", status: "learning" as const, nextReviewAt: "2026-07-09T00:00:00.000Z" },
+  ];
+
+  assert.deepEqual(
+    cards.sort(compareReviewPriority).map((card) => card.id),
+    ["learning-older", "learning-newer", "new", "mastered"],
+  );
+});
+
+test("computeMastery scales the again penalty", () => {
+  assert.equal(computeMastery(100, "again"), 90);
+  assert.equal(computeMastery(82, "again"), 72);
+  assert.equal(computeMastery(79, "again"), 59);
+  assert.equal(computeMastery(50, "again"), 20);
+  assert.equal(computeMastery(16, "again"), 0);
+  assert.equal(computeMastery(50, "hard"), 56);
+  assert.equal(computeMastery(90, "good"), 100);
+});
+
+test("computeWordStatus gives mastered cards hysteresis after one miss", () => {
+  assert.equal(computeWordStatus("mastered", 72), "mastered");
+  assert.equal(computeWordStatus("mastered", 59), "learning");
+  assert.equal(computeWordStatus("learning", 72), "learning");
+  assert.equal(computeWordStatus("learning", 80), "mastered");
+  assert.equal(computeWordStatus("new", 0), "new");
 });
 
 test("summarizeSession reports rating counts and completion", () => {

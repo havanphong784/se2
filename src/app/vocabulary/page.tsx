@@ -6,15 +6,19 @@ import { VocabularyLibrary } from "@/components/vocabulary-library";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { getDecks } from "@/lib/data";
+import { isDueForReview } from "@/lib/study";
 
 export const metadata: Metadata = { title: "Học từ vựng" };
 
 export default async function VocabularyPage() {
   const decks = await getDecks();
   const words = decks.flatMap((deck) => deck.words);
-  const due = words.filter((word) => word.status === "learning").length;
+  const now = new Date();
+  const due = words.filter((word) => isDueForReview(word, now)).length;
   const mastered = words.filter((word) => word.status === "mastered").length;
-  const firstDeck = decks[0];
+  const dueDeck = decks.find((deck) =>
+    deck.words.some((word) => isDueForReview(word, now)),
+  );
 
   return (
     <div className="mx-auto w-full max-w-[1200px] px-5 py-8 md:px-8 lg:py-10">
@@ -30,13 +34,23 @@ export default async function VocabularyPage() {
             Học theo chủ đề, nghe phát âm và ôn đúng lúc bằng phương pháp lặp lại ngắt quãng.
           </p>
         </div>
-        {firstDeck && (
+        {dueDeck ? (
           <Link
-            href={`/vocabulary/practice?deck=${firstDeck.slug}`}
+            href={`/vocabulary/practice?deck=${dueDeck.slug}`}
             className={buttonVariants({ size: "lg", className: "w-full sm:w-auto" })}
           >
-            Ôn {due || 6} từ hôm nay <ArrowRight />
+            Ôn {due} từ hôm nay <ArrowRight />
           </Link>
+        ) : (
+          <span
+            className={buttonVariants({
+              variant: "secondary",
+              size: "lg",
+              className: "w-full cursor-default sm:w-auto",
+            })}
+          >
+            Chưa có từ đến hạn
+          </span>
         )}
       </header>
 

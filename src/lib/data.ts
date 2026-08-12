@@ -1,13 +1,7 @@
 import { and, asc, eq, gte } from "drizzle-orm";
 
 import { getDb } from "@/db";
-import {
-  dailyActivity,
-  decks,
-  users,
-  wordProgress,
-  words,
-} from "@/db/schema";
+import { dailyActivity, decks, wordProgress, words } from "@/db/schema";
 import {
   DEMO_ACTIVITY,
   DEMO_DECKS,
@@ -15,11 +9,31 @@ import {
   type VocabularyDeck,
   type VocabularyWord,
 } from "@/lib/demo-data";
-
-const demoEmail = process.env.DEMO_USER_EMAIL ?? "demo@vocabloom.vn";
+import { getDemoUser } from "@/lib/server-data";
 
 function fallbackDecks() {
   return structuredClone(DEMO_DECKS);
+}
+
+function recentUtcDates() {
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+  return Array.from({ length: 7 }, (_, index) => {
+    const date = new Date(today);
+    date.setUTCDate(today.getUTCDate() - (6 - index));
+    return date;
+  });
+}
+
+function emptyRecentActivity(): ActivityItem[] {
+  const weekdays = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
+  return recentUtcDates().map((date) => ({
+    day: weekdays[date.getUTCDay()],
+    fullDate: `${String(date.getUTCDate()).padStart(2, "0")}/${String(date.getUTCMonth() + 1).padStart(2, "0")}`,
+    reviewed: 0,
+    learned: 0,
+    xp: 0,
+  }));
 }
 
 export async function getDecks(): Promise<VocabularyDeck[]> {
@@ -27,11 +41,7 @@ export async function getDecks(): Promise<VocabularyDeck[]> {
   if (!db) return fallbackDecks();
 
   try {
-    const [user] = await db
-      .select({ id: users.id })
-      .from(users)
-      .where(eq(users.email, demoEmail))
-      .limit(1);
+    const user = await getDemoUser(db);
 
     const rows = await db
       .select({
@@ -50,6 +60,7 @@ export async function getDecks(): Promise<VocabularyDeck[]> {
         status: wordProgress.status,
         mastery: wordProgress.mastery,
         intervalDays: wordProgress.intervalDays,
+        nextReviewAt: wordProgress.nextReviewAt,
       })
       .from(decks)
       .innerJoin(words, eq(words.deckId, decks.id))
@@ -91,14 +102,15 @@ export async function getDecks(): Promise<VocabularyDeck[]> {
         status: (row.status as VocabularyWord["status"] | null) ?? "new",
         mastery: row.mastery ?? 0,
         intervalDays: row.intervalDays ?? 0,
+        nextReviewAt: row.nextReviewAt?.toISOString() ?? null,
       };
       result.get(row.deckId)?.words.push(item);
     }
 
-    return result.size ? [...result.values()] : fallbackDecks();
+    return [...result.values()];
   } catch (error) {
-    console.warn("Database unavailable, using VocaBloom demo content.", error);
-    return fallbackDecks();
+    console.error("Unable to load decks from the configured database.", error);
+    throw new Error("Không thể tải dữ liệu từ cơ sở dữ liệu.", { cause: error });
   }
 }
 
@@ -111,16 +123,11 @@ export async function getActivity(): Promise<ActivityItem[]> {
   if (!db) return structuredClone(DEMO_ACTIVITY);
 
   try {
-    const [user] = await db
-      .select({ id: users.id })
-      .from(users)
-      .where(eq(users.email, demoEmail))
-      .limit(1);
-    if (!user) return structuredClone(DEMO_ACTIVITY);
+    const user = await getDemoUser(db);
+    if (!user) return emptyRecentActivity();
 
-    const start = new Date();
-    start.setDate(start.getDate() - 6);
-    const startKey = start.toISOString().slice(0, 10);
+    const dates = recentUtcDates();
+    const startKey = dates[0].toISOString().slice(0, 10);
     const rows = await db
       .select()
       .from(dailyActivity)
@@ -132,20 +139,21 @@ export async function getActivity(): Promise<ActivityItem[]> {
       )
       .orderBy(asc(dailyActivity.activityDate));
 
-    if (!rows.length) return structuredClone(DEMO_ACTIVITY);
+    const byDate = new Map(rows.map((row) => [row.activityDate, row]));
     const weekdays = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
-    return rows.map((row) => {
-      const date = new Date(`${row.activityDate}T00:00:00`);
+    return dates.map((date) => {
+      const key = date.toISOString().slice(0, 10);
+      const row = byDate.get(key);
       return {
-        day: weekdays[date.getDay()],
-        fullDate: `${String(date.getDate()).padStart(2, "0")}/${String(date.getMonth() + 1).padStart(2, "0")}`,
-        reviewed: row.reviewedCount,
-        learned: row.learnedCount,
-        xp: row.xpEarned,
+        day: weekdays[date.getUTCDay()],
+        fullDate: `${String(date.getUTCDate()).padStart(2, "0")}/${String(date.getUTCMonth() + 1).padStart(2, "0")}`,
+        reviewed: row?.reviewedCount ?? 0,
+        learned: row?.learnedCount ?? 0,
+        xp: row?.xpEarned ?? 0,
       };
     });
   } catch (error) {
-    console.warn("Activity query failed, using demo activity.", error);
-    return structuredClone(DEMO_ACTIVITY);
+    console.error("Unable to load activity from the configured database.", error);
+    throw new Error("Không thể tải hoạt động từ cơ sở dữ liệu.", { cause: error });
   }
 }

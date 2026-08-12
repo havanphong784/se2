@@ -18,6 +18,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { getActivity, getDecks } from "@/lib/data";
+import { isDueForReview } from "@/lib/study";
 import { cn } from "@/lib/utils";
 
 export default async function DashboardPage() {
@@ -29,21 +30,32 @@ export default async function DashboardPage() {
   const dailyGoal = 10;
   const reviewedToday = today?.reviewed ?? 0;
   const goalPercent = Math.min(100, Math.round((reviewedToday / dailyGoal) * 100));
-  const currentDeck = decks.find((deck) => deck.slug === "giao-tiep-hang-ngay") ?? decks[0];
+  const now = new Date();
+  const dueWords = allWords.filter((word) => isDueForReview(word, now));
+  const currentDeck = decks.find((deck) =>
+    deck.words.some((word) => isDueForReview(word, now)),
+  );
+  const activeDays = activity.filter((item) => item.reviewed > 0).length;
+  const dateLabel = new Intl.DateTimeFormat("vi-VN", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    timeZone: "UTC",
+  }).format(new Date());
 
   return (
     <div className="mx-auto w-full max-w-[1200px] px-5 py-8 md:px-8 lg:py-10">
       <header className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <Badge variant="blue" className="mb-3">
-            <CalendarDays className="size-4" /> Chủ nhật, 12 tháng 7
+            <CalendarDays className="size-4" /> {dateLabel}
           </Badge>
           <h1 className="font-display text-balance text-[36px] font-extrabold leading-[1.08] text-eel-dark-blue md:text-[44px]">
             Chào Minh Anh, mình nở thêm vài từ nhé!
           </h1>
         </div>
         <div className="flex items-center gap-2 text-sm font-extrabold text-ash">
-          <Flame className="size-5 fill-[#ffb020] text-[#ffb020]" /> Chuỗi học 12 ngày
+          <Flame className="size-5 fill-[#ffb020] text-[#ffb020]" /> Đã học {activeDays}/7 ngày gần đây
         </div>
       </header>
 
@@ -57,18 +69,26 @@ export default async function DashboardPage() {
               id="daily-mission"
               className="font-display text-balance text-[32px] font-extrabold leading-[1.1] text-[#438f0e] md:text-[40px]"
             >
-              Ôn 6 từ đang chờ bạn
+              {dueWords.length > 0
+                ? `Ôn ${dueWords.length} từ đang chờ bạn`
+                : "Bạn đã ôn xong hôm nay"}
             </h2>
             <p className="mt-3 max-w-lg text-pretty font-bold leading-7 text-charcoal">
               Một phiên ngắn khoảng 5 phút. VocaBloom sẽ ưu tiên những từ bạn sắp quên.
             </p>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
-              <Link
-                href={`/vocabulary/practice?deck=${currentDeck.slug}`}
-                className={buttonVariants({ size: "lg" })}
-              >
-                Bắt đầu ôn <ArrowRight />
-              </Link>
+              {currentDeck ? (
+                <Link
+                  href={`/vocabulary/practice?deck=${currentDeck.slug}`}
+                  className={buttonVariants({ size: "lg" })}
+                >
+                  Bắt đầu ôn <ArrowRight />
+                </Link>
+              ) : (
+                <Link href="/vocabulary" className={buttonVariants({ size: "lg" })}>
+                  Khám phá bộ từ <ArrowRight />
+                </Link>
+              )}
               <span className="inline-flex items-center gap-2 text-sm font-extrabold text-ash">
                 <Clock3 className="size-4" /> Khoảng 5 phút
               </span>

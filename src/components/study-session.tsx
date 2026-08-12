@@ -18,7 +18,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import type { VocabularyDeck, VocabularyWord } from "@/lib/demo-data";
-import { summarizeSession, type Rating } from "@/lib/study";
+import {
+  compareReviewPriority,
+  isDueForReview,
+  summarizeSession,
+  type Rating,
+} from "@/lib/study";
 import { cn } from "@/lib/utils";
 
 const ratingMeta: Record<
@@ -66,13 +71,13 @@ function saveLocalRating(word: VocabularyWord, rating: Rating) {
 }
 
 export function StudySession({ deck }: { deck: VocabularyDeck }) {
+  const [queueCreatedAt] = useState(() => new Date());
   const queue = useMemo(
     () =>
-      [...deck.words].sort((a, b) => {
-        const priority = { learning: 0, new: 1, mastered: 2 };
-        return priority[a.status] - priority[b.status];
-      }),
-    [deck.words],
+      deck.words
+        .filter((item) => isDueForReview(item, queueCreatedAt))
+        .sort(compareReviewPriority),
+    [deck.words, queueCreatedAt],
   );
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
@@ -81,27 +86,41 @@ export function StudySession({ deck }: { deck: VocabularyDeck }) {
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [startedAt, setStartedAt] = useState(() => Date.now());
+  const [sessionId, setSessionId] = useState(() => crypto.randomUUID());
   const cardRef = useRef<HTMLButtonElement>(null);
+  const learnedCountRef = useRef(0);
+  const syncFailedRef = useRef(false);
   const word = queue[index];
   const progress = finished ? 100 : Math.round((index / queue.length) * 100);
 
   async function finishSession(nextRatings: Rating[]) {
     const summary = summarizeSession(nextRatings, queue.length);
     const durationSeconds = Math.max(1, Math.round((Date.now() - startedAt) / 1_000));
+
+    if (syncFailedRef.current) {
+      setSaveError(
+        "Phiên học đã hoàn tất nhưng có tiến độ chưa đồng bộ. Kết quả phiên chưa được cộng vào máy chủ.",
+      );
+      setFinished(true);
+      setSaving(false);
+      return;
+    }
+
     try {
       const response = await fetch("/api/sessions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          sessionId,
           deckId: deck.id,
           reviewedCount: summary.reviewed,
-          learnedCount: queue.filter((item) => item.status === "new").length,
+          learnedCount: learnedCountRef.current,
           correctCount: summary.hard + summary.good,
           durationSeconds,
-          xpEarned: summary.good * 10 + summary.hard * 6 + summary.again * 2,
         }),
       });
-      if (!response.ok) throw new Error("Không thể lưu phiên học");
+      const result = (await response.json()) as { persisted?: boolean };
+      if (!response.ok || result.persisted !== true) throw new Error("Không thể lưu phiên học");
     } catch {
       setSaveError("Phiên học đã hoàn tất nhưng chưa đồng bộ được lên máy chủ.");
     } finally {
@@ -127,9 +146,12 @@ export function StudySession({ deck }: { deck: VocabularyDeck }) {
           intervalDays: word.intervalDays,
         }),
       });
-      if (!response.ok) throw new Error("Không thể lưu tiến độ");
+      const result = (await response.json()) as { persisted?: boolean; status?: string };
+      if (!response.ok || result.persisted !== true) throw new Error("Không thể lưu tiến độ");
+      if (word.status === "new" && result.status !== "new") learnedCountRef.current += 1;
       setSaveError(null);
     } catch {
+      syncFailedRef.current = true;
       setSaveError("Chưa đồng bộ được tiến độ. Kết quả vẫn được lưu trên thiết bị này.");
     }
 
@@ -151,6 +173,9 @@ export function StudySession({ deck }: { deck: VocabularyDeck }) {
     setSaving(false);
     setSaveError(null);
     setStartedAt(Date.now());
+    setSessionId(crypto.randomUUID());
+    learnedCountRef.current = 0;
+    syncFailedRef.current = false;
   }
 
   useEffect(() => {
