@@ -9,7 +9,7 @@ interface IpaSoundCardProps {
   isSelected: boolean;
   onSelect: (sound: IpaSound) => void;
   onPlayAudio: (sound: IpaSound, e: React.MouseEvent) => void;
-  cardRef?: (el: HTMLButtonElement | null) => void;
+  cardRef?: (el: HTMLDivElement | null) => void;
 }
 
 export function IpaSoundCard({
@@ -20,12 +20,19 @@ export function IpaSoundCard({
   cardRef,
 }: IpaSoundCardProps) {
   return (
-    <button
+    <div
       ref={cardRef}
-      type="button"
+      role="button"
+      tabIndex={0}
       onClick={() => onSelect(sound)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onSelect(sound);
+        }
+      }}
       className={cn(
-        "group relative flex w-full items-center justify-between rounded-xl border-2 p-3.5 text-left transition-all duration-150 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-lingot-lime/40 active:translate-y-0.5",
+        "group relative flex w-full cursor-pointer items-center justify-between rounded-xl border-2 p-3.5 text-left transition-all duration-150 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-lingot-lime/40 active:translate-y-0.5",
         isSelected
           ? "border-[#438f0e] bg-[#f7fff1] shadow-sm"
           : "border-[#e5e5e5] bg-white hover:border-[#d0d0d0] hover:bg-[#fafafa]",
@@ -69,6 +76,6 @@ export function IpaSoundCard({
       >
         <Volume2 className="size-4" />
       </button>
-    </button>
+    </div>
   );
 }

@@ -15,7 +15,7 @@ export function IpaPracticeSession() {
   const [autoPlay, setAutoPlay] = useState<boolean>(true);
 
   // Map lưu ref của từng card để thực hiện scrollIntoView
-  const cardRefs = useRef<Map<string, HTMLButtonElement | null>>(new Map());
+  const cardRefs = useRef<Map<string, HTMLDivElement | null>>(new Map());
 
   const handleSelectSound = (sound: IpaSound) => {
     setSelectedSound(sound);
