@@ -50,7 +50,7 @@ export default async function DeckPage({ params }: DeckPageProps) {
             <p className="mt-3 max-w-2xl text-pretty font-bold leading-7 text-ash">{deck.description}</p>
           </div>
           <Link
-            href={`/vocabulary/practice?deck=${deck.slug}`}
+            href={`/vocabulary/practice?mode=learn&deck=${deck.slug}`}
             className={buttonVariants({ size: "lg", className: "w-full md:w-auto" })}
           >
             Học ngay <ArrowRight />

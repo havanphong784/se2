@@ -19,24 +19,23 @@ import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { getLearningData } from "@/lib/data";
-import { createStudyQueue, isDueForReview } from "@/lib/study";
+import { isDueForReview } from "@/lib/study";
 import { cn } from "@/lib/utils";
 
 export default async function DashboardPage() {
   const learning = await getLearningData();
   const { decks, activity } = learning.data;
   const allWords = decks.flatMap((deck) => deck.words);
-  const mastered = allWords.filter((word) => word.status === "mastered").length;
-  const learningCount = allWords.filter((word) => word.status === "learning").length;
+  const mastered = allWords.filter((word) => word.reviewCompletedAt).length;
+  const learningCount = allWords.filter(
+    (word) => word.learnedAt && !word.reviewCompletedAt,
+  ).length;
   const today = activity.at(-1);
   const dailyGoal = 10;
   const reviewedToday = today?.reviewed ?? 0;
   const goalPercent = Math.min(100, Math.round((reviewedToday / dailyGoal) * 100));
   const now = new Date();
-  const currentDeck = decks.find((deck) =>
-    deck.words.some((word) => isDueForReview(word, now)),
-  );
-  const dueWords = currentDeck ? createStudyQueue(currentDeck.words, now) : [];
+  const dueWords = allWords.filter((word) => isDueForReview(word, now));
   const activeDays = activity.filter((item) => item.reviewed > 0).length;
   const dateLabel = new Intl.DateTimeFormat("vi-VN", {
     weekday: "long",
@@ -80,9 +79,9 @@ export default async function DashboardPage() {
               Một phiên ngắn khoảng 5 phút. VocaBloom sẽ ưu tiên những từ bạn sắp quên.
             </p>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
-              {currentDeck ? (
+              {dueWords.length > 0 ? (
                 <Link
-                  href={`/vocabulary/practice?deck=${currentDeck.slug}`}
+                  href="/vocabulary/practice?mode=review"
                   className={buttonVariants({ size: "lg" })}
                 >
                   Bắt đầu ôn <ArrowRight />

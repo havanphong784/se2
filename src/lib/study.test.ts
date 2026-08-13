@@ -1,154 +1,221 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-const studyModule = "./study.ts";
-const {
+import {
+  addDays,
   compareReviewPriority,
-  createStudyQueue,
-  computeMastery,
-  computeNextReview,
-  computeWordStatus,
+  createMultipleChoiceOptions,
+  evaluateStudyAnswer,
+  getStudyShortcutAction,
   isDueForReview,
+  isTypingAnswerCorrect,
+  moveFirstToEnd,
+  normalizeAnswer,
+  scheduleCorrectReview,
+  scheduleIncorrectReview,
+  scheduleLearnedWord,
+  selectDueWords,
+  selectNewWords,
   summarizeSession,
-} = (await import(studyModule)) as typeof import("./study");
+  type StudyWord,
+} from "./study";
 
 const now = new Date("2026-07-12T00:00:00.000Z");
+const word = (overrides: Partial<StudyWord> = {}): StudyWord => ({
+  id: "word-1",
+  term: "hello",
+  translation: "xin chào",
+  learnedAt: null,
+  reviewStage: 0,
+  lastReviewedAt: null,
+  nextReviewAt: null,
+  reviewCompletedAt: null,
+  ...overrides,
+});
 
-test("computeNextReview schedules new and repeated cards", () => {
-  assert.deepEqual(computeNextReview({ intervalDays: 0 }, "good", now), {
-    intervalDays: 1,
-    nextReviewAt: new Date("2026-07-13T00:00:00.000Z"),
+test("selectNewWords limits new words to requested session size", () => {
+  const words = Array.from({ length: 25 }, (_, index) =>
+    word({ id: String(index), learnedAt: index === 0 ? now.toISOString() : null }),
+  );
+  assert.equal(selectNewWords(words, 10).length, 10);
+  assert.equal(selectNewWords(words, 20).length, 20);
+  assert.equal(selectNewWords(words.slice(0, 6), 10).length, 5);
+});
+
+test("due selection prioritizes oldest due then never reviewed", () => {
+  const words = [
+    word({ id: "future", learnedAt: now.toISOString(), nextReviewAt: addDays(now, 1).toISOString() }),
+    word({ id: "new", nextReviewAt: addDays(now, -10).toISOString() }),
+    word({ id: "reviewed", learnedAt: now.toISOString(), nextReviewAt: addDays(now, -2).toISOString(), lastReviewedAt: addDays(now, -5).toISOString() }),
+    word({ id: "never", learnedAt: now.toISOString(), nextReviewAt: addDays(now, -2).toISOString() }),
+    word({ id: "oldest", learnedAt: now.toISOString(), nextReviewAt: addDays(now, -3).toISOString() }),
+    word({ id: "done", learnedAt: now.toISOString(), nextReviewAt: addDays(now, -9).toISOString(), reviewCompletedAt: now.toISOString() }),
+  ];
+
+  assert.deepEqual(selectDueWords(words, 10, now).map((item) => item.id), [
+    "oldest",
+    "never",
+    "reviewed",
+  ]);
+  assert.equal(isDueForReview(words[0], now), false);
+  assert.ok(compareReviewPriority(words[3], words[2]) < 0);
+});
+
+test("incorrect queue item moves to end without duplication", () => {
+  assert.deepEqual(moveFirstToEnd(["a", "b", "c"]), ["b", "c", "a"]);
+  assert.deepEqual(moveFirstToEnd(["a"]), ["a"]);
+  assert.deepEqual(moveFirstToEnd<string>([]), []);
+});
+
+test("typing normalization accepts formatting differences only", () => {
+  assert.equal(normalizeAnswer("  THANK   YOU  "), "thank you");
+  assert.equal(normalizeAnswer("can’t—wait"), "can't-wait");
+  assert.equal(isTypingAnswerCorrect("Thank you", " thank   YOU "), true);
+  assert.equal(isTypingAnswerCorrect("form", "from"), false);
+  assert.equal(isTypingAnswerCorrect("hello", ""), false);
+});
+
+test("study answers return authoritative correctness and expected answer", () => {
+  assert.deepEqual(
+    evaluateStudyAnswer({
+      phase: "flashcard",
+      wordId: "word-1",
+      term: "hello",
+      translation: "xin chào",
+    }),
+    { isCorrect: true, expectedAnswer: "xin chào" },
+  );
+  assert.deepEqual(
+    evaluateStudyAnswer({
+      phase: "multiple_choice",
+      wordId: "word-1",
+      term: "hello",
+      translation: "xin chào",
+      selectedWordId: "word-2",
+    }),
+    { isCorrect: false, expectedAnswer: "xin chào" },
+  );
+  assert.deepEqual(
+    evaluateStudyAnswer({
+      phase: "typing",
+      wordId: "word-1",
+      term: "Thank you",
+      translation: "cảm ơn",
+      answer: " thank   YOU ",
+    }),
+    { isCorrect: true, expectedAnswer: "Thank you" },
+  );
+});
+
+test("study shortcuts respect phase, feedback, and option boundaries", () => {
+  const shortcut = (
+    key: string,
+    overrides: Partial<Parameters<typeof getStudyShortcutAction>[0]> = {},
+  ) =>
+    getStudyShortcutAction({
+      key,
+      phase: "flashcard",
+      hasFeedback: false,
+      flashcardIndex: 1,
+      optionCount: 4,
+      canSpeak: true,
+      ...overrides,
+    });
+
+  assert.deepEqual(shortcut("ArrowLeft"), { type: "previous-flashcard" });
+  assert.equal(shortcut("ArrowLeft", { flashcardIndex: 0 }), null);
+  assert.deepEqual(shortcut("ArrowRight"), { type: "next-flashcard" });
+  assert.deepEqual(shortcut("1", { phase: "multiple_choice" }), {
+    type: "choose-option",
+    optionIndex: 0,
   });
-  assert.deepEqual(computeNextReview({ intervalDays: 1 }, "good", now), {
+  assert.deepEqual(shortcut("D", { phase: "multiple_choice" }), {
+    type: "choose-option",
+    optionIndex: 3,
+  });
+  assert.equal(shortcut("4", { phase: "multiple_choice", optionCount: 3 }), null);
+  assert.deepEqual(shortcut("Enter", { phase: "typing", hasFeedback: true }), {
+    type: "continue-feedback",
+  });
+  assert.equal(shortcut("Enter", { phase: "typing" }), null);
+  assert.equal(shortcut("P", { phase: "typing" }), null);
+  assert.deepEqual(shortcut("p", { phase: "typing", hasFeedback: true }), {
+    type: "speak",
+  });
+  assert.deepEqual(shortcut("m"), { type: "toggle-auto-speak" });
+  assert.equal(shortcut("m", { canSpeak: false }), null);
+  assert.equal(shortcut("2", { phase: "multiple_choice", hasFeedback: true }), null);
+});
+
+test("multiple choice options are stable, distinct, and session-scoped", () => {
+  const target = word({ id: "a", translation: "quả táo" });
+  const words = [
+    target,
+    word({ id: "b", translation: "nước" }),
+    word({ id: "c", translation: "cơm" }),
+    word({ id: "d", translation: "bánh mì" }),
+    word({ id: "e", translation: " NƯỚC " }),
+  ];
+  const first = createMultipleChoiceOptions(target, words, "session:a");
+  const second = createMultipleChoiceOptions(target, words, "session:a");
+  assert.deepEqual(first, second);
+  assert.equal(first.length, 4);
+  assert.equal(first.filter((item) => item.id === target.id).length, 1);
+  assert.equal(new Set(first.map((item) => normalizeAnswer(item.translation))).size, 4);
+});
+
+test("review schedule advances through 3, 7, and 30 day cycle", () => {
+  assert.deepEqual(scheduleLearnedWord(now), {
+    reviewStage: 0,
     intervalDays: 3,
-    nextReviewAt: new Date("2026-07-15T00:00:00.000Z"),
+    nextReviewAt: addDays(now, 3),
+    reviewCompletedAt: null,
+    status: "learning",
   });
-  assert.deepEqual(computeNextReview({ intervalDays: 2 }, "hard", now), {
-    intervalDays: 3,
-    nextReviewAt: new Date("2026-07-15T00:00:00.000Z"),
+  assert.deepEqual(scheduleCorrectReview(0, false, now), {
+    reviewStage: 1,
+    intervalDays: 7,
+    nextReviewAt: addDays(now, 7),
+    reviewCompletedAt: null,
+    status: "learning",
   });
-  assert.deepEqual(computeNextReview({ intervalDays: 14 }, "again", now), {
+  assert.deepEqual(scheduleCorrectReview(1, false, now), {
+    reviewStage: 2,
+    intervalDays: 30,
+    nextReviewAt: addDays(now, 30),
+    reviewCompletedAt: null,
+    status: "learning",
+  });
+  assert.deepEqual(scheduleCorrectReview(2, false, now), {
+    reviewStage: 3,
     intervalDays: 0,
-    nextReviewAt: new Date("2026-07-12T00:10:00.000Z"),
+    nextReviewAt: null,
+    reviewCompletedAt: now,
+    status: "mastered",
   });
 });
 
-test("isDueForReview honors status and review date", () => {
-  assert.equal(isDueForReview({ status: "new", nextReviewAt: null }, now), true);
-  assert.equal(isDueForReview({ status: "learning", nextReviewAt: null }, now), true);
-  assert.equal(isDueForReview({ status: "mastered", nextReviewAt: null }, now), false);
-  assert.equal(
-    isDueForReview({ status: "learning", nextReviewAt: "2026-07-11T23:59:00.000Z" }, now),
-    true,
-  );
-  assert.equal(
-    isDueForReview({ status: "mastered", nextReviewAt: "2026-07-11T23:59:00.000Z" }, now),
-    true,
-  );
-  assert.equal(
-    isDueForReview({ status: "mastered", nextReviewAt: "2026-07-13T00:00:00.000Z" }, now),
-    false,
-  );
-  assert.equal(
-    isDueForReview({ status: "learning", nextReviewAt: "not-a-date" }, now),
-    false,
-  );
+test("incorrect review is due tomorrow and relearning restarts at three days", () => {
+  assert.deepEqual(scheduleIncorrectReview(now), {
+    reviewStage: 0,
+    intervalDays: 1,
+    nextReviewAt: addDays(now, 1),
+    reviewCompletedAt: null,
+    status: "learning",
+  });
+  assert.deepEqual(scheduleCorrectReview(2, true, now), scheduleLearnedWord(now));
 });
 
-test("compareReviewPriority sorts status first and oldest due date within a status", () => {
-  const cards = [
-    { id: "mastered", status: "mastered" as const, nextReviewAt: "2026-07-01T00:00:00.000Z" },
-    { id: "learning-newer", status: "learning" as const, nextReviewAt: "2026-07-11T00:00:00.000Z" },
-    { id: "new", status: "new" as const, nextReviewAt: null },
-    { id: "learning-older", status: "learning" as const, nextReviewAt: "2026-07-09T00:00:00.000Z" },
-  ];
-
+test("session summary counts unique words separately from attempts", () => {
   assert.deepEqual(
-    cards.sort(compareReviewPriority).map((card) => card.id),
-    ["learning-older", "learning-newer", "new", "mastered"],
-  );
-});
-
-test("createStudyQueue prioritizes reviews and limits new cards", () => {
-  const cards = [
-    ...Array.from({ length: 18 }, (_, index) => ({
-      id: `review-${index}`,
-      status: "learning" as const,
-      nextReviewAt: new Date(now.getTime() - index * 60_000).toISOString(),
-    })),
-    ...Array.from({ length: 10 }, (_, index) => ({
-      id: `new-${index}`,
-      status: "new" as const,
-      nextReviewAt: null,
-    })),
+    summarizeSession({ selectedCount: 10, completedCount: 8, attemptCount: 15, incorrectCount: 5 }),
     {
-      id: "future",
-      status: "mastered" as const,
-      nextReviewAt: "2026-07-13T00:00:00.000Z",
+      selectedCount: 10,
+      completedCount: 8,
+      remainingCount: 2,
+      attemptCount: 15,
+      incorrectCount: 5,
+      accuracy: 67,
     },
-  ];
-
-  const queue = createStudyQueue(cards, now);
-  assert.equal(queue.length, 20);
-  assert.equal(queue.filter((card) => card.status === "new").length, 2);
-  assert.equal(queue[0].id, "review-17");
-  assert.equal(queue.some((card) => card.id === "future"), false);
-});
-
-test("createStudyQueue admits at most five new cards when review load is low", () => {
-  const cards = [
-    {
-      id: "review",
-      status: "learning" as const,
-      nextReviewAt: "2026-07-11T00:00:00.000Z",
-    },
-    ...Array.from({ length: 9 }, (_, index) => ({
-      id: `new-${index}`,
-      status: "new" as const,
-      nextReviewAt: null,
-    })),
-  ];
-
-  const queue = createStudyQueue(cards, now);
-  assert.deepEqual(
-    queue.map((card) => card.id),
-    ["review", "new-0", "new-1", "new-2", "new-3", "new-4"],
   );
-});
-
-test("computeMastery scales the again penalty", () => {
-  assert.equal(computeMastery(100, "again"), 90);
-  assert.equal(computeMastery(82, "again"), 72);
-  assert.equal(computeMastery(79, "again"), 59);
-  assert.equal(computeMastery(50, "again"), 20);
-  assert.equal(computeMastery(16, "again"), 0);
-  assert.equal(computeMastery(50, "hard"), 56);
-  assert.equal(computeMastery(90, "good"), 100);
-});
-
-test("computeWordStatus gives mastered cards hysteresis after one miss", () => {
-  assert.equal(computeWordStatus("mastered", 72), "mastered");
-  assert.equal(computeWordStatus("mastered", 59), "learning");
-  assert.equal(computeWordStatus("learning", 72), "learning");
-  assert.equal(computeWordStatus("learning", 80), "mastered");
-  assert.equal(computeWordStatus("new", 0), "new");
-});
-
-test("summarizeSession reports rating counts and completion", () => {
-  assert.deepEqual(summarizeSession(["good", "again", "hard", "good"], 6), {
-    reviewed: 4,
-    remaining: 2,
-    again: 1,
-    hard: 1,
-    good: 2,
-    accuracy: 75,
-  });
-  assert.deepEqual(summarizeSession([], 5), {
-    reviewed: 0,
-    remaining: 5,
-    again: 0,
-    hard: 0,
-    good: 0,
-    accuracy: 0,
-  });
 });

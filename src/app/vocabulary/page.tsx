@@ -7,7 +7,7 @@ import { VocabularyLibrary } from "@/components/vocabulary-library";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { getDecksResult } from "@/lib/data";
-import { createStudyQueue, isDueForReview } from "@/lib/study";
+import { isDueForReview } from "@/lib/study";
 
 export const metadata: Metadata = { title: "Học từ vựng" };
 
@@ -17,11 +17,7 @@ export default async function VocabularyPage() {
   const words = decks.flatMap((deck) => deck.words);
   const now = new Date();
   const totalDue = words.filter((word) => isDueForReview(word, now)).length;
-  const mastered = words.filter((word) => word.status === "mastered").length;
-  const dueDeck = decks.find((deck) =>
-    deck.words.some((word) => isDueForReview(word, now)),
-  );
-  const sessionSize = dueDeck ? createStudyQueue(dueDeck.words, now).length : 0;
+  const mastered = words.filter((word) => word.reviewCompletedAt).length;
 
   return (
     <div className="mx-auto w-full max-w-[1200px] px-5 py-8 md:px-8 lg:py-10">
@@ -45,12 +41,12 @@ export default async function VocabularyPage() {
           >
             <FileUp /> Nhập từ vựng
           </Link>
-          {dueDeck ? (
+          {totalDue > 0 ? (
             <Link
-              href={`/vocabulary/practice?deck=${dueDeck.slug}`}
+              href="/vocabulary/practice?mode=review"
               className={buttonVariants({ size: "lg", className: "w-full sm:w-auto" })}
             >
-              Ôn {sessionSize} từ trong “{dueDeck.title}” <ArrowRight />
+              Ôn {totalDue} từ đến hạn <ArrowRight />
             </Link>
           ) : (
             <span

@@ -17,6 +17,8 @@ try {
     union all select 'words', count(*)::int from public.words
     union all select 'word_progress', count(*)::int from public.word_progress
     union all select 'study_sessions', count(*)::int from public.study_sessions
+    union all select 'study_session_words', count(*)::int from public.study_session_words
+    union all select 'study_attempts', count(*)::int from public.study_attempts
     union all select 'daily_activity', count(*)::int from public.daily_activity
     order by table_name
   `;

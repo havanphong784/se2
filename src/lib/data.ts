@@ -88,7 +88,11 @@ async function loadDecks(
       status: wordProgress.status,
       mastery: wordProgress.mastery,
       intervalDays: wordProgress.intervalDays,
+      learnedAt: wordProgress.learnedAt,
+      reviewStage: wordProgress.reviewStage,
+      lastReviewedAt: wordProgress.lastReviewedAt,
       nextReviewAt: wordProgress.nextReviewAt,
+      reviewCompletedAt: wordProgress.reviewCompletedAt,
     })
     .from(decks)
     .innerJoin(words, eq(words.deckId, decks.id))
@@ -129,7 +133,11 @@ async function loadDecks(
       status: (row.status as VocabularyWord["status"] | null) ?? "new",
       mastery: row.mastery ?? 0,
       intervalDays: row.intervalDays ?? 0,
+      learnedAt: row.learnedAt?.toISOString() ?? null,
+      reviewStage: (row.reviewStage as VocabularyWord["reviewStage"] | null) ?? 0,
+      lastReviewedAt: row.lastReviewedAt?.toISOString() ?? null,
       nextReviewAt: row.nextReviewAt?.toISOString() ?? null,
+      reviewCompletedAt: row.reviewCompletedAt?.toISOString() ?? null,
     };
     loadedDecks.get(row.deckId)?.words.push(item);
   }
