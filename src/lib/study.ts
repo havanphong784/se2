@@ -1,10 +1,16 @@
 const DAY_MS = 24 * 60 * 60 * 1_000;
 
 export type WordStatus = "new" | "learning" | "mastered";
-export type StudyMode = "learn" | "review";
+export type StudyMode = "learn" | "review" | "custom";
 export type StudyPhase = "flashcard" | "multiple_choice" | "typing";
 export type SessionSize = 10 | 20;
 export type ReviewStage = 0 | 1 | 2 | 3;
+export type StudySpeechSpeed = "slow" | "normal";
+
+export type HighlightedTextPart = {
+  text: string;
+  highlighted: boolean;
+};
 
 export const SESSION_SIZES: SessionSize[] = [10, 20];
 
@@ -21,6 +27,23 @@ export type StudyWord = {
 
 export function addDays(now: Date, days: number) {
   return new Date(now.getTime() + days * DAY_MS);
+}
+
+export function isLearnedToday(learnedAt: string | null, now = new Date()) {
+  if (!learnedAt) return false;
+  const date = new Date(learnedAt);
+  if (Number.isNaN(date.getTime())) return false;
+  return (
+    date.getUTCFullYear() === now.getUTCFullYear() &&
+    date.getUTCMonth() === now.getUTCMonth() &&
+    date.getUTCDate() === now.getUTCDate()
+  );
+}
+
+export function selectRandomWords<T>(items: T[], count: number | "all") {
+  const shuffled = [...items].sort(() => Math.random() - 0.5);
+  if (count === "all") return shuffled;
+  return shuffled.slice(0, Math.min(items.length, count));
 }
 
 export function selectNewWords<T extends Pick<StudyWord, "learnedAt">>(
@@ -87,6 +110,25 @@ export function normalizeAnswer(value: string) {
 export function isTypingAnswerCorrect(expected: string, actual: string) {
   const answer = normalizeAnswer(actual);
   return answer.length > 0 && answer === normalizeAnswer(expected);
+}
+
+export function getStudySpeechSpeed(phase: StudyPhase): StudySpeechSpeed {
+  return phase === "flashcard" ? "slow" : "normal";
+}
+
+export function highlightTermInExample(example: string, term: string): HighlightedTextPart[] {
+  const normalizedTerm = term.trim();
+  if (!normalizedTerm) return [{ text: example, highlighted: false }];
+
+  const escapedTerm = normalizedTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const matcher = new RegExp(`(${escapedTerm})`, "gi");
+  return example
+    .split(matcher)
+    .filter(Boolean)
+    .map((text) => ({
+      text,
+      highlighted: text.localeCompare(normalizedTerm, "en", { sensitivity: "accent" }) === 0,
+    }));
 }
 
 export type StudyShortcutAction =
