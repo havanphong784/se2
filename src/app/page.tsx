@@ -35,11 +35,11 @@ export default async function DashboardPage() {
   ).length;
   const today = activity.at(-1);
   const dailyGoal = 10;
-  const reviewedToday = today?.reviewed ?? 0;
-  const goalPercent = Math.min(100, Math.round((reviewedToday / dailyGoal) * 100));
+  const studiedToday = (today?.reviewed ?? 0) + (today?.learned ?? 0);
+  const goalPercent = Math.min(100, Math.round((studiedToday / dailyGoal) * 100));
   const now = new Date();
   const dueWords = allWords.filter((word) => isDueForReview(word, now));
-  const activeDays = activity.filter((item) => item.reviewed > 0).length;
+  const activeDays = activity.filter((item) => item.reviewed > 0 || item.learned > 0).length;
   const dateLabel = new Intl.DateTimeFormat("vi-VN", {
     weekday: "long",
     day: "numeric",
@@ -108,7 +108,7 @@ export default async function DashboardPage() {
               <p className="text-xs font-extrabold uppercase tracking-[0.08em] text-ash">
                 Mục tiêu hôm nay
               </p>
-              <CardTitle className="mt-1 text-[24px]">{reviewedToday}/{dailyGoal} từ</CardTitle>
+              <CardTitle className="mt-1 text-[24px]">{studiedToday}/{dailyGoal} từ</CardTitle>
             </div>
             <span className="grid size-12 place-items-center rounded-xl border-2 border-macaw-blue text-macaw-blue">
               <Target className="size-6" />
@@ -119,7 +119,7 @@ export default async function DashboardPage() {
             <p className="mt-3 text-sm font-bold leading-6 text-ash">
               {goalPercent >= 100
                 ? "Tuyệt vời! Bạn đã hoàn thành mục tiêu hôm nay."
-                : `Chỉ còn ${Math.max(0, dailyGoal - reviewedToday)} từ để chạm mục tiêu.`}
+                : `Chỉ còn ${Math.max(0, dailyGoal - studiedToday)} từ để chạm mục tiêu.`}
             </p>
             <div className="mt-6 border-t-2 border-[#eeeeee] pt-5">
               <div className="flex items-center justify-between py-2">
@@ -159,7 +159,7 @@ export default async function DashboardPage() {
               </CardTitle>
             </div>
             <Badge variant="neutral">
-              {activity.reduce((sum, item) => sum + item.reviewed, 0)} từ đã ôn
+              {activity.reduce((sum, item) => sum + item.reviewed + item.learned, 0)} từ đã học/ôn
             </Badge>
           </CardHeader>
           <CardContent className="pt-0">
