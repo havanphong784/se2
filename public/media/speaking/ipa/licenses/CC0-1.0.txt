@@ -1,0 +1,9 @@
+CC0 1.0 Universal (Public Domain Dedication)
+
+Placeholder. Replace with canonical legalcode from
+https://creativecommons.org/publicdomain/zero/1.0/legalcode.txt
+before bundling authoritative British RP audio for production.
+
+Until reviewed human RP + rights audit completes, no audio files are
+shipped under public/media/speaking/ipa/rp/, and the validator reports
+pending review diagnostics on purpose.
