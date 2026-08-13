@@ -1,21 +1,25 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 import { StudySession } from "@/components/study-session";
-import { getDeck, getDecks } from "@/lib/data";
+import { getDeckResult } from "@/lib/data";
+import type { StudyMode } from "@/lib/study";
 
 export const metadata: Metadata = { title: "Phiên học từ vựng" };
 
 export default async function PracticePage({
   searchParams,
 }: {
-  searchParams: Promise<{ deck?: string }>;
+  searchParams: Promise<{ deck?: string; mode?: string }>;
 }) {
-  const requestedSlug = (await searchParams).deck;
-  const deck = requestedSlug
-    ? await getDeck(requestedSlug)
-    : (await getDecks())[0] ?? null;
+  const params = await searchParams;
+  const mode: StudyMode = params.mode === "review" ? "review" : "learn";
 
-  if (!deck) notFound();
-  return <StudySession deck={deck} />;
+  if (mode === "review") return <StudySession mode="review" />;
+  if (!params.deck) redirect("/vocabulary");
+
+  const deckResult = await getDeckResult(params.deck);
+  if (!deckResult.data) notFound();
+
+  return <StudySession mode="learn" deck={deckResult.data} />;
 }

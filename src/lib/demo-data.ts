@@ -11,7 +11,11 @@ export type VocabularyWord = {
   status: WordStatus;
   mastery: number;
   intervalDays: number;
+  learnedAt: string | null;
+  reviewStage: 0 | 1 | 2 | 3;
+  lastReviewedAt: string | null;
   nextReviewAt: string | null;
+  reviewCompletedAt: string | null;
 };
 
 export type VocabularyDeck = {
@@ -21,6 +25,7 @@ export type VocabularyDeck = {
   description: string;
   level: string;
   emoji: string;
+  ownership?: "system" | "personal";
   words: VocabularyWord[];
 };
 
@@ -54,7 +59,11 @@ const word = (
   status,
   mastery,
   intervalDays,
-  nextReviewAt: status === "new" ? null : new Date(0).toISOString(),
+  learnedAt: status === "new" ? null : new Date(0).toISOString(),
+  reviewStage: status === "mastered" ? 3 : 0,
+  lastReviewedAt: status === "new" ? null : new Date(0).toISOString(),
+  nextReviewAt: status === "new" || status === "mastered" ? null : new Date(0).toISOString(),
+  reviewCompletedAt: status === "mastered" ? new Date(0).toISOString() : null,
 });
 
 export const DEMO_DECKS: VocabularyDeck[] = [
@@ -366,8 +375,10 @@ export const DEMO_ACTIVITY: DailyActivity[] = [
 ];
 
 export function deckProgress(deck: VocabularyDeck) {
-  const mastered = deck.words.filter((item) => item.status === "mastered").length;
-  const learning = deck.words.filter((item) => item.status === "learning").length;
+  const mastered = deck.words.filter((item) => item.reviewCompletedAt).length;
+  const learning = deck.words.filter(
+    (item) => item.learnedAt && !item.reviewCompletedAt,
+  ).length;
   const completed = mastered + learning * 0.5;
 
   return {

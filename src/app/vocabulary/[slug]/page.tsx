@@ -3,27 +3,30 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight, BookOpen, Clock3, Leaf, Trophy } from "lucide-react";
 
+import { DataSourceNotice } from "@/components/data-source-notice";
 import { WordList } from "@/components/word-list";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { getDeck } from "@/lib/data";
+import { getDeckResult } from "@/lib/data";
 import { deckProgress } from "@/lib/demo-data";
 
 type DeckPageProps = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: DeckPageProps): Promise<Metadata> {
-  const deck = await getDeck((await params).slug);
-  return { title: deck?.title ?? "Bộ từ" };
+  const deckResult = await getDeckResult((await params).slug);
+  return { title: deckResult.data?.title ?? "Bộ từ" };
 }
 
 export default async function DeckPage({ params }: DeckPageProps) {
-  const deck = await getDeck((await params).slug);
+  const deckResult = await getDeckResult((await params).slug);
+  const deck = deckResult.data;
   if (!deck) notFound();
   const progress = deckProgress(deck);
 
   return (
     <div className="mx-auto w-full max-w-[1100px] px-5 py-8 md:px-8 lg:py-10">
+      <DataSourceNotice source={deckResult.source} />
       <Link
         href="/vocabulary"
         className="inline-flex min-h-11 items-center gap-2 rounded-xl font-extrabold text-ash hover:text-charcoal focus-visible:ring-4 focus-visible:ring-lingot-lime/40"
@@ -47,7 +50,7 @@ export default async function DeckPage({ params }: DeckPageProps) {
             <p className="mt-3 max-w-2xl text-pretty font-bold leading-7 text-ash">{deck.description}</p>
           </div>
           <Link
-            href={`/vocabulary/practice?deck=${deck.slug}`}
+            href={`/vocabulary/practice?mode=learn&deck=${deck.slug}`}
             className={buttonVariants({ size: "lg", className: "w-full md:w-auto" })}
           >
             Học ngay <ArrowRight />

@@ -1,3 +1,5 @@
+import { sql } from "drizzle-orm";
+
 import { closeDb, getDb } from "../src/db";
 import {
   dailyActivity,
@@ -107,6 +109,7 @@ async function seed() {
       const [deck] = await tx
         .insert(decks)
         .values({
+          ownerId: null,
           slug: deckSeed.slug,
           title: deckSeed.title,
           description: deckSeed.description,
@@ -115,7 +118,9 @@ async function seed() {
         })
         .onConflictDoUpdate({
           target: decks.slug,
+          targetWhere: sql`${decks.ownerId} is null`,
           set: {
+            ownerId: null,
             title: deckSeed.title,
             description: deckSeed.description,
             level: deckSeed.level,
@@ -170,24 +175,30 @@ async function seed() {
         .values({
           userId: demoUser.id,
           wordId: word.id,
-          status: mastery >= 80 ? "mastered" : "learning",
+          status: "learning",
           mastery,
-          intervalDays: mastery >= 80 ? 5 : mastery >= 50 ? 2 : 1,
+          intervalDays: index % 3 === 0 ? 30 : index % 3 === 1 ? 7 : 3,
+          learnedAt: dateDaysAgo(40 + index),
+          reviewStage: (index % 3) as 0 | 1 | 2,
           correctCount: 2 + index,
           incorrectCount: index % 3,
           lastReviewedAt,
           nextReviewAt,
+          reviewCompletedAt: null,
         })
         .onConflictDoUpdate({
           target: [wordProgress.userId, wordProgress.wordId],
           set: {
-            status: mastery >= 80 ? "mastered" : "learning",
+            status: "learning",
             mastery,
-            intervalDays: mastery >= 80 ? 5 : mastery >= 50 ? 2 : 1,
+            intervalDays: index % 3 === 0 ? 30 : index % 3 === 1 ? 7 : 3,
+            learnedAt: dateDaysAgo(40 + index),
+            reviewStage: (index % 3) as 0 | 1 | 2,
             correctCount: 2 + index,
             incorrectCount: index % 3,
             lastReviewedAt,
             nextReviewAt,
+            reviewCompletedAt: null,
             updatedAt: now,
           },
         });
@@ -212,11 +223,16 @@ async function seed() {
         .values({
           userId: demoUser.id,
           deckId: seededDecks[index].id,
+          mode: "legacy",
+          status: "completed",
           reviewedCount: session.reviewed,
           correctCount: session.correct,
+          attemptCount: session.reviewed,
+          incorrectCount: session.reviewed - session.correct,
           xpEarned: session.xp,
           durationSeconds: session.seconds,
           startedAt,
+          lastActivityAt: completedAt,
           completedAt,
         })
         .onConflictDoUpdate({

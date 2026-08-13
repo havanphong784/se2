@@ -1,0 +1,14 @@
+[
+  {
+    "term": "hello",
+    "translation": "xin chào",
+    "phonetic": "/həˈləʊ/",
+    "partOfSpeech": "thán từ",
+    "exampleSentence": "Hello, friend.",
+    "exampleTranslation": "Xin chào, bạn."
+  },
+  {
+    "term": "sunflower",
+    "translation": "hoa hướng dương"
+  }
+]

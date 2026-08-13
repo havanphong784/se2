@@ -1,27 +1,27 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, BookOpenText, Brain, Clock3, Sparkles } from "lucide-react";
+import { ArrowRight, BookOpenText, Brain, Clock3, FileUp, Sparkles } from "lucide-react";
 
+import { DataSourceNotice } from "@/components/data-source-notice";
 import { VocabularyLibrary } from "@/components/vocabulary-library";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
-import { getDecks } from "@/lib/data";
+import { getDecksResult } from "@/lib/data";
 import { isDueForReview } from "@/lib/study";
 
 export const metadata: Metadata = { title: "Học từ vựng" };
 
 export default async function VocabularyPage() {
-  const decks = await getDecks();
+  const decksResult = await getDecksResult();
+  const decks = decksResult.data;
   const words = decks.flatMap((deck) => deck.words);
   const now = new Date();
-  const due = words.filter((word) => isDueForReview(word, now)).length;
-  const mastered = words.filter((word) => word.status === "mastered").length;
-  const dueDeck = decks.find((deck) =>
-    deck.words.some((word) => isDueForReview(word, now)),
-  );
+  const totalDue = words.filter((word) => isDueForReview(word, now)).length;
+  const mastered = words.filter((word) => word.reviewCompletedAt).length;
 
   return (
     <div className="mx-auto w-full max-w-[1200px] px-5 py-8 md:px-8 lg:py-10">
+      <DataSourceNotice source={decksResult.source} />
       <header className="grid gap-6 border-b-2 border-[#eeeeee] pb-8 lg:grid-cols-[1fr_auto] lg:items-end">
         <div>
           <Badge className="mb-3">
@@ -34,24 +34,32 @@ export default async function VocabularyPage() {
             Học theo chủ đề, nghe phát âm và ôn đúng lúc bằng phương pháp lặp lại ngắt quãng.
           </p>
         </div>
-        {dueDeck ? (
+        <div className="flex flex-col gap-3 sm:flex-row">
           <Link
-            href={`/vocabulary/practice?deck=${dueDeck.slug}`}
-            className={buttonVariants({ size: "lg", className: "w-full sm:w-auto" })}
+            href="/vocabulary/import"
+            className={buttonVariants({ variant: "secondary", size: "lg", className: "w-full sm:w-auto" })}
           >
-            Ôn {due} từ hôm nay <ArrowRight />
+            <FileUp /> Nhập từ vựng
           </Link>
-        ) : (
-          <span
-            className={buttonVariants({
-              variant: "secondary",
-              size: "lg",
-              className: "w-full cursor-default sm:w-auto",
-            })}
-          >
-            Chưa có từ đến hạn
-          </span>
-        )}
+          {totalDue > 0 ? (
+            <Link
+              href="/vocabulary/practice?mode=review"
+              className={buttonVariants({ size: "lg", className: "w-full sm:w-auto" })}
+            >
+              Ôn {totalDue} từ đến hạn <ArrowRight />
+            </Link>
+          ) : (
+            <span
+              className={buttonVariants({
+                variant: "secondary",
+                size: "lg",
+                className: "w-full cursor-default sm:w-auto",
+              })}
+            >
+              Chưa có từ đến hạn
+            </span>
+          )}
+        </div>
       </header>
 
       <section aria-label="Tóm tắt tiến độ" className="grid border-b-2 border-[#eeeeee] sm:grid-cols-3">
@@ -69,8 +77,8 @@ export default async function VocabularyPage() {
             <Sparkles className="size-5" />
           </span>
           <div>
-            <p className="text-xs font-extrabold uppercase tracking-[0.08em] text-ash">Đang học</p>
-            <p className="mt-0.5 text-xl font-extrabold text-eel-dark-blue tabular-nums">{due} từ</p>
+            <p className="text-xs font-extrabold uppercase tracking-[0.08em] text-ash">Đến hạn hôm nay</p>
+            <p className="mt-0.5 text-xl font-extrabold text-eel-dark-blue tabular-nums">{totalDue} từ</p>
           </div>
         </div>
         <div className="flex items-center gap-4 border-t-2 border-[#eeeeee] py-5 sm:border-t-0 sm:px-5">
