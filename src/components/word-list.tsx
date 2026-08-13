@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import type { VocabularyWord, WordStatus } from "@/lib/demo-data";
+import { speakEnglish } from "@/lib/speech";
 import { cn } from "@/lib/utils";
 
 const filters: Array<{ value: "all" | WordStatus; label: string }> = [
@@ -22,15 +23,6 @@ const statusLabels: Record<WordStatus, { label: string; variant: "neutral" | "bl
   learning: { label: "Đang học", variant: "blue" },
   mastered: { label: "Đã thuộc", variant: "default" },
 };
-
-function speak(term: string) {
-  if (!("speechSynthesis" in window)) return;
-  window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(term);
-  utterance.lang = "en-US";
-  utterance.rate = 0.86;
-  window.speechSynthesis.speak(utterance);
-}
 
 export function WordList({ words }: { words: VocabularyWord[] }) {
   const [query, setQuery] = useState("");
@@ -90,7 +82,7 @@ export function WordList({ words }: { words: VocabularyWord[] }) {
                   type="button"
                   variant="secondary"
                   size="icon"
-                  onClick={() => speak(word.term)}
+                  onClick={() => speakEnglish(word.term, "slow")}
                   aria-label={`Nghe phát âm ${word.term}`}
                   className="shrink-0 text-macaw-blue"
                 >

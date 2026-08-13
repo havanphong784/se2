@@ -25,11 +25,14 @@ import type { VocabularyDeck } from "@/lib/demo-data";
 import {
   createMultipleChoiceOptions,
   getStudyShortcutAction,
+  getStudySpeechSpeed,
+  highlightTermInExample,
   moveFirstToEnd,
   type SessionSize,
   type StudyMode,
   type StudyPhase,
 } from "@/lib/study";
+import { cancelEnglishSpeech, canSpeakEnglish, speakEnglish } from "@/lib/speech";
 import type {
   StudyEventResult,
   StudySessionDto,
@@ -53,19 +56,6 @@ type Feedback = {
   selectedWordId?: string;
   submittedAnswer?: string;
 };
-
-function canSpeak() {
-  return typeof window !== "undefined" && "speechSynthesis" in window;
-}
-
-function speak(term: string) {
-  if (!canSpeak()) return;
-  window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(term);
-  utterance.lang = "en-US";
-  utterance.rate = 0.86;
-  window.speechSynthesis.speak(utterance);
-}
 
 function isEditableTarget(target: EventTarget | null) {
   if (!(target instanceof HTMLElement)) return false;
@@ -109,7 +99,7 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
   const [autoSpeakEnabled, setAutoSpeakEnabled] = useState(
     () => typeof window === "undefined" || localStorage.getItem(AUTO_SPEAK_KEY) !== "false",
   );
-  const speechSupported = canSpeak();
+  const speechSupported = canSpeakEnglish();
   const feedbackRef = useRef<HTMLDivElement>(null);
   const promptRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -138,7 +128,7 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
 
   useEffect(
     () => () => {
-      if (canSpeak()) window.speechSynthesis.cancel();
+      cancelEnglishSpeech();
     },
     [],
   );
@@ -151,7 +141,7 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
       !feedback &&
       (session?.phase === "flashcard" || session?.phase === "multiple_choice")
     ) {
-      speak(currentWord.term);
+      speakEnglish(currentWord.term, getStudySpeechSpeed(session.phase));
     }
   }, [autoSpeakEnabled, currentWord, feedback, session?.phase, speechSupported]);
 
@@ -217,10 +207,11 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
     } else if (action.type === "toggle-auto-speak") {
       toggleAutoSpeak();
     } else {
-      speak(
+      speakEnglish(
         session.phase === "typing" && feedback
           ? feedback.result.expectedAnswer
           : currentWord.term,
+        getStudySpeechSpeed(session.phase),
       );
     }
   });
@@ -238,8 +229,10 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
     const next = !autoSpeakEnabled;
     setAutoSpeakEnabled(next);
     localStorage.setItem(AUTO_SPEAK_KEY, String(next));
-    if (!next && canSpeak()) window.speechSynthesis.cancel();
-    if (next && currentWord && session?.phase !== "typing") speak(currentWord.term);
+    if (!next) cancelEnglishSpeech();
+    if (next && currentWord && session?.phase && session.phase !== "typing") {
+      speakEnglish(currentWord.term, getStudySpeechSpeed(session.phase));
+    }
   }
 
   function resetQueue(nextSession: StudySessionDto) {
@@ -321,7 +314,7 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
       });
       setPendingEvent(null);
       if (payload.phase === "typing" && autoSpeakEnabled) {
-        speak(submitted.result.expectedAnswer);
+        speakEnglish(submitted.result.expectedAnswer, "normal");
       }
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Không thể lưu câu trả lời.");
@@ -374,7 +367,7 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
 
   function closeSession() {
     if (!session || session.status !== "active") return;
-    if (canSpeak()) window.speechSynthesis.cancel();
+    cancelEnglishSpeech();
     void fetch(`/api/study-sessions/${session.id}/abandon`, {
       method: "POST",
       keepalive: true,
@@ -448,28 +441,36 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
 
       <main className="mx-auto flex min-h-[calc(100svh-80px)] max-w-[860px] flex-col justify-center px-5 py-8">
         {session.phase === "flashcard" && currentWord && (
-          <Card ref={promptRef} tabIndex={-1} className="overflow-hidden border-eel-light border-b-4 outline-none shadow-[0_12px_35px_rgba(30,70,20,0.07)] focus-visible:ring-4 focus-visible:ring-eel-light">
-            <CardHeader className="flex-row items-center justify-between border-b-2 border-[#f0f0f0] bg-[#fbfff8] p-5">
-              <div className="flex items-center gap-2"><Badge variant="blue">{currentWord.partOfSpeech}</Badge><span className="text-sm font-extrabold text-ash">{flashcardIndex + 1}/{session.words.length}</span></div>
-              <Button type="button" variant="blue" size="icon" onClick={() => speak(currentWord.term)} aria-label={`Nghe ${currentWord.term}`} aria-keyshortcuts="P" disabled={!speechSupported}><Volume2 /><span className="sr-only">Phím P</span></Button>
+          <Card ref={promptRef} tabIndex={-1} className="mx-auto flex w-full max-w-[600px] flex-col overflow-hidden border-eel-light border-b-4 outline-none shadow-[0_12px_35px_rgba(30,70,20,0.07)] focus-visible:ring-4 focus-visible:ring-eel-light sm:min-h-[450px]">
+            <CardHeader className="min-h-12 justify-center border-b-2 border-[#f0f0f0] bg-[#fbfff8] px-5 py-2.5">
+              <div className="flex w-full items-center justify-between gap-3">
+                <Badge variant="blue" className="min-w-0 whitespace-normal text-left">{currentWord.partOfSpeech}</Badge>
+                <span className="shrink-0 text-xs font-extrabold text-ash tabular-nums">{flashcardIndex + 1} / {session.words.length}</span>
+              </div>
             </CardHeader>
-            <CardContent className="p-6 text-center md:p-10">
-              <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-macaw-blue">Từ tiếng Anh</p>
-              <h1 className="mt-3 font-display text-5xl font-extrabold text-eel-dark-blue sm:text-6xl">{currentWord.term}</h1>
-              <p className="mt-3 text-lg font-extrabold text-macaw-blue">{currentWord.phonetic}</p>
-              <div className="mx-auto mt-8 max-w-2xl rounded-xl border-2 border-lingot-lime bg-[#f7fff1] px-5 py-6"><p className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#438f0e]">Nghĩa tiếng Việt</p><p className="mt-2 text-3xl font-extrabold text-[#438f0e]">{currentWord.translation}</p></div>
-              <div className="mx-auto mt-6 max-w-2xl text-left"><p className="font-extrabold text-charcoal">{currentWord.exampleSentence}</p><p className="mt-2 font-bold text-ash">{currentWord.exampleTranslation}</p></div>
+            <CardContent className="flex flex-1 flex-col p-5 text-center sm:p-6">
+              <div className="flex flex-wrap items-center justify-center gap-3">
+                <h1 className="min-w-0 break-words font-display text-4xl font-extrabold text-eel-dark-blue sm:text-5xl">{currentWord.term}</h1>
+                <Button type="button" variant="blue" size="icon" className="size-10 shrink-0" onClick={() => speakEnglish(currentWord.term, "slow")} aria-label={`Nghe ${currentWord.term}`} aria-keyshortcuts="P" disabled={!speechSupported}><Volume2 /><span className="sr-only">Phím P</span></Button>
+              </div>
+              <p className="mt-1.5 text-base font-extrabold text-macaw-blue">{currentWord.phonetic}</p>
+              <div className="mt-4 rounded-xl border-2 border-lingot-lime/70 bg-[#f7fff1] px-4 py-4"><p className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#438f0e]">Nghĩa tiếng Việt</p><p className="mt-1 text-2xl font-extrabold text-[#438f0e]">{currentWord.translation}</p></div>
+              <div className="mt-3 rounded-xl border-2 border-[#eeeeee] bg-[#fcfcfc] p-4 text-left">
+                <p className="mb-1.5 text-xs font-extrabold uppercase tracking-[0.12em] text-ash">Ví dụ</p>
+                <p className="font-bold leading-6 text-charcoal">{highlightTermInExample(currentWord.exampleSentence, currentWord.term).map((part, index) => part.highlighted ? <strong key={`${part.text}-${index}`} className="font-extrabold text-eel-dark-blue">{part.text}</strong> : <span key={`${part.text}-${index}`}>{part.text}</span>)}</p>
+                <p className="mt-1.5 text-sm font-bold text-ash">{currentWord.exampleTranslation}</p>
+              </div>
             </CardContent>
-            <CardFooter className="justify-between gap-3 border-t-2 border-[#f0f0f0] bg-[#fcfcfc] p-5">
-              <Button variant="secondary" size="lg" disabled={saving || flashcardIndex === 0} onClick={() => setFlashcardIndex((index) => index - 1)} aria-keyshortcuts="ArrowLeft"><ArrowLeft /> Lùi <ShortcutKey>←</ShortcutKey></Button>
-              <Button size="lg" disabled={saving} onClick={() => void nextFlashcard()} aria-keyshortcuts="ArrowRight">{flashcardIndex === session.words.length - 1 ? "Sang trắc nghiệm" : "Tiếp"} <ShortcutKey>→</ShortcutKey> <ArrowRight /></Button>
+            <CardFooter className="mt-auto grid min-h-[68px] grid-cols-2 gap-3 border-t-2 border-[#f0f0f0] bg-[#fcfcfc] p-3 sm:p-4">
+              <Button variant="secondary" size="lg" className="w-full" disabled={saving || flashcardIndex === 0} onClick={() => setFlashcardIndex((index) => index - 1)} aria-keyshortcuts="ArrowLeft"><ArrowLeft /> Lùi <span className="hidden sm:inline"><ShortcutKey>←</ShortcutKey></span></Button>
+              <Button size="lg" className="w-full px-3" disabled={saving} onClick={() => void nextFlashcard()} aria-keyshortcuts="ArrowRight"><span className="truncate">{flashcardIndex === session.words.length - 1 ? "Sang trắc nghiệm" : "Tiếp"}</span> <span className="hidden sm:inline"><ShortcutKey>→</ShortcutKey></span> <ArrowRight /></Button>
             </CardFooter>
           </Card>
         )}
 
         {session.phase === "multiple_choice" && currentWord && (
           <section aria-labelledby="quiz-prompt">
-            <div ref={promptRef} tabIndex={-1} className="mb-7 rounded-xl text-center outline-none focus-visible:ring-4 focus-visible:ring-eel-light"><Badge variant="blue"><Headphones className="size-4" /> Chọn nghĩa đúng</Badge><h1 id="quiz-prompt" className="mt-4 font-display text-5xl font-extrabold text-eel-dark-blue sm:text-6xl">{currentWord.term}</h1><button type="button" onClick={() => speak(currentWord.term)} className="mt-3 inline-flex items-center gap-2 font-extrabold text-macaw-blue hover:underline" disabled={!speechSupported} aria-keyshortcuts="P"><Volume2 className="size-5" /> {currentWord.phonetic} <ShortcutKey>P</ShortcutKey></button></div>
+            <div ref={promptRef} tabIndex={-1} className="mb-7 rounded-xl text-center outline-none focus-visible:ring-4 focus-visible:ring-eel-light"><Badge variant="blue"><Headphones className="size-4" /> Chọn nghĩa đúng</Badge><h1 id="quiz-prompt" className="mt-4 font-display text-5xl font-extrabold text-eel-dark-blue sm:text-6xl">{currentWord.term}</h1><button type="button" onClick={() => speakEnglish(currentWord.term, "normal")} className="mt-3 inline-flex items-center gap-2 font-extrabold text-macaw-blue hover:underline" disabled={!speechSupported} aria-keyshortcuts="P"><Volume2 className="size-5" /> {currentWord.phonetic} <ShortcutKey>P</ShortcutKey></button></div>
             <div className="grid gap-3 sm:grid-cols-2" role="group" aria-label={`Chọn nghĩa của ${currentWord.term}`}>
               {options.map((option, index) => {
                 const selected = feedback?.selectedWordId === option.id;
@@ -499,8 +500,8 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
 
         {feedback && (
           <div ref={feedbackRef} tabIndex={-1} role="status" aria-live="polite" aria-atomic="true" className={cn("mt-6 rounded-xl border-2 border-b-4 p-5 outline-none sm:flex sm:items-center sm:justify-between sm:gap-5", feedback.result.isCorrect ? "border-ecto-green bg-[#f2ffe9]" : "border-[#ff6b6b] bg-[#fff3f3]")}>
-            <div className="flex gap-3">{feedback.result.isCorrect ? <CheckCircle2 className="mt-0.5 size-7 shrink-0 text-ecto-green" /> : <XCircle className="mt-0.5 size-7 shrink-0 text-[#d94e4e]" />}<div><h2 className={cn("text-xl font-extrabold", feedback.result.isCorrect ? "text-[#438f0e]" : "text-[#b93636]")}>{feedback.result.isCorrect ? "Chính xác!" : "Chưa đúng"}</h2>{!feedback.result.isCorrect && <p className="mt-1 font-bold text-charcoal">Đáp án đúng: <strong>{feedback.result.expectedAnswer}</strong></p>}{feedback.submittedAnswer && !feedback.result.isCorrect && <p className="mt-1 text-sm font-bold text-ash">Bạn đã nhập: {feedback.submittedAnswer}</p>}</div></div>
-            <div className="mt-4 flex gap-2 sm:mt-0">{session.phase === "typing" && <Button type="button" variant="secondary" size="icon" onClick={() => speak(feedback.result.expectedAnswer)} aria-label={`Nghe ${feedback.result.expectedAnswer}`} aria-keyshortcuts="P" disabled={!speechSupported}><Volume2 /><span className="sr-only">Phím P</span></Button>}<Button type="button" size="lg" onClick={continueAfterFeedback} aria-keyshortcuts="Enter">Tiếp tục <ShortcutKey>Enter</ShortcutKey> <ArrowRight /></Button></div>
+            <div className="flex gap-3">{feedback.result.isCorrect ? <CheckCircle2 className="mt-0.5 size-7 shrink-0 text-ecto-green" /> : <XCircle className="mt-0.5 size-7 shrink-0 text-[#d94e4e]" />}<div><h2 className={cn("text-xl font-extrabold", feedback.result.isCorrect ? "text-[#438f0e]" : "text-[#b93636]")}>{feedback.result.isCorrect ? "Chính xác!" : "Chưa đúng"}</h2>{!feedback.result.isCorrect && <p className="mt-1 font-bold text-charcoal">Đáp án đúng: <strong>{feedback.result.expectedAnswer}</strong></p>}{!feedback.result.isCorrect && feedback.result.phase === "typing" && currentWord?.phonetic.trim() && <p className="mt-1 font-extrabold text-macaw-blue">{currentWord.phonetic}</p>}{feedback.submittedAnswer && !feedback.result.isCorrect && <p className="mt-1 text-sm font-bold text-ash">Bạn đã nhập: {feedback.submittedAnswer}</p>}</div></div>
+            <div className="mt-4 flex gap-2 sm:mt-0">{session.phase === "typing" && <Button type="button" variant="secondary" size="icon" onClick={() => speakEnglish(feedback.result.expectedAnswer, "normal")} aria-label={`Nghe ${feedback.result.expectedAnswer}`} aria-keyshortcuts="P" disabled={!speechSupported}><Volume2 /><span className="sr-only">Phím P</span></Button>}<Button type="button" size="lg" onClick={continueAfterFeedback} aria-keyshortcuts="Enter">Tiếp tục <ShortcutKey>Enter</ShortcutKey> <ArrowRight /></Button></div>
           </div>
         )}
 

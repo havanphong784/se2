@@ -5,6 +5,12 @@ export type StudyMode = "learn" | "review";
 export type StudyPhase = "flashcard" | "multiple_choice" | "typing";
 export type SessionSize = 10 | 20;
 export type ReviewStage = 0 | 1 | 2 | 3;
+export type StudySpeechSpeed = "slow" | "normal";
+
+export type HighlightedTextPart = {
+  text: string;
+  highlighted: boolean;
+};
 
 export const SESSION_SIZES: SessionSize[] = [10, 20];
 
@@ -87,6 +93,25 @@ export function normalizeAnswer(value: string) {
 export function isTypingAnswerCorrect(expected: string, actual: string) {
   const answer = normalizeAnswer(actual);
   return answer.length > 0 && answer === normalizeAnswer(expected);
+}
+
+export function getStudySpeechSpeed(phase: StudyPhase): StudySpeechSpeed {
+  return phase === "flashcard" ? "slow" : "normal";
+}
+
+export function highlightTermInExample(example: string, term: string): HighlightedTextPart[] {
+  const normalizedTerm = term.trim();
+  if (!normalizedTerm) return [{ text: example, highlighted: false }];
+
+  const escapedTerm = normalizedTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const matcher = new RegExp(`(${escapedTerm})`, "gi");
+  return example
+    .split(matcher)
+    .filter(Boolean)
+    .map((text) => ({
+      text,
+      highlighted: text.localeCompare(normalizedTerm, "en", { sensitivity: "accent" }) === 0,
+    }));
 }
 
 export type StudyShortcutAction =

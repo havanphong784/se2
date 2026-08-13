@@ -7,6 +7,8 @@ import {
   createMultipleChoiceOptions,
   evaluateStudyAnswer,
   getStudyShortcutAction,
+  getStudySpeechSpeed,
+  highlightTermInExample,
   isDueForReview,
   isTypingAnswerCorrect,
   moveFirstToEnd,
@@ -73,6 +75,38 @@ test("typing normalization accepts formatting differences only", () => {
   assert.equal(isTypingAnswerCorrect("Thank you", " thank   YOU "), true);
   assert.equal(isTypingAnswerCorrect("form", "from"), false);
   assert.equal(isTypingAnswerCorrect("hello", ""), false);
+});
+
+test("study speech is slow only during flashcards", () => {
+  assert.equal(getStudySpeechSpeed("flashcard"), "slow");
+  assert.equal(getStudySpeechSpeed("multiple_choice"), "normal");
+  assert.equal(getStudySpeechSpeed("typing"), "normal");
+});
+
+test("example highlighting preserves text and matches literal terms", () => {
+  assert.deepEqual(highlightTermInExample("Give me a Second, second.", "second"), [
+    { text: "Give me a ", highlighted: false },
+    { text: "Second", highlighted: true },
+    { text: ", ", highlighted: false },
+    { text: "second", highlighted: true },
+    { text: ".", highlighted: false },
+  ]);
+  assert.deepEqual(highlightTermInExample("I use C++.", "C++"), [
+    { text: "I use ", highlighted: false },
+    { text: "C++", highlighted: true },
+    { text: ".", highlighted: false },
+  ]);
+  assert.deepEqual(highlightTermInExample("Wait a little.", "a little"), [
+    { text: "Wait ", highlighted: false },
+    { text: "a little", highlighted: true },
+    { text: ".", highlighted: false },
+  ]);
+  assert.deepEqual(highlightTermInExample("No matching word.", "second"), [
+    { text: "No matching word.", highlighted: false },
+  ]);
+  assert.deepEqual(highlightTermInExample("Keep this text.", "  "), [
+    { text: "Keep this text.", highlighted: false },
+  ]);
 });
 
 test("study answers return authoritative correctness and expected answer", () => {
