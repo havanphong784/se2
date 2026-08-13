@@ -1,7 +1,7 @@
 const DAY_MS = 24 * 60 * 60 * 1_000;
 
 export type WordStatus = "new" | "learning" | "mastered";
-export type StudyMode = "learn" | "review";
+export type StudyMode = "learn" | "review" | "custom";
 export type StudyPhase = "flashcard" | "multiple_choice" | "typing";
 export type SessionSize = 10 | 20;
 export type ReviewStage = 0 | 1 | 2 | 3;
@@ -27,6 +27,23 @@ export type StudyWord = {
 
 export function addDays(now: Date, days: number) {
   return new Date(now.getTime() + days * DAY_MS);
+}
+
+export function isLearnedToday(learnedAt: string | null, now = new Date()) {
+  if (!learnedAt) return false;
+  const date = new Date(learnedAt);
+  if (Number.isNaN(date.getTime())) return false;
+  return (
+    date.getUTCFullYear() === now.getUTCFullYear() &&
+    date.getUTCMonth() === now.getUTCMonth() &&
+    date.getUTCDate() === now.getUTCDate()
+  );
+}
+
+export function selectRandomWords<T>(items: T[], count: number | "all") {
+  const shuffled = [...items].sort(() => Math.random() - 0.5);
+  if (count === "all") return shuffled;
+  return shuffled.slice(0, Math.min(items.length, count));
 }
 
 export function selectNewWords<T extends Pick<StudyWord, "learnedAt">>(
