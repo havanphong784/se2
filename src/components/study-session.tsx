@@ -283,7 +283,12 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
   }
 
   async function nextFlashcard() {
-    if (!session || !currentWord || saving || error || feedback) return;
+    if (!session || !currentWord || saving || feedback) return;
+    if (currentWord.flashcardCompleted) {
+      setError(null);
+      setFlashcardIndex((index) => Math.min(index + 1, session.words.length - 1));
+      return;
+    }
     setSaving(true);
     setError(null);
     try {
