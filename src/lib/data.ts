@@ -63,6 +63,7 @@ function emptyRecentActivity(): ActivityItem[] {
     reviewed: 0,
     learned: 0,
     xp: 0,
+    studySeconds: 0,
   }));
 }
 
@@ -169,6 +170,7 @@ async function loadActivity(
       reviewed: row?.reviewedCount ?? 0,
       learned: row?.learnedCount ?? 0,
       xp: row?.xpEarned ?? 0,
+      studySeconds: row?.studySeconds ?? 0,
     };
   });
 }

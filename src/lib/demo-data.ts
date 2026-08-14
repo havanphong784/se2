@@ -35,6 +35,7 @@ export type DailyActivity = {
   reviewed: number;
   learned: number;
   xp: number;
+  studySeconds?: number;
 };
 
 const word = (
@@ -365,19 +366,21 @@ export const DEMO_DECKS: VocabularyDeck[] = [
 ];
 
 export const DEMO_ACTIVITY: DailyActivity[] = [
-  { day: "T2", fullDate: "06/07", reviewed: 8, learned: 4, xp: 55 },
-  { day: "T3", fullDate: "07/07", reviewed: 12, learned: 6, xp: 85 },
-  { day: "T4", fullDate: "08/07", reviewed: 7, learned: 3, xp: 45 },
-  { day: "T5", fullDate: "09/07", reviewed: 15, learned: 8, xp: 110 },
-  { day: "T6", fullDate: "10/07", reviewed: 10, learned: 5, xp: 75 },
-  { day: "T7", fullDate: "11/07", reviewed: 18, learned: 9, xp: 130 },
-  { day: "CN", fullDate: "12/07", reviewed: 6, learned: 3, xp: 40 },
+  { day: "T2", fullDate: "06/07", reviewed: 8, learned: 4, xp: 55, studySeconds: 420 },
+  { day: "T3", fullDate: "07/07", reviewed: 12, learned: 6, xp: 85, studySeconds: 540 },
+  { day: "T4", fullDate: "08/07", reviewed: 7, learned: 3, xp: 45, studySeconds: 300 },
+  { day: "T5", fullDate: "09/07", reviewed: 15, learned: 8, xp: 110, studySeconds: 660 },
+  { day: "T6", fullDate: "10/07", reviewed: 10, learned: 5, xp: 75, studySeconds: 480 },
+  { day: "T7", fullDate: "11/07", reviewed: 18, learned: 9, xp: 130, studySeconds: 780 },
+  { day: "CN", fullDate: "12/07", reviewed: 6, learned: 3, xp: 40, studySeconds: 360 },
 ];
 
 export function deckProgress(deck: VocabularyDeck) {
-  const mastered = deck.words.filter((item) => item.reviewCompletedAt).length;
+  const mastered = deck.words.filter(
+    (item) => item.status === "mastered" || Boolean(item.reviewCompletedAt),
+  ).length;
   const learning = deck.words.filter(
-    (item) => item.learnedAt && !item.reviewCompletedAt,
+    (item) => item.status !== "mastered" && !item.reviewCompletedAt && Boolean(item.learnedAt),
   ).length;
   const completed = mastered + learning * 0.5;
 
