@@ -8,6 +8,7 @@ import {
   evaluateStudyAnswer,
   getStudyShortcutAction,
   getStudySpeechSpeed,
+  getTodayStudyMinutes,
   highlightTermInExample,
   isDueForReview,
   isTypingAnswerCorrect,
@@ -52,6 +53,7 @@ test("due selection prioritizes oldest due then never reviewed", () => {
     word({ id: "never", learnedAt: now.toISOString(), nextReviewAt: addDays(now, -2).toISOString() }),
     word({ id: "oldest", learnedAt: now.toISOString(), nextReviewAt: addDays(now, -3).toISOString() }),
     word({ id: "done", learnedAt: now.toISOString(), nextReviewAt: addDays(now, -9).toISOString(), reviewCompletedAt: now.toISOString() }),
+    word({ id: "mastered_by_status", status: "mastered", learnedAt: now.toISOString(), nextReviewAt: addDays(now, -9).toISOString() }),
   ];
 
   assert.deepEqual(selectDueWords(words, 10, now).map((item) => item.id), [
@@ -60,6 +62,7 @@ test("due selection prioritizes oldest due then never reviewed", () => {
     "reviewed",
   ]);
   assert.equal(isDueForReview(words[0], now), false);
+  assert.equal(isDueForReview(words[6], now), false);
   assert.ok(compareReviewPriority(words[3], words[2]) < 0);
 });
 
@@ -252,4 +255,12 @@ test("session summary counts unique words separately from attempts", () => {
       accuracy: 67,
     },
   );
+});
+
+test("getTodayStudyMinutes calculates study time accurately", () => {
+  assert.equal(getTodayStudyMinutes(undefined), 0);
+  assert.equal(getTodayStudyMinutes({ reviewed: 0, learned: 0, studySeconds: 0 }), 0);
+  assert.equal(getTodayStudyMinutes({ reviewed: 5, learned: 5, studySeconds: 150 }), 3);
+  assert.equal(getTodayStudyMinutes({ reviewed: 5, learned: 5, studySeconds: 20 }), 1);
+  assert.equal(getTodayStudyMinutes({ reviewed: 4, learned: 6, studySeconds: 0 }), 5);
 });

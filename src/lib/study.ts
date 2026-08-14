@@ -54,12 +54,36 @@ export function selectNewWords<T extends Pick<StudyWord, "learnedAt">>(
 }
 
 export function isDueForReview(
-  progress: Pick<StudyWord, "learnedAt" | "nextReviewAt" | "reviewCompletedAt">,
+  progress: Pick<StudyWord, "learnedAt" | "nextReviewAt" | "reviewCompletedAt"> & {
+    status?: WordStatus;
+  },
   now: Date,
 ) {
-  if (!progress.learnedAt || progress.reviewCompletedAt || !progress.nextReviewAt) return false;
+  if (
+    !progress.learnedAt ||
+    progress.status === "mastered" ||
+    progress.reviewCompletedAt ||
+    !progress.nextReviewAt
+  )
+    return false;
   const dueAt = Date.parse(progress.nextReviewAt);
   return Number.isFinite(dueAt) && dueAt <= now.getTime();
+}
+
+export function getTodayStudyMinutes(activityItem?: {
+  reviewed: number;
+  learned: number;
+  studySeconds?: number;
+}) {
+  if (!activityItem) return 0;
+  if (activityItem.studySeconds && activityItem.studySeconds > 0) {
+    return Math.max(1, Math.round(activityItem.studySeconds / 60));
+  }
+  const totalCount = activityItem.reviewed + activityItem.learned;
+  if (totalCount > 0) {
+    return Math.max(1, Math.round(totalCount * 0.5));
+  }
+  return 0;
 }
 
 export function compareReviewPriority(
