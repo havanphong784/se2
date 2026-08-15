@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import {
   ArrowRight,
   BookOpen,
@@ -11,7 +11,6 @@ import {
   Leaf,
   Search,
   Sprout,
-  X,
   type LucideIcon,
 } from "lucide-react";
 
@@ -75,9 +74,6 @@ function getPlantStage(percent: number): PlantStage {
 export function VocabularyLibrary({ decks }: { decks: VocabularyDeck[] }) {
   const [query, setQuery] = useState("");
   const [level, setLevel] = useState<(typeof levels)[number]>("Tất cả");
-  const [selectedDeck, setSelectedDeck] = useState<VocabularyDeck | null>(null);
-  const closeButtonRef = useRef<HTMLButtonElement>(null);
-  const activeCardRef = useRef<HTMLElement | null>(null);
   const shouldReduceMotion = useReducedMotion();
 
   const filteredDecks = useMemo(() => {
@@ -95,30 +91,6 @@ export function VocabularyLibrary({ decks }: { decks: VocabularyDeck[] }) {
           )),
     );
   }, [decks, level, query]);
-
-  useEffect(() => {
-    if (!selectedDeck) return;
-
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    closeButtonRef.current?.focus();
-
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") setSelectedDeck(null);
-    }
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      window.removeEventListener("keydown", handleKeyDown);
-      activeCardRef.current?.focus();
-    };
-  }, [selectedDeck]);
-
-  function openDeck(deck: VocabularyDeck, trigger: HTMLElement) {
-    activeCardRef.current = trigger;
-    setSelectedDeck(deck);
-  }
 
   return (
     <>
@@ -182,11 +154,10 @@ export function VocabularyLibrary({ decks }: { decks: VocabularyDeck[] }) {
                 transition={{ duration: shouldReduceMotion ? 0 : 0.22, ease: [0.23, 1, 0.32, 1] }}
                 className="h-full"
               >
-                <button
-                  type="button"
-                  onClick={(event) => openDeck(deck, event.currentTarget)}
+                <Link
+                  href={`/vocabulary/${deck.slug}`}
                   className="group flex h-full w-full flex-col rounded-xl border-2 border-[#e5e5e5] bg-white text-left transition-[border-color,transform] hover:-translate-y-0.5 hover:border-lingot-lime focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-lingot-lime/50 motion-reduce:transform-none"
-                  aria-label={`Xem chi tiết bộ từ ${deck.title}, trình độ ${deck.level}, hoàn thành ${progress.percent}%`}
+                  aria-label={`Bộ từ ${deck.title}, trình độ ${deck.level}, hoàn thành ${progress.percent}%`}
                 >
                   <span className="flex flex-1 flex-col p-5">
                     <span className="flex items-start justify-between gap-3">
@@ -233,11 +204,11 @@ export function VocabularyLibrary({ decks }: { decks: VocabularyDeck[] }) {
                         <BookOpen className="size-4 text-macaw-blue" /> {deck.words.length} từ
                       </span>
                       <span className="flex items-center gap-1 text-ecto-green group-hover:underline">
-                        Xem chi tiết <ArrowRight className="size-4" />
+                        Học bộ từ này <ArrowRight className="size-4" />
                       </span>
                     </span>
                   </span>
-                </button>
+                </Link>
               </motion.article>
             );
           })}
@@ -263,140 +234,6 @@ export function VocabularyLibrary({ decks }: { decks: VocabularyDeck[] }) {
           </button>
         </div>
       )}
-
-      <AnimatePresence>
-        {selectedDeck && (
-          <DeckDetailsDialog
-            deck={selectedDeck}
-            onClose={() => setSelectedDeck(null)}
-            closeButtonRef={closeButtonRef}
-            shouldReduceMotion={Boolean(shouldReduceMotion)}
-          />
-        )}
-      </AnimatePresence>
     </>
-  );
-}
-
-function DeckDetailsDialog({
-  deck,
-  onClose,
-  closeButtonRef,
-  shouldReduceMotion,
-}: {
-  deck: VocabularyDeck;
-  onClose: () => void;
-  closeButtonRef: React.RefObject<HTMLButtonElement | null>;
-  shouldReduceMotion: boolean;
-}) {
-  const progress = deckProgress(deck);
-  const plantStage = getPlantStage(progress.percent);
-  const PlantIcon = plantStage.Icon;
-  const titleId = `deck-dialog-title-${deck.id}`;
-  const descriptionId = `deck-dialog-description-${deck.id}`;
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <motion.button
-        type="button"
-        aria-label="Đóng hộp thoại chi tiết bộ từ"
-        initial={shouldReduceMotion ? false : { opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        onClick={onClose}
-        className="fixed inset-0 cursor-default bg-black/40"
-      />
-
-      <motion.div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={titleId}
-        aria-describedby={descriptionId}
-        initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.97, y: 8 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: shouldReduceMotion ? 1 : 0.97, y: shouldReduceMotion ? 0 : 8 }}
-        transition={{ duration: shouldReduceMotion ? 0 : 0.18 }}
-        className="relative z-10 max-h-[calc(100vh-2rem)] w-full max-w-lg overflow-y-auto rounded-xl border-2 border-[#e5e5e5] bg-white p-6"
-      >
-        <div className="flex items-start justify-between gap-4 border-b-2 border-[#eeeeee] pb-4">
-          <div className="flex min-w-0 items-center gap-3">
-            <span
-              className={cn(
-                "grid size-14 shrink-0 place-items-center rounded-xl border-2",
-                plantStage.surfaceClassName,
-              )}
-              aria-hidden="true"
-            >
-              <PlantIcon className={cn("size-8", plantStage.iconClassName)} strokeWidth={2.4} />
-            </span>
-            <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-2">
-                <Badge variant="neutral">{deck.level}</Badge>
-                <span className="text-xs font-extrabold text-charcoal">{plantStage.stageName}</span>
-              </div>
-              <h3 id={titleId} className="mt-1 text-2xl font-extrabold leading-tight text-eel-dark-blue">
-                {deck.title}
-              </h3>
-            </div>
-          </div>
-          <button
-            ref={closeButtonRef}
-            type="button"
-            onClick={onClose}
-            className="grid size-10 shrink-0 place-items-center rounded-xl border-2 border-[#e5e5e5] text-charcoal transition-colors hover:border-lingot-lime focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-lingot-lime/50"
-            aria-label="Đóng"
-          >
-            <X className="size-5" />
-          </button>
-        </div>
-
-        <p id={descriptionId} className="mt-4 text-sm font-bold leading-6 text-charcoal">
-          {deck.description || "Bộ từ vựng được xây dựng để giúp bạn ghi nhớ hiệu quả theo phương pháp lặp lại ngắt quãng."}
-        </p>
-
-        <div className="mt-5 rounded-xl border-2 border-eel-light bg-[#fbfff8] p-4">
-          <div className="flex items-center justify-between gap-3 text-sm font-extrabold text-eel-dark-blue">
-            <span>Tiến độ bộ từ</span>
-            <span className="text-lg text-ecto-green tabular-nums">{progress.percent}%</span>
-          </div>
-          <Progress
-            value={progress.percent}
-            aria-label={`Tiến độ học bộ từ ${deck.title}`}
-            className="mt-3"
-          />
-
-          <div className="mt-4 grid grid-cols-3 divide-x-2 divide-[#eeeeee] rounded-xl border-2 border-[#e5e5e5] bg-white text-center">
-            <div className="px-2 py-3">
-              <p className="text-lg font-extrabold text-ecto-green">{progress.mastered}</p>
-              <p className="text-xs font-bold text-ash">Đã thuộc</p>
-            </div>
-            <div className="px-2 py-3">
-              <p className="text-lg font-extrabold text-macaw-blue">{progress.learning}</p>
-              <p className="text-xs font-bold text-ash">Đang học</p>
-            </div>
-            <div className="px-2 py-3">
-              <p className="text-lg font-extrabold text-charcoal">{progress.fresh}</p>
-              <p className="text-xs font-bold text-ash">Từ mới</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-5 flex flex-col-reverse gap-3 sm:flex-row">
-          <button
-            type="button"
-            onClick={onClose}
-            className={buttonVariants({ variant: "secondary", size: "lg", className: "sm:w-1/3" })}
-          >
-            Đóng
-          </button>
-          <Link
-            href={`/vocabulary/${deck.slug}`}
-            className={buttonVariants({ size: "lg", className: "justify-center sm:w-2/3" })}
-          >
-            Học bộ từ này <ArrowRight className="size-4" />
-          </Link>
-        </div>
-      </motion.div>
-    </div>
   );
 }
