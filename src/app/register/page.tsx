@@ -78,7 +78,7 @@ export default function RegisterPage() {
                 required
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
-                placeholder="Hà Văn Phong"
+                placeholder="Nguyễn Văn A"
                 className="pl-11"
               />
             </div>
@@ -96,7 +96,7 @@ export default function RegisterPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="havanphong784@gmail.com"
+                placeholder="name@example.com"
                 className="pl-11"
               />
             </div>

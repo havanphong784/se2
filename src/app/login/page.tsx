@@ -10,7 +10,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 export default function LoginPage() {
-  const router = Router();
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -77,7 +77,7 @@ export default function LoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="havanphong784@gmail.com"
+                placeholder="name@example.com"
                 className="pl-11"
               />
             </div>
@@ -131,8 +131,4 @@ export default function LoginPage() {
       </div>
     </div>
   );
-}
-
-function Router() {
-  return useRouter();
 }
