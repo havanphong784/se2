@@ -4,13 +4,19 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   ArrowLeftRight,
+  BookOpen,
   CheckCircle2,
+  Clock,
   Copy,
   FolderPlus,
+  HelpCircle,
+  History,
   Languages,
+  Lightbulb,
   Loader2,
   Plus,
   Sparkles,
+  Trash2,
   Volume2,
 } from "lucide-react";
 
@@ -34,6 +40,24 @@ type TranslationResult = {
   exampleTranslation?: string;
 };
 
+type TranslationHistoryItem = {
+  id: string;
+  original: string;
+  translated: string;
+  direction: "en-vi" | "vi-en";
+  timestamp: string;
+};
+
+const SUGGESTED_TOPICS = [
+  { label: "Trường học", query: "school" },
+  { label: "Môi trường", query: "environment" },
+  { label: "Du lịch", query: "travel" },
+  { label: "Trí tuệ nhân tạo", query: "artificial intelligence" },
+  { label: "Sức khỏe", query: "health" },
+  { label: "Kinh tế", query: "economy" },
+  { label: "Ẩm thực", query: "cuisine" },
+];
+
 export function TranslationTool({
   available,
   decks: initialDecks,
@@ -47,6 +71,40 @@ export function TranslationTool({
   const [result, setResult] = useState<TranslationResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+
+  const STORAGE_KEY = "vocabloom_translation_history";
+
+  // Recent translation history state
+  const [history, setHistory] = useState<TranslationHistoryItem[]>([]);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        setHistory(JSON.parse(saved));
+      }
+    } catch {
+      // Ignore localStorage errors
+    }
+  }, []);
+
+  function saveHistory(items: TranslationHistoryItem[]) {
+    setHistory(items);
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    } catch {
+      // Ignore localStorage errors
+    }
+  }
+
+  function handleClearHistory() {
+    setHistory([]);
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      // Ignore localStorage errors
+    }
+  }
 
   // Deck modal state
   const [decks, setDecks] = useState<PersonalDeck[]>(initialDecks);
@@ -78,8 +136,8 @@ export function TranslationTool({
     }
   }
 
-  async function handleTranslate() {
-    if (!inputText.trim()) return;
+  async function performTranslate(textToTranslate: string, dir: "en-vi" | "vi-en" = direction) {
+    if (!textToTranslate.trim()) return;
     setLoading(true);
     setError(null);
     setResult(null);
@@ -87,7 +145,7 @@ export function TranslationTool({
       const response = await fetch("/api/translate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: inputText.trim(), direction }),
+        body: JSON.stringify({ text: textToTranslate.trim(), direction: dir }),
       });
       const data = await response.json();
       if (!response.ok) {
@@ -100,11 +158,45 @@ export function TranslationTool({
       setCustomPartsOfSpeech(data.partsOfSpeech ? data.partsOfSpeech.join(", ") : "");
       setCustomExampleSentence(data.exampleSentence || "");
       setCustomExampleTranslation(data.exampleTranslation || "");
+
+      // Add to history
+      const newItem: TranslationHistoryItem = {
+        id: Date.now().toString(),
+        original: data.original,
+        translated: data.translated,
+        direction: data.direction,
+        timestamp: new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
+      };
+      setHistory((prev) => {
+        const next = [newItem, ...prev.filter((h) => h.original !== data.original).slice(0, 9)];
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+        } catch {
+          // Ignore localStorage errors
+        }
+        return next;
+      });
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Không thể kết nối dịch vụ dịch.");
     } finally {
       setLoading(false);
     }
+  }
+
+  function handleTranslate() {
+    performTranslate(inputText, direction);
+  }
+
+  function handleTopicClick(query: string) {
+    setInputText(query);
+    setDirection("en-vi");
+    performTranslate(query, "en-vi");
+  }
+
+  function handleHistoryClick(item: TranslationHistoryItem) {
+    setInputText(item.original);
+    setDirection(item.direction);
+    performTranslate(item.original, item.direction);
   }
 
   function handleCopy() {
@@ -196,206 +288,348 @@ export function TranslationTool({
         : "";
 
   return (
-    <div className="space-y-8">
-      {/* Header card */}
-      <Card className="border-eel-light border-b-4 shadow-sm">
-        <CardHeader className="bg-[#fbfff8] pb-4">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <Badge variant="blue" className="gap-1.5">
-              <Languages className="size-4" /> Dịch thuật thông minh
-            </Badge>
+    <div className="grid gap-8 lg:grid-cols-12">
+      {/* Left Column: Translation Workspace (8 cols) */}
+      <div className="space-y-6 lg:col-span-8">
+        <Card className="border-eel-light border-b-4 shadow-sm">
+          <CardHeader className="bg-[#fbfff8] pb-4 border-b border-[#eeeeee]">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <Badge variant="blue" className="gap-1.5 text-xs font-extrabold">
+                <Languages className="size-4" /> Bảng dịch trực tiếp
+              </Badge>
 
-            {/* Direction toggle */}
-            <div className="flex items-center gap-2 font-extrabold text-eel-dark-blue">
-              <span className={cn(direction === "en-vi" && "text-[#438f0e] font-black")}>
-                Tiếng Anh
-              </span>
-              <Button
-                type="button"
-                variant="secondary"
-                size="sm"
-                onClick={handleSwapDirection}
-                title="Đổi chiều dịch"
-                className="size-9 rounded-lg p-0"
-              >
-                <ArrowLeftRight className="size-4" />
-              </Button>
-              <span className={cn(direction === "vi-en" && "text-[#438f0e] font-black")}>
-                Tiếng Việt
-              </span>
-            </div>
-          </div>
-        </CardHeader>
-
-        <CardContent className="space-y-6 pt-6">
-          <div className="grid gap-6 md:grid-cols-2">
-            {/* Input area */}
-            <div className="space-y-2">
-              <label className="text-xs font-extrabold uppercase tracking-wider text-ash">
-                Văn bản gốc ({direction === "en-vi" ? "Tiếng Anh" : "Tiếng Việt"})
-              </label>
-              <textarea
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-                placeholder={
-                  direction === "en-vi"
-                    ? "Nhập từ hoặc câu tiếng Anh cần dịch…"
-                    : "Nhập từ hoặc câu tiếng Việt cần dịch…"
-                }
-                rows={5}
-                className="w-full resize-none rounded-xl border-2 border-[#e5e5e5] p-4 text-base font-bold text-eel-dark-blue focus:border-ecto-green focus:outline-none"
-              />
-              <div className="flex justify-between items-center">
-                <span className="text-xs font-bold text-ash">
-                  {inputText.length}/2000 ký tự
+              {/* Direction toggle */}
+              <div className="flex items-center gap-2 font-extrabold text-eel-dark-blue text-sm">
+                <span className={cn(direction === "en-vi" && "text-[#438f0e] font-black")}>
+                  Tiếng Anh
                 </span>
-                {direction === "en-vi" && inputText.trim() && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleSpeak(inputText)}
-                    className="h-8 gap-1 text-xs"
-                  >
-                    <Volume2 className="size-4 text-macaw-blue" /> Nghe
-                  </Button>
-                )}
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleSwapDirection}
+                  title="Đổi chiều dịch"
+                  className="size-9 rounded-lg p-0 border-2 border-[#e5e5e5]"
+                >
+                  <ArrowLeftRight className="size-4" />
+                </Button>
+                <span className={cn(direction === "vi-en" && "text-[#438f0e] font-black")}>
+                  Tiếng Việt
+                </span>
               </div>
             </div>
+          </CardHeader>
 
-            {/* Result area */}
-            <div className="space-y-2">
-              <label className="text-xs font-extrabold uppercase tracking-wider text-ash">
-                Bản dịch ({direction === "en-vi" ? "Tiếng Việt" : "Tiếng Anh"})
-              </label>
-              <div className="relative min-h-[140px] w-full rounded-xl border-2 border-[#e5e5e5] bg-[#fcfcfc] p-4">
-                {loading ? (
-                  <div className="flex h-28 items-center justify-center text-ash gap-2 font-bold">
-                    <Loader2 className="size-5 animate-spin text-ecto-green" /> Đang dịch…
-                  </div>
-                ) : result ? (
-                  <div className="space-y-3">
-                    <p className="text-xl font-extrabold text-[#438f0e] leading-relaxed">
-                      {result.translated}
-                    </p>
-
-                    {/* Rich dictionary details badge section */}
-                    {(result.phonetic || (result.partsOfSpeech && result.partsOfSpeech.length > 0)) && (
-                      <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-[#eeeeee]">
-                        {result.phonetic && (
-                          <button
-                            type="button"
-                            onClick={() => handleSpeak(englishTextToSpeak)}
-                            className="inline-flex items-center gap-1.5 rounded-lg border border-macaw-blue/40 bg-[#f0f9ff] px-2.5 py-1 text-xs font-black text-macaw-blue hover:bg-[#e0f2fe] transition"
-                            title="Click để nghe phát âm phiên âm"
-                          >
-                            <Volume2 className="size-3.5" />
-                            {result.phonetic}
-                          </button>
-                        )}
-                        {result.partsOfSpeech?.map((pos, idx) => (
-                          <Badge key={idx} variant="blue" className="text-xs">
-                            {pos}
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Example sentence & translation if available */}
-                    {result.exampleSentence && (
-                      <div className="text-xs font-bold text-ash border-t border-[#f0f0f0] pt-2 space-y-0.5">
-                        <p>
-                          <span className="font-extrabold text-eel-dark-blue">Ví dụ:</span> &ldquo;
-                          {result.exampleSentence}&rdquo;
-                        </p>
-                        {result.exampleTranslation && (
-                          <p className="text-[#438f0e]">
-                            &rarr; &ldquo;{result.exampleTranslation}&rdquo;
-                          </p>
-                        )}
-                      </div>
-                    )}
-
-                    {result.confidence !== null && (
-                      <p className="text-[11px] font-bold text-ash/80">
-                        Độ khớp dịch: {Math.round(result.confidence * 100)}%
-                      </p>
-                    )}
-                  </div>
-                ) : (
-                  <p className="text-sm font-bold text-ash/60 italic">
-                    Kết quả dịch sẽ xuất hiện ở đây…
-                  </p>
-                )}
+          <CardContent className="space-y-6 pt-6">
+            <div className="grid gap-6 md:grid-cols-2">
+              {/* Input area */}
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <label className="text-xs font-extrabold uppercase tracking-wider text-ash">
+                    Văn bản gốc ({direction === "en-vi" ? "Tiếng Anh" : "Tiếng Việt"})
+                  </label>
+                  {inputText && (
+                    <button
+                      type="button"
+                      onClick={() => setInputText("")}
+                      className="text-xs font-bold text-ash hover:text-red-500"
+                    >
+                      Xóa
+                    </button>
+                  )}
+                </div>
+                <textarea
+                  value={inputText}
+                  onChange={(e) => setInputText(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+                      e.preventDefault();
+                      handleTranslate();
+                    }
+                  }}
+                  placeholder={
+                    direction === "en-vi"
+                      ? "Nhập từ hoặc câu tiếng Anh cần dịch (Ví dụ: environment, hello, ...)"
+                      : "Nhập từ hoặc câu tiếng Việt cần dịch (Ví dụ: xin chào, môi trường, ...)"
+                  }
+                  rows={6}
+                  className="w-full resize-none rounded-xl border-2 border-[#e5e5e5] p-4 text-base font-bold text-eel-dark-blue focus:border-ecto-green focus:outline-none transition-colors"
+                />
+                <div className="flex justify-between items-center">
+                  <span className="text-xs font-bold text-ash">
+                    {inputText.length}/2000 ký tự (Ctrl + Enter để dịch)
+                  </span>
+                  {direction === "en-vi" && inputText.trim() && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleSpeak(inputText)}
+                      className="h-8 gap-1 text-xs font-extrabold text-macaw-blue hover:bg-blue-50"
+                    >
+                      <Volume2 className="size-4" /> Nghe phát âm
+                    </Button>
+                  )}
+                </div>
               </div>
 
-              {result && (
-                <div className="flex flex-wrap items-center gap-2 pt-1">
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    size="sm"
-                    onClick={handleCopy}
-                    className="h-9 text-xs"
-                  >
-                    <Copy className="size-3.5" />
-                    {copied ? "Đã chép" : "Sao chép"}
-                  </Button>
+              {/* Result area */}
+              <div className="space-y-2">
+                <label className="text-xs font-extrabold uppercase tracking-wider text-ash">
+                  Bản dịch ({direction === "en-vi" ? "Tiếng Việt" : "Tiếng Anh"})
+                </label>
+                <div className="relative min-h-[168px] w-full rounded-xl border-2 border-[#e5e5e5] bg-[#fcfcfc] p-4">
+                  {loading ? (
+                    <div className="flex h-36 items-center justify-center text-ash gap-2 font-bold">
+                      <Loader2 className="size-6 animate-spin text-ecto-green" /> Đang dịch qua Google API…
+                    </div>
+                  ) : result ? (
+                    <div className="space-y-3">
+                      <p className="text-xl font-extrabold text-[#438f0e] leading-relaxed select-all">
+                        {result.translated}
+                      </p>
 
-                  {englishTextToSpeak && (
+                      {/* Rich dictionary details badge section */}
+                      {(result.phonetic || (result.partsOfSpeech && result.partsOfSpeech.length > 0)) && (
+                        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-[#eeeeee]">
+                          {result.phonetic && (
+                            <button
+                              type="button"
+                              onClick={() => handleSpeak(englishTextToSpeak)}
+                              className="inline-flex items-center gap-1.5 rounded-lg border border-macaw-blue/40 bg-[#f0f9ff] px-2.5 py-1 text-xs font-black text-macaw-blue hover:bg-[#e0f2fe] transition"
+                              title="Click để nghe phát âm phiên âm IPA"
+                            >
+                              <Volume2 className="size-3.5" />
+                              {result.phonetic}
+                            </button>
+                          )}
+                          {result.partsOfSpeech?.map((pos, idx) => (
+                            <Badge key={idx} variant="blue" className="text-xs font-bold">
+                              {pos}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Example sentence & translation if available */}
+                      {result.exampleSentence && (
+                        <div className="text-xs font-bold text-ash border-t border-[#f0f0f0] pt-2 space-y-1 bg-[#f8fafc] p-2.5 rounded-lg">
+                          <p>
+                            <span className="font-extrabold text-eel-dark-blue">Ví dụ Anh:</span> &ldquo;
+                            {result.exampleSentence}&rdquo;
+                          </p>
+                          {result.exampleTranslation && (
+                            <p className="text-[#438f0e]">
+                              <span className="font-extrabold text-[#438f0e]">Dịch Việt:</span> &ldquo;{result.exampleTranslation}&rdquo;
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="flex h-36 flex-col items-center justify-center text-center text-ash/60">
+                      <Languages className="size-8 mb-2 opacity-40" />
+                      <p className="text-sm font-bold italic">
+                        Nhập từ vựng hoặc câu ở bên trái để xem bản dịch…
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {result && (
+                  <div className="flex flex-wrap items-center gap-2 pt-1">
                     <Button
                       type="button"
                       variant="secondary"
                       size="sm"
-                      onClick={() => handleSpeak(englishTextToSpeak)}
-                      className="h-9 text-xs"
+                      onClick={handleCopy}
+                      className="h-9 text-xs font-extrabold border-2"
                     >
-                      <Volume2 className="size-3.5 text-macaw-blue" /> Đọc từ tiếng Anh
+                      <Copy className="size-3.5" />
+                      {copied ? "Đã chép" : "Sao chép"}
                     </Button>
-                  )}
 
-                  <Button
-                    type="button"
-                    variant="blue"
-                    size="sm"
-                    onClick={handleOpenAddModal}
-                    className="h-9 text-xs ml-auto"
+                    {englishTextToSpeak && (
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => handleSpeak(englishTextToSpeak)}
+                        className="h-9 text-xs font-extrabold text-macaw-blue border-2"
+                      >
+                        <Volume2 className="size-3.5" /> Nghe từ tiếng Anh
+                      </Button>
+                    )}
+
+                    <Button
+                      type="button"
+                      variant="blue"
+                      size="sm"
+                      onClick={handleOpenAddModal}
+                      className="h-9 text-xs ml-auto font-black"
+                    >
+                      <FolderPlus className="size-4" /> Thêm vào gói từ
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {error && (
+              <div className="rounded-xl border-2 border-[#ff6b6b] bg-[#fff3f3] p-4 text-sm font-bold text-[#b93636]">
+                {error}
+              </div>
+            )}
+
+            {/* Action row */}
+            <div className="flex justify-end pt-2 border-t border-[#eeeeee]">
+              <Button
+                type="button"
+                size="lg"
+                onClick={handleTranslate}
+                disabled={loading || !inputText.trim()}
+                className="w-full sm:w-auto min-w-[160px] font-black"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="size-5 animate-spin" /> Đang dịch…
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="size-5" /> Dịch ngay
+                  </>
+                )}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Topic suggestions */}
+        <Card className="border-eel-light border-b-4 shadow-sm bg-[#fbfff8]">
+          <CardContent className="p-5">
+            <div className="flex items-center gap-2 mb-3 text-xs font-extrabold uppercase tracking-wider text-ash">
+              <Sparkles className="size-4 text-ecto-green" /> Từ vựng gợi ý theo chủ đề nhanh
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {SUGGESTED_TOPICS.map((topic) => (
+                <button
+                  key={topic.query}
+                  type="button"
+                  onClick={() => handleTopicClick(topic.query)}
+                  className="rounded-xl border-2 border-[#e5e5e5] bg-white px-3.5 py-1.5 text-xs font-extrabold text-eel-dark-blue hover:border-ecto-green hover:bg-[#f2ffe9] hover:text-[#438f0e] transition"
+                >
+                  {topic.label} ({topic.query})
+                </button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Right Column: History & Quick Deck Access (4 cols) */}
+      <div className="space-y-6 lg:col-span-4">
+        {/* Recent Translation History */}
+        <Card className="border-eel-light border-b-4 shadow-sm">
+          <CardHeader className="pb-3 border-b border-[#eeeeee]">
+            <CardTitle className="flex items-center justify-between text-base font-extrabold text-eel-dark-blue">
+              <span className="flex items-center gap-2">
+                <History className="size-4 text-macaw-blue" />
+                Lịch sử dịch
+              </span>
+              {history.length > 0 && (
+                <button
+                  type="button"
+                  onClick={handleClearHistory}
+                  className="text-xs font-bold text-ash hover:text-red-500"
+                  title="Xóa lịch sử"
+                >
+                  <Trash2 className="size-3.5" />
+                </button>
+              )}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 pt-3">
+            {history.length === 0 ? (
+              <div className="py-6 text-center text-xs font-bold text-ash/70">
+                <Clock className="size-6 mx-auto mb-2 opacity-40" />
+                Chưa có từ nào được dịch trong phiên làm việc này.
+              </div>
+            ) : (
+              <ul className="divide-y divide-[#eeeeee] space-y-2">
+                {history.map((item) => (
+                  <li key={item.id} className="pt-2 first:pt-0">
+                    <button
+                      type="button"
+                      onClick={() => handleHistoryClick(item)}
+                      className="w-full text-left p-2.5 rounded-xl border border-transparent hover:border-[#e5e5e5] hover:bg-[#f9fafb] transition group"
+                    >
+                      <div className="flex justify-between items-start">
+                        <span className="text-xs font-extrabold text-eel-dark-blue group-hover:text-macaw-blue">
+                          {item.original}
+                        </span>
+                        <span className="text-[10px] font-bold text-ash">{item.timestamp}</span>
+                      </div>
+                      <p className="text-xs font-bold text-[#438f0e] truncate mt-0.5">
+                        &rarr; {item.translated}
+                      </p>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Personal Decks Summary */}
+        <Card className="border-eel-light border-b-4 shadow-sm bg-[#fafafa]">
+          <CardHeader className="pb-3 border-b border-[#eeeeee]">
+            <CardTitle className="flex items-center justify-between text-base font-extrabold text-eel-dark-blue">
+              <span className="flex items-center gap-2">
+                <BookOpen className="size-4 text-ecto-green" />
+                Gói từ cá nhân ({decks.length})
+              </span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 space-y-3">
+            {decks.length === 0 ? (
+              <p className="text-xs font-bold text-ash">
+                Bạn chưa tạo gói từ cá nhân nào. Hãy dịch một từ và bấm &ldquo;Thêm vào gói từ&rdquo; để tạo mới!
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {decks.slice(0, 4).map((d) => (
+                  <div
+                    key={d.id}
+                    className="flex items-center justify-between rounded-xl border border-[#e5e5e5] bg-white p-2.5 text-xs font-bold text-eel-dark-blue"
                   >
-                    <FolderPlus className="size-4" /> Thêm vào gói từ
-                  </Button>
-                </div>
-              )}
-            </div>
-          </div>
+                    <span className="truncate max-w-[180px] font-extrabold">{d.title}</span>
+                    <Link
+                      href={`/vocabulary/${d.slug}`}
+                      className="text-xs font-extrabold text-macaw-blue hover:underline shrink-0"
+                    >
+                      Xem gói &rarr;
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
-          {error && (
-            <div className="rounded-xl border-2 border-[#ff6b6b] bg-[#fff3f3] p-4 text-sm font-bold text-[#b93636]">
-              {error}
+        {/* Helpful Tips Card */}
+        <Card className="border-eel-light border-b-4 shadow-sm bg-[#f0f9ff]">
+          <CardContent className="p-4 space-y-2">
+            <div className="flex items-center gap-2 text-xs font-black uppercase text-macaw-blue">
+              <Lightbulb className="size-4" /> Mẹo học từ vựng hiệu quả
             </div>
-          )}
-
-          {/* Action row */}
-          <div className="flex justify-end pt-2">
-            <Button
-              type="button"
-              size="lg"
-              onClick={handleTranslate}
-              disabled={loading || !inputText.trim()}
-              className="w-full sm:w-auto"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="size-5 animate-spin" /> Đang dịch…
-                </>
-              ) : (
-                <>
-                  <Sparkles className="size-5" /> Dịch ngay
-                </>
-              )}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+            <ul className="text-xs font-bold text-eel-dark-blue space-y-1.5 leading-relaxed list-disc list-inside">
+              <li>Tra từ đơn lẻ để hệ thống tự động tìm phiên âm IPA &amp; loại từ.</li>
+              <li>Lưu ngay từ vừa tra vào gói từ vựng cá nhân để học lặp lại ngắt quãng.</li>
+              <li>Sử dụng tính năng đọc âm thanh để luyện nghe và phát âm theo.</li>
+            </ul>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Modal dialog for adding word to deck */}
       {showDeckModal && result && (
@@ -412,13 +646,13 @@ export function TranslationTool({
               <div className="rounded-xl border-2 border-lingot-lime/70 bg-[#f7fff1] p-3 text-sm">
                 <p className="font-extrabold text-[#438f0e]">
                   Từ tiếng Anh:{" "}
-                  <span className="text-eel-dark-blue">
+                  <span className="text-eel-dark-blue font-black">
                     {result.direction === "en-vi" ? result.original : result.translated}
                   </span>
                 </p>
                 <p className="font-extrabold text-[#438f0e]">
                   Nghĩa tiếng Việt:{" "}
-                  <span className="text-eel-dark-blue">
+                  <span className="text-eel-dark-blue font-black">
                     {result.direction === "en-vi" ? result.translated : result.original}
                   </span>
                 </p>
