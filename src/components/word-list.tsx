@@ -153,7 +153,7 @@ export function WordList({ words: initialWords }: { words: VocabularyWord[] }) {
                 </Button>
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="text-lg font-extrabold text-eel-dark-blue">{word.term}</h3>
+                    <h2 className="text-lg font-extrabold text-eel-dark-blue">{word.term}</h2>
                     <Badge variant={status.variant}>{status.label}</Badge>
                   </div>
                   <p className="mt-1 text-sm font-bold text-ash">
