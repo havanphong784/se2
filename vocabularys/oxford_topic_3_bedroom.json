@@ -1,0 +1,262 @@
+[
+  {
+    "term": "lamp",
+    "translation": "đèn",
+    "phonetic": "/læmp/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She turned on the bedside lamp to read her favorite book.",
+    "exampleTranslation": "Cô ấy đã bật chiếc đèn ngủ ở đầu giường để đọc cuốn sách yêu thích của mình."
+  },
+  {
+    "term": "pillowcase",
+    "translation": "bao gối",
+    "phonetic": "/ˈpɪl.əʊ.keɪs/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He changed the old pillowcase for a clean, white one.",
+    "exampleTranslation": "Anh ấy đã thay chiếc bao gối cũ bằng một chiếc màu trắng sạch sẽ."
+  },
+  {
+    "term": "curtain",
+    "translation": "rèm",
+    "phonetic": "/ˈkɜː.tən/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Please close the window curtain to block the bright morning sunlight.",
+    "exampleTranslation": "Làm ơn hãy đóng rèm cửa sổ lại để chặn ánh nắng ban mai chói chang."
+  },
+  {
+    "term": "bed",
+    "translation": "giường",
+    "phonetic": "/bed/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "After a long working day, he jumped straight into his comfortable bed.",
+    "exampleTranslation": "Sau một ngày làm việc dài, anh ấy đã nhảy ngay lên chiếc giường thoải mái của mình."
+  },
+  {
+    "term": "mirror",
+    "translation": "gương",
+    "phonetic": "/ˈmɪr.ər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She looked at herself in the mirror before leaving the house.",
+    "exampleTranslation": "Cô ấy đã tự nhìn mình trong gương trước khi rời khỏi nhà."
+  },
+  {
+    "term": "cushion",
+    "translation": "đệm",
+    "phonetic": "/ˈkʊʃ.ən/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Place a soft cushion behind your back if you feel uncomfortable.",
+    "exampleTranslation": "Hãy đặt một chiếc đệm mềm sau lưng nếu bạn cảm thấy không thoải mái."
+  },
+  {
+    "term": "wardrobe",
+    "translation": "tủ quần áo",
+    "phonetic": "/ˈwɔː.drəʊb/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He hung his expensive suits neatly inside the large wooden wardrobe.",
+    "exampleTranslation": "Anh ấy đã treo những bộ vest đắt tiền của mình ngăn nắp bên trong chiếc tủ quần áo lớn bằng gỗ."
+  },
+  {
+    "term": "fitted carpet",
+    "translation": "thảm lót sàn",
+    "phonetic": "/ˌfɪt.ɪd ˈkɑː.pɪt/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "The bedroom floor is fully covered with a luxurious fitted carpet.",
+    "exampleTranslation": "Sàn phòng ngủ được bao phủ hoàn toàn bằng một tấm thảm lót sàn sang trọng."
+  },
+  {
+    "term": "dressing table",
+    "translation": "bàn trang điểm",
+    "phonetic": "/ˈdres.ɪŋ ˌteɪ.bəl/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "She keeps all her skincare products on her modern dressing table.",
+    "exampleTranslation": "Cô ấy giữ tất cả các sản phẩm chăm sóc da của mình trên chiếc bàn trang điểm hiện đại."
+  },
+  {
+    "term": "wallpaper",
+    "translation": "giấy dán tường",
+    "phonetic": "/ˈwɔːlˌpeɪ.pər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "They chose a floral pattern wallpaper to decorate their bedroom walls.",
+    "exampleTranslation": "Họ đã chọn một loại giấy dán tường có họa tiết hoa để trang trí các bức tường phòng ngủ."
+  },
+  {
+    "term": "pillow",
+    "translation": "gối",
+    "phonetic": "/ˈpɪl.əʊ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He likes to sleep with a very soft feather pillow under his head.",
+    "exampleTranslation": "Anh ấy thích ngủ với một chiếc gối lông vũ rất mềm dưới đầu."
+  },
+  {
+    "term": "carpet",
+    "translation": "tấm thảm",
+    "phonetic": "/ˈkɑː.pɪt/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The beautiful woven carpet adds warmth to the entire bedroom space.",
+    "exampleTranslation": "Tấm thảm dệt đẹp đẽ tạo thêm sự ấm áp cho toàn bộ không gian phòng ngủ."
+  },
+  {
+    "term": "blind",
+    "translation": "mành, rèm che",
+    "phonetic": "/blaɪnd/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She pulled down the window blind to make the room darker.",
+    "exampleTranslation": "Cô ấy đã kéo mành che cửa sổ xuống để làm cho căn phòng tối hơn."
+  },
+  {
+    "term": "mattress",
+    "translation": "nệm",
+    "phonetic": "/ˈmæt.rəs/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "This new memory foam mattress is extremely good for his backache.",
+    "exampleTranslation": "Chiếc nệm cao su non mới này cực kỳ tốt cho bệnh đau lưng của anh ấy."
+  },
+  {
+    "term": "bedspread",
+    "translation": "khăn trải giường",
+    "phonetic": "/ˈbed.spred/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She spread a clean, colorful bedspread over the mattress this morning.",
+    "exampleTranslation": "Sáng nay cô ấy đã trải một tấm khăn trải giường sạch sẽ, đầy màu sắc lên nệm."
+  },
+  {
+    "term": "blanket",
+    "translation": "tấm chăn, mền",
+    "phonetic": "/ˈblæŋ.kɪt/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "It was so cold last night that I needed an extra wool blanket.",
+    "exampleTranslation": "Đêm qua trời lạnh đến mức tôi cần thêm một chiếc chăn len nữa."
+  },
+  {
+    "term": "jewelry",
+    "translation": "trang sức",
+    "phonetic": "/dʒuːl.ri/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She keeps her expensive jewelry safe inside a small locked drawer.",
+    "exampleTranslation": "Cô ấy cất giữ những món trang sức đắt tiền của mình an toàn bên trong một chiếc ngăn kéo nhỏ có khóa."
+  },
+  {
+    "term": "alarm clock",
+    "translation": "đồng hồ báo thức",
+    "phonetic": "/əˈlɑːm ˌklɒk/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "The loud ringing of the alarm clock woke him up at six.",
+    "exampleTranslation": "Tiếng chuông reo lớn của chiếc đồng hồ báo thức đã đánh thức anh ấy dậy lúc sáu giờ."
+  },
+  {
+    "term": "air conditioner",
+    "translation": "máy điều hòa",
+    "phonetic": "/ˈeə kənˌdɪʃ.ən.ər/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "We turned on the air conditioner because the room was very hot.",
+    "exampleTranslation": "Chúng tôi đã bật máy điều hòa vì căn phòng rất nóng."
+  },
+  {
+    "term": "box spring",
+    "translation": "khung lò xo nâng nệm",
+    "phonetic": "/ˈbɒks ˌsprɪŋ/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "A sturdy box spring supports the heavy mattress and prevents it from sagging.",
+    "exampleTranslation": "Một khung lò xo chắc chắn hỗ trợ chiếc nệm nặng và ngăn nó không bị võng xuống."
+  },
+  {
+    "term": "comforter",
+    "translation": "chăn bông",
+    "phonetic": "/ˈkʌm.fə.tər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She pulled the warm comforter up to her chin to stay warm.",
+    "exampleTranslation": "Cô ấy đã kéo chiếc chăn bông ấm áp lên tận cằm để giữ ấm."
+  },
+  {
+    "term": "hanger",
+    "translation": "móc treo (quần áo)",
+    "phonetic": "/ˈhæŋ.ər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Please put your jacket on a wooden hanger inside the closet.",
+    "exampleTranslation": "Vui lòng đặt chiếc áo khoác của bạn lên một chiếc móc treo bằng gỗ bên trong tủ quần áo."
+  },
+  {
+    "term": "closet",
+    "translation": "tủ đóng trong tường",
+    "phonetic": "/ˈklɒz.ɪt/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She has a lot of beautiful dresses hanging inside her walk-in closet.",
+    "exampleTranslation": "Cô ấy có rất nhiều bộ váy đẹp đang treo bên trong chiếc tủ quần áo lớn của mình."
+  },
+  {
+    "term": "comb",
+    "translation": "lược",
+    "phonetic": "/kəʊm/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He used a plastic comb to style his hair before the interview.",
+    "exampleTranslation": "Anh ấy đã sử dụng một chiếc lược nhựa để tạo kiểu tóc trước cuộc phỏng vấn."
+  },
+  {
+    "term": "light switch",
+    "translation": "công tắc điện",
+    "phonetic": "/laɪt swɪtʃ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The light switch is located right next to the bedroom door entrance.",
+    "exampleTranslation": "Công tắc điện nằm ngay cạnh lối vào cửa phòng ngủ."
+  },
+  {
+    "term": "chest of drawers",
+    "translation": "tủ kéo",
+    "phonetic": "/ˌtʃest əv ˈdrɔːz/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "She keeps her folded shirts and socks inside the wooden chest of drawers.",
+    "exampleTranslation": "Cô ấy giữ những chiếc áo sơ mi gấp gọn và tất của mình bên trong chiếc tủ kéo bằng gỗ."
+  }
+]

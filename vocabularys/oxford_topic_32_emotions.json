@@ -1,0 +1,182 @@
+[
+  {
+    "term": "angry",
+    "translation": "tức giận",
+    "phonetic": "/ˈæŋɡri/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "He was extremely angry when he found out that his laptop was stolen.",
+    "exampleTranslation": "Anh ấy đã vô cùng tức giận khi phát hiện ra chiếc máy tính xách tay của mình bị đánh cắp."
+  },
+  {
+    "term": "sleepy",
+    "translation": "buồn ngủ",
+    "phonetic": "/ˈsliːpi/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "I feel very sleepy after sitting through the long and boring lecture.",
+    "exampleTranslation": "Tôi cảm thấy rất buồn ngủ sau khi ngồi nghe bài giảng dài và nhàm chán."
+  },
+  {
+    "term": "surprised",
+    "translation": "ngạc nhiên, bất ngờ",
+    "phonetic": "/səˈpraɪzd/ - /sərˈpraɪzd/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "She was pleasantly surprised by the unexpected birthday party from her close friends.",
+    "exampleTranslation": "Cô ấy đã ngạc nhiên và vui mừng trước bữa tiệc sinh nhật bất ngờ từ những người bạn thân của mình."
+  },
+  {
+    "term": "grateful",
+    "translation": "biết ơn",
+    "phonetic": "/ˈɡreɪtfl/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "We are deeply grateful for your kind help during our difficult times.",
+    "exampleTranslation": "Chúng tôi vô cùng biết ơn sự giúp đỡ tận tình của bạn trong những thời điểm khó khăn của chúng tôi."
+  },
+  {
+    "term": "scared",
+    "translation": "sợ hãi",
+    "phonetic": "/skeəd/ - /skerd/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "The little child was scared of the loud thunder during the storm last night.",
+    "exampleTranslation": "Đứa trẻ nhỏ đã sợ hãi tiếng sấm lớn trong cơn bão đêm qua."
+  },
+  {
+    "term": "embarrassed",
+    "translation": "bối rối, xấu hổ",
+    "phonetic": "/ɪmˈbærəst/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "He felt embarrassed when he accidentally spilled red wine on her white dress.",
+    "exampleTranslation": "Anh ấy cảm thấy xấu hổ khi vô tình làm đổ rượu vang đỏ lên chiếc váy trắng của cô ấy."
+  },
+  {
+    "term": "confused",
+    "translation": "lúng túng, bối rối",
+    "phonetic": "/kənˈfjuːzd/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "The students were completely confused by the complex math instructions on the board.",
+    "exampleTranslation": "Các học sinh đã hoàn toàn bối rối trước những hướng dẫn toán học phức tạp trên bảng."
+  },
+  {
+    "term": "sad",
+    "translation": "buồn rầu",
+    "phonetic": "/sæd/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "The little boy felt sad because his favorite toy was accidentally broken yesterday.",
+    "exampleTranslation": "Cậu bé cảm thấy buồn rầu vì món đồ chơi yêu thích của mình vô tình bị hỏng ngày hôm qua."
+  },
+  {
+    "term": "hungry",
+    "translation": "đói bụng",
+    "phonetic": "/ˈhʌŋɡri/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "The children were very hungry after playing soccer in the park for hours.",
+    "exampleTranslation": "Lũ trẻ đã rất đói bụng sau khi chơi bóng đá trong công viên hàng giờ liền."
+  },
+  {
+    "term": "full",
+    "translation": "no",
+    "phonetic": "/fʊl/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "I cannot eat any more chocolate cake because I am completely full now.",
+    "exampleTranslation": "Tôi không thể ăn thêm bất kỳ mẩu bánh sô-cô-la nào nữa vì bây giờ tôi đã hoàn toàn no rồi."
+  },
+  {
+    "term": "happy",
+    "translation": "vui, hạnh phúc",
+    "phonetic": "/ˈhæpi/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "They were extremely happy to hear that their daughter had passed the entrance exam.",
+    "exampleTranslation": "Họ đã vô cùng hạnh phúc khi nghe tin con gái mình đã thi đỗ kỳ thi tuyển sinh."
+  },
+  {
+    "term": "jealous",
+    "translation": "ghen, ghen tuông",
+    "phonetic": "/ˈdʒeləs/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "He felt a bit jealous when his best friend bought a brand new car.",
+    "exampleTranslation": "Anh ấy cảm thấy hơi ghen tị khi người bạn thân nhất của mình mua một chiếc xe hơi hoàn toàn mới."
+  },
+  {
+    "term": "nervous",
+    "translation": "bồn chồn, lo lắng",
+    "phonetic": "/ˈnɜːvəs/ - /ˈnɜːrvəs/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "She felt very nervous before giving her first presentation to a large audience.",
+    "exampleTranslation": "Cô ấy cảm thấy rất bồn chồn lo lắng trước khi thực hiện bài thuyết trình đầu tiên trước một lượng khán giả lớn."
+  },
+  {
+    "term": "thirsty",
+    "translation": "khát nước",
+    "phonetic": "/ˈθɜːsti/ - /ˈθɜːrsti/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "After running a long marathon in the hot sun, the athletes were incredibly thirsty.",
+    "exampleTranslation": "Sau khi chạy một cuộc thi marathon dài dưới trời nắng nóng, các vận động viên vô cùng khát nước."
+  },
+  {
+    "term": "comfortable",
+    "translation": "thoải mái",
+    "phonetic": "/ˈkʌmftəbl/ - /ˈkʌmfətəbl/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "This modern sofa is extremely comfortable to sit on while watching a movie.",
+    "exampleTranslation": "Chiếc ghế sô-pha hiện đại này vô cùng thoải mái để ngồi khi xem một bộ phim."
+  },
+  {
+    "term": "tense",
+    "translation": "căng thẳng",
+    "phonetic": "/tens/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "The atmosphere in the meeting room became tense as they argued about the budget.",
+    "exampleTranslation": "Bầu không khí trong phòng họp trở nên căng thẳng khi họ tranh luận về ngân sách."
+  },
+  {
+    "term": "tired",
+    "translation": "mệt mỏi",
+    "phonetic": "/ˈtaɪəd/ - /ˈtaɪərd/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "She felt completely tired after working a long twelve-hour shift at the hospital.",
+    "exampleTranslation": "Cô ấy cảm thấy hoàn toàn mệt mỏi sau khi làm việc trong một ca làm việc dài mười hai tiếng tại bệnh viện."
+  },
+  {
+    "term": "bored",
+    "translation": "chán nản",
+    "phonetic": "/bɔːd/ - /bɔːrd/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "The audience felt bored because the movie was far too slow and predictable.",
+    "exampleTranslation": "Khán giả cảm thấy chán nản vì bộ phim quá chậm chạp và dễ đoán."
+  }
+]

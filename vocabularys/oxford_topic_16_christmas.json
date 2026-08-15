@@ -1,0 +1,182 @@
+[
+  {
+    "term": "winter",
+    "translation": "mùa đông",
+    "phonetic": "/ˈwɪn.tər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Winter is my favorite season because of the beautiful white snow.",
+    "exampleTranslation": "Mùa đông là mùa yêu thích của tôi vì những bông tuyết trắng tuyệt đẹp."
+  },
+  {
+    "term": "candle",
+    "translation": "nến",
+    "phonetic": "/ˈkæn.dəl/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The scented candle filled the whole room with a warm and cozy aroma.",
+    "exampleTranslation": "Cây nến thơm làm tràn ngập cả căn phòng với một hương thơm ấm áp và dễ chịu."
+  },
+  {
+    "term": "snow",
+    "translation": "tuyết",
+    "phonetic": "/snoʊ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The heavy snow covered the streets and roofs of the entire quiet town.",
+    "exampleTranslation": "Tuyết rơi dày đặc đã bao phủ các đường phố và mái nhà của toàn bộ thị trấn yên tĩnh."
+  },
+  {
+    "term": "sack",
+    "translation": "bao, túi",
+    "phonetic": "/sæk/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Santa Claus carried a huge red sack filled with wonderful presents for kids.",
+    "exampleTranslation": "Ông già Noel mang theo một chiếc bao lớn màu đỏ chứa đầy những món quà tuyệt vời cho trẻ em."
+  },
+  {
+    "term": "card",
+    "translation": "tấm thiệp",
+    "phonetic": "/kɑːrd/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "I received a beautiful handmade card from my best friend yesterday morning.",
+    "exampleTranslation": "Tôi đã nhận được một tấm thiệp làm bằng tay rất đẹp từ người bạn thân nhất của tôi vào sáng hôm qua."
+  },
+  {
+    "term": "fireplace",
+    "translation": "lò sưởi",
+    "phonetic": "/ˈfaɪərˌpleɪs/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "We sat near the warm fireplace and drank hot chocolate during winter nights.",
+    "exampleTranslation": "Chúng tôi ngồi gần chiếc lò sưởi ấm áp và uống sô-cô-la nóng suốt những đêm mùa đông."
+  },
+  {
+    "term": "chimney",
+    "translation": "ống khói",
+    "phonetic": "/ˈtʃɪm.ni/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The grey smoke rose steadily from the brick chimney of the small cottage.",
+    "exampleTranslation": "Làn khói xám bốc lên đều đặn từ ống khói bằng gạch của ngôi nhà tranh nhỏ."
+  },
+  {
+    "term": "gift",
+    "translation": "quà tặng",
+    "phonetic": "/ɡɪft/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "My loving parents gave me a very special gift for my twelfth birthday.",
+    "exampleTranslation": "Bố mẹ yêu thương của tôi đã tặng tôi một món quà rất đặc biệt nhân dịp sinh nhật lần thứ mười hai."
+  },
+  {
+    "term": "Christmas",
+    "translation": "lễ Giáng sinh",
+    "phonetic": "/ˈkrɪs.məs/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Christmas is a wonderful time for family reunions and spreading love to everyone.",
+    "exampleTranslation": "Giáng sinh là một khoảng thời gian tuyệt vời để gia đình đoàn tụ và lan tỏa tình yêu thương đến mọi người."
+  },
+  {
+    "term": "ornament",
+    "translation": "đồ trang trí",
+    "phonetic": "/ˈɔːr.nə.mənt/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "We hung shiny glass ornaments on the green branches of the festive tree.",
+    "exampleTranslation": "Chúng tôi đã treo những đồ trang trí bằng thủy tinh lấp lánh lên những cành xanh của cây thông lễ hội."
+  },
+  {
+    "term": "pine tree",
+    "translation": "cây thông",
+    "phonetic": "/paɪn triː/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "The tall pine tree stood strong and beautiful against the cold winter winds.",
+    "exampleTranslation": "Cây thông cao lớn đứng vững vàng và đẹp đẽ trước những làn gió mùa đông lạnh giá."
+  },
+  {
+    "term": "sled",
+    "translation": "xe trượt tuyết",
+    "phonetic": "/slɛd/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The children love to sled down the steep snow-covered hill behind their house.",
+    "exampleTranslation": "Trẻ em thích trượt tuyết xuống con đồi dốc phủ đầy tuyết phía sau nhà của chúng."
+  },
+  {
+    "term": "bell",
+    "translation": "chuông",
+    "phonetic": "/bɛl/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The silver church bells rang merrily to announce the arrival of Christmas Eve.",
+    "exampleTranslation": "Những chiếc chuông nhà thờ màu bạc vang lên vui vẻ báo hiệu đêm Giáng sinh đã đến."
+  },
+  {
+    "term": "snowflake",
+    "translation": "bông tuyết",
+    "phonetic": "/snoʊˌfleɪk/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Each tiny snowflake has a unique and beautiful pattern under the microscope.",
+    "exampleTranslation": "Mỗi bông tuyết nhỏ bé đều có một hoa văn độc đáo và đẹp đẽ dưới kính hiển vi."
+  },
+  {
+    "term": "wreath",
+    "translation": "vòng hoa",
+    "phonetic": "/riːθ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She hung a beautiful green pine wreath decorated with ribbons on the door.",
+    "exampleTranslation": "Cô ấy đã treo một chiếc vòng hoa thông xanh tuyệt đẹp trang trí bằng ruy-băng trên cửa."
+  },
+  {
+    "term": "scarf",
+    "translation": "khăn choàng cổ",
+    "phonetic": "/skɑːrf/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He wore a thick red woolen scarf around his neck to keep warm.",
+    "exampleTranslation": "Anh ấy đã đeo một chiếc khăn choàng cổ dày bằng len màu đỏ quanh cổ để giữ ấm."
+  },
+  {
+    "term": "Christmas tree",
+    "translation": "cây thông Giáng sinh",
+    "phonetic": "/ˈkrɪs.məs triː/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "They decorated the tall Christmas tree with colorful glowing lights and bright stars.",
+    "exampleTranslation": "Họ đã trang trí cây thông Giáng sinh cao lớn với những dải đèn phát sáng đầy màu sắc và những ngôi sao rực rỡ."
+  },
+  {
+    "term": "Christmas card",
+    "translation": "thiệp Giáng sinh",
+    "phonetic": "/ˈkrɪs.məs kɑːrd/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "She spent the entire evening writing heartwarming Christmas cards to all her relatives.",
+    "exampleTranslation": "Cô ấy dành cả buổi tối để viết những tấm thiệp Giáng sinh ấm áp gửi đến tất cả người thân của mình."
+  }
+]

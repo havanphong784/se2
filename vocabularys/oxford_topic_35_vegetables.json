@@ -1,0 +1,262 @@
+[
+  {
+    "term": "tomato",
+    "translation": "cà chua",
+    "phonetic": "/təˈmɑːtəʊ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She added sliced tomatoes and fresh lettuce to make a healthy summer salad.",
+    "exampleTranslation": "Cô ấy đã thêm cà chua cắt lát và rau xà lách tươi để làm món salad mùa hè tốt cho sức khỏe."
+  },
+  {
+    "term": "spinach",
+    "translation": "rau chân vịt",
+    "phonetic": "/ˈspɪnɪtʃ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Eating fresh spinach is very good for your health because it contains iron.",
+    "exampleTranslation": "Ăn rau chân vịt tươi rất tốt cho sức khỏe của bạn vì nó chứa nhiều chất sắt."
+  },
+  {
+    "term": "water spinach",
+    "translation": "rau muống",
+    "phonetic": "/ˈwɔːtə(r) ˈspɪnɪtʃ/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "Garlic stir-fried water spinach is a highly popular dish in Vietnamese family meals.",
+    "exampleTranslation": "Rau muống xào tỏi là một món ăn vô cùng phổ biến trong bữa cơm gia đình Việt Nam."
+  },
+  {
+    "term": "Thai basil",
+    "translation": "húng quế",
+    "phonetic": "/taɪ ˈbæz.əl/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "The aromatic Thai basil leaves add a wonderful fragrance to the hot bowl of pho.",
+    "exampleTranslation": "Những chiếc lá húng quế thơm phức thêm một hương vị tuyệt vời cho bát phở nóng hổi."
+  },
+  {
+    "term": "eggplant",
+    "translation": "cà tím",
+    "phonetic": "/ˈeɡplɑːnt/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He grilled the eggplant over hot coals and served it with scallion oil.",
+    "exampleTranslation": "Anh ấy nướng cà tím trên than hồng và dùng kèm với mỡ hành."
+  },
+  {
+    "term": "beet",
+    "translation": "củ cải đường",
+    "phonetic": "/biːt/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The sweet beet can be boiled or roasted to make a delicious side dish.",
+    "exampleTranslation": "Củ cải đường ngọt có thể được luộc hoặc nướng để tạo thành một món ăn kèm thơm ngon."
+  },
+  {
+    "term": "pepper",
+    "translation": "ớt",
+    "phonetic": "/ˈpepə(r)/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Please do not add too much red pepper to my noodles because I cannot eat spicy food.",
+    "exampleTranslation": "Làm ơn đừng cho quá nhiều ớt đỏ vào mì của tôi vì tôi không ăn được đồ cay."
+  },
+  {
+    "term": "cauliflower",
+    "translation": "súp lơ",
+    "phonetic": "/’kɔliflauə/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She made a delicious soup using fresh cauliflower and some chopped carrots.",
+    "exampleTranslation": "Cô ấy đã nấu một món súp ngon tuyệt bằng súp lơ tươi và một ít cà rốt băm nhỏ."
+  },
+  {
+    "term": "cilantro",
+    "translation": "rau mùi",
+    "phonetic": "/sɪˈlæn.trəʊ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He sprinkled chopped cilantro on top of the soup to add a fresh aroma.",
+    "exampleTranslation": "Anh ấy rắc rau mùi băm nhỏ lên trên món súp để thêm hương thơm tươi mát."
+  },
+  {
+    "term": "marrow",
+    "translation": "bí ngô",
+    "phonetic": "/ˈmærəʊ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "They harvested a gigantic marrow from their organic vegetable garden this morning.",
+    "exampleTranslation": "Họ đã thu hoạch một quả bí ngô khổng lồ từ vườn rau hữu cơ của mình sáng nay."
+  },
+  {
+    "term": "fish mint",
+    "translation": "diếp cá",
+    "phonetic": "/ˈfɪʃ mɪnt/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "Fish mint has a very distinctive smell that some people love and others dislike.",
+    "exampleTranslation": "Rau diếp cá có một mùi hương rất đặc trưng mà một số người thích và một số khác thì không."
+  },
+  {
+    "term": "rice paddy",
+    "translation": "ngò ôm",
+    "phonetic": "/ˈraɪs ˌpæd.i/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "Rice paddy herb is commonly used to flavor traditional sweet and sour fish soup.",
+    "exampleTranslation": "Rau ngò ôm thường được sử dụng để tạo hương vị cho món canh chua cá truyền thống."
+  },
+  {
+    "term": "batata",
+    "translation": "khoai lang",
+    "phonetic": "/bæ’tɑ:tə/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Roasted batata is a sweet and warm snack that is very popular during winter evenings.",
+    "exampleTranslation": "Khoai lang nướng là một món ăn nhẹ ngọt ngào và ấm áp rất phổ biến trong những buổi tối mùa đông."
+  },
+  {
+    "term": "asparagus",
+    "translation": "măng tây",
+    "phonetic": "/əˈspærəɡəs/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She stir-fried the asparagus with fresh garlic and beef for a delicious dinner.",
+    "exampleTranslation": "Cô ấy đã xào măng tây với tỏi tươi và thịt bò cho một bữa tối ngon miệng."
+  },
+  {
+    "term": "mustard leaves",
+    "translation": "cải bẹ xanh",
+    "phonetic": "/ˈmʌstəd li:vz/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "Mustard leaves have a slightly bitter taste that works perfectly in traditional hotpots.",
+    "exampleTranslation": "Cải bẹ xanh có vị hơi đắng, rất phù hợp khi dùng trong các món lẩu truyền thống."
+  },
+  {
+    "term": "pumpkin buds",
+    "translation": "bông bí",
+    "phonetic": "/ˈhʌmp.kɪn bʌdz/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "Garlic stir-fried pumpkin buds are considered a rustic yet delicious specialty in Vietnam.",
+    "exampleTranslation": "Bông bí xào tỏi được coi là một món đặc sản mộc mạc nhưng ngon miệng ở Việt Nam."
+  },
+  {
+    "term": "pumpkin",
+    "translation": "bí đỏ",
+    "phonetic": "/ˈpʌmpkɪn/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "We carved a scary face into the pumpkin to make a Halloween lantern.",
+    "exampleTranslation": "Chúng tôi đã khắc một khuôn mặt đáng sợ lên quả bí đỏ để làm đèn lồng Halloween."
+  },
+  {
+    "term": "corn",
+    "translation": "ngô",
+    "phonetic": "/kɔːn/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Sweet corn can be boiled or grilled and brushed with melted butter.",
+    "exampleTranslation": "Ngô ngọt có thể được luộc hoặc nướng và quết một lớp bơ chảy."
+  },
+  {
+    "term": "pepper-elder",
+    "translation": "rau càng cua",
+    "phonetic": "/ˈpepə ˈeldə(r)/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "Pepper-elder salad with a sweet and sour dressing is refreshing and healthy.",
+    "exampleTranslation": "Món salad rau càng cua với nước sốt chua ngọt thật tươi mát và bổ dưỡng."
+  },
+  {
+    "term": "onion",
+    "translation": "củ hành",
+    "phonetic": "/’ʌniən/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She chopped the onion finely, which caused her eyes to water heavily.",
+    "exampleTranslation": "Cô ấy thái nhỏ củ hành tây, điều này khiến mắt cô ấy chảy nước mắt giàn giụa."
+  },
+  {
+    "term": "cress",
+    "translation": "rau cải xoong",
+    "phonetic": "/kres/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He added fresh cress to the sandwich to give it a peppery flavor.",
+    "exampleTranslation": "Anh ấy đã thêm rau cải xoong tươi vào bánh mì kẹp để tạo vị cay nồng."
+  },
+  {
+    "term": "celery",
+    "translation": "cần tây",
+    "phonetic": "/ˈseləri/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Juicing fresh celery has become a popular morning habit for health-conscious people.",
+    "exampleTranslation": "Ép nước cần tây tươi đã trở thành thói quen buổi sáng phổ biến của những người quan tâm đến sức khỏe."
+  },
+  {
+    "term": "potato",
+    "translation": "khoai tây",
+    "phonetic": "/pəˈteɪtəʊ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Mashed potatoes are a perfect side dish to serve alongside grilled steak.",
+    "exampleTranslation": "Khoai tây nghiền là một món ăn kèm hoàn hảo để dùng cùng với thịt bò bít tết nướng."
+  },
+  {
+    "term": "carrot",
+    "translation": "cà rốt",
+    "phonetic": "/ˈkærət/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Rabbits love to eat crunchy orange carrots from the vegetable garden.",
+    "exampleTranslation": "Thỏ rất thích ăn những củ cà rốt màu cam giòn tan từ vườn rau."
+  },
+  {
+    "term": "artichoke",
+    "translation": "cây atiso",
+    "phonetic": "/’ɑ:tit∫ouk /",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Drinking hot artichoke tea helps to detoxify the liver and improve digestion.",
+    "exampleTranslation": "Uống trà atiso nóng giúp giải độc gan và cải thiện hệ tiêu hóa."
+  },
+  {
+    "term": "beetroot",
+    "translation": "củ dền",
+    "phonetic": "/’bi:tru:t/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The vibrant red beetroot juice can be used as a natural food coloring.",
+    "exampleTranslation": "Nước ép củ dền đỏ rực rỡ có thể được sử dụng làm chất màu thực phẩm tự nhiên."
+  }
+]

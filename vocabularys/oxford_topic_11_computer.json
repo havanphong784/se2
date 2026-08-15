@@ -1,0 +1,372 @@
+[
+  {
+    "term": "monitor",
+    "translation": "màn hình",
+    "phonetic": "/ˈmɒn.ɪ.tər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The computer monitor displayed a lot of colorful charts and data analysis reports clearly.",
+    "exampleTranslation": "Màn hình máy tính hiển thị rõ ràng rất nhiều biểu đồ màu sắc và báo cáo phân tích dữ liệu."
+  },
+  {
+    "term": "mouse pad",
+    "translation": "tấm lót chuột",
+    "phonetic": "/ˈmaʊs ˌpæd/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "Using a high-quality mouse pad makes moving the cursor much smoother and more precise.",
+    "exampleTranslation": "Sử dụng một tấm lót chuột chất lượng cao giúp di chuyển con trỏ mượt mà và chính xác hơn nhiều."
+  },
+  {
+    "term": "printer",
+    "translation": "máy in",
+    "phonetic": "/ˈprɪn.tər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "We need to connect the wireless printer to the network before we can print our documents.",
+    "exampleTranslation": "Chúng ta cần kết nối máy in không dây với mạng trước khi có thể in tài liệu của mình."
+  },
+  {
+    "term": "scanner",
+    "translation": "máy quét",
+    "phonetic": "/ˈskæn.ər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She used the digital scanner to upload her signed contract to the computer system.",
+    "exampleTranslation": "Cô ấy đã sử dụng máy quét kỹ thuật số để tải hợp đồng đã ký của mình lên hệ thống máy tính."
+  },
+  {
+    "term": "open",
+    "translation": "khởi động, mở",
+    "phonetic": "/ˈəʊ.pən/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "You should double-click on the application icon to open the photo editing program.",
+    "exampleTranslation": "Bạn nên nhấp đúp vào biểu tượng ứng dụng để mở chương trình chỉnh sửa ảnh."
+  },
+  {
+    "term": "close",
+    "translation": "đóng, tắt",
+    "phonetic": "/kləʊz/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "Remember to save your work before you close the word processor on your laptop.",
+    "exampleTranslation": "Hãy nhớ lưu công việc của bạn trước khi bạn đóng trình xử lý văn bản trên máy tính xách tay của mình."
+  },
+  {
+    "term": "delete",
+    "translation": "xóa, loại bỏ",
+    "phonetic": "/dɪˈliːt/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "Be careful not to delete important system files when you are cleaning up your hard drive.",
+    "exampleTranslation": "Hãy cẩn thận không xóa các tệp hệ thống quan trọng khi bạn đang dọn dẹp ổ cứng của mình."
+  },
+  {
+    "term": "insert",
+    "translation": "cho vào, chèn",
+    "phonetic": "/ɪnˈsɜːt/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "You can insert a beautiful image or table into your document to make it look professional.",
+    "exampleTranslation": "Bạn có thể chèn một hình ảnh hoặc bảng biểu đẹp vào tài liệu của mình để làm cho nó trông chuyên nghiệp."
+  },
+  {
+    "term": "merge",
+    "translation": "sát nhập",
+    "phonetic": "/mɜːdʒ/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "The program allows you to merge multiple Excel spreadsheets into one single comprehensive file.",
+    "exampleTranslation": "Chương trình cho phép bạn sáp nhập nhiều bảng tính Excel thành một tệp toàn diện duy nhất."
+  },
+  {
+    "term": "helpline",
+    "translation": "đường dây trợ giúp",
+    "phonetic": "/ˈhelp.laɪn/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "If you experience any technical issues with the software, please call our 24-hour customer helpline.",
+    "exampleTranslation": "Nếu bạn gặp bất kỳ vấn đề kỹ thuật nào với phần mềm, vui lòng gọi cho đường dây trợ giúp khách hàng 24 giờ của chúng tôi."
+  },
+  {
+    "term": "hard disk",
+    "translation": "ổ cứng",
+    "phonetic": "/ˈhɑːd ˌdɪsk/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "My old computer is running very slow because the hard disk is almost completely full of data.",
+    "exampleTranslation": "Máy tính cũ của tôi đang chạy rất chậm vì ổ cứng đã gần như đầy dữ liệu hoàn toàn."
+  },
+  {
+    "term": "software",
+    "translation": "phần mềm",
+    "phonetic": "/ˈsɒft.weər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The company installed a new security software to protect their database from cyber attacks.",
+    "exampleTranslation": "Công ty đã cài đặt một phần mềm bảo mật mới để bảo vệ cơ sở dữ liệu của họ khỏi các cuộc tấn công mạng."
+  },
+  {
+    "term": "CD-ROM",
+    "translation": "đĩa CD dữ liệu",
+    "phonetic": "/ˌsiː.diːˈrɒm/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He inserted the old CD-ROM into the drive to read the archived photo files from ten years ago.",
+    "exampleTranslation": "Anh ấy đã lắp chiếc đĩa CD dữ liệu cũ vào ổ đĩa để đọc các tệp ảnh lưu trữ từ mười năm trước."
+  },
+  {
+    "term": "toolbar",
+    "translation": "thanh công cụ",
+    "phonetic": "/ˈtuːl.bɑːr/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The paintbrush tool is located on the left side of the main application toolbar.",
+    "exampleTranslation": "Công cụ chổi sơn nằm ở phía bên trái của thanh công cụ ứng dụng chính."
+  },
+  {
+    "term": "database",
+    "translation": "cơ sở dữ liệu",
+    "phonetic": "/ˈdeɪ.tə.beɪs/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The IT department maintains a secure database containing all client contact details and purchase histories.",
+    "exampleTranslation": "Bộ phận CNTT duy trì một cơ sở dữ liệu an toàn chứa tất cả chi tiết liên hệ của khách hàng và lịch sử mua hàng."
+  },
+  {
+    "term": "hacker",
+    "translation": "tin tặc",
+    "phonetic": "/ˈhæk.ər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "An anonymous hacker attempted to access the bank's internal network to steal sensitive user information.",
+    "exampleTranslation": "Một tin tặc ẩn danh đã cố gắng truy cập vào mạng nội bộ của ngân hàng để đánh cắp thông tin nhạy cảm của người dùng."
+  },
+  {
+    "term": "save",
+    "translation": "lưu",
+    "phonetic": "/seɪv æz/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "Don't forget to save your progress frequently so that you do not lose any of your important work.",
+    "exampleTranslation": "Đừng quên lưu tiến trình của bạn thường xuyên để không bị mất bất kỳ công việc quan trọng nào."
+  },
+  {
+    "term": "select",
+    "translation": "chọn",
+    "phonetic": "/sɪˈlekt/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "You must select the text first before you can change its font size or text color.",
+    "exampleTranslation": "Bạn phải chọn văn bản trước rồi mới có thể thay đổi kích thước phông chữ hoặc màu văn bản của nó."
+  },
+  {
+    "term": "copy",
+    "translation": "sao chép",
+    "phonetic": "/ˈkɒp.i/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "You can copy the entire paragraph and paste it into another document with a simple shortcut.",
+    "exampleTranslation": "Bạn có thể sao chép toàn bộ đoạn văn và dán nó vào một tài liệu khác bằng một phím tắt đơn giản."
+  },
+  {
+    "term": "computer",
+    "translation": "máy vi tính",
+    "phonetic": "/kəmˈpjuː.tər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "I bought a powerful desktop computer to handle heavy video editing and graphic design tasks.",
+    "exampleTranslation": "Tôi đã mua một chiếc máy vi tính để bàn mạnh mẽ để xử lý các tác vụ dựng video và thiết kế đồ họa nặng."
+  },
+  {
+    "term": "laptop",
+    "translation": "máy tính xách tay",
+    "phonetic": "/ˈlæp.tɒp/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She packed her thin laptop into her backpack before traveling to the business conference.",
+    "exampleTranslation": "Cô ấy đã xếp chiếc máy tính xách tay mỏng của mình vào ba lô trước khi di chuyển đến hội nghị kinh doanh."
+  },
+  {
+    "term": "speaker",
+    "translation": "loa",
+    "phonetic": "/ˈspiː.kər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He connected the external bluetooth speaker to his phone to play some energetic music during the party.",
+    "exampleTranslation": "Anh ấy đã kết nối chiếc loa bluetooth ngoài với điện thoại của mình để phát một số bản nhạc sôi động trong suốt bữa tiệc."
+  },
+  {
+    "term": "file",
+    "translation": "tệp, tập tin",
+    "phonetic": "/faɪl/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Please send me the PDF file containing the detailed project proposal via email today.",
+    "exampleTranslation": "Vui lòng gửi cho tôi tệp PDF chứa đề xuất dự án chi tiết qua email trong ngày hôm nay."
+  },
+  {
+    "term": "disk drive",
+    "translation": "ổ đĩa",
+    "phonetic": "/ˈdɪsk ˌdraɪv/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "The external disk drive can be connected via USB port to provide extra storage space.",
+    "exampleTranslation": "Ổ đĩa ngoài có thể được kết nối qua cổng USB để cung cấp thêm không gian lưu trữ."
+  },
+  {
+    "term": "battery",
+    "translation": "pin",
+    "phonetic": "/ˈbæt.ər.i/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The laptop battery drains very quickly when you are playing video games or watching high-definition movies.",
+    "exampleTranslation": "Pin máy tính xách tay cạn kiệt rất nhanh khi bạn đang chơi trò chơi điện tử hoặc xem phim độ phân giải cao."
+  },
+  {
+    "term": "click",
+    "translation": "nhấp chuột",
+    "phonetic": "/klɪk/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "With just one simple click, you can access thousands of online lessons and educational resources instantly.",
+    "exampleTranslation": "Chỉ với một cú nhấp chuột đơn giản, bạn có thể truy cập ngay lập tức vào hàng ngàn bài học trực tuyến và tài nguyên giáo dục."
+  },
+  {
+    "term": "type",
+    "translation": "đánh chữ, gõ chữ",
+    "phonetic": "/taɪp/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Although the document specifies 'type' as a noun, we often use it to enter data on our keyboard.",
+    "exampleTranslation": "Mặc dù tài liệu ghi rõ 'type' là một danh từ, chúng ta thường sử dụng nó để nhập dữ liệu trên bàn phím."
+  },
+  {
+    "term": "mouse",
+    "translation": "con chuột",
+    "phonetic": "/maʊs/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "This ergonomic wireless mouse reduces wrist strain during long hours of office work and study.",
+    "exampleTranslation": "Con chuột không dây công thái học này giúp giảm mỏi cổ tay trong suốt nhiều giờ làm việc văn phòng và học tập."
+  },
+  {
+    "term": "keyboard",
+    "translation": "bàn phím",
+    "phonetic": "/ˈkiː.bɔːd/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He cleaned his mechanical keyboard carefully to remove all the dust trapped under the keys.",
+    "exampleTranslation": "Anh ấy đã lau chùi bàn phím cơ của mình một cách cẩn thận để loại bỏ tất cả bụi bẩn bám dưới các phím."
+  },
+  {
+    "term": "mouse mat",
+    "translation": "miếng lót chuột",
+    "phonetic": "/ˈmaʊs ˌmæt/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "The large gaming mouse mat covers almost the entire surface of his wooden desk.",
+    "exampleTranslation": "Miếng lót chuột chơi game cỡ lớn che phủ gần như toàn bộ bề mặt bàn gỗ của anh ấy."
+  },
+  {
+    "term": "key",
+    "translation": "phím",
+    "phonetic": "/kiː/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The Enter key is one of the most frequently used keys on a standard computer keyboard.",
+    "exampleTranslation": "Phím Enter là một trong những phím được sử dụng thường xuyên nhất trên bàn phím máy tính tiêu chuẩn."
+  },
+  {
+    "term": "shut down",
+    "translation": "tắt máy",
+    "phonetic": "/ʃʌt daʊn/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "You should shut down your computer properly at the end of the day to save energy.",
+    "exampleTranslation": "Bạn nên tắt máy tính của mình đúng cách vào cuối ngày để tiết kiệm năng lượng."
+  },
+  {
+    "term": "folder",
+    "translation": "thư mục",
+    "phonetic": "/ˈfəʊl.dər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She organized her school projects into a separate folder on her desktop for easy access.",
+    "exampleTranslation": "Cô ấy đã sắp xếp các dự án trường học của mình vào một thư mục riêng trên màn hình máy tính để dễ dàng truy cập."
+  },
+  {
+    "term": "print",
+    "translation": "in",
+    "phonetic": "/prɪnt/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "Can you print out three copies of the financial report for the upcoming board meeting?",
+    "exampleTranslation": "Bạn có thể in ra ba bản báo cáo tài chính cho cuộc họp hội đồng quản trị sắp tới không?"
+  },
+  {
+    "term": "program",
+    "translation": "chương trình",
+    "phonetic": "/ˈprəʊ.ɡræm/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "We need to install a special software program to open and view these architectural design files.",
+    "exampleTranslation": "Chúng ta cần cài đặt một chương trình phần mềm đặc biệt để mở và xem các tệp thiết kế kiến trúc này."
+  },
+  {
+    "term": "search",
+    "translation": "tìm kiếm (thông tin)",
+    "phonetic": "/sɜːtʃ/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "You can search the internet to find high-quality tutorials on how to learn programming languages.",
+    "exampleTranslation": "Bạn có thể tìm kiếm trên mạng để tìm các bài hướng dẫn chất lượng cao về cách học các ngôn ngữ lập trình."
+  },
+  {
+    "term": "screen",
+    "translation": "màn hình",
+    "phonetic": "/skriːn/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Please do not sit too close to the television screen to protect your eyesight from strain.",
+    "exampleTranslation": "Vui lòng không ngồi quá gần màn hình tivi để bảo vệ thị lực của bạn khỏi bị mỏi."
+  }
+]

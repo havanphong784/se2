@@ -1,0 +1,622 @@
+[
+  {
+    "term": "watercolour",
+    "translation": "màu nước",
+    "phonetic": "/ˈwɔː.təˌkʌl.ər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She painted a beautiful landscape using her new watercolour set.",
+    "exampleTranslation": "Cô ấy đã vẽ một bức tranh phong cảnh tuyệt đẹp bằng bộ màu nước mới của mình."
+  },
+  {
+    "term": "thumbtack",
+    "translation": "đinh ghim",
+    "phonetic": "/ˈθʌm.tæk/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "I used a blue thumbtack to pin the poster on the wall.",
+    "exampleTranslation": "Tôi đã dùng một chiếc đinh ghim màu xanh để ghim bức áp phích lên tường."
+  },
+  {
+    "term": "textbook",
+    "translation": "sách giáo khoa",
+    "phonetic": "/ˈtekst.bʊk/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Students are required to bring their science textbook to class every day.",
+    "exampleTranslation": "Học sinh được yêu cầu mang sách giáo khoa khoa học đến lớp mỗi ngày."
+  },
+  {
+    "term": "test tube",
+    "translation": "ống nghiệm",
+    "phonetic": "/ˈtest ˌtjuːb/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "The scientist carefully poured the chemical liquid into the glass test tube.",
+    "exampleTranslation": "Nhà khoa học đã cẩn thận rót chất lỏng hóa học vào ống nghiệm thủy tinh."
+  },
+  {
+    "term": "tape measure",
+    "translation": "thước dây",
+    "phonetic": "/ˈteɪp ˌmeʒ.ər/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "The carpenter used a tape measure to check the length of the table.",
+    "exampleTranslation": "Người thợ mộc đã sử dụng thước dây để kiểm tra chiều dài của chiếc bàn."
+  },
+  {
+    "term": "stencil",
+    "translation": "giấy nến",
+    "phonetic": "/ˈsten.səl/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Children love using a plastic stencil to draw perfect star shapes.",
+    "exampleTranslation": "Trẻ em rất thích sử dụng khuôn vẽ bằng nhựa để vẽ những hình ngôi sao hoàn hảo."
+  },
+  {
+    "term": "stapler",
+    "translation": "đồ dập ghim",
+    "phonetic": "/ˈsteɪ.plər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Please hand me the stapler so I can bind these papers together.",
+    "exampleTranslation": "Làm ơn đưa cho tôi cái dập ghim để tôi có thể đóng những tờ giấy này lại với nhau."
+  },
+  {
+    "term": "staple remover",
+    "translation": "cái gỡ ghim bấm",
+    "phonetic": "/ˈsteɪ.plər rɪˈmuː.vər/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "She used a small staple remover to detach the old documents carefully.",
+    "exampleTranslation": "Cô ấy đã dùng một chiếc gỡ ghim nhỏ để gỡ tài liệu cũ một cách cẩn thận."
+  },
+  {
+    "term": "set square",
+    "translation": "ê-ke",
+    "phonetic": "/ˈset ˌskweər/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "We need a set square to draw perfect right angles in geometry.",
+    "exampleTranslation": "Chúng ta cần một chiếc ê-ke để vẽ các góc vuông hoàn hảo trong hình học."
+  },
+  {
+    "term": "Scotch tape",
+    "translation": "băng dính trong suốt",
+    "phonetic": "/ˌskɒtʃ ˈteɪp/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "He used scotch tape to repair the torn page of his notebook.",
+    "exampleTranslation": "Anh ấy đã dùng băng dính trong suốt để sửa trang sách bị rách của mình."
+  },
+  {
+    "term": "scissors",
+    "translation": "kéo",
+    "phonetic": "/ˈsɪz.əz/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "You must be very careful when using these sharp scissors to cut paper.",
+    "exampleTranslation": "Bạn phải rất cẩn thận khi sử dụng chiếc kéo sắc này để cắt giấy."
+  },
+  {
+    "term": "ruler",
+    "translation": "thước",
+    "phonetic": "/ˈruː.lər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "I need a long ruler to draw a straight line on my paper.",
+    "exampleTranslation": "Tôi cần một cây thước dài để vẽ một đường thẳng trên tờ giấy của mình."
+  },
+  {
+    "term": "ribbon",
+    "translation": "ruy-băng",
+    "phonetic": "/ˈrɪb.ən/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She tied a beautiful red ribbon around the birthday gift for her friend.",
+    "exampleTranslation": "Cô ấy đã buộc một dải ruy-băng màu đỏ xinh đẹp quanh món quà sinh nhật cho bạn mình."
+  },
+  {
+    "term": "protractor",
+    "translation": "thước đo góc",
+    "phonetic": "/prəˈtræk.tər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The math teacher showed us how to use a protractor to measure angles.",
+    "exampleTranslation": "Giáo viên toán đã hướng dẫn chúng tôi cách sử dụng thước đo góc để đo các góc."
+  },
+  {
+    "term": "Post-it note",
+    "translation": "giấy nhớ",
+    "phonetic": "/ˈpəʊst.ɪt ˌnəʊt/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "I wrote a quick reminder on a yellow post-it note and stuck it.",
+    "exampleTranslation": "Tôi đã viết một lời nhắc nhanh lên tờ giấy nhớ màu vàng và dán nó lên."
+  },
+  {
+    "term": "pin",
+    "translation": "đinh ghim, kẹp",
+    "phonetic": "/pɪn/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She used a sharp metal pin to attach the notice to the board.",
+    "exampleTranslation": "Cô ấy đã dùng một chiếc đinh ghim kim loại sắc nhọn để gắn thông báo lên bảng."
+  },
+  {
+    "term": "pencil",
+    "translation": "bút chì",
+    "phonetic": "/ˈpen.səl/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He prefers to write his drafts with a pencil so he can erase.",
+    "exampleTranslation": "Anh ấy thích viết các bản nháp của mình bằng bút chì để có thể xóa đi."
+  },
+  {
+    "term": "pencil sharpener",
+    "translation": "đồ gọt bút chì",
+    "phonetic": "/ˈpen.səl ˌʃɑː.pən.ər/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "I need to find a pencil sharpener because my pencil lead broke.",
+    "exampleTranslation": "Tôi cần tìm một cái gọt bút chì vì ngòi bút chì của tôi đã bị gãy."
+  },
+  {
+    "term": "pencil case",
+    "translation": "hộp bút",
+    "phonetic": "/ˈpen.səl ˌkeɪs/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "She keeps all her pens and pencils neatly inside her small pencil case.",
+    "exampleTranslation": "Cô ấy giữ tất cả bút mực và bút chì của mình ngăn nắp bên trong hộp bút nhỏ."
+  },
+  {
+    "term": "pen",
+    "translation": "bút mực",
+    "phonetic": "/pen/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The teacher signed the report card using a blue ink pen.",
+    "exampleTranslation": "Giáo viên đã ký vào phiếu liên lạc bằng một cây bút mực màu xanh."
+  },
+  {
+    "term": "paper",
+    "translation": "giấy",
+    "phonetic": "/ˈpeɪ.pər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Please write your name and phone number on a clean sheet of paper.",
+    "exampleTranslation": "Vui lòng viết tên và số điện thoại của bạn lên một tờ giấy sạch."
+  },
+  {
+    "term": "paper fastener",
+    "translation": "dụng cụ kẹp giấy",
+    "phonetic": "/ˈpeɪ.pər ˈfɑːs.ən.ər/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "We can use a metal paper fastener to secure these loose sheets.",
+    "exampleTranslation": "Chúng ta có thể sử dụng dụng cụ kẹp giấy bằng kim loại để cố định các tờ giấy rời này."
+  },
+  {
+    "term": "paper clip",
+    "translation": "kẹp giấy",
+    "phonetic": "/ˌpeɪ.pə ˌklɪp/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "She used a colorful paper clip to hold the two documents together.",
+    "exampleTranslation": "Cô ấy đã dùng một chiếc kẹp giấy màu sắc để giữ hai tài liệu lại với nhau."
+  },
+  {
+    "term": "palette",
+    "translation": "bảng màu",
+    "phonetic": "/ˈpæl.ət/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The artist mixed different shades of blue oil paint on his wooden palette.",
+    "exampleTranslation": "Họa sĩ đã pha trộn các sắc thái xanh khác nhau của sơn dầu trên bảng màu bằng gỗ của mình."
+  },
+  {
+    "term": "paint",
+    "translation": "sơn, màu",
+    "phonetic": "/peɪnt/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "They decided to buy some bright yellow paint for the living room walls.",
+    "exampleTranslation": "Họ quyết định mua một ít sơn màu vàng tươi cho các bức tường phòng khách."
+  },
+  {
+    "term": "paintbrush",
+    "translation": "chổi sơn",
+    "phonetic": "/ˈpeɪntˌbrʌʃ/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "He dipped his paintbrush into the water before picking up the color.",
+    "exampleTranslation": "Anh ấy đã nhúng chổi sơn của mình vào nước trước khi lấy màu vẽ."
+  },
+  {
+    "term": "notebook",
+    "translation": "cuốn sổ, vở",
+    "phonetic": "/ˈnəʊt.bʊk/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She writes down all her daily thoughts and lessons in a leather notebook.",
+    "exampleTranslation": "Cô ấy viết lại tất cả suy nghĩ và bài học hàng ngày của mình vào một cuốn sổ da."
+  },
+  {
+    "term": "map",
+    "translation": "bản đồ",
+    "phonetic": "/mæp/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The tourists looked at the city map to find the nearest museum.",
+    "exampleTranslation": "Khách du lịch đã nhìn vào bản đồ thành phố để tìm viện bảo tàng gần nhất."
+  },
+  {
+    "term": "magnifying glass",
+    "translation": "kính lúp",
+    "phonetic": "/ˈmæɡ.nɪ.faɪ.ɪŋ ˌɡlɑːs/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "The detective used a magnifying glass to inspect the tiny clues closely.",
+    "exampleTranslation": "Thám tử đã sử dụng kính lúp để kiểm tra kỹ lưỡng những manh mối nhỏ bé."
+  },
+  {
+    "term": "index card",
+    "translation": "phiếu làm mục lục",
+    "phonetic": "/ˈkɑːd ˌɪn.deks/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "She wrote key vocabulary terms on each index card for active revision.",
+    "exampleTranslation": "Cô ấy đã viết các thuật ngữ từ vựng chính lên mỗi phiếu mục lục để ôn tập tích cực."
+  },
+  {
+    "term": "highlighter",
+    "translation": "bút đánh dấu màu",
+    "phonetic": "/ˈhaɪˌlaɪ.tər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "I always use a yellow highlighter to mark important sentences in textbooks.",
+    "exampleTranslation": "Tôi luôn sử dụng bút đánh dấu màu vàng để đánh dấu những câu quan trọng trong sách giáo khoa."
+  },
+  {
+    "term": "glue",
+    "translation": "keo",
+    "phonetic": "/ɡluː/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Use a small amount of glue to stick the photo onto the paper.",
+    "exampleTranslation": "Hãy dùng một lượng keo nhỏ để dán bức ảnh lên tờ giấy."
+  },
+  {
+    "term": "globe",
+    "translation": "quả địa cầu",
+    "phonetic": "/ɡləʊb/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The students spun the large globe to locate the continent of Africa.",
+    "exampleTranslation": "Các học sinh đã xoay quả địa cầu lớn để xác định vị trí của châu Phi."
+  },
+  {
+    "term": "flash card",
+    "translation": "thẻ ghi nhớ",
+    "phonetic": "/ˈflæʃ ˌkɑːd/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "Learning vocabulary with a flash card is a highly effective study method.",
+    "exampleTranslation": "Học từ vựng bằng thẻ ghi nhớ là một phương pháp học tập rất hiệu quả."
+  },
+  {
+    "term": "file holder",
+    "translation": "tập hồ sơ",
+    "phonetic": "/faɪlˈhəʊl.dər/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "He organized all his important certificates neatly inside a blue file holder.",
+    "exampleTranslation": "Anh ấy đã sắp xếp tất cả các chứng chỉ quan trọng của mình ngăn nắp bên trong tập hồ sơ màu xanh."
+  },
+  {
+    "term": "file cabinet",
+    "translation": "tủ đựng tài liệu",
+    "phonetic": "/ˈfaɪl ˌkæb.ɪ.nət/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "The secretary stored the confidential files inside the metal file cabinet.",
+    "exampleTranslation": "Thư ký đã cất giữ các hồ sơ bảo mật bên trong tủ đựng tài liệu bằng kim loại."
+  },
+  {
+    "term": "felt pen",
+    "translation": "bút dạ",
+    "phonetic": "/felt pen/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "The children drew bright illustrations on the poster using a felt pen.",
+    "exampleTranslation": "Lũ trẻ đã vẽ những hình minh họa rực rỡ lên tờ áp phích bằng bút dạ."
+  },
+  {
+    "term": "rubber",
+    "translation": "cục tẩy",
+    "phonetic": "/ˈrʌb.ər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He used a soft rubber to erase the pencil mistake on his drawing.",
+    "exampleTranslation": "Anh ấy đã dùng một cục tẩy mềm để xóa lỗi bút chì trên bức vẽ của mình."
+  },
+  {
+    "term": "duster",
+    "translation": "khăn lau bảng",
+    "phonetic": "/ˈdʌs.tər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The teacher asked a student to clean the blackboard with a dry duster.",
+    "exampleTranslation": "Giáo viên đã yêu cầu một học sinh lau bảng đen bằng khăn lau bảng khô."
+  },
+  {
+    "term": "dossier",
+    "translation": "hồ sơ",
+    "phonetic": "/ˈdɒs.i.eɪ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The police compiled a complete dossier containing all evidence against the suspect.",
+    "exampleTranslation": "Cảnh sát đã biên soạn một hồ sơ đầy đủ chứa tất cả bằng chứng chống lại nghi phạm."
+  },
+  {
+    "term": "dictionary",
+    "translation": "từ điển",
+    "phonetic": "/ˈdɪk.ʃən.ər.i/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "You should look up unfamiliar words in an English-Vietnamese dictionary.",
+    "exampleTranslation": "Bạn nên tra cứu những từ không quen thuộc trong từ điển Anh-Việt."
+  },
+  {
+    "term": "desk",
+    "translation": "bàn học",
+    "phonetic": "/desk/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She placed her computer and a reading lamp on the study desk.",
+    "exampleTranslation": "Cô ấy đã đặt máy tính và một chiếc đèn đọc sách lên bàn học."
+  },
+  {
+    "term": "crayon",
+    "translation": "bút chì màu",
+    "phonetic": "/ˈkreɪ.ɒn/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The little girl colored the picture beautifully with her favorite wax crayon.",
+    "exampleTranslation": "Cô bé đã tô màu bức tranh thật đẹp bằng cây bút chì màu sáp yêu thích của mình."
+  },
+  {
+    "term": "computer",
+    "translation": "máy tính bàn",
+    "phonetic": "/kəmˈpjuː.tər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He uses his personal computer to complete his school assignments every night.",
+    "exampleTranslation": "Anh ấy sử dụng máy tính cá nhân của mình để hoàn thành các bài tập ở trường mỗi tối."
+  },
+  {
+    "term": "compass",
+    "translation": "com-pa",
+    "phonetic": "/ˈkʌm.pəs/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He used a compass to draw a perfect circle on his geometry worksheet.",
+    "exampleTranslation": "Anh ấy đã sử dụng com-pa để vẽ một hình tròn hoàn hảo trên tờ bài tập hình học."
+  },
+  {
+    "term": "coloured pencil",
+    "translation": "bút chì màu",
+    "phonetic": "/ˈkʌl.əd ˈpen.səl/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "The art student bought a new box of professional coloured pencils today.",
+    "exampleTranslation": "Học sinh mỹ thuật đã mua một hộp bút chì màu chuyên nghiệp mới vào hôm nay."
+  },
+  {
+    "term": "clock",
+    "translation": "đồng hồ treo tường",
+    "phonetic": "/klɒk/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The round clock on the classroom wall shows that it is almost noon.",
+    "exampleTranslation": "Chiếc đồng hồ tròn trên tường lớp học cho thấy trời đã gần trưa."
+  },
+  {
+    "term": "clamp",
+    "translation": "kẹp",
+    "phonetic": "/klæmp/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "We used a strong metal clamp to hold the wooden boards tightly together.",
+    "exampleTranslation": "Chúng tôi đã sử dụng một chiếc kẹp kim loại chắc chắn để giữ chặt các tấm gỗ lại với nhau."
+  },
+  {
+    "term": "chalk",
+    "translation": "phấn",
+    "phonetic": "/tʃɔːk/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The teacher wrote the math formula on the board with white chalk.",
+    "exampleTranslation": "Giáo viên đã viết công thức toán học lên bảng bằng phấn trắng."
+  },
+  {
+    "term": "chair",
+    "translation": "ghế",
+    "phonetic": "/tʃeər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He pulled out a comfortable chair and sat down at the table.",
+    "exampleTranslation": "Anh ấy đã kéo một chiếc ghế thoải mái ra và ngồi xuống bàn."
+  },
+  {
+    "term": "carbon paper",
+    "translation": "giấy than",
+    "phonetic": "/ˈkɑː.bən ˌpeɪ.pər/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "She put carbon paper between the sheets to make a second copy.",
+    "exampleTranslation": "Cô ấy đã đặt giấy than giữa các tờ giấy để tạo ra bản sao thứ hai."
+  },
+  {
+    "term": "calculator",
+    "translation": "máy tính cầm tay",
+    "phonetic": "/ˈkæl.kjə.leɪ.tər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Students are allowed to use a scientific calculator during the mathematics exam.",
+    "exampleTranslation": "Học sinh được phép sử dụng máy tính cầm tay khoa học trong kỳ thi môn toán."
+  },
+  {
+    "term": "bookcase",
+    "translation": "giá sách",
+    "phonetic": "/ˈbʊk.keɪs/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The wooden bookcase in the library is filled with historical novels.",
+    "exampleTranslation": "Chiếc giá sách bằng gỗ trong thư viện chất đầy những cuốn tiểu thuyết lịch sử."
+  },
+  {
+    "term": "book",
+    "translation": "sách",
+    "phonetic": "/bʊk/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Reading an interesting book is a great way to relax before sleep.",
+    "exampleTranslation": "Đọc một cuốn sách thú vị là một cách tuyệt vời để thư giãn trước khi ngủ."
+  },
+  {
+    "term": "board",
+    "translation": "bảng",
+    "phonetic": "/bɔːd/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The teacher wrote the homework assignment clearly on the green board.",
+    "exampleTranslation": "Giáo viên đã viết bài tập về nhà rõ ràng trên bảng màu xanh."
+  },
+  {
+    "term": "blackboard",
+    "translation": "bảng đen",
+    "phonetic": "/ˈblæk.bɔːd/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The old school still uses a traditional blackboard instead of whiteboards.",
+    "exampleTranslation": "Ngôi trường cũ vẫn sử dụng bảng đen truyền thống thay vì bảng trắng."
+  },
+  {
+    "term": "binder",
+    "translation": "bìa rời (báo, tạp chí)",
+    "phonetic": "/ˈbaɪn.dər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She keeps all her history worksheets organized inside a large three-ring binder.",
+    "exampleTranslation": "Cô ấy giữ tất cả các tờ bài tập lịch sử của mình ngăn nắp trong một bìa rời lớn có ba vòng."
+  },
+  {
+    "term": "beaker",
+    "translation": "cốc bêse",
+    "phonetic": "/ˈbiː.kər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The science student filled the glass beaker with fifty milliliters of water.",
+    "exampleTranslation": "Học sinh khoa học đã đổ đầy năm mươi mililít nước vào chiếc cốc bêse thủy tinh."
+  },
+  {
+    "term": "ballpoint pen",
+    "translation": "bút bi",
+    "phonetic": "/ˌbɔːl.pɔɪnt ˈpen/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "I prefer writing with a ballpoint pen because the ink dries very quickly.",
+    "exampleTranslation": "Tôi thích viết bằng bút bi hơn vì mực của nó khô rất nhanh."
+  },
+  {
+    "term": "bag",
+    "translation": "cặp sách",
+    "phonetic": "/bæɡ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She packed her notebook and water bottle into her small leather bag.",
+    "exampleTranslation": "Cô ấy đã đóng gói cuốn sổ và bình nước của mình vào chiếc cặp sách da nhỏ."
+  },
+  {
+    "term": "backpack",
+    "translation": "ba lô",
+    "phonetic": "/ˈbæk.pæk/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He carried a heavy backpack filled with heavy textbooks on his shoulders.",
+    "exampleTranslation": "Anh ấy đã đeo một chiếc ba lô nặng trĩu sách giáo khoa trên vai."
+  },
+  {
+    "term": "funnel",
+    "translation": "cái phễu",
+    "phonetic": "/ˈfʌn.əl/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She used a plastic funnel to pour the oil into the bottle safely.",
+    "exampleTranslation": "Cô ấy đã sử dụng một chiếc phễu nhựa để rót dầu vào chai một cách an toàn."
+  }
+]

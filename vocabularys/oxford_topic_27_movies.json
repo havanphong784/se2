@@ -1,0 +1,192 @@
+[
+  {
+    "term": "movie",
+    "translation": "phim",
+    "phonetic": "/ˈmuː.vi/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "We are planning to watch an exciting science fiction movie tonight.",
+    "exampleTranslation": "Chúng tôi đang có kế hoạch xem một bộ phim khoa học viễn tưởng thú vị vào tối nay."
+  },
+  {
+    "term": "famous",
+    "translation": "nổi tiếng",
+    "phonetic": "/ˈfeɪməs/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "He became famous after starring in that blockbuster Hollywood action movie.",
+    "exampleTranslation": "Anh ấy đã trở nên nổi tiếng sau khi đóng vai chính trong bộ phim hành động bom tấn đó của Hollywood."
+  },
+  {
+    "term": "comedy",
+    "translation": "hài kịch",
+    "phonetic": "/ˈkɑmədi/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "They went to the theater to see a hilarious comedy play last night.",
+    "exampleTranslation": "Họ đã đến nhà hát để xem một vở hài kịch vui nhộn vào tối qua."
+  },
+  {
+    "term": "audience",
+    "translation": "khán giả",
+    "phonetic": "/ˈɔː.di.əns/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The excited audience applauded loudly at the end of the beautiful concert.",
+    "exampleTranslation": "Khán giả hào hứng đã vỗ tay nồng nhiệt khi kết thúc buổi hòa nhạc tuyệt vời."
+  },
+  {
+    "term": "film festival",
+    "translation": "liên hoan phim",
+    "phonetic": "/fɪlm ˈfɛstɪvəl/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "Many international directors gathered to present their works at the film festival.",
+    "exampleTranslation": "Nhiều đạo diễn quốc tế đã tụ họp để trình chiếu các tác phẩm của họ tại liên hoan phim."
+  },
+  {
+    "term": "trailer",
+    "translation": "đoạn phim quảng cáo",
+    "phonetic": "/ˈtreɪlər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The short trailer of the new horror film looked incredibly scary.",
+    "exampleTranslation": "Đoạn trailer ngắn của bộ phim kinh dị mới trông vô cùng đáng sợ."
+  },
+  {
+    "term": "movie star",
+    "translation": "ngôi sao điện ảnh",
+    "phonetic": "/ˈmuː.vi stɑːr/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "She dreamed of becoming a famous movie star since she was young.",
+    "exampleTranslation": "Cô ấy đã mơ ước trở thành một ngôi sao điện ảnh nổi tiếng từ khi còn nhỏ."
+  },
+  {
+    "term": "soundtrack",
+    "translation": "nhạc phim",
+    "phonetic": "/ˈsaʊnˌtræk/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The emotional soundtrack of the romantic film touched many viewers' hearts.",
+    "exampleTranslation": "Nhạc phim đầy cảm xúc của bộ phim lãng mạn đã chạm đến trái tim của nhiều người xem."
+  },
+  {
+    "term": "cartoon",
+    "translation": "phim hoạt hình",
+    "phonetic": "/kɑːrˈtuːn/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Children love watching colorful cartoons on television during weekend mornings.",
+    "exampleTranslation": "Trẻ em thích xem những bộ phim hoạt hình đầy màu sắc trên tivi vào các buổi sáng cuối tuần."
+  },
+  {
+    "term": "drama",
+    "translation": "vở kịch",
+    "phonetic": "/ˈdrɑː.mə/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She prefers intense historical dramas that depict realistic struggles of the past.",
+    "exampleTranslation": "Cô ấy thích những vở kịch lịch sử gay cấn mô tả những cuộc đấu tranh thực tế trong quá khứ."
+  },
+  {
+    "term": "action film",
+    "translation": "phim hành động",
+    "phonetic": "/ˈækʃən fɪlm/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "He enjoys watching action films with thrilling car chases and explosive scenes.",
+    "exampleTranslation": "Anh ấy thích xem phim hành động với những màn rượt đuổi xe kịch tính và những cảnh cháy nổ."
+  },
+  {
+    "term": "celebrity",
+    "translation": "người nổi tiếng",
+    "phonetic": "/səˈlɛbrɪti/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The young celebrity had to wear sunglasses to avoid being recognized by paparazzi.",
+    "exampleTranslation": "Ngôi sao trẻ phải đeo kính râm để tránh bị các tay săn ảnh nhận ra."
+  },
+  {
+    "term": "script",
+    "translation": "kịch bản",
+    "phonetic": "/skrɪpt/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The talented writer spent several months completing the final script for the movie.",
+    "exampleTranslation": "Nhà biên kịch tài năng đã dành vài tháng để hoàn thành kịch bản cuối cùng cho bộ phim."
+  },
+  {
+    "term": "theater",
+    "translation": "nhà hát",
+    "phonetic": "/ˈθiː.ə.tər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "We arrived early at the theater to get the best center seats.",
+    "exampleTranslation": "Chúng tôi đã đến nhà hát sớm để có được những chỗ ngồi ở trung tâm tốt nhất."
+  },
+  {
+    "term": "actor",
+    "translation": "nam diễn viên",
+    "phonetic": "/ˈæktər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The main actor delivered an incredibly powerful performance in the dramatic scene.",
+    "exampleTranslation": "Nam diễn viên chính đã mang lại một màn trình diễn vô cùng ấn tượng trong cảnh quay đầy kịch tính."
+  },
+  {
+    "term": "actress",
+    "translation": "nữ diễn viên",
+    "phonetic": "/ˈæk.trɪs/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The talented actress won an academy award for her outstanding leading role.",
+    "exampleTranslation": "Nữ diễn viên tài năng đã giành giải Oscar cho vai diễn chính xuất sắc của mình."
+  },
+  {
+    "term": "director",
+    "translation": "đạo diễn",
+    "phonetic": "/dɪˈrɛktər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The director instructed the actors carefully before shooting the final scene.",
+    "exampleTranslation": "Đạo diễn đã hướng dẫn các diễn viên cẩn thận trước khi quay cảnh cuối cùng."
+  },
+  {
+    "term": "romantic",
+    "translation": "lãng mạn",
+    "phonetic": "/roʊˈmæntɪk/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "They watched a romantic movie about two lovers separated by war.",
+    "exampleTranslation": "Họ đã xem một bộ phim lãng mạn về hai người yêu nhau bị chia cắt bởi chiến tranh."
+  },
+  {
+    "term": "silent film",
+    "translation": "phim câm",
+    "phonetic": "/ˈsaɪlənt fɪlm/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "In the early years of cinema, people watched silent films with live piano music.",
+    "exampleTranslation": "Trong những năm đầu của nền điện ảnh, mọi người xem những bộ phim câm với nhạc piano trực tiếp."
+  }
+]

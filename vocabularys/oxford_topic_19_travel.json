@@ -1,0 +1,212 @@
+[
+  {
+    "term": "travel",
+    "translation": "du lịch",
+    "phonetic": "/ˈtræv.əl/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "We plan to travel around Europe by train next summer.",
+    "exampleTranslation": "Chúng tôi lên kế hoạch đi du lịch quanh châu Âu bằng tàu hỏa vào mùa hè tới."
+  },
+  {
+    "term": "travel agent",
+    "translation": "đại lý du lịch",
+    "phonetic": "/ˈtræv.əl ˌeɪ.dʒənt/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "The helpful travel agent booked our flights and hotel reservations yesterday.",
+    "exampleTranslation": "Đại lý du lịch chu đáo đã đặt vé máy bay và phòng khách sạn cho chúng tôi ngày hôm qua."
+  },
+  {
+    "term": "vacation",
+    "translation": "kỳ nghỉ",
+    "phonetic": "/veɪˈkeɪ.ʃən/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Our family always goes to the beach for our summer vacation.",
+    "exampleTranslation": "Gia đình chúng tôi luôn đi biển vào kỳ nghỉ hè của mình."
+  },
+  {
+    "term": "flight",
+    "translation": "chuyến bay",
+    "phonetic": "/flaɪt/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Her flight to London was delayed for three hours due to bad weather.",
+    "exampleTranslation": "Chuyến bay của cô ấy đến London đã bị hoãn ba tiếng do thời tiết xấu."
+  },
+  {
+    "term": "voyage",
+    "translation": "chuyến hải hành",
+    "phonetic": "/ˈvɔɪ.ɪdʒ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The historic voyage across the Atlantic Ocean took several weeks to complete.",
+    "exampleTranslation": "Chuyến hải hành lịch sử vượt Đại Tây Dương đã mất vài tuần để hoàn thành."
+  },
+  {
+    "term": "relax",
+    "translation": "thư giãn",
+    "phonetic": "/rɪˈlæks/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "You should take a deep breath and relax after a very stressful day at work.",
+    "exampleTranslation": "Bạn nên hít một hơi thật sâu và thư giãn sau một ngày làm việc rất căng thẳng."
+  },
+  {
+    "term": "cancel",
+    "translation": "hủy bỏ",
+    "phonetic": "/ˈkæn.səl/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "They had to cancel their weekend trip because of the heavy rainstorm.",
+    "exampleTranslation": "Họ đã phải hủy bỏ chuyến đi cuối tuần của mình vì cơn bão mưa lớn."
+  },
+  {
+    "term": "homestay",
+    "translation": "lưu trú tại nhà dân bản địa",
+    "phonetic": "/ˈhəʊm.steɪ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Staying at a local homestay is a great way to experience foreign culture.",
+    "exampleTranslation": "Ở tại một nhà dân bản địa là một cách tuyệt vời để trải nghiệm văn hóa nước ngoài."
+  },
+  {
+    "term": "souvenir",
+    "translation": "quà lưu niệm",
+    "phonetic": "/ˌsuː.vənˈɪər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She bought a small wooden keychain as a souvenir of her trip to Paris.",
+    "exampleTranslation": "Cô ấy đã mua một chiếc móc khóa bằng gỗ nhỏ làm quà lưu niệm cho chuyến đi Paris của mình."
+  },
+  {
+    "term": "travel sickness",
+    "translation": "say tàu xe",
+    "phonetic": "/ˈtræv.əl ˌsɪk.nəs/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "She always takes some medicine before the journey to prevent travel sickness.",
+    "exampleTranslation": "Cô ấy luôn uống một ít thuốc trước hành trình để ngăn ngừa việc say tàu xe."
+  },
+  {
+    "term": "journey",
+    "translation": "chuyến đi",
+    "phonetic": "/ˈdʒɜː.ni/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Their long journey through the beautiful mountains was filled with wonderful adventures.",
+    "exampleTranslation": "Chuyến đi dài của họ qua những ngọn núi xinh đẹp tràn ngập những cuộc phiêu lưu tuyệt vời."
+  },
+  {
+    "term": "peak season",
+    "translation": "mùa cao điểm",
+    "phonetic": "/piːk ˈsiː.zən/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "Hotel prices are much higher during the peak season in this tourist city.",
+    "exampleTranslation": "Giá khách sạn cao hơn nhiều trong mùa cao điểm ở thành phố du lịch này."
+  },
+  {
+    "term": "route",
+    "translation": "tuyến đường",
+    "phonetic": "/ruːt/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The GPS showed us the fastest route to get to our destination.",
+    "exampleTranslation": "Hệ thống định vị toàn cầu đã chỉ cho chúng tôi tuyến đường nhanh nhất để đến điểm đến."
+  },
+  {
+    "term": "trip",
+    "translation": "chuyến đi (ngắn ngày)",
+    "phonetic": "/trɪp/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "We are planning a short weekend trip to visit our grandparents in the countryside.",
+    "exampleTranslation": "Chúng tôi đang lên kế hoạch cho một chuyến đi ngắn ngày cuối tuần để về thăm ông bà ở quê."
+  },
+  {
+    "term": "excursion",
+    "translation": "chuyến tham quan",
+    "phonetic": "/ɪkˈskɜː.ʃən/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The school organized a wonderful day excursion to the national science museum.",
+    "exampleTranslation": "Nhà trường đã tổ chức một chuyến tham quan trong ngày tuyệt vời đến bảo tàng khoa học quốc gia."
+  },
+  {
+    "term": "luggage",
+    "translation": "hành lý",
+    "phonetic": "/ˈlʌɡ.ɪdʒ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Please keep a close eye on your luggage while waiting at the station.",
+    "exampleTranslation": "Vui lòng để mắt kỹ đến hành lý của bạn trong khi chờ đợi ở nhà ga."
+  },
+  {
+    "term": "tourist",
+    "translation": "du khách",
+    "phonetic": "/ˈtʊə.rɪst/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The ancient temple attracts thousands of foreign tourists every single year.",
+    "exampleTranslation": "Ngôi đền cổ kính thu hút hàng ngàn du khách nước ngoài mỗi năm."
+  },
+  {
+    "term": "ticket",
+    "translation": "vé",
+    "phonetic": "/ˈtɪk.ɪt/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "You must show your train ticket to the inspector before boarding.",
+    "exampleTranslation": "Bạn phải xuất trình vé tàu của mình cho người soát vé trước khi lên tàu."
+  },
+  {
+    "term": "eager",
+    "translation": "háo hức",
+    "phonetic": "/ˈiː.ɡər/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "The children were very eager to open their colorful Christmas gifts.",
+    "exampleTranslation": "Lũ trẻ đã rất háo hức mở những món quà Giáng sinh đầy màu sắc của chúng."
+  },
+  {
+    "term": "sunglasses",
+    "translation": "kính mát",
+    "phonetic": "/ˈsʌŋˌɡlɑː.sɪz/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He wore dark sunglasses to protect his sensitive eyes from the bright sunlight.",
+    "exampleTranslation": "Anh ấy đã đeo kính mát sẫm màu để bảo vệ đôi mắt nhạy cảm của mình khỏi ánh nắng chói chang."
+  },
+  {
+    "term": "safari",
+    "translation": "chuyến thám hiểm thiên nhiên",
+    "phonetic": "/səˈfɑː.ri/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "They went on an exciting safari in Africa to see wild lions and elephants.",
+    "exampleTranslation": "Họ đã tham gia một chuyến thám hiểm thiên nhiên thú vị ở châu Phi để xem sư tử và voi hoang dã."
+  }
+]

@@ -17,7 +17,7 @@ test("missing database configuration returns isolated demo data with metadata", 
     first.data.decks[0].title = "changed locally";
     const second = await getLearningData();
     assert.notEqual(second.data.decks[0].title, "changed locally");
-    assert.equal(DEMO_DECKS[0].title, "Giao tiếp hằng ngày");
+    assert.equal(DEMO_DECKS[0].title, "Dụng cụ học tập");
   } finally {
     if (previousUrl === undefined) delete process.env.DATABASE_URL;
     else process.env.DATABASE_URL = previousUrl;

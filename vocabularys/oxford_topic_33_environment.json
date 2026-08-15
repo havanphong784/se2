@@ -1,0 +1,202 @@
+[
+  {
+    "term": "land",
+    "translation": "đất, đất đai",
+    "phonetic": "/lænd/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The government is implementing new policies to protect agricultural land from industrial development.",
+    "exampleTranslation": "Chính phủ đang triển khai các chính sách mới để bảo vệ đất nông nghiệp khỏi sự phát triển công nghiệp."
+  },
+  {
+    "term": "pollute",
+    "translation": "làm ô nhiễm",
+    "phonetic": "/pəˈluːt/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "Chemical waste from local factories continues to seriously pollute the nearby river.",
+    "exampleTranslation": "Chất thải hóa học từ các nhà máy địa phương tiếp tục làm ô nhiễm nghiêm trọng con sông gần đó."
+  },
+  {
+    "term": "decompose",
+    "translation": "phân hủy",
+    "phonetic": "/ˌdiː.kəmˈpəʊz/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "Plastic bags can take hundreds of years to fully decompose in the environment.",
+    "exampleTranslation": "Túi ni lông có thể mất hàng trăm năm để phân hủy hoàn toàn trong môi trường."
+  },
+  {
+    "term": "balance",
+    "translation": "sự cân bằng",
+    "phonetic": "/ˈbæl.əns/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Human activities have disrupted the delicate ecological balance of this rain forest.",
+    "exampleTranslation": "Các hoạt động của con người đã làm gián đoạn sự cân bằng sinh thái mỏng manh của khu rừng mưa này."
+  },
+  {
+    "term": "climate change",
+    "translation": "biến đổi khí hậu",
+    "phonetic": "/ˈklaɪ.mət ˌtʃeɪndʒ/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "Climate change poses a severe threat to coastal communities due to rising sea levels.",
+    "exampleTranslation": "Biến đổi khí hậu đặt ra một mối đe dọa nghiêm trọng đối với các cộng đồng ven biển do mực nước biển dâng cao."
+  },
+  {
+    "term": "global warming",
+    "translation": "nóng lên toàn cầu",
+    "phonetic": "/ˌɡləʊ.bəl ˈwɔː.mɪŋ/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "We must reduce greenhouse gas emissions to slow down the process of global warming.",
+    "exampleTranslation": "Chúng ta phải giảm lượng khí thải gây hiệu ứng nhà kính để làm chậm quá trình nóng lên toàn cầu."
+  },
+  {
+    "term": "oil slick",
+    "translation": "dầu loang",
+    "phonetic": "/ˈɔɪl ˌslɪk/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "The massive oil slick after the tanker accident damaged the local marine life severely.",
+    "exampleTranslation": "Vệt dầu loang khổng lồ sau vụ tai nạn tàu chở dầu đã gây thiệt hại nghiêm trọng cho sinh vật biển địa phương."
+  },
+  {
+    "term": "ozone layer",
+    "translation": "tầng ozon",
+    "phonetic": "/ˈəʊ.zəʊn ˌleɪ.ər/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "The ozone layer plays an essential role in filtering harmful ultraviolet radiation from the sun.",
+    "exampleTranslation": "Tầng ozon đóng vai trò thiết yếu trong việc lọc bức xạ cực tím có hại từ mặt trời."
+  },
+  {
+    "term": "biodiversity",
+    "translation": "đa dạng sinh học",
+    "phonetic": "/ˌbaɪ.əʊ.daɪˈvɜː.sə.ti/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The national park was established to preserve the unique biodiversity of the region.",
+    "exampleTranslation": "Công viên quốc gia được thành lập để bảo tồn sự đa dạng sinh học độc đáo của khu vực."
+  },
+  {
+    "term": "ecology",
+    "translation": "sinh thái học",
+    "phonetic": "/iˈkɒl.ə.dʒi/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Scientists are studying the complex ecology of the coral reefs in the Pacific Ocean.",
+    "exampleTranslation": "Các nhà khoa học đang nghiên cứu ngành sinh thái học phức tạp của các rạn san hô ở Thái Bình Dương."
+  },
+  {
+    "term": "water",
+    "translation": "nước",
+    "phonetic": "/ˈwɔː.tər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Clean drinking water is a basic human right that must be guaranteed for everyone.",
+    "exampleTranslation": "Nước uống sạch là quyền cơ bản của con người cần phải được đảm bảo cho tất cả mọi người."
+  },
+  {
+    "term": "air",
+    "translation": "không khí",
+    "phonetic": "/eər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The air quality in major cities has deteriorated significantly due to traffic emissions.",
+    "exampleTranslation": "Chất lượng không khí ở các thành phố lớn đã bị suy giảm đáng kể do khí thải giao thông."
+  },
+  {
+    "term": "forest",
+    "translation": "rừng",
+    "phonetic": "/ˈfɒr.ɪst/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Illegal logging continues to destroy massive areas of tropical rainforest every year.",
+    "exampleTranslation": "Nạn khai thác gỗ bất hợp pháp tiếp tục hủy hoại những diện tích rừng mưa nhiệt đới khổng lồ mỗi năm."
+  },
+  {
+    "term": "flora",
+    "translation": "hệ thực vật",
+    "phonetic": "/ˈflɔː.rə/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The botanical garden features a diverse collection of rare flora from all over the world.",
+    "exampleTranslation": "Vườn bách thảo có một bộ sưu tập hệ thực vật quý hiếm đa dạng từ khắp nơi trên thế giới."
+  },
+  {
+    "term": "creature",
+    "translation": "sinh vật",
+    "phonetic": "/ˈkriː.tʃər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The deep ocean is home to many strange creatures that have never been seen by humans.",
+    "exampleTranslation": "Đại dương sâu thẳm là nơi sinh sống của nhiều sinh vật kỳ lạ chưa từng được con người nhìn thấy."
+  },
+  {
+    "term": "reproduction",
+    "translation": "sự sinh sản",
+    "phonetic": "/ˌriː.prəˈdʌk.ʃən/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The successful reproduction of endangered animals in captivity is vital for their survival.",
+    "exampleTranslation": "Sự sinh sản thành công của các loài động vật hoang dã có nguy cơ tuyệt chủng trong điều kiện nuôi nhốt là vô cùng quan trọng đối với sự sinh tồn của chúng."
+  },
+  {
+    "term": "wildlife",
+    "translation": "động vật hoang dã",
+    "phonetic": "/ˈwaɪld.laɪf/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Industrial expansion has destroyed the natural habitat of local forest wildlife.",
+    "exampleTranslation": "Sự mở rộng công nghiệp đã phá hủy môi trường sống tự nhiên của động vật hoang dã trong rừng địa phương."
+  },
+  {
+    "term": "sewage",
+    "translation": "nước thải",
+    "phonetic": "/ˈsuː.ɪdʒ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The city needs to build a modern plant to treat raw sewage before dumping it.",
+    "exampleTranslation": "Thành phố cần xây dựng một nhà máy hiện đại để xử lý nước thải thô trước khi xả ra ngoài."
+  },
+  {
+    "term": "fauna",
+    "translation": "hệ động vật",
+    "phonetic": "/ˈfɔː.nə/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The isolated island developed a very unique fauna with no natural predators.",
+    "exampleTranslation": "Hòn đảo cô lập đã phát triển một hệ động vật rất độc đáo không có loài thú săn mồi tự nhiên."
+  },
+  {
+    "term": "insect",
+    "translation": "côn trùng",
+    "phonetic": "/ˈɪn.sekt/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Many types of crops rely on insects like bees for healthy pollination.",
+    "exampleTranslation": "Nhiều loại cây trồng phụ thuộc vào các loài côn trùng như ong để thụ phấn khỏe mạnh."
+  }
+]

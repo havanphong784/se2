@@ -1,0 +1,322 @@
+[
+  {
+    "term": "sea",
+    "translation": "biển",
+    "phonetic": "/siː/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The calm blue sea looked absolutely beautiful under the bright morning sun.",
+    "exampleTranslation": "Vùng biển xanh phẳng lặng trông tuyệt đẹp dưới ánh mặt trời rực rỡ buổi sáng."
+  },
+  {
+    "term": "ocean",
+    "translation": "đại dương",
+    "phonetic": "/ˈəʊʃən/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The Atlantic Ocean is home to many fascinating species of marine life.",
+    "exampleTranslation": "Đại dương Đại Tây Dương là nhà của nhiều loài sinh vật biển hấp dẫn."
+  },
+  {
+    "term": "wave",
+    "translation": "sóng",
+    "phonetic": "/weɪv/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The massive waves crashed violently against the rocky cliffs of the coast.",
+    "exampleTranslation": "Những con sóng khổng lồ đập mạnh vào các vách đá dựng đứng của bờ biển."
+  },
+  {
+    "term": "island",
+    "translation": "hòn đảo",
+    "phonetic": "/ˈaɪlənd/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "They decided to spend their summer vacation on a quiet tropical island.",
+    "exampleTranslation": "Họ đã quyết định dành kỳ nghỉ hè của mình trên một hòn đảo nhiệt đới yên tĩnh."
+  },
+  {
+    "term": "harbor",
+    "translation": "cảng biển",
+    "phonetic": "/ˈhɑːr.bɚ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Many fishing boats were safely anchored inside the harbor before the storm arrived.",
+    "exampleTranslation": "Nhiều thuyền đánh cá đã neo đậu an toàn bên trong cảng biển trước khi bão đổ bộ."
+  },
+  {
+    "term": "lighthouse",
+    "translation": "hải đăng",
+    "phonetic": "/ˈlaɪthaʊs/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The old lighthouse guided ships safely through the dangerous rocky waters at night.",
+    "exampleTranslation": "Ngọn hải đăng cổ đã dẫn đường cho các tàu thuyền an toàn đi qua những vùng nước nhiều đá đá nguy hiểm vào ban đêm."
+  },
+  {
+    "term": "submarine",
+    "translation": "tàu ngầm",
+    "phonetic": "/ˌsʌbmərˈiːn/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The military submarine traveled deep beneath the ocean surface on its secret mission.",
+    "exampleTranslation": "Chiếc tàu ngầm quân sự đã di chuyển sâu dưới bề mặt đại dương trong sứ mệnh bí mật của nó."
+  },
+  {
+    "term": "ship",
+    "translation": "tàu thuỷ",
+    "phonetic": "/ʃɪp/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "A large cargo ship carrying international goods arrived at the port this morning.",
+    "exampleTranslation": "Một chiếc tàu thủy chở hàng lớn mang theo hàng hóa quốc tế đã cập cảng sáng nay."
+  },
+  {
+    "term": "boat",
+    "translation": "thuyền",
+    "phonetic": "/bəʊt/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "They rented a small wooden boat to row across the peaceful forest lake.",
+    "exampleTranslation": "Họ đã thuê một chiếc thuyền gỗ nhỏ để chèo qua hồ nước yên bình trong rừng."
+  },
+  {
+    "term": "captain",
+    "translation": "thuyền trưởng",
+    "phonetic": "/ˈkæptɪn/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The experienced captain successfully steered the cruise ship through the rough storm.",
+    "exampleTranslation": "Vị thuyền trưởng giàu kinh nghiệm đã lèo lái con tàu du lịch vượt qua cơn bão dữ dội một cách thành công."
+  },
+  {
+    "term": "fisherman",
+    "translation": "ngư dân",
+    "phonetic": "/ˈfɪʃəmən/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The hardworking fisherman cast his net into the sea early in the morning.",
+    "exampleTranslation": "Người ngư dân chăm chỉ đã quăng lưới của mình xuống biển vào sáng sớm."
+  },
+  {
+    "term": "lifeguard",
+    "translation": "người cứu hộ",
+    "phonetic": "/ˈlaɪfɡɑːd/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The vigilant lifeguard immediately rescued the young swimmer who was struggling in the water.",
+    "exampleTranslation": "Người cứu hộ cảnh giác đã ngay lập tức giải cứu người bơi trẻ tuổi đang vật lộn dưới nước."
+  },
+  {
+    "term": "seashore",
+    "translation": "bờ biển",
+    "phonetic": "/ˈsiːʃɔːr/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "We walked slowly along the sandy seashore looking for beautiful seashells.",
+    "exampleTranslation": "Chúng tôi đi bộ chậm rãi dọc theo bờ biển đầy cát để tìm những vỏ sò đẹp đẽ."
+  },
+  {
+    "term": "beach",
+    "translation": "bãi biển",
+    "phonetic": "/biːtʃ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Many tourists lay on the sunny beach to get a beautiful golden tan.",
+    "exampleTranslation": "Nhiều du khách nằm trên bãi biển đầy nắng để có một làn da rám nắng vàng tuyệt đẹp."
+  },
+  {
+    "term": "coast",
+    "translation": "bờ (biển)",
+    "phonetic": "/kəʊst/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The scenic road runs along the rugged coast, offering breathtaking ocean views.",
+    "exampleTranslation": "Con đường đẹp như tranh vẽ chạy dọc theo bờ biển hiểm trở, mang lại tầm nhìn tuyệt đẹp ra đại dương."
+  },
+  {
+    "term": "seagull",
+    "translation": "mòng biển",
+    "phonetic": "/ˈsiː.ɡʌl/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "A noisy seagull flew over the tourist and stole a piece of bread from his hand.",
+    "exampleTranslation": "Một chú chim mòng biển ồn ào đã bay qua người du khách và giật lấy một mẩu bánh mì từ tay anh ta."
+  },
+  {
+    "term": "whale",
+    "translation": "cá voi",
+    "phonetic": "/weɪl/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "We were lucky enough to see a giant blue whale breach the water.",
+    "exampleTranslation": "Chúng tôi đã đủ may mắn khi được nhìn thấy một con cá voi xanh khổng lồ nhô lên khỏi mặt nước."
+  },
+  {
+    "term": "shark",
+    "translation": "cá mập",
+    "phonetic": "/ʃɑːk/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The warning sign on the beach advised swimmers to watch out for sharks.",
+    "exampleTranslation": "Biển báo cảnh báo trên bãi biển khuyên những người bơi lội nên cẩn thận với cá mập."
+  },
+  {
+    "term": "dolphin",
+    "translation": "cá heo",
+    "phonetic": "/ˈdɒlfɪn/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "A pod of friendly dolphins swam alongside our boat, jumping high in the air.",
+    "exampleTranslation": "Một đàn cá heo thân thiện đã bơi dọc theo thuyền của chúng tôi, nhảy cao lên không trung."
+  },
+  {
+    "term": "octopus",
+    "translation": "bạch tuộc",
+    "phonetic": "/ˈɑːktəpəs/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The octopus used its powerful tentacles to hide behind the rocks on the seabed.",
+    "exampleTranslation": "Con bạch tuộc đã sử dụng những chiếc xúc tu mạnh mẽ của mình để trốn sau các tảng đá dưới đáy biển."
+  },
+  {
+    "term": "fish",
+    "translation": "cá",
+    "phonetic": "/fɪʃ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The colorful tropical fish swam gracefully among the vibrant coral reefs.",
+    "exampleTranslation": "Những chú cá nhiệt đới đầy màu sắc đã bơi lội duyên dáng giữa rạn san hô rực rỡ."
+  },
+  {
+    "term": "jellyfish",
+    "translation": "sứa",
+    "phonetic": "/ˈdʒelifɪʃ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "You should be careful because some species of jellyfish have very painful stings.",
+    "exampleTranslation": "Bạn nên cẩn thận vì một số loài sứa có những vết chích rất đau đớn."
+  },
+  {
+    "term": "sea horse",
+    "translation": "cá ngựa",
+    "phonetic": "/ˈsiˌhɔrs/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "The tiny sea horse used its tail to anchor itself to a piece of seaweed.",
+    "exampleTranslation": "Chú cá ngựa nhỏ bé đã sử dụng chiếc đuôi của mình để bám vào một nhánh rong biển."
+  },
+  {
+    "term": "seaweed",
+    "translation": "rong biển",
+    "phonetic": "/ˈsiːwiːd/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Many Asian cuisines use dried seaweed to wrap sushi rolls or make delicious soups.",
+    "exampleTranslation": "Nhiều nền ẩm thực châu Á sử dụng rong biển khô để cuộn sushi hoặc nấu những món súp thơm ngon."
+  },
+  {
+    "term": "coral",
+    "translation": "san hô",
+    "phonetic": "/ˈkɒrəl/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Scientists are working hard to protect the delicate marine coral from global warming.",
+    "exampleTranslation": "Các nhà khoa học đang nỗ lực bảo vệ san hô biển mỏng manh khỏi sự nóng lên toàn cầu."
+  },
+  {
+    "term": "coral reef",
+    "translation": "rạn san hô",
+    "phonetic": "/ˌkɒr.əl ˈriːf/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "Scuba divers love exploring the diverse ecosystem of the Great Barrier Coral Reef.",
+    "exampleTranslation": "Những người lặn bình khí rất thích khám phá hệ sinh thái đa dạng của Rạn san hô Great Barrier."
+  },
+  {
+    "term": "shellfish",
+    "translation": "động vật có vỏ",
+    "phonetic": "/ˈshel.fɪʃ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He ordered a platter of steamed shellfish, including oysters, mussels, and clams.",
+    "exampleTranslation": "Anh ấy đã gọi một đĩa động vật có vỏ hấp, bao gồm hàu, vẹm và nghêu."
+  },
+  {
+    "term": "clam",
+    "translation": "nghêu",
+    "phonetic": "/klæm/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "We dug in the wet sand at low tide to find fresh clams for dinner.",
+    "exampleTranslation": "Chúng tôi đã đào trên bãi cát ướt lúc thủy triều xuống để tìm nghêu tươi cho bữa tối."
+  },
+  {
+    "term": "starfish",
+    "translation": "sao biển",
+    "phonetic": "/ˈstɑːrfɪʃ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "My daughter was amazed to find a bright red starfish resting on a rock.",
+    "exampleTranslation": "Con gái tôi đã rất kinh ngạc khi tìm thấy một con sao biển màu đỏ rực rỡ đang nằm trên một tảng đá."
+  },
+  {
+    "term": "seal",
+    "translation": "hải cẩu",
+    "phonetic": "/siːl/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "A group of playful seals lay basking in the sun on the sandy rocks.",
+    "exampleTranslation": "Một nhóm hải cẩu tinh nghịch đang nằm phơi nắng trên những tảng đá đầy cát."
+  },
+  {
+    "term": "turtle",
+    "translation": "rùa biển",
+    "phonetic": "/ˈtɜːtl/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The female sea turtle crawled slowly onto the beach to lay her eggs at night.",
+    "exampleTranslation": "Con rùa biển cái đã bò chậm rãi lên bãi biển để đẻ trứng vào ban đêm."
+  },
+  {
+    "term": "crab",
+    "translation": "cua",
+    "phonetic": "/kræb/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "A small sand crab scurried sideways across the beach and hid in a hole.",
+    "exampleTranslation": "Một con cua cát nhỏ chạy nhanh sang ngang qua bãi biển và trốn vào một cái lỗ."
+  }
+]

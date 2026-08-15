@@ -1,0 +1,472 @@
+[
+  {
+    "term": "brush your teeth",
+    "translation": "đánh răng",
+    "phonetic": "/brʌʃ ti:θ/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "You should always brush your teeth at least twice a day to protect your enamel.",
+    "exampleTranslation": "Bạn nên luôn đánh răng ít nhất hai lần một ngày để bảo vệ men răng của mình."
+  },
+  {
+    "term": "buy",
+    "translation": "mua",
+    "phonetic": "/bai/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "We need to buy some fresh organic ingredients for the upcoming dinner party.",
+    "exampleTranslation": "Chúng ta cần mua một số nguyên liệu hữu cơ tươi ngon cho bữa tiệc tối sắp tới."
+  },
+  {
+    "term": "comb the hair",
+    "translation": "chải đầu",
+    "phonetic": "/koum ðə heə/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "She uses a wide-tooth comb to comb her hair gently after taking a warm shower.",
+    "exampleTranslation": "Cô ấy sử dụng một chiếc lược răng thưa để chải đầu nhẹ nhàng sau khi tắm nước ấm."
+  },
+  {
+    "term": "cook",
+    "translation": "nấu ăn",
+    "phonetic": "/kuk/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "They decided to cook a delicious traditional meal together on Saturday evening.",
+    "exampleTranslation": "Họ đã quyết định cùng nhau nấu một bữa ăn truyền thống thơm ngon vào tối thứ Bảy."
+  },
+  {
+    "term": "do exercise",
+    "translation": "tập thể dục",
+    "phonetic": "/du: eksəsaiz/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "Doing physical exercise every morning helps you maintain a strong and healthy immune system.",
+    "exampleTranslation": "Tập thể dục thể chất mỗi buổi sáng giúp bạn duy trì một hệ miễn dịch mạnh khỏe và tốt lành."
+  },
+  {
+    "term": "do your homework",
+    "translation": "làm bài tập về nhà",
+    "phonetic": "/du ‘houmwə:k/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "The teacher told the students to do their homework before coming to class tomorrow.",
+    "exampleTranslation": "Giáo viên đã bảo các học sinh hoàn thành bài tập về nhà trước khi đến lớp vào ngày mai."
+  },
+  {
+    "term": "eat out",
+    "translation": "đi ăn ở ngoài",
+    "phonetic": "/ˈiːt ˌaʊt/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "Since it was his birthday, we decided to eat out at a fancy Italian restaurant.",
+    "exampleTranslation": "Vì là ngày sinh nhật của anh ấy, chúng tôi đã quyết định đi ăn ở ngoài tại một nhà hàng Ý sang trọng."
+  },
+  {
+    "term": "feed the dog",
+    "translation": "cho chó ăn",
+    "phonetic": "/fi:d ðə dɔg/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "Don't forget to feed the dog before you leave the house for your trip.",
+    "exampleTranslation": "Đừng quên cho chó ăn trước khi bạn rời khỏi nhà để đi du lịch nhé."
+  },
+  {
+    "term": "finish working",
+    "translation": "kết thúc công việc",
+    "phonetic": "/’finiʃ ˈwəːkɪŋ/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "He usually finishes working around six o'clock and then heads straight to the local gym.",
+    "exampleTranslation": "Anh ấy thường kết thúc công việc vào khoảng sáu giờ và sau đó đi thẳng đến phòng tập thể dục địa phương."
+  },
+  {
+    "term": "gardening",
+    "translation": "làm vườn",
+    "phonetic": "/ˈgɑː.dən.ɪŋ/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "My grandmother loves spending her free time doing some relaxing gardening in the backyard.",
+    "exampleTranslation": "Bà của tôi thích dành thời gian rảnh rỗi để làm vườn thư giãn ở sân sau nhà."
+  },
+  {
+    "term": "get dressed",
+    "translation": "mặc quần áo",
+    "phonetic": "/get dres/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "She quickly got dressed in her formal business suit and rushed to the meeting.",
+    "exampleTranslation": "Cô ấy nhanh chóng mặc quần áo với bộ vest công sở lịch sự và vội vã đến cuộc họp."
+  },
+  {
+    "term": "get up",
+    "translation": "thức dậy",
+    "phonetic": "/get Λp/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "I have to get up extremely early tomorrow morning to catch the first flight.",
+    "exampleTranslation": "Tôi phải thức dậy cực kỳ sớm vào sáng mai để kịp bắt chuyến bay đầu tiên."
+  },
+  {
+    "term": "go home",
+    "translation": "về nhà",
+    "phonetic": "/gou houm/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "We should go home immediately before the heavy rainstorm starts flooding the streets.",
+    "exampleTranslation": "Chúng ta nên về nhà ngay lập tức trước khi cơn bão lớn bắt đầu làm ngập các con đường."
+  },
+  {
+    "term": "go shopping",
+    "translation": "đi mua sắm",
+    "phonetic": "/gouˈʃɒp.ɪŋ/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "They planning to go shopping for some winter clothes at the new shopping mall.",
+    "exampleTranslation": "Họ đang lên kế hoạch đi mua sắm một số quần áo mùa đông tại trung tâm mua sắm mới."
+  },
+  {
+    "term": "go to bed",
+    "translation": "đi ngủ",
+    "phonetic": "/gou tə bed/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "You should go to bed early tonight so that you feel refreshed tomorrow.",
+    "exampleTranslation": "Bạn nên đi ngủ sớm tối nay để ngày mai cảm thấy sảng khoái tinh thần."
+  },
+  {
+    "term": "go to the movies",
+    "translation": "đi xem phim",
+    "phonetic": "/gou tə ðəˈmuː.vi/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "We are going to the movies this Friday to watch the latest sci-fi blockbuster.",
+    "exampleTranslation": "Chúng tôi sẽ đi xem phim vào thứ Sáu này để xem bộ phim bom tấn khoa học viễn tưởng mới nhất."
+  },
+  {
+    "term": "have a bath",
+    "translation": "đi tắm",
+    "phonetic": "/hæv ə ‘bɑ:θ/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "There is nothing better than having a warm bath with herbal oils after work.",
+    "exampleTranslation": "Không có gì tuyệt vời hơn là được đi tắm nước ấm với dầu thảo mộc sau khi làm việc."
+  },
+  {
+    "term": "have a nap",
+    "translation": "ngủ ngắn",
+    "phonetic": "/ˌhæv.ə næp/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "Taking a short nap during the lunch break can significantly improve your productivity.",
+    "exampleTranslation": "Chợp mắt một giấc ngủ ngắn trong giờ nghỉ trưa có thể cải thiện đáng kể hiệu suất làm việc của bạn."
+  },
+  {
+    "term": "have breakfast",
+    "translation": "ăn sáng",
+    "phonetic": "/ˌhævˈbrek.fəst/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "It is highly recommended to have a nutritious breakfast before starting a busy workday.",
+    "exampleTranslation": "Bạn rất nên ăn một bữa sáng đầy đủ dinh dưỡng trước khi bắt đầu một ngày làm việc bận rộn."
+  },
+  {
+    "term": "have dinner",
+    "translation": "ăn tối",
+    "phonetic": "/ˌhævˈdɪn.ər/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "The whole family gathered around the wooden dining table to have dinner together.",
+    "exampleTranslation": "Cả gia đình quây quần xung quanh chiếc bàn ăn bằng gỗ để ăn tối cùng nhau."
+  },
+  {
+    "term": "have lunch",
+    "translation": "ăn trưa",
+    "phonetic": "/ˌhæv lʌntʃ/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "We usually have lunch at the office cafeteria with our close colleagues around noon.",
+    "exampleTranslation": "Chúng tôi thường ăn trưa tại nhà ăn văn phòng với các đồng nghiệp thân thiết vào khoảng giữa trưa."
+  },
+  {
+    "term": "have a shower",
+    "translation": "tắm vòi hoa sen",
+    "phonetic": "/hæv ə ˈʃaʊər/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "A cold shower after doing heavy exercise will help refresh your tired body.",
+    "exampleTranslation": "Tắm vòi hoa sen bằng nước lạnh sau khi tập thể dục nặng sẽ giúp làm mới cơ thể đang mệt mỏi của bạn."
+  },
+  {
+    "term": "listen to music",
+    "translation": "nghe nhạc",
+    "phonetic": "/ˈlɪs.ən tuːˈmjuː.zɪk/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "I love to listen to instrumental music while studying to improve my concentration.",
+    "exampleTranslation": "Tôi thích nghe nhạc không lời trong lúc học bài để tăng cường khả năng tập trung."
+  },
+  {
+    "term": "make breakfast",
+    "translation": "làm bữa ăn sáng",
+    "phonetic": "/meik ‘brekfəst/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "He woke up early to make breakfast with fried eggs and hot coffee.",
+    "exampleTranslation": "Anh ấy thức dậy sớm để làm bữa ăn sáng với trứng ốp la và cà phê nóng."
+  },
+  {
+    "term": "make up",
+    "translation": "trang điểm",
+    "phonetic": "/meik Λp/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "She took a long time to make up before attending the wedding party.",
+    "exampleTranslation": "Cô ấy đã mất khá nhiều thời gian để trang điểm trước khi tham dự bữa tiệc đám cưới."
+  },
+  {
+    "term": "meditation",
+    "translation": "thiền",
+    "phonetic": "/,medi’teiʃn/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Practicing mindfulness meditation daily is an excellent way to reduce chronic stress levels.",
+    "exampleTranslation": "Thực hành thiền chánh niệm hàng ngày là một cách tuyệt vời để giảm mức độ căng thẳng mãn tính."
+  },
+  {
+    "term": "play an instrument",
+    "translation": "chơi nhạc cụ",
+    "phonetic": "/pleɪ ænˈɪn.strə.mənt/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "Learning to play a musical instrument can boost cognitive development in young children.",
+    "exampleTranslation": "Học chơi một loại nhạc cụ có thể thúc đẩy sự phát triển nhận thức ở trẻ nhỏ."
+  },
+  {
+    "term": "play outside",
+    "translation": "đi ra ngoài chơi",
+    "phonetic": "/pleɪ ˌaʊtˈsaɪd/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "Parents should encourage their children to play outside in nature instead of watching screens.",
+    "exampleTranslation": "Cha mẹ nên khuyến khích con cái đi ra ngoài chơi giữa thiên nhiên thay vì xem màn hình điện thoại."
+  },
+  {
+    "term": "play sports",
+    "translation": "chơi thể thao",
+    "phonetic": "/pleɪ spɔːts/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "Playing outdoor sports with friends is a fantastic way to stay fit and active.",
+    "exampleTranslation": "Chơi các môn thể thao ngoài trời với bạn bè là một cách tuyệt vời để duy trì vóc dáng cân đối và năng động."
+  },
+  {
+    "term": "play video games",
+    "translation": "chơi trò chơi điện tử",
+    "phonetic": "/pleɪ ˈvɪd.i.əʊ ˌgəɪmz/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "Teenagers should not spend more than two hours a day playing video games online.",
+    "exampleTranslation": "Thanh thiếu niên không nên dành quá hai giờ mỗi ngày để chơi trò chơi điện tử trực tuyến."
+  },
+  {
+    "term": "read books",
+    "translation": "đọc sách",
+    "phonetic": "/riːd bʊks /",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "Reading scientific books regularly expands your knowledge and sharpens your critical thinking skills.",
+    "exampleTranslation": "Đọc sách khoa học thường xuyên giúp mở rộng kiến thức và làm nhạy bén các kỹ năng tư duy phản biện của bạn."
+  },
+  {
+    "term": "read newspapers",
+    "translation": "đọc báo",
+    "phonetic": "/ri:d’nju:z,peipəz/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "My grandfather reads local newspapers every morning while enjoying his green tea cup.",
+    "exampleTranslation": "Ông tôi đọc báo địa phương mỗi sáng trong khi thưởng thức tách trà xanh của mình."
+  },
+  {
+    "term": "relax",
+    "translation": "thư giãn",
+    "phonetic": "/rɪˈlæks/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "Listening to classical music is a simple way to relax your mind after work.",
+    "exampleTranslation": "Nghe nhạc cổ điển là một cách đơn giản để thư giãn tâm trí của bạn sau khi làm việc."
+  },
+  {
+    "term": "set the alarm",
+    "translation": "đặt chuông báo thức",
+    "phonetic": "/set ðə ə’lɑ:m/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "You should set the alarm clock for six tomorrow morning so you won't overslept.",
+    "exampleTranslation": "Bạn nên đặt chuông báo thức lúc sáu giờ sáng mai để không bị ngủ quên."
+  },
+  {
+    "term": "shave",
+    "translation": "cạo râu",
+    "phonetic": "/∫eiv/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "He uses a modern electric razor to shave his beard neatly every single morning.",
+    "exampleTranslation": "Anh ấy sử dụng một chiếc máy cạo râu điện hiện đại để cạo râu gọn gàng mỗi sáng."
+  },
+  {
+    "term": "sleep",
+    "translation": "ngủ",
+    "phonetic": "/sliːp/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "Getting enough quality sleep is absolutely essential for your overall physical and mental health.",
+    "exampleTranslation": "Ngủ đủ giấc chất lượng là hoàn toàn thiết yếu cho sức khỏe thể chất và tinh thần tổng thể của bạn."
+  },
+  {
+    "term": "study",
+    "translation": "học tập, nghiên cứu",
+    "phonetic": "/ˈstʌd.i/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "She decided to study environmental science at a well-known university in Canada.",
+    "exampleTranslation": "Cô ấy đã quyết định nghiên cứu khoa học môi trường tại một trường đại học nổi tiếng ở Canada."
+  },
+  {
+    "term": "surf the internet",
+    "translation": "lướt mạng",
+    "phonetic": "/sɜːf ðiː ˈn.tə.net/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "Many young people surf the internet for hours instead of engaging in physical exercises.",
+    "exampleTranslation": "Nhiều người trẻ tuổi lướt mạng hàng giờ đồng hồ thay vì tham gia vào các bài tập thể dục thể chất."
+  },
+  {
+    "term": "take the rubbish out",
+    "translation": "đi đổ rác",
+    "phonetic": "/teik ðə ‘rʌbiʃ aut/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "It is your turn to take the heavy rubbish out to the bins downstairs.",
+    "exampleTranslation": "Đến lượt của bạn đi đổ túi rác nặng ra các thùng rác ở tầng dưới rồi đấy."
+  },
+  {
+    "term": "drink",
+    "translation": "uống",
+    "phonetic": "/driɳk/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "You need to drink enough water throughout the hot day to stay properly hydrated.",
+    "exampleTranslation": "Bạn cần phải uống đủ nước trong ngày nóng bức để giữ cho cơ thể được bù nước hợp lý."
+  },
+  {
+    "term": "turn off",
+    "translation": "tắt",
+    "phonetic": "/tɜrn ɒf/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "Please turn off all the lights and air conditioners before leaving the classroom.",
+    "exampleTranslation": "Vui lòng tắt toàn bộ đèn và máy điều hòa trước khi rời khỏi phòng học."
+  },
+  {
+    "term": "visit your friend",
+    "translation": "thăm bạn bè",
+    "phonetic": "/ˈvɪz.ɪt jɔːr frend/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "I plan to visit my old high school friend during my short summer vacation.",
+    "exampleTranslation": "Tôi lên kế hoạch đi thăm người bạn học cũ thời cấp ba của mình trong kỳ nghỉ hè ngắn ngủi."
+  },
+  {
+    "term": "wake up",
+    "translation": "tỉnh giấc",
+    "phonetic": "/weik Λp/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "She usually wakes up naturally before the alarm clock starts ringing at dawn.",
+    "exampleTranslation": "Cô ấy thường tự tỉnh giấc một cách tự nhiên trước khi chuông đồng hồ báo thức bắt đầu reo lúc bình minh."
+  },
+  {
+    "term": "wash your face",
+    "translation": "rửa mặt",
+    "phonetic": "/wɒʃ jɔːr feɪs/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "Washing your face with cold water can make you feel instantly awake in the morning.",
+    "exampleTranslation": "Rửa mặt bằng nước lạnh có thể khiến bạn cảm thấy lập tức tỉnh táo vào buổi sáng."
+  },
+  {
+    "term": "wash the dishes",
+    "translation": "rửa chén",
+    "phonetic": "/wɔʃ ðə dɪʃ/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "We should help our parents wash the dishes and clean the kitchen after dinner.",
+    "exampleTranslation": "Chúng ta nên giúp đỡ bố mẹ rửa chén bát và dọn dẹp nhà bếp sau bữa ăn tối."
+  },
+  {
+    "term": "watch television",
+    "translation": "xem tivi",
+    "phonetic": "/wɔtʃ ‘teli,viʤn/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "Watching too much television is not good for children's eyesight and brain development.",
+    "exampleTranslation": "Xem tivi quá nhiều không tốt cho thị lực và sự phát triển trí não của trẻ nhỏ."
+  },
+  {
+    "term": "work",
+    "translation": "làm việc",
+    "phonetic": "/wə:k/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "He has to work very hard to earn enough money for his university tuition.",
+    "exampleTranslation": "Anh ấy phải làm việc rất chăm chỉ để kiếm đủ tiền trang trải học phí đại học."
+  }
+]

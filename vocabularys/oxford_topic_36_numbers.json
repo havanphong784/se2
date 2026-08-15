@@ -1,0 +1,204 @@
+[
+  {
+    "term": "cardinal number",
+    "translation": "số đếm",
+    "phonetic": "/ˈkɑr·dən·əl ˈnʌm·bər/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "A cardinal number is used to represent the quantity of objects, such as three books.",
+    "exampleTranslation": "Một số đếm được sử dụng để biểu thị số lượng của các đồ vật, chẳng hạn như ba cuốn sách."
+  },
+  {
+    "term": "ordinal number",
+    "translation": "số thứ tự",
+    "phonetic": "/ˈɔr·dən·əl ˈnʌm·bər/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "An ordinal number shows the position of something in a list, like first or second.",
+    "exampleTranslation": "Một số thứ tự hiển thị vị trí của một thứ gì đó trong danh sách, như thứ nhất hoặc thứ hai."
+  },
+  {
+    "term": "decimal",
+    "translation": "số thập phân",
+    "phonetic": "/ˈdes.ɪ.məl/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The math teacher explained how to convert a decimal into a fraction.",
+    "exampleTranslation": "Giáo viên toán đã giải thích cách chuyển đổi một số thập phân thành một phân số."
+  },
+  {
+    "term": "fraction",
+    "translation": "phân số",
+    "phonetic": "/ˈfræk.ʃən/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The children learned how to add fractions with different denominators today.",
+    "exampleTranslation": "Hôm nay trẻ em đã học cách cộng các phân số có mẫu số khác nhau."
+  },
+  {
+    "term": "percentage",
+    "translation": "phần trăm",
+    "phonetic": "/pəˈsen.tɪdʒ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "A high percentage of the students passed the final exam with excellent grades.",
+    "exampleTranslation": "Một tỷ lệ phần trăm cao các học sinh đã vượt qua kỳ thi cuối kỳ với điểm số xuất sắc."
+  },
+  {
+    "term": "arithmetic",
+    "translation": "số học",
+    "phonetic": "/əˈrɪθ.mə.tɪk/",
+    "partOfSpeech": [
+      "tính từ",
+      "danh từ"
+    ],
+    "exampleSentence": "Basic arithmetic includes the operations of addition, subtraction, multiplication, and division.",
+    "exampleTranslation": "Số học cơ bản bao gồm các phép tính cộng, trừ, nhân và chia."
+  },
+  {
+    "term": "divide",
+    "translation": "chia",
+    "phonetic": "/dɪˈvaɪd/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "If you divide twelve by three, the result is equal to four.",
+    "exampleTranslation": "Nếu bạn chia mười hai cho ba, kết quả sẽ bằng bốn."
+  },
+  {
+    "term": "plus",
+    "translation": "cộng",
+    "phonetic": "/plʌs/",
+    "partOfSpeech": [
+      "giới từ"
+    ],
+    "exampleSentence": "Five plus five is equal to ten, which is a very simple math equation.",
+    "exampleTranslation": "Năm cộng năm bằng mười, đó là một phép tính toán học rất đơn giản."
+  },
+  {
+    "term": "minus",
+    "translation": "trừ",
+    "phonetic": "/ˈmaɪ.nəs/",
+    "partOfSpeech": [
+      "giới từ"
+    ],
+    "exampleSentence": "Ten minus three equals seven, which leaves us with a small amount.",
+    "exampleTranslation": "Mười trừ ba bằng bảy, điều này để lại cho chúng ta một lượng nhỏ."
+  },
+  {
+    "term": "multiply",
+    "translation": "nhân",
+    "phonetic": "/ˈmʌl.tɪ.plaɪ/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "You need to multiply the length by the width to calculate the total area.",
+    "exampleTranslation": "Bạn cần nhân chiều dài với chiều rộng để tính toán tổng diện tích."
+  },
+  {
+    "term": "equal",
+    "translation": "ngang bằng, bằng",
+    "phonetic": "/ˈiː.kwəl/",
+    "partOfSpeech": [
+      "tính từ",
+      "động từ"
+    ],
+    "exampleSentence": "Two plus two will always equal four, no matter how you look at it.",
+    "exampleTranslation": "Hai cộng hai sẽ luôn bằng bốn, bất kể bạn nhìn nhận nó như thế nào."
+  },
+  {
+    "term": "total",
+    "translation": "tổng, tổng số",
+    "phonetic": "/ˈtəʊ.təl/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "The total cost of the shopping trip came to fifty dollars.",
+    "exampleTranslation": "Tổng chi phí của chuyến đi mua sắm hết năm mươi đô la."
+  },
+  {
+    "term": "dozen",
+    "translation": "tá (12 đơn vị)",
+    "phonetic": "/ˈdʌz.ən/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She bought a dozen fresh eggs from the grocery store to bake a cake.",
+    "exampleTranslation": "Cô ấy đã mua một tá trứng tươi từ cửa hàng tạp hóa để nướng bánh ngọt."
+  },
+  {
+    "term": "around",
+    "translation": "khoảng",
+    "phonetic": "/əˈraʊnd/",
+    "partOfSpeech": [
+      "trạng từ"
+    ],
+    "exampleSentence": "There were around fifty guests invited to the intimate birthday party.",
+    "exampleTranslation": "Có khoảng năm mươi vị khách được mời tham dự bữa tiệc sinh nhật thân mật."
+  },
+  {
+    "term": "zero",
+    "translation": "số không",
+    "phonetic": "/ˈzɪə.rəʊ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The temperature dropped to zero degrees celsius during the cold winter night.",
+    "exampleTranslation": "Nhiệt độ đã giảm xuống không độ C trong đêm đông lạnh giá."
+  },
+  {
+    "term": "hundred",
+    "translation": "một trăm",
+    "phonetic": "/ˈhʌn.drəd/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The library has over one hundred books about ancient histories.",
+    "exampleTranslation": "Thư viện có hơn một trăm cuốn sách nói về lịch sử cổ đại."
+  },
+  {
+    "term": "thousand",
+    "translation": "một nghìn",
+    "phonetic": "/ˈθaʊ.zənd/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He won a prize of one thousand dollars in the science competition.",
+    "exampleTranslation": "Anh ấy đã giành được giải thưởng trị giá một nghìn đô la trong cuộc thi khoa học."
+  },
+  {
+    "term": "million",
+    "translation": "một triệu",
+    "phonetic": "/ˈmɪl.jən/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The famous pop singer has over one million followers on social media.",
+    "exampleTranslation": "Ca sĩ nhạc pop nổi tiếng có hơn một triệu người theo dõi trên mạng xã hội."
+  },
+  {
+    "term": "billion",
+    "translation": "một tỷ",
+    "phonetic": "/ˈbɪl.jən/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The world population has already surpassed eight billion people this year.",
+    "exampleTranslation": "Dân số thế giới đã vượt qua tám tỷ người vào năm nay."
+  },
+  {
+    "term": "half",
+    "translation": "một nửa",
+    "phonetic": "/hɑːf/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She cut the juicy red apple in half to share with her younger brother.",
+    "exampleTranslation": "Cô ấy đã cắt quả táo đỏ mọng nước làm đôi để chia sẻ với em trai mình."
+  }
+]

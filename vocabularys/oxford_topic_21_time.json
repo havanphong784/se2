@@ -1,0 +1,162 @@
+[
+  {
+    "term": "second",
+    "translation": "giây",
+    "phonetic": "/ˈsek.ənd/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He ran the hundred-meter race in just under ten seconds today.",
+    "exampleTranslation": "Hôm nay anh ấy đã chạy cuộc đua một trăm mét chỉ trong chưa đầy mười giây."
+  },
+  {
+    "term": "minute",
+    "translation": "phút",
+    "phonetic": "/ˈmɪn.ɪt/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Please wait a minute while I check your flight reservation details.",
+    "exampleTranslation": "Vui lòng chờ một phút trong khi tôi kiểm tra chi tiết đặt chỗ chuyến bay của bạn."
+  },
+  {
+    "term": "hour",
+    "translation": "tiếng",
+    "phonetic": "/aʊr/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "We spent more than an hour discussing our new project plans.",
+    "exampleTranslation": "Chúng tôi đã dành hơn một tiếng đồng hồ để thảo luận về các kế hoạch dự án mới của mình."
+  },
+  {
+    "term": "week",
+    "translation": "tuần",
+    "phonetic": "/wiːk/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "My brother is coming back from his business trip next week.",
+    "exampleTranslation": "Anh trai tôi sẽ trở về sau chuyến đi công tác vào tuần tới."
+  },
+  {
+    "term": "decade",
+    "translation": "thập niên",
+    "phonetic": "/dekˈeɪd/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The technology sector has developed incredibly fast over the past decade.",
+    "exampleTranslation": "Ngành công nghệ đã phát triển nhanh một cách kinh ngạc trong thập kỷ qua."
+  },
+  {
+    "term": "century",
+    "translation": "thế kỷ",
+    "phonetic": "/ˈsen.tʃər.i/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "This historic temple was built during the eleventh century by the king.",
+    "exampleTranslation": "Ngôi đền lịch sử này được xây dựng vào thế kỷ thứ mười một bởi nhà vua."
+  },
+  {
+    "term": "weekend",
+    "translation": "cuối tuần",
+    "phonetic": "/ˈwiːend/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "They love to spend their quiet weekend hiking in the beautiful forest.",
+    "exampleTranslation": "Họ thích dành những ngày cuối tuần yên tĩnh của mình để đi bộ đường dài trong khu rừng xinh đẹp."
+  },
+  {
+    "term": "month",
+    "translation": "tháng",
+    "phonetic": "/mʌnθ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Our family is going to move to a new apartment next month.",
+    "exampleTranslation": "Gia đình chúng tôi sẽ chuyển đến một căn hộ mới vào tháng tới."
+  },
+  {
+    "term": "year",
+    "translation": "năm",
+    "phonetic": "/jɪr/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She graduated from the prestigious university with honors last year.",
+    "exampleTranslation": "Cô ấy đã tốt nghiệp trường đại học danh tiếng với tấm bằng danh dự vào năm ngoái."
+  },
+  {
+    "term": "millennium",
+    "translation": "thiên niên kỷ",
+    "phonetic": "/mɪˈlen.i.əm/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The turn of the millennium was celebrated with spectacular fireworks worldwide.",
+    "exampleTranslation": "Sự chuyển giao thiên niên kỷ đã được chào đón bằng những màn bắn pháo hoa ngoạn mục trên toàn thế giới."
+  },
+  {
+    "term": "morning",
+    "translation": "buổi sáng",
+    "phonetic": "/ˈmɔːnɪŋ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Drinking a warm cup of coffee in the morning makes me feel awake.",
+    "exampleTranslation": "Uống một tách cà phê ấm vào buổi sáng khiến tôi cảm thấy tỉnh táo."
+  },
+  {
+    "term": "afternoon",
+    "translation": "buổi chiều",
+    "phonetic": "/ˌæf.tɚˈnuːn/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "We decided to have a small picnic in the park this afternoon.",
+    "exampleTranslation": "Chúng tôi đã quyết định có một buổi dã ngoại nhỏ trong công viên vào chiều nay."
+  },
+  {
+    "term": "evening",
+    "translation": "buổi tối",
+    "phonetic": "/ˈiːnɪŋ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Our family always gathers around the dining table to eat dinner in the evening.",
+    "exampleTranslation": "Gia đình chúng tôi luôn quây quần bên bàn ăn để ăn tối vào buổi tối."
+  },
+  {
+    "term": "midnight",
+    "translation": "nửa đêm",
+    "phonetic": "/ˈmɪd.naɪt/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The train finally arrived at the dark station shortly before midnight last night.",
+    "exampleTranslation": "Chuyến tàu cuối cùng cũng đã đến nhà ga tối tăm một lúc trước nửa đêm đêm qua."
+  },
+  {
+    "term": "dusk",
+    "translation": "hoàng hôn",
+    "phonetic": "/dʌsk/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The birds returned to their cozy nests on the tree at dusk.",
+    "exampleTranslation": "Những chú chim đã bay trở về tổ ấm cúng của mình trên cây vào lúc hoàng hôn."
+  },
+  {
+    "term": "dawn",
+    "translation": "bình minh",
+    "phonetic": "/dɑːn/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The hard-working farmers usually wake up before dawn to start their workday.",
+    "exampleTranslation": "Những người nông dân làm việc chăm chỉ thường thức dậy trước bình minh để bắt đầu ngày làm việc."
+  }
+]

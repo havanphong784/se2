@@ -22,10 +22,16 @@ import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { getLearningData } from "@/lib/data";
+import { getCurrentAuthUser } from "@/lib/auth";
+import { getDb } from "@/db";
 import { isDueForReview } from "@/lib/study";
 import { cn } from "@/lib/utils";
 
 export default async function DashboardPage() {
+  const db = getDb();
+  const authUser = db ? await getCurrentAuthUser(db) : null;
+  const displayName = authUser?.displayName ?? "Minh Anh";
+
   const learning = await getLearningData();
   const { decks, activity } = learning.data;
   const allWords = decks.flatMap((deck) => deck.words);
@@ -56,7 +62,7 @@ export default async function DashboardPage() {
             <CalendarDays className="size-4" /> {dateLabel}
           </Badge>
           <h1 className="font-display text-balance text-[36px] font-extrabold leading-[1.08] text-eel-dark-blue md:text-[44px]">
-            Chào Minh Anh, mình nở thêm vài từ nhé!
+            Chào {displayName}, mình nở thêm vài từ nhé!
           </h1>
         </div>
         <div className="flex items-center gap-2 text-sm font-extrabold text-ash">

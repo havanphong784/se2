@@ -1,0 +1,402 @@
+[
+  {
+    "term": "pack",
+    "translation": "bó, gói",
+    "phonetic": "/pæk/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "They need to pack their suitcases before leaving for the airport.",
+    "exampleTranslation": "Họ cần phải đóng gói hành lý trước khi lên đường ra sân bay."
+  },
+  {
+    "term": "paint",
+    "translation": "quét sơn",
+    "phonetic": "/peint/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "The workers will paint the outer walls of the house tomorrow.",
+    "exampleTranslation": "Các công nhân sẽ quét sơn các bức tường bên ngoài của ngôi nhà vào ngày mai."
+  },
+  {
+    "term": "paste",
+    "translation": "dán",
+    "phonetic": "/peist/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "The child used glue to paste the pictures onto the paper.",
+    "exampleTranslation": "Đứa trẻ đã sử dụng keo để dán các bức tranh lên tờ giấy."
+  },
+  {
+    "term": "pick",
+    "translation": "hái, nhổ",
+    "phonetic": "/pik/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "We decided to pick some fresh apples from the local orchard.",
+    "exampleTranslation": "Chúng tôi quyết định hái một vài quả táo tươi từ vườn cây địa phương."
+  },
+  {
+    "term": "plant",
+    "translation": "trồng",
+    "phonetic": "/plænt/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "My grandfather loves to plant beautiful flowers in his front garden.",
+    "exampleTranslation": "Ông nội của tôi rất thích trồng những loài hoa đẹp trong vườn trước nhà."
+  },
+  {
+    "term": "play",
+    "translation": "chơi",
+    "phonetic": "/plei/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "The children want to play football in the park this afternoon.",
+    "exampleTranslation": "Lũ trẻ muốn chơi bóng đá trong công viên vào chiều nay."
+  },
+  {
+    "term": "point",
+    "translation": "chỉ",
+    "phonetic": "/pɔint/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "She raised her finger to point at the star in the sky.",
+    "exampleTranslation": "Cô ấy đã giơ ngón tay lên để chỉ vào ngôi sao trên bầu trời."
+  },
+  {
+    "term": "pour",
+    "translation": "rót, đổ",
+    "phonetic": "/pɔ:/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "Please pour a glass of fresh orange juice for our guest.",
+    "exampleTranslation": "Vui lòng rót một ly nước cam tươi cho khách của chúng ta."
+  },
+  {
+    "term": "pull",
+    "translation": "lôi, kéo",
+    "phonetic": "/pul/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "You need to pull the door strongly to open it completely.",
+    "exampleTranslation": "Bạn cần kéo mạnh cánh cửa để mở nó ra hoàn toàn."
+  },
+  {
+    "term": "push",
+    "translation": "xô, đẩy",
+    "phonetic": "/puʃ/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "The sign on the glass door says to push, not pull.",
+    "exampleTranslation": "Biển hiệu trên cửa kính ghi là xô đẩy vào, chứ không phải kéo ra."
+  },
+  {
+    "term": "rake",
+    "translation": "cào, cời",
+    "phonetic": "/reik/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "He spent the whole afternoon trying to rake dry leaves in the yard.",
+    "exampleTranslation": "Anh ấy đã dành cả buổi chiều để cố gắng cào lá khô trong sân."
+  },
+  {
+    "term": "read",
+    "translation": "đọc",
+    "phonetic": "/ri:d/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "She loves to read romantic novels before she goes to bed.",
+    "exampleTranslation": "Cô ấy thích đọc tiểu thuyết lãng mạn trước khi đi ngủ."
+  },
+  {
+    "term": "ride",
+    "translation": "đi, cưỡi",
+    "phonetic": "/raid/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "The young boy is learning how to ride a bicycle without support.",
+    "exampleTranslation": "Cậu bé đang học cách đi xe đạp mà không cần sự trợ giúp."
+  },
+  {
+    "term": "row",
+    "translation": "chèo thuyền",
+    "phonetic": "/rou/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "They hired a wooden boat to row across the peaceful lake.",
+    "exampleTranslation": "Họ đã thuê một chiếc thuyền gỗ để chèo qua hồ nước yên bình."
+  },
+  {
+    "term": "run",
+    "translation": "chạy",
+    "phonetic": "/rʌn/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "He has to run very fast to catch the morning bus.",
+    "exampleTranslation": "Anh ấy phải chạy thật nhanh để bắt kịp chuyến xe buýt buổi sáng."
+  },
+  {
+    "term": "sail",
+    "translation": "lái (thuyền buồm)",
+    "phonetic": "/seil/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "They plan to sail their yacht around the islands next summer.",
+    "exampleTranslation": "Họ lên kế hoạch lái thuyền buồm của mình quanh các hòn đảo vào mùa hè tới."
+  },
+  {
+    "term": "scrub",
+    "translation": "lau, chùi, cọ rửa",
+    "phonetic": "/skrʌb/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "You should scrub the kitchen floor carefully to remove all stains.",
+    "exampleTranslation": "Bạn nên cọ rửa sàn bếp một cách cân nhận để loại bỏ tất cả các vết bẩn."
+  },
+  {
+    "term": "see",
+    "translation": "thấy, xem",
+    "phonetic": "/si:/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "We can see the beautiful mountain peak from our hotel window.",
+    "exampleTranslation": "Chúng tôi có thể nhìn thấy đỉnh núi đẹp đẽ từ cửa sổ khách sạn của mình."
+  },
+  {
+    "term": "set",
+    "translation": "để, đặt",
+    "phonetic": "/set/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "She helped her mother to set the dining table for dinner.",
+    "exampleTranslation": "Cô ấy đã giúp mẹ mình để bày biện bàn ăn cho bữa tối."
+  },
+  {
+    "term": "sew",
+    "translation": "may, khâu",
+    "phonetic": "/soʊ/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "My grandmother showed me how to sew a button onto my shirt.",
+    "exampleTranslation": "Bà ngoại của tôi đã chỉ cho tôi cách may một chiếc cúc áo vào áo sơ mi của mình."
+  },
+  {
+    "term": "shout",
+    "translation": "la hét, reo hò",
+    "phonetic": "/ʃaʊt/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "Please do not shout in the library because people are studying.",
+    "exampleTranslation": "Làm ơn đừng la hét trong thư viện vì mọi người đang học tập."
+  },
+  {
+    "term": "show",
+    "translation": "cho xem, cho thấy, trưng",
+    "phonetic": "/ʃou/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "He wants to show his new drawing to his art teacher.",
+    "exampleTranslation": "Anh ấy muốn cho giáo viên mỹ thuật của mình xem bức vẽ mới."
+  },
+  {
+    "term": "sing",
+    "translation": "hát, hót",
+    "phonetic": "/siɳ/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "The choir began to sing a beautiful melody at the ceremony.",
+    "exampleTranslation": "Dàn hợp xướng đã bắt đầu hát một giai điệu tuyệt đẹp tại nghi lễ."
+  },
+  {
+    "term": "sit",
+    "translation": "ngồi",
+    "phonetic": "/sit/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "You can sit on the comfortable sofa while you wait.",
+    "exampleTranslation": "Bạn có thể ngồi trên chiếc ghế sô-pha thoải mái trong khi chờ đợi."
+  },
+  {
+    "term": "skate",
+    "translation": "trượt băng",
+    "phonetic": "/skeit/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "Many people love to skate on the frozen lake during winter.",
+    "exampleTranslation": "Nhiều người thích trượt băng trên hồ nước đóng băng vào mùa đông."
+  },
+  {
+    "term": "skip",
+    "translation": "nhảy",
+    "phonetic": "/skip/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "The active girls love to skip rope together on the playground.",
+    "exampleTranslation": "Những cô gái năng động thích nhảy dây cùng nhau trên sân chơi."
+  },
+  {
+    "term": "sleep",
+    "translation": "ngủ",
+    "phonetic": "/sli:p/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "You should sleep at least eight hours a night to stay healthy.",
+    "exampleTranslation": "Bạn nên ngủ ít nhất tám tiếng một đêm để giữ gìn sức khỏe."
+  },
+  {
+    "term": "slide",
+    "translation": "trượt",
+    "phonetic": "/slaid/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "The children laughed as they started to slide down the hill.",
+    "exampleTranslation": "Lũ trẻ đã cười vang khi chúng bắt đầu trượt xuống đồi."
+  },
+  {
+    "term": "sneeze",
+    "translation": "hắt hơi",
+    "phonetic": "/sni:z/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "The strong dust in the air made him sneeze several times.",
+    "exampleTranslation": "Bụi mạnh trong không khí đã khiến anh ấy hắt hơi vài lần."
+  },
+  {
+    "term": "spin",
+    "translation": "quay",
+    "phonetic": "/spɪn/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "The dancer started to spin around gracefully on the stage floor.",
+    "exampleTranslation": "Vũ công bắt đầu quay vòng một cách uyển chuyển trên sàn sân khấu."
+  },
+  {
+    "term": "stand",
+    "translation": "đứng",
+    "phonetic": "/stænd/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "Please stand in a straight line while waiting for the bus.",
+    "exampleTranslation": "Vui lòng đứng thành một hàng thẳng trong khi chờ xe buýt."
+  },
+  {
+    "term": "stop",
+    "translation": "ngừng",
+    "phonetic": "/stɔp/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "The car had to stop suddenly at the red traffic light.",
+    "exampleTranslation": "Chiếc xe đã phải ngừng lại đột ngột trước đèn giao thông màu đỏ."
+  },
+  {
+    "term": "sweep",
+    "translation": "quét qua; lan ra",
+    "phonetic": "/swi:p/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "She used a broom to sweep the dust off the floor.",
+    "exampleTranslation": "Cô ấy đã dùng một cây chổi để quét bụi bẩn ra khỏi sàn nhà."
+  },
+  {
+    "term": "swim",
+    "translation": "bơi",
+    "phonetic": "/swim/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "He loves to swim in the cool ocean water every morning.",
+    "exampleTranslation": "Anh ấy thích bơi lội trong làn nước biển mát lạnh mỗi sáng."
+  },
+  {
+    "term": "swing",
+    "translation": "đu đưa",
+    "phonetic": "/swɪŋ/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "The young children love to swing back and forth in the playground.",
+    "exampleTranslation": "Trẻ nhỏ rất thích đu đưa qua lại trên chiếc xích đu ở sân chơi."
+  },
+  {
+    "term": "take",
+    "translation": "cầm, nắm, lấy",
+    "phonetic": "/teik/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "Don't forget to take your umbrella because it might rain today.",
+    "exampleTranslation": "Đừng quên mang theo ô của bạn vì hôm nay trời có thể mưa."
+  },
+  {
+    "term": "talk",
+    "translation": "nói chuyện",
+    "phonetic": "/tɔ:k/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "They spent hours trying to talk about their plans for vacation.",
+    "exampleTranslation": "Họ đã dành nhiều giờ để nói chuyện về các kế hoạch nghỉ mát của mình."
+  },
+  {
+    "term": "tell",
+    "translation": "nói",
+    "phonetic": "/tel/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "The grandfather started to tell a fascinating story to his grandchildren.",
+    "exampleTranslation": "Người ông đã bắt đầu kể một câu chuyện hấp dẫn cho các cháu của mình."
+  },
+  {
+    "term": "throw",
+    "translation": "ném, quăng",
+    "phonetic": "/θrəʊ/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "You should not throw plastic bottles into the natural environment.",
+    "exampleTranslation": "Bạn không nên ném các chai nhựa vào môi trường tự nhiên."
+  },
+  {
+    "term": "tie",
+    "translation": "buộc, cột, trói",
+    "phonetic": "/tai/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "He had to tie his shoelaces tightly before starting the race.",
+    "exampleTranslation": "Anh ấy đã phải buộc dây giày thật chặt trước khi bắt đầu cuộc đua."
+  }
+]

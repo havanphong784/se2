@@ -1,0 +1,342 @@
+[
+  {
+    "term": "village",
+    "translation": "ngôi làng",
+    "phonetic": "/ˈvɪl.ɪdʒ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Our grandparents live in a small, quiet village near the green mountains.",
+    "exampleTranslation": "Ông bà của chúng tôi sống trong một ngôi làng nhỏ, yên bình gần những ngọn núi xanh."
+  },
+  {
+    "term": "countryside",
+    "translation": "nông thôn",
+    "phonetic": "/ˈkʌn.tri.saɪd/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "We really love breathing the fresh and clean air of the countryside on weekends.",
+    "exampleTranslation": "Chúng tôi thực sự thích hít thở bầu không khí trong lành và sạch sẽ của vùng nông thôn vào cuối tuần."
+  },
+  {
+    "term": "cottage",
+    "translation": "nhà tranh",
+    "phonetic": "/ˈkɒt.ɪdʒ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "They spent their summer holiday in a beautiful wooden cottage beside the river.",
+    "exampleTranslation": "Họ đã trải qua kỳ nghỉ hè của mình trong một ngôi nhà tranh bằng gỗ đẹp đẽ cạnh bờ sông."
+  },
+  {
+    "term": "winding",
+    "translation": "quanh co, uốn khúc",
+    "phonetic": "/ˈwaɪn.dɪŋ/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "The driver carefully navigated the winding road that leads up to the mountain top.",
+    "exampleTranslation": "Người tài xế đã cẩn thận điều khiển xe đi qua con đường quanh co dẫn lên đỉnh núi."
+  },
+  {
+    "term": "well",
+    "translation": "giếng",
+    "phonetic": "/wel/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "People in the old village used to gather around the deep water well every afternoon.",
+    "exampleTranslation": "Người dân ở ngôi làng cổ thường tụ tập quanh cái giếng nước sâu vào mỗi buổi chiều."
+  },
+  {
+    "term": "buffalo",
+    "translation": "con trâu",
+    "phonetic": "/ˈbʌf.ə.ləʊ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The hard-working buffalo is historically considered a loyal friend of Vietnamese farmers.",
+    "exampleTranslation": "Con trâu chăm chỉ từ xưa đến nay được coi là người bạn trung thành của người nông dân Việt Nam."
+  },
+  {
+    "term": "field",
+    "translation": "cánh đồng",
+    "phonetic": "/fiːld/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The vast green rice fields stretch as far as the eye can see in this area.",
+    "exampleTranslation": "Những cánh đồng lúa xanh bao la trải dài tít tắp đến tận chân trời ở vùng này."
+  },
+  {
+    "term": "canal",
+    "translation": "kênh",
+    "phonetic": "/kəˈnæl/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The narrow canal provides essential water for all the agricultural fields in the region.",
+    "exampleTranslation": "Con kênh hẹp cung cấp nguồn nước thiết yếu cho tất cả các cánh đồng nông nghiệp trong vùng."
+  },
+  {
+    "term": "river",
+    "translation": "sông",
+    "phonetic": "/ˈrɪv.ər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Children in the countryside often enjoy swimming in the cool river during hot summer days.",
+    "exampleTranslation": "Trẻ em ở vùng nông thôn thường thích bơi lội dưới dòng sông mát rượi trong những ngày hè nóng nực."
+  },
+  {
+    "term": "pond",
+    "translation": "ao",
+    "phonetic": "/pɒnd/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "There is a small lotus pond in front of my uncle's old house.",
+    "exampleTranslation": "Có một cái ao sen nhỏ ở ngay trước ngôi nhà cổ của bác tôi."
+  },
+  {
+    "term": "folk music",
+    "translation": "nhạc dân gian",
+    "phonetic": "/ˈfoʊk ˌmju·zɪk/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "Traditional Vietnamese folk music deeply reflects the cultural values and spirit of the people.",
+    "exampleTranslation": "Nhạc dân gian truyền thống của Việt Nam phản ánh sâu sắc các giá trị văn hóa và tâm hồn của người dân."
+  },
+  {
+    "term": "farm",
+    "translation": "trang trại",
+    "phonetic": "/fɑːm/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "They own a large organic farm where they raise dairy cattle and grow organic vegetables.",
+    "exampleTranslation": "Họ sở hữu một trang trại hữu cơ lớn, nơi họ nuôi bò sữa và trồng các loại rau sạch."
+  },
+  {
+    "term": "plow",
+    "translation": "cày",
+    "phonetic": "/plaʊ/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "The old farmer and his buffalo plow the muddy field early in the morning.",
+    "exampleTranslation": "Người nông dân già và con trâu của mình cày cánh đồng bùn lầy vào sáng sớm."
+  },
+  {
+    "term": "agriculture",
+    "translation": "nông nghiệp",
+    "phonetic": "/ˈæɡ.rɪ.kʌl.tʃər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Modern technology has significantly improved the efficiency of agriculture in our country.",
+    "exampleTranslation": "Công nghệ hiện đại đã cải thiện đáng kể hiệu quả của ngành nông nghiệp nước ta."
+  },
+  {
+    "term": "boat",
+    "translation": "thuyền",
+    "phonetic": "/bəʊt/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "They rowed a small wooden boat across the peaceful lake to enjoy the sunset.",
+    "exampleTranslation": "Họ đã chèo một chiếc thuyền gỗ nhỏ băng qua hồ nước yên bình để ngắm cảnh hoàng hôn."
+  },
+  {
+    "term": "peaceful",
+    "translation": "yên bình",
+    "phonetic": "/ˈpiːs.fəl/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "Living in a rural area offers a peaceful lifestyle away from busy city traffic.",
+    "exampleTranslation": "Sống ở vùng nông thôn mang lại một lối sống yên bình, tránh xa sự ồn ào của xe cộ thành thị."
+  },
+  {
+    "term": "bay",
+    "translation": "vịnh",
+    "phonetic": "/beɪ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Ha Long Bay is internationally famous for its spectacular limestone islands and emerald waters.",
+    "exampleTranslation": "Vịnh Hạ Long nổi tiếng quốc tế với những hòn đảo đá vôi hùng vĩ và làn nước xanh như ngọc."
+  },
+  {
+    "term": "hill",
+    "translation": "ngọn đồi",
+    "phonetic": "/hɪl/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "They decided to walk up the grassy hill to get a better view of the sunset.",
+    "exampleTranslation": "Họ quyết định đi bộ lên ngọn đồi cỏ để có thể ngắm cảnh hoàng hôn đẹp hơn."
+  },
+  {
+    "term": "forest",
+    "translation": "rừng",
+    "phonetic": "/ˈfɒr.ɪst/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The dense tropical forest is home to many rare species of animals and plants.",
+    "exampleTranslation": "Khu rừng nhiệt đới rậm rạp là nơi sinh sống của nhiều loài động thực vật quý hiếm."
+  },
+  {
+    "term": "mountain",
+    "translation": "núi",
+    "phonetic": "/ˈmaʊn.tɪn/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Climbing this steep mountain requires a lot of physical strength and professional equipment.",
+    "exampleTranslation": "Leo lên ngọn núi dốc này đòi hỏi rất nhiều thể lực và thiết bị chuyên nghiệp."
+  },
+  {
+    "term": "port",
+    "translation": "bến cảng",
+    "phonetic": "/pɔːt/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The busy cargo ships arrived at the deep-water port to unload their containers.",
+    "exampleTranslation": "Những chiếc tàu chở hàng bận rộn đã cập bến cảng nước sâu để bốc dỡ các container của họ."
+  },
+  {
+    "term": "lake",
+    "translation": "hồ",
+    "phonetic": "/leɪk/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The beautiful water of the lake reflected the clear blue sky above perfectly.",
+    "exampleTranslation": "Làn nước xinh đẹp của hồ phản chiếu bầu trời xanh trong vắt phía trên một cách hoàn hảo."
+  },
+  {
+    "term": "sea",
+    "translation": "biển",
+    "phonetic": "/siː/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Many tourists visit the coastal city to swim in the warm sea water during summer.",
+    "exampleTranslation": "Nhiều du khách ghé thăm thành phố ven biển để tắm nước biển ấm áp vào mùa hè."
+  },
+  {
+    "term": "sand",
+    "translation": "cát",
+    "phonetic": "/sænd/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The golden sand on the beach was warm under our bare feet as we walked.",
+    "exampleTranslation": "Bãi cát vàng trên bờ biển thật ấm áp dưới bàn chân trần của chúng tôi khi dạo bước."
+  },
+  {
+    "term": "valley",
+    "translation": "thung lũng",
+    "phonetic": "/ˈvæl.i/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The picturesque valley was filled with thousands of beautiful blooming wildflowers in spring.",
+    "exampleTranslation": "Thung lũng đẹp như tranh vẽ tràn ngập hàng ngàn đóa hoa dại nở rộ tuyệt đẹp vào mùa xuân."
+  },
+  {
+    "term": "waterfall",
+    "translation": "thác nước",
+    "phonetic": "/ˈwɔː.tə.fɔːl/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "We could hear the loud sound of the spectacular waterfall from a mile away.",
+    "exampleTranslation": "Chúng tôi có thể nghe thấy âm thanh lớn của thác nước hùng vĩ từ khoảng cách một dặm."
+  },
+  {
+    "term": "barn",
+    "translation": "kho thóc",
+    "phonetic": "/bɑːn/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The farm workers stored the freshly harvested golden hay inside the wooden barn.",
+    "exampleTranslation": "Các công nhân trang trại đã cất giữ cỏ khô vàng mới thu hoạch vào trong kho thóc bằng gỗ."
+  },
+  {
+    "term": "harvest",
+    "translation": "vụ gặt",
+    "phonetic": "/ˈhɑː.vɪst/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The farmers are extremely busy with the golden autumn rice harvest this month.",
+    "exampleTranslation": "Những người nông dân đang cực kỳ bận rộn với vụ gặt lúa mùa thu vàng trong tháng này."
+  },
+  {
+    "term": "cattle",
+    "translation": "gia súc",
+    "phonetic": "/ˈkæt.əl/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "A large herd of dairy cattle was grazing peacefully in the green pasture field.",
+    "exampleTranslation": "Một đàn gia súc lấy sữa lớn đang gặm cỏ một cách yên bình trên cánh đồng cỏ xanh."
+  },
+  {
+    "term": "rural",
+    "translation": "(thuộc) nông thôn",
+    "phonetic": "/ˈrʊə.rəl/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "The local government is investing more funds to develop the rural infrastructure quickly.",
+    "exampleTranslation": "Chính quyền địa phương đang đầu tư thêm ngân sách để phát triển nhanh chóng cơ sở hạ tầng nông thôn."
+  },
+  {
+    "term": "cliff",
+    "translation": "vách đá",
+    "phonetic": "/klɪf/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The adventurous tourists stood near the edge of the steep cliff to take photos.",
+    "exampleTranslation": "Những du khách thích phiêu lưu đứng gần rìa vách đá dốc để chụp những bức ảnh."
+  },
+  {
+    "term": "landscape",
+    "translation": "phong cảnh",
+    "phonetic": "/ˈlænd.skeɪp/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "They stopped their car on the roadside to admire the breathtaking natural landscape.",
+    "exampleTranslation": "Họ đã dừng xe bên lề đường để chiêm ngưỡng phong cảnh thiên nhiên ngoạn mục."
+  },
+  {
+    "term": "terraced house",
+    "translation": "dãy nhà",
+    "phonetic": "/ˈrəʊˌhaʊs/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "He lives in a charming terraced house located in the historic center of town.",
+    "exampleTranslation": "Anh ấy sống trong một dãy nhà duyên dáng nằm ở trung tâm lịch sử của thị trấn."
+  },
+  {
+    "term": "view",
+    "translation": "khung cảnh, quang cảnh",
+    "phonetic": "/vjuː/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The hotel room window offers a magnificent panoramic view of the blue ocean.",
+    "exampleTranslation": "Cửa sổ phòng khách sạn mang đến một quang cảnh toàn cảnh tuyệt đẹp của đại dương xanh."
+  }
+]

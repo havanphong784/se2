@@ -1,0 +1,502 @@
+[
+  {
+    "term": "road",
+    "translation": "đường",
+    "phonetic": "/roʊd/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "We drove slowly along the narrow country road because of the dense fog.",
+    "exampleTranslation": "Chúng tôi đã lái xe chậm rãi dọc theo con đường nông thôn hẹp vì sương mù dày đặc."
+  },
+  {
+    "term": "traffic",
+    "translation": "giao thông",
+    "phonetic": "/ˈtræfɪk/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The heavy traffic on the highway delayed our arrival by more than an hour.",
+    "exampleTranslation": "Giao thông ùn tắc trên đường cao tốc đã làm trì hoãn giờ đến của chúng tôi hơn một tiếng đồng hồ."
+  },
+  {
+    "term": "vehicle",
+    "translation": "phương tiện",
+    "phonetic": "/ˈviːəkl/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Every motor vehicle must pass a safety inspection before being allowed on the road.",
+    "exampleTranslation": "Mỗi phương tiện giao thông đường bộ phải vượt qua kỳ kiểm tra an toàn trước khi được phép chạy trên đường."
+  },
+  {
+    "term": "roadside",
+    "translation": "lề đường",
+    "phonetic": "/ˈroʊdsaɪd/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "They parked their car on the roadside to look at the beautiful valley below.",
+    "exampleTranslation": "Họ đỗ xe bên lề đường để ngắm nhìn thung lũng tuyệt đẹp phía dưới."
+  },
+  {
+    "term": "car hire",
+    "translation": "việc thuê xe ô tô",
+    "phonetic": "/kɑːr ˈhaɪər/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "We arranged for a car hire service at the airport so we could travel freely.",
+    "exampleTranslation": "Chúng tôi đã sắp xếp dịch vụ thuê xe ô tô tại sân bay để có thể di chuyển tự do."
+  },
+  {
+    "term": "ring road",
+    "translation": "đường vành đai",
+    "phonetic": "/rɪŋ roʊd/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "Taking the newly constructed ring road helped us bypass the busy city center easily.",
+    "exampleTranslation": "Đi theo con đường vành đai mới xây dựng đã giúp chúng tôi tránh được trung tâm thành phố bận rộn một cách dễ dàng."
+  },
+  {
+    "term": "petrol station",
+    "translation": "trạm xăng",
+    "phonetic": "/ˈpetrəl ˈsteɪʃn/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "We had to stop at the nearest petrol station because our fuel tank was almost empty.",
+    "exampleTranslation": "Chúng tôi phải dừng lại ở trạm xăng gần nhất vì bình nhiên liệu gần như đã cạn sạch."
+  },
+  {
+    "term": "kerb",
+    "translation": "lề đường",
+    "phonetic": "/kɜːrb/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She accidentally hit the concrete kerb while attempting to park her car on the street.",
+    "exampleTranslation": "Cô ấy đã vô tình đâm vào lề đường bê tông khi cố gắng đỗ xe trên phố."
+  },
+  {
+    "term": "road sign",
+    "translation": "biển báo giao thông",
+    "phonetic": "/roʊd saɪn/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "You should pay close attention to every road sign when driving in an unfamiliar city.",
+    "exampleTranslation": "Bạn nên chú ý kỹ đến từng biển báo giao thông khi lái xe ở một thành phố lạ."
+  },
+  {
+    "term": "pedestrian crossing",
+    "translation": "lối qua đường",
+    "phonetic": "/pəˈdestriən ˈkrɔːsɪŋ/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "All drivers must stop and yield to people walking on the pedestrian crossing.",
+    "exampleTranslation": "Tất cả các tài xế phải dừng lại và nhường đường cho người đi bộ trên lối qua đường."
+  },
+  {
+    "term": "turning",
+    "translation": "chỗ rẽ, ngã rẽ",
+    "phonetic": "/ˈtɜːrnɪŋ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The GPS instructed us to take the second turning on the right side of the road.",
+    "exampleTranslation": "Thiết bị định vị GPS hướng dẫn chúng tôi rẽ vào ngã rẽ thứ hai ở phía bên phải đường."
+  },
+  {
+    "term": "fork",
+    "translation": "ngã ba",
+    "phonetic": "/fɔːrk/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "When you reach the fork in the mountain trail, turn left to find the waterfall.",
+    "exampleTranslation": "Khi bạn đến ngã ba trên đường mòn leo núi, hãy rẽ trái để tìm thác nước."
+  },
+  {
+    "term": "toll",
+    "translation": "lệ phí qua đường, qua cầu",
+    "phonetic": "/toʊl/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Drivers must pay a small toll when crossing this massive newly built bridge.",
+    "exampleTranslation": "Các tài xế phải trả một khoản lệ phí nhỏ khi đi qua cây cầu khổng lồ mới xây này."
+  },
+  {
+    "term": "toll road",
+    "translation": "đường có thu phí",
+    "phonetic": "/toʊl roʊd/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "Using the toll road is much faster because there are fewer traffic jams there.",
+    "exampleTranslation": "Sử dụng đường có thu phí nhanh hơn nhiều vì ở đó có ít tình trạng ùn tắc giao thông hơn."
+  },
+  {
+    "term": "motorway",
+    "translation": "xa lộ",
+    "phonetic": "/ˈmoʊtərweɪ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The speed limit on this wide motorway is one hundred and twenty kilometers per hour.",
+    "exampleTranslation": "Giới hạn tốc độ trên xa lộ rộng lớn này là một trăm hai mươi km một giờ."
+  },
+  {
+    "term": "hard shoulder",
+    "translation": "vạt đất cạnh xa lộ để dừng xe",
+    "phonetic": "/hɑːrd ˈʃoʊldə/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "If your vehicle breaks down, you should pull over immediately onto the hard shoulder.",
+    "exampleTranslation": "Nếu phương tiện của bạn bị hỏng, bạn nên tấp xe ngay lập tức vào vạt đất cạnh xa lộ."
+  },
+  {
+    "term": "dual carriageway",
+    "translation": "xa lộ hai chiều",
+    "phonetic": "/duːəl ˈkærɪdʒweɪ/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "This dual carriageway has a central barrier separating the opposite directions of heavy traffic.",
+    "exampleTranslation": "Xa lộ hai chiều này có dải phân cách ở giữa chia tách các hướng giao thông ngược chiều nhau."
+  },
+  {
+    "term": "one-way street",
+    "translation": "đường một chiều",
+    "phonetic": "/wʌn weɪ striːt/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "Be careful not to drive the wrong way down this narrow one-way street.",
+    "exampleTranslation": "Hãy cẩn thận để không lái xe ngược chiều đi vào con đường một chiều hẹp này."
+  },
+  {
+    "term": "T-junction",
+    "translation": "ngã ba",
+    "phonetic": "/tiːˈdʒʌŋkʃn/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Turn left when you reach the busy T-junction at the end of this road.",
+    "exampleTranslation": "Hãy rẽ trái khi bạn đến ngã ba bận rộn ở cuối con đường này."
+  },
+  {
+    "term": "roundabout",
+    "translation": "bùng binh",
+    "phonetic": "/ˈraʊndəbaʊt/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The drivers must yield to vehicles that are already circulating inside the roundabout.",
+    "exampleTranslation": "Các tài xế phải nhường đường cho các phương tiện đang lưu thông bên trong bùng binh."
+  },
+  {
+    "term": "accident",
+    "translation": "tai nạn",
+    "phonetic": "/ˈæksɪdənt/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The serious traffic accident blocked all three lanes of the main highway this morning.",
+    "exampleTranslation": "Vụ tai nạn giao thông nghiêm trọng đã làm phong tỏa cả ba làn đường của xa lộ chính sáng nay."
+  },
+  {
+    "term": "breathalyser",
+    "translation": "thiết bị kiểm tra độ cồn trong hơi thở",
+    "phonetic": "/ˈbreθəlaɪzər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The police officer used a portable breathalyser to test the driver for alcohol consumption.",
+    "exampleTranslation": "Viên cảnh sát đã sử dụng một thiết bị kiểm tra độ cồn cầm tay để kiểm tra nồng độ cồn của tài xế."
+  },
+  {
+    "term": "traffic warden",
+    "translation": "nhân viên kiểm soát đỗ xe",
+    "phonetic": "/ˈtræfɪk ˈwɔːrdn/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "The alert traffic warden wrote a parking ticket for the car left in the restricted zone.",
+    "exampleTranslation": "Nhân viên kiểm soát đỗ xe cảnh giác đã ghi một vé phạt đỗ xe cho chiếc ô tô đỗ ở khu vực cấm."
+  },
+  {
+    "term": "parking-meter",
+    "translation": "đồng hồ đỗ xe",
+    "phonetic": "/ˈpɑːrkɪŋ ˈmiːtər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He put some coins into the parking-meter to pay for two hours of street parking.",
+    "exampleTranslation": "Anh ấy đã bỏ một vài đồng xu vào đồng hồ đỗ xe để thanh toán cho hai giờ đỗ xe trên đường."
+  },
+  {
+    "term": "car park",
+    "translation": "bãi đỗ xe",
+    "phonetic": "/kɑːr pɑːrk/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "The shopping mall has a spacious car park that can accommodate hundreds of vehicles.",
+    "exampleTranslation": "Trung tâm mua sắm có một bãi đỗ xe rộng rãi có thể chứa hàng trăm phương tiện."
+  },
+  {
+    "term": "parking space",
+    "translation": "chỗ đỗ xe",
+    "phonetic": "/ˈpɑːrkɪŋ speɪs/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "Finding an empty parking space in the city center during rush hour is extremely difficult.",
+    "exampleTranslation": "Tìm kiếm một chỗ đỗ xe trống ở trung tâm thành phố trong giờ cao điểm là vô cùng khó khăn."
+  },
+  {
+    "term": "multi-storey car park",
+    "translation": "bãi đỗ xe nhiều tầng",
+    "phonetic": "/ˈmʌlti ˈstɔːri kɑːr pɑːrk/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "We decided to park our new vehicle safely inside the multi-storey car park near the theater.",
+    "exampleTranslation": "Chúng tôi quyết định đỗ chiếc xe mới của mình an toàn bên trong bãi đỗ xe nhiều tầng gần nhà hát."
+  },
+  {
+    "term": "parking ticket",
+    "translation": "vé đỗ xe",
+    "phonetic": "/ˈpɑːrkɪŋ ˈtɪkɪt/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "She was upset to find a parking ticket on her windshield after returning to the car.",
+    "exampleTranslation": "Cô ấy đã rất khó chịu khi thấy một chiếc vé đỗ xe phạt trên kính chắn gió sau khi quay lại xe."
+  },
+  {
+    "term": "driving licence",
+    "translation": "bằng lái xe",
+    "phonetic": "/ˈdraɪvɪŋ ˈlaɪsns/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "You must always carry your valid driving licence whenever you operate a motor vehicle.",
+    "exampleTranslation": "Bạn phải luôn mang theo bằng lái xe hợp lệ bất cứ khi nào bạn vận hành phương tiện cơ giới."
+  },
+  {
+    "term": "reverse gear",
+    "translation": "số lùi (xe máy)",
+    "phonetic": "/rɪˈvɜːrs ɡɪr/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "He put the vehicle into reverse gear to carefully back out of the garage.",
+    "exampleTranslation": "Anh ấy đã vào số lùi để cẩn thận lùi phương tiện ra khỏi nhà xe."
+  },
+  {
+    "term": "learner driver",
+    "translation": "người học lái xe",
+    "phonetic": "/ˈlɜːrnər ˈdraɪvər/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "The learner driver was practicing parking between two lines under her instructor's guidance.",
+    "exampleTranslation": "Người học lái xe đang thực hành đỗ xe giữa hai vạch dưới sự hướng dẫn của người dạy."
+  },
+  {
+    "term": "passenger",
+    "translation": "hành khách",
+    "phonetic": "/ˈpæsɪndʒər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The flight attendants made sure that every passenger had fastened their seatbelts properly.",
+    "exampleTranslation": "Các tiếp viên hàng không đã đảm bảo rằng mọi hành khách đều thắt dây an toàn đúng cách."
+  },
+  {
+    "term": "stall",
+    "translation": "làm chết máy",
+    "phonetic": "/stɔːl/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "New drivers often accidently stall the car engine when learning to release the clutch.",
+    "exampleTranslation": "Các tài xế mới thường vô tình làm chết máy xe khi học cách nhả côn."
+  },
+  {
+    "term": "tyre pressure",
+    "translation": "áp suất lốp xe",
+    "phonetic": "/ˈtaɪər ˈpreʃər/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "You should check your tyre pressure regularly to ensure maximum safety and fuel efficiency.",
+    "exampleTranslation": "Bạn nên kiểm tra áp suất lốp xe thường xuyên để đảm bảo an toàn tối đa và tiết kiệm nhiên liệu."
+  },
+  {
+    "term": "traffic light",
+    "translation": "đèn giao thông",
+    "phonetic": "/ˈtræfɪk laɪt/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "The traffic light suddenly turned red, forcing all vehicles to stop immediately.",
+    "exampleTranslation": "Đèn giao thông đột ngột chuyển sang màu đỏ, buộc tất cả các phương tiện phải dừng lại ngay lập tức."
+  },
+  {
+    "term": "speed limit",
+    "translation": "giới hạn tốc độ",
+    "phonetic": "/spiːd ˈlɪmɪt/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "Please slow down because the speed limit decreases near school zones for children's safety.",
+    "exampleTranslation": "Xin vui lòng đi chậm lại vì giới hạn tốc độ giảm xuống gần khu vực trường học vì sự an toàn của trẻ em."
+  },
+  {
+    "term": "speeding fine",
+    "translation": "phạt tốc độ",
+    "phonetic": "/ˈspeeding faɪn/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "He received a heavy speeding fine after being caught driving over the limit by a camera.",
+    "exampleTranslation": "Anh ấy đã phải nhận một khoản phạt tốc độ nặng sau khi bị camera ghi hình lái xe vượt quá tốc độ cho phép."
+  },
+  {
+    "term": "level crossing",
+    "translation": "chỗ chắn tàu",
+    "phonetic": "/ˈlevl ˈkrɔːsɪŋ/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "The barrier at the level crossing lowered as the fast passenger train was approaching.",
+    "exampleTranslation": "Thanh chắn tại chỗ chắn tàu đã hạ xuống khi chuyến tàu chở khách tốc độ cao đang tiến lại gần."
+  },
+  {
+    "term": "jump leads",
+    "translation": "dây sạc điện",
+    "phonetic": "/dʒʌmp liːdz/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "My car battery died, but luckily a friendly neighbor lent me his jump leads.",
+    "exampleTranslation": "Ắc quy xe của tôi đã bị hỏng, nhưng may mắn thay một người hàng xóm thân thiện đã cho tôi mượn dây sạc điện của anh ấy."
+  },
+  {
+    "term": "oil",
+    "translation": "dầu",
+    "phonetic": "/ɔɪl/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "You should check the engine oil level before going on a long road trip.",
+    "exampleTranslation": "Bạn nên kiểm tra mức dầu động cơ trước khi thực hiện một chuyến đi đường dài."
+  },
+  {
+    "term": "diesel",
+    "translation": "dầu diesel",
+    "phonetic": "/ˈdiːzl/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Some heavy commercial trucks require diesel fuel instead of standard regular gasoline.",
+    "exampleTranslation": "Một số xe tải thương mại hạng nặng yêu cầu sử dụng dầu diesel thay vì xăng thông thường."
+  },
+  {
+    "term": "petrol",
+    "translation": "xăng",
+    "phonetic": "/ˈpetrəl/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The price of petrol has risen significantly over the past couple of months globally.",
+    "exampleTranslation": "Giá xăng đã tăng lên đáng kể trong vài tháng qua trên phạm vi toàn cầu."
+  },
+  {
+    "term": "unleaded",
+    "translation": "không chì",
+    "phonetic": "/ˌunˈledɪd/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "Most modern passenger cars are designed to run exclusively on unleaded gasoline.",
+    "exampleTranslation": "Hầu hết các xe ô tô chở khách hiện đại đều được thiết kế để chỉ chạy bằng xăng không chì."
+  },
+  {
+    "term": "petrol pump",
+    "translation": "bơm xăng",
+    "phonetic": "/ˈpetrəl pʌmp/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "He inserted the nozzle of the petrol pump into his car's fuel tank to begin filling.",
+    "exampleTranslation": "Anh ấy đã đưa vòi của máy bơm xăng vào bình xăng của xe để bắt đầu đổ đầy."
+  },
+  {
+    "term": "driver",
+    "translation": "tài xế",
+    "phonetic": "/ˈdraɪvər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The bus driver greeted every passenger warmly as they stepped onto the bus.",
+    "exampleTranslation": "Bác tài xế xe buýt đã chào đón nồng nhiệt từng hành khách khi họ bước lên xe."
+  },
+  {
+    "term": "drive",
+    "translation": "lái xe",
+    "phonetic": "/draɪv/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "Taking a relaxing drive through the countryside is a great way to relieve work stress.",
+    "exampleTranslation": "Lái xe thư giãn qua vùng nông thôn là một cách tuyệt vời để giải tỏa căng thẳng trong công việc."
+  },
+  {
+    "term": "change gear",
+    "translation": "chuyển số",
+    "phonetic": "/tʃeɪndʒ ɡɪr/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "You need to press the clutch pedal down completely to change gear smoothly.",
+    "exampleTranslation": "Bạn cần phải nhấn hết bàn đạp côn để chuyển số một cách mượt mà."
+  },
+  {
+    "term": "jack",
+    "translation": "đòn bẩy, pa lăng",
+    "phonetic": "/dʒæk/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "We used a hydraulic jack to lift the car up and replace the punctured wheel.",
+    "exampleTranslation": "Chúng tôi đã sử dụng kích thủy lực để nâng chiếc xe lên và thay bánh xe bị thủng xăm."
+  },
+  {
+    "term": "flat tyre",
+    "translation": "lốp xì hơi",
+    "phonetic": "/flæt ˈtaɪər/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "We had to pull over onto the side of the highway because of a flat tyre.",
+    "exampleTranslation": "Chúng tôi đã phải tấp vào lề đường cao tốc vì một chiếc lốp bị xì hơi."
+  },
+  {
+    "term": "puncture",
+    "translation": "sự thủng xăm",
+    "phonetic": "/ˈpʌŋktʃər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "A small sharp nail caused a deep puncture in the front wheel of my bicycle.",
+    "exampleTranslation": "Một chiếc đinh nhỏ sắc nhọn đã gây ra một vết thủng xăm sâu ở bánh trước chiếc xe đạp của tôi."
+  }
+]
