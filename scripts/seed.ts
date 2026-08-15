@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { isNull, sql } from "drizzle-orm";
+import { and, eq, isNull, notInArray, or, sql } from "drizzle-orm";
 
 import { closeDb, getDb } from "../src/db";
 import {
@@ -102,7 +102,16 @@ async function seed() {
     const seededDecks: { id: string; slug: string }[] = [];
     const seededWords: { id: string; deckId: string }[] = [];
 
-    // 2. Insert system default decks (ownerId = null)
+    // 2. Clean up any decks owned by demoUser or legacy unowned decks not in standard 36 topics
+    const validSlugs = topics.map((t) => t.slug);
+    await tx
+      .delete(decks)
+      .where(
+        or(
+          eq(decks.ownerId, demoUser.id),
+          and(isNull(decks.ownerId), notInArray(decks.slug, validSlugs)),
+        ),
+      );
     for (const [deckIndex, topic] of topics.entries()) {
       const [deck] = await tx
         .insert(decks)
