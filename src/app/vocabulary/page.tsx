@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, BookOpenText, Brain, Clock3, FileUp, RotateCcw, Sparkles, Sprout } from "lucide-react";
+import { ArrowRight, Brain, Clock3, FileUp, RotateCcw, Sparkles, Sprout } from "lucide-react";
 
 import { DataSourceNotice } from "@/components/data-source-notice";
 import { VocabularyLibrary } from "@/components/vocabulary-library";
@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { getLearningData } from "@/lib/data";
 import { getTodayStudyMinutes, isDueForReview } from "@/lib/study";
+import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "Học từ vựng" };
 
@@ -27,145 +28,137 @@ export default async function VocabularyPage() {
     <div className="mx-auto w-full max-w-[1200px] px-5 py-8 md:px-8 lg:py-10 space-y-8">
       <DataSourceNotice source={learningResult.source} />
 
-      {/* Header Banner */}
-      <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b-2 border-[#eeeeee] pb-6">
+      <header className="grid gap-6 border-b-2 border-border pb-6 lg:grid-cols-[1fr_auto] lg:items-end">
         <div>
-          <div className="flex items-center gap-2 mb-2">
-            <Badge className="gap-1.5 font-extrabold text-xs">
-              <Sprout className="size-4 text-ecto-green" /> Khu vườn từ vựng
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            <Badge className="gap-1.5 text-xs font-extrabold">
+              <Sprout className="size-4" /> Khu vườn từ vựng
             </Badge>
-            <Badge variant="neutral" className="gap-1 text-xs font-bold">
+            <Badge variant="neutral" className="text-xs font-bold">
               {decks.length} bộ từ vựng
             </Badge>
           </div>
-          <h1 className="font-display text-balance text-[32px] font-extrabold text-eel-dark-blue md:text-[42px]">
-            Gieo từ mới, nhớ thật lâu
+          <h1 className="font-display text-balance text-[40px] font-extrabold leading-[1.08] text-eel-dark-blue md:text-[52px]">
+            Gieo từ mới, nhớ thật lâu.
           </h1>
-          <p className="mt-1 max-w-2xl text-pretty text-base font-bold text-ash">
-            Học theo chủ đề, chăm sóc mầm cây từ vựng từ hạt mầm nhỏ thành hoa nở rộ!
+          <p className="mt-3 max-w-2xl text-pretty text-base font-bold leading-7 text-ash">
+            Học theo chủ đề và chăm sóc từng mầm từ vựng đến khi hoa nở rộ.
           </p>
         </div>
 
-        {/* Quick Stats */}
-        <div className="flex flex-wrap gap-3 shrink-0">
-          <div className="flex items-center gap-3 rounded-2xl border-2 border-[#eeeeee] bg-white px-4 py-2.5 shadow-sm">
-            <span className="grid size-10 place-items-center rounded-xl border-2 border-eel-light bg-[#fbfff8] text-ecto-green">
-              <Brain className="size-5" />
-            </span>
+        <div className="grid min-w-64 rounded-xl border-2 border-graphite bg-white sm:grid-cols-2">
+          <div className="flex items-center gap-3 border-b-2 border-graphite px-4 py-3 sm:border-b-0 sm:border-r-2">
+            <Brain className="size-5 shrink-0 text-ecto-green" />
             <div>
-              <p className="text-[10px] font-extrabold uppercase tracking-wider text-ash">Đã thuộc</p>
-              <p className="text-base font-extrabold text-eel-dark-blue leading-none">{mastered} từ</p>
+              <p className="text-xs font-extrabold uppercase tracking-[0.08em] text-ash">Đã thuộc</p>
+              <p className="text-lg font-extrabold text-eel-dark-blue tabular-nums">{mastered} từ</p>
             </div>
           </div>
-          <div className="flex items-center gap-3 rounded-2xl border-2 border-[#eeeeee] bg-white px-4 py-2.5 shadow-sm">
-            <span className="grid size-10 place-items-center rounded-xl border-2 border-[#ffe89b] bg-[#fffdf0] text-[#b47b00]">
-              <Clock3 className="size-5" />
-            </span>
+          <div className="flex items-center gap-3 px-4 py-3">
+            <Clock3 className="size-5 shrink-0 text-macaw-blue" />
             <div>
-              <p className="text-[10px] font-extrabold uppercase tracking-wider text-ash">Hôm nay</p>
-              <p className="text-base font-extrabold text-eel-dark-blue leading-none">{todayMinutes} phút</p>
+              <p className="text-xs font-extrabold uppercase tracking-[0.08em] text-ash">Hôm nay</p>
+              <p className="text-lg font-extrabold text-eel-dark-blue tabular-nums">{todayMinutes} phút</p>
             </div>
           </div>
         </div>
       </header>
 
-      {/* 3 Main Action Feature Cards */}
       <section aria-label="Công cụ học tập" className="grid gap-5 md:grid-cols-3">
-        {/* Card 1: Dịch từ mới */}
-        <div className="group flex flex-col justify-between rounded-2xl border-2 border-[#eeeeee] bg-white p-5 shadow-sm transition-all hover:border-macaw-blue hover:shadow-md">
+        <article className={cn(
+          "flex flex-col justify-between rounded-xl border-2 border-b-4 bg-white p-5",
+          totalDue > 0 ? "border-ecto-green" : "border-graphite",
+        )}>
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="grid size-12 place-items-center rounded-xl border-2 border-[#bfe9fd] bg-[#f0f9ff] text-macaw-blue">
-                <Sparkles className="size-6" />
-              </span>
-              <Badge variant="blue" className="text-[11px] font-bold">Tra cứu &amp; Dịch</Badge>
-            </div>
-            <div>
-              <h3 className="font-display text-xl font-extrabold text-eel-dark-blue">
-                Dịch từ mới
-              </h3>
-              <p className="mt-1.5 text-xs font-bold text-ash leading-relaxed">
-                Tra cứu từ 2 chiều Anh - Việt, phát âm IPA, loại từ và lưu trực tiếp vào gói cá nhân.
-              </p>
-            </div>
-          </div>
-          <div className="mt-5 pt-3 border-t border-[#eeeeee]">
-            <Link
-              href="/vocabulary/translate"
-              className={buttonVariants({ variant: "outline", size: "sm", className: "w-full justify-between font-extrabold text-xs h-10" })}
-            >
-              Tra từ ngay <ArrowRight className="size-4" />
-            </Link>
-          </div>
-        </div>
-
-        {/* Card 2: Nhập từ vựng */}
-        <div className="group flex flex-col justify-between rounded-2xl border-2 border-[#eeeeee] bg-white p-5 shadow-sm transition-all hover:border-ecto-green hover:shadow-md">
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="grid size-12 place-items-center rounded-xl border-2 border-eel-light bg-[#fbfff8] text-ecto-green">
-                <FileUp className="size-6" />
-              </span>
-              <Badge variant="neutral" className="text-[11px] font-bold">CSV / JSON</Badge>
-            </div>
-            <div>
-              <h3 className="font-display text-xl font-extrabold text-eel-dark-blue">
-                Nhập từ vựng
-              </h3>
-              <p className="mt-1.5 text-xs font-bold text-ash leading-relaxed">
-                Tải lên danh sách từ từ tệp CSV hoặc JSON có sẵn để tạo nhanh gói từ học tập.
-              </p>
-            </div>
-          </div>
-          <div className="mt-5 pt-3 border-t border-[#eeeeee]">
-            <Link
-              href="/vocabulary/import"
-              className={buttonVariants({ variant: "secondary", size: "sm", className: "w-full justify-between font-extrabold text-xs h-10" })}
-            >
-              Nhập từ vựng <ArrowRight className="size-4" />
-            </Link>
-          </div>
-        </div>
-
-        {/* Card 3: Ôn tập lặp lại SRS */}
-        <div className={`group flex flex-col justify-between rounded-2xl border-2 p-5 shadow-sm transition-all hover:shadow-md ${totalDue > 0 ? "border-ecto-green bg-[#fbfff8]" : "border-[#eeeeee] bg-white"}`}>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className={`grid size-12 place-items-center rounded-xl border-2 font-bold ${totalDue > 0 ? "border-eel-light bg-[#f7fff1] text-ecto-green" : "border-[#eeeeee] bg-[#fafafa] text-ash"}`}>
+            <div className="flex items-center justify-between gap-3">
+              <span className={cn(
+                "grid size-12 place-items-center rounded-xl border-2",
+                totalDue > 0
+                  ? "border-eel-light text-ecto-green"
+                  : "border-border text-ash",
+              )}>
                 <RotateCcw className="size-6" />
               </span>
-              {totalDue > 0 ? (
-                <Badge className="bg-ecto-green text-white border-0 text-[11px] font-extrabold">
-                  {totalDue} từ cần ôn
-                </Badge>
-              ) : (
-                <Badge variant="neutral" className="text-[11px] font-bold">Hoàn thành</Badge>
-              )}
+              <Badge variant={totalDue > 0 ? "default" : "neutral"}>
+                {totalDue > 0 ? `${totalDue} từ đến hạn` : "Đã hoàn thành"}
+              </Badge>
             </div>
             <div>
-              <h3 className="font-display text-xl font-extrabold text-eel-dark-blue">
-                Ôn tập lặp lại (SRS)
-              </h3>
-              <p className="mt-1.5 text-xs font-bold text-ash leading-relaxed">
-                Thuật toán ngắt quãng nhắc nhở ôn lại đúng thời điểm để ghi nhớ từ vựng lâu dài.
+              <h2 className="text-xl font-extrabold text-eel-dark-blue">Ôn tập SRS</h2>
+              <p className="mt-1.5 text-sm font-bold leading-6 text-ash">
+                Ôn đúng thời điểm để giữ từ vựng trong trí nhớ dài hạn.
               </p>
             </div>
           </div>
-          <div className="mt-5 pt-3 border-t border-[#eeeeee]">
+          <div className="mt-5 border-t-2 border-border pt-4">
             {totalDue > 0 ? (
               <Link
                 href="/vocabulary/practice?mode=review"
-                className={buttonVariants({ size: "sm", className: "w-full justify-between font-extrabold text-xs h-10 bg-ecto-green hover:bg-[#438f0e]" })}
+                className={buttonVariants({ size: "sm", className: "w-full justify-between" })}
               >
                 Ôn ngay {totalDue} từ <ArrowRight className="size-4" />
               </Link>
             ) : (
-              <span className={buttonVariants({ variant: "secondary", size: "sm", className: "w-full justify-between font-extrabold text-xs h-10 cursor-default opacity-70" })}>
+              <span className={buttonVariants({
+                variant: "secondary",
+                size: "sm",
+                className: "w-full cursor-default justify-between",
+              })}>
                 Không có từ đến hạn
               </span>
             )}
           </div>
-        </div>
+        </article>
+
+        <article className="flex flex-col justify-between rounded-xl border-2 border-b-4 border-macaw-blue bg-white p-5">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between gap-3">
+              <span className="grid size-12 place-items-center rounded-xl border-2 border-macaw-blue text-macaw-blue">
+                <Sparkles className="size-6" />
+              </span>
+              <Badge variant="blue">Tra cứu &amp; Dịch</Badge>
+            </div>
+            <div>
+              <h2 className="text-xl font-extrabold text-eel-dark-blue">Dịch từ mới</h2>
+              <p className="mt-1.5 text-sm font-bold leading-6 text-ash">
+                Tra nghĩa, IPA, loại từ và lưu ngay vào bộ từ cá nhân.
+              </p>
+            </div>
+          </div>
+          <div className="mt-5 border-t-2 border-border pt-4">
+            <Link
+              href="/vocabulary/translate"
+              className={buttonVariants({ variant: "blue", size: "sm", className: "w-full justify-between" })}
+            >
+              Tra từ ngay <ArrowRight className="size-4" />
+            </Link>
+          </div>
+        </article>
+
+        <article className="flex flex-col justify-between rounded-xl border-2 border-b-4 border-lingot-lime bg-white p-5">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between gap-3">
+              <span className="grid size-12 place-items-center rounded-xl border-2 border-lingot-lime text-charcoal">
+                <FileUp className="size-6" />
+              </span>
+              <Badge variant="neutral">CSV / JSON</Badge>
+            </div>
+            <div>
+              <h2 className="text-xl font-extrabold text-eel-dark-blue">Nhập từ vựng</h2>
+              <p className="mt-1.5 text-sm font-bold leading-6 text-ash">
+                Tạo nhanh bộ từ cá nhân từ danh sách CSV hoặc JSON có sẵn.
+              </p>
+            </div>
+          </div>
+          <div className="mt-5 border-t-2 border-border pt-4">
+            <Link
+              href="/vocabulary/import"
+              className={buttonVariants({ variant: "outline", size: "sm", className: "w-full justify-between" })}
+            >
+              Nhập từ vựng <ArrowRight className="size-4" />
+            </Link>
+          </div>
+        </article>
       </section>
 
       {/* Vocabulary Library Grid Section */}
