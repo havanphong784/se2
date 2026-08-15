@@ -1,0 +1,302 @@
+[
+  {
+    "term": "radiologist",
+    "translation": "bác sĩ chụp X-quang",
+    "phonetic": "/ˌreɪdiˈɒlədʒɪst/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The experienced radiologist carefully examined the chest X-ray for any signs of infection.",
+    "exampleTranslation": "Bác sĩ chụp X-quang giàu kinh nghiệm đã kiểm tra cẩn thận ảnh chụp X-quang ngực để tìm bất kỳ dấu hiệu nhiễm trùng nào."
+  },
+  {
+    "term": "emergency room",
+    "translation": "phòng cấp cứu",
+    "phonetic": "/ɪˈmɜːdʒənsi ruːm/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The injured players were rushed to the emergency room immediately after the accident on the field.",
+    "exampleTranslation": "Các cầu thủ bị thương đã được đưa đến phòng cấp cứu ngay lập tức sau tai nạn trên sân."
+  },
+  {
+    "term": "obstetrician",
+    "translation": "bác sĩ sản khoa",
+    "phonetic": "/ɒbˈstetrɪʃən/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She made an appointment with her obstetrician to discuss her birth plan and prenatal care.",
+    "exampleTranslation": "Cô ấy đã hẹn gặp bác sĩ sản khoa của mình để thảo luận về kế hoạch sinh nở và chăm sóc tiền sản."
+  },
+  {
+    "term": "operating room",
+    "translation": "phòng phẫu thuật",
+    "phonetic": "/ˈɒpəreɪtɪŋ ruːm/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The surgical team spent several hours preparing the operating room for the complex open-heart surgery.",
+    "exampleTranslation": "Đội ngũ phẫu thuật đã dành vài giờ để chuẩn bị phòng phẫu thuật cho ca mổ tim hở phức tạp."
+  },
+  {
+    "term": "needle",
+    "translation": "kim tiêm",
+    "phonetic": "/ˈniːdl/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The nurse used a sterile needle to draw blood from the patient's arm for testing.",
+    "exampleTranslation": "Y tá đã sử dụng một cây kim tiêm vô trùng để lấy máu từ cánh tay của bệnh nhân để xét nghiệm."
+  },
+  {
+    "term": "laboratory",
+    "translation": "phòng thí nghiệm",
+    "phonetic": "/ˈlæbrətəri/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The medical scientists conducted experiments in the high-tech laboratory to find a cure for the disease.",
+    "exampleTranslation": "Các nhà khoa học y học đã tiến hành các thí nghiệm trong phòng thí nghiệm công nghệ cao để tìm ra phương pháp chữa trị căn bệnh này."
+  },
+  {
+    "term": "pharmacy",
+    "translation": "tiệm thuốc",
+    "phonetic": "/ˈfɑːməsi/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He went to the local pharmacy to pick up the prescription medicines prescribed by his doctor.",
+    "exampleTranslation": "Anh ấy đã đến tiệm thuốc địa phương để lấy các loại thuốc theo đơn do bác sĩ kê đơn."
+  },
+  {
+    "term": "hospital bed",
+    "translation": "giường bệnh",
+    "phonetic": "/ˈhɒspɪtl bed/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The elderly patient was resting comfortably in his hospital bed while receiving intravenous fluids.",
+    "exampleTranslation": "Bệnh nhân lớn tuổi đang nghỉ ngơi thoải mái trên giường bệnh của mình trong khi được truyền dịch tĩnh mạch."
+  },
+  {
+    "term": "call button",
+    "translation": "chuông gọi",
+    "phonetic": "/kɔːl ˈbʌtən/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "If you feel any pain, please press the call button to alert the nurse on duty.",
+    "exampleTranslation": "Nếu bạn cảm thấy đau, vui lòng nhấn chuông gọi để báo động cho y tá đang trực."
+  },
+  {
+    "term": "doctor",
+    "translation": "bác sĩ",
+    "phonetic": "/ˈdɒktər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The family doctor advised him to eat more fresh vegetables and exercise regularly for better health.",
+    "exampleTranslation": "Bác sĩ gia đình khuyên anh nên ăn nhiều rau tươi và tập thể dục đều đặn để có sức khỏe tốt hơn."
+  },
+  {
+    "term": "nurse",
+    "translation": "y tá",
+    "phonetic": "/nɜːs/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The friendly nurse checked the patient's temperature and blood pressure every three hours during the night.",
+    "exampleTranslation": "Người y tá thân thiện đã kiểm tra nhiệt độ và huyết áp của bệnh nhân cứ ba giờ một lần trong đêm."
+  },
+  {
+    "term": "gurney",
+    "translation": "xe đẩy tay",
+    "phonetic": "/ˈgɜːni/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The paramedics carefully transferred the injured man from the ambulance onto a metal gurney.",
+    "exampleTranslation": "Các nhân viên y tế đã cẩn thận chuyển người đàn ông bị thương từ xe cứu thương lên một chiếc xe đẩy tay bằng kim loại."
+  },
+  {
+    "term": "waiting room",
+    "translation": "phòng chờ",
+    "phonetic": "/ˈweɪtɪŋ ruːm/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Many anxious relatives were sitting in the waiting room, hoping for good news from the surgeon.",
+    "exampleTranslation": "Nhiều người thân đang lo lắng ngồi trong phòng chờ, hy vọng nhận được tin tốt từ bác sĩ phẫu thuật."
+  },
+  {
+    "term": "surgeon",
+    "translation": "bác sĩ phẫu thuật",
+    "phonetic": "/ˈsɜːdʒən/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The skilled surgeon successfully performed a delicate brain operation that lasted for over eight hours.",
+    "exampleTranslation": "Vị bác sĩ phẫu thuật lành nghề đã thực hiện thành công ca mổ não tinh vi kéo dài hơn tám giờ đồng hồ."
+  },
+  {
+    "term": "midwife",
+    "translation": "bà đỡ",
+    "phonetic": "/ˈmɪdwɪf/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The experienced midwife helped the young mother deliver her healthy baby girl at home.",
+    "exampleTranslation": "Bà đỡ giàu kinh nghiệm đã giúp người mẹ trẻ sinh hạ bé gái khỏe mạnh ngay tại nhà."
+  },
+  {
+    "term": "injection",
+    "translation": "việc tiêm",
+    "phonetic": "/ɪnˈdʒekʃən/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The doctor gave the child a flu injection to protect him during the winter season.",
+    "exampleTranslation": "Bác sĩ đã tiêm cho đứa trẻ một mũi tiêm phòng cúm để bảo vệ bé trong suốt mùa đông."
+  },
+  {
+    "term": "calcium",
+    "translation": "canxi",
+    "phonetic": "/ˈkælsiəm/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Drinking milk every day provides your body with essential calcium to build strong bones and teeth.",
+    "exampleTranslation": "Uống sữa mỗi ngày cung cấp cho cơ thể bạn lượng canxi thiết yếu để xây dựng xương và răng chắc khóa."
+  },
+  {
+    "term": "hospital",
+    "translation": "bệnh viện",
+    "phonetic": "/ˈhɒspɪtl/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The city hospital has recently upgraded its medical equipment to provide better healthcare services to everyone.",
+    "exampleTranslation": "Bệnh viện thành phố gần đây đã nâng cấp trang thiết bị y tế để cung cấp dịch vụ chăm sóc sức khỏe tốt hơn cho mọi người."
+  },
+  {
+    "term": "crutch",
+    "translation": "cái nạng",
+    "phonetic": "/krʌtʃ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He had to walk with a crutch after breaking his leg during a football match last week.",
+    "exampleTranslation": "Anh ấy đã phải đi lại với một cái nạng sau khi bị gãy chân trong một trận đấu bóng đá tuần trước."
+  },
+  {
+    "term": "wheelchair",
+    "translation": "xe lăn",
+    "phonetic": "/ˈwiːltʃeər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She uses an electric wheelchair to move around the neighborhood independently and comfortably.",
+    "exampleTranslation": "Cô ấy sử dụng một chiếc xe lăn điện để tự di chuyển xung quanh khu phố một cách độc lập và thoải mái."
+  },
+  {
+    "term": "paramedic",
+    "translation": "nhân viên y tế",
+    "phonetic": "/ˌpærəˈmedɪk/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The quick-thinking paramedic administered first aid to the victim before the ambulance arrived.",
+    "exampleTranslation": "Nhân viên y tế nhanh trí đã sơ cứu cho nạn nhân trước khi xe cứu thương đến."
+  },
+  {
+    "term": "stretcher",
+    "translation": "cáng cứu thương",
+    "phonetic": "/ˈstretʃər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The rescue workers placed the collapsed hiker on a stretcher and carried him down the steep mountain.",
+    "exampleTranslation": "Các nhân viên cứu hộ đã đặt người leo núi bị ngất xỉu lên cáng cứu thương và khênh anh xuống ngọn núi dốc."
+  },
+  {
+    "term": "rush",
+    "translation": "đưa đi, chuyển đi nhanh",
+    "phonetic": "/rʌʃ/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "The ambulance had to rush the heart attack patient to the nearest hospital as fast as possible.",
+    "exampleTranslation": "Xe cứu thương đã phải đưa bệnh nhân bị nhồi máu cơ tim đến bệnh viện gần nhất nhanh nhất có thể."
+  },
+  {
+    "term": "treat",
+    "translation": "điều trị, chữa trị",
+    "phonetic": "/triːt/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "Doctors use advanced medical techniques and specialized drugs to treat patients with chronic diseases.",
+    "exampleTranslation": "Các bác sĩ sử dụng các kỹ thuật y tế tiên tiến và các loại thuốc chuyên dụng để điều trị cho những bệnh nhân mắc bệnh mãn tính."
+  },
+  {
+    "term": "condition",
+    "translation": "tình trạng",
+    "phonetic": "/kənˈdɪʃən/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The medical team reported that the patient's critical condition has finally stabilized after the surgery.",
+    "exampleTranslation": "Đội ngũ y tế báo cáo rằng tình trạng nguy kịch của bệnh nhân cuối cùng đã ổn định sau ca phẫu thuật."
+  },
+  {
+    "term": "recover",
+    "translation": "sự phục hồi",
+    "phonetic": "/rɪˈkʌvər/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "She took a few weeks off from work to fully recover from her major back surgery.",
+    "exampleTranslation": "Cô ấy đã xin nghỉ làm vài tuần để phục hồi hoàn toàn sau ca phẫu thuật lưng nghiêm trọng."
+  },
+  {
+    "term": "suffer",
+    "translation": "chịu đựng",
+    "phonetic": "/ˈsʌfər/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "Many people suffer from seasonal allergies when the pollen count rises in the spring.",
+    "exampleTranslation": "Nhiều người phải chịu đựng chứng dị ứng theo mùa khi lượng phấn hoa tăng lên vào mùa xuân."
+  },
+  {
+    "term": "deteriorate",
+    "translation": "xấu đi, tệ hơn",
+    "phonetic": "/dɪˈtɪəriəreɪt/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "If your health continues to deteriorate, you should consult a doctor immediately without any delay.",
+    "exampleTranslation": "Nếu sức khỏe của bạn tiếp tục xấu đi, bạn nên tham khảo ý kiến bác sĩ ngay lập tức mà không được chậm trễ."
+  },
+  {
+    "term": "coma",
+    "translation": "sự hôn mê",
+    "phonetic": "/ˈkəʊmə/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The victim of the car accident fell into a deep coma and remained unconscious for two weeks.",
+    "exampleTranslation": "Nạn nhân của vụ tai nạn ô tô đã rơi vào tình trạng hôn mê sâu và bất tỉnh suốt hai tuần."
+  },
+  {
+    "term": "common cold",
+    "translation": "bệnh cảm lạnh thông thường",
+    "phonetic": "/ˈkɒmən kəʊld/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Getting enough sleep and drinking warm water can help you recover from the common cold quickly.",
+    "exampleTranslation": "Ngủ đủ giấc và uống nước ấm có thể giúp bạn nhanh chóng hồi phục khỏi bệnh cảm lạnh thông thường."
+  }
+]

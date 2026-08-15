@@ -444,8 +444,8 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
           <Card ref={promptRef} tabIndex={-1} className="mx-auto flex w-full max-w-[600px] flex-col overflow-hidden border-eel-light border-b-4 outline-none shadow-[0_12px_35px_rgba(30,70,20,0.07)] focus-visible:ring-4 focus-visible:ring-eel-light sm:min-h-[450px]">
             <CardHeader className="min-h-12 justify-center border-b-2 border-[#f0f0f0] bg-[#fbfff8] px-5 py-2.5">
               <div className="flex w-full items-center justify-between gap-3">
-                <Badge variant="blue" className="min-w-0 whitespace-normal text-left">{currentWord.partOfSpeech}</Badge>
-                <span className="shrink-0 text-xs font-extrabold text-ash tabular-nums">{flashcardIndex + 1} / {session.words.length}</span>
+                {currentWord.partOfSpeech.length > 0 && <Badge variant="blue" className="min-w-0 whitespace-normal text-left">{currentWord.partOfSpeech.join(", ")}</Badge>}
+                <span className="ml-auto shrink-0 text-xs font-extrabold text-ash tabular-nums">{flashcardIndex + 1} / {session.words.length}</span>
               </div>
             </CardHeader>
             <CardContent className="flex flex-1 flex-col p-5 text-center sm:p-6">

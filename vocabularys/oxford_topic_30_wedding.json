@@ -1,0 +1,312 @@
+[
+  {
+    "term": "bride",
+    "translation": "cô dâu",
+    "phonetic": "/braɪd/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The beautiful bride wore a stunning white gown with a long lace veil.",
+    "exampleTranslation": "Cô dâu xinh đẹp mặc một chiếc váy cưới màu trắng lộng lẫy với chiếc khăn voan ren dài."
+  },
+  {
+    "term": "vow",
+    "translation": "lời thề",
+    "phonetic": "/vaʊ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "They exchanged their wedding vows in front of their beloved family and friends.",
+    "exampleTranslation": "Họ đã trao nhau lời thề đám cưới trước mặt gia đình và bạn bè yêu quý của mình."
+  },
+  {
+    "term": "groomsman",
+    "translation": "phù rể",
+    "phonetic": "/ˈgruːmz.mən/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The groomsman gave a heartwarming and funny speech about his best friend during the party.",
+    "exampleTranslation": "Phù rể đã có một bài phát biểu ấm áp và hài hước về người bạn thân nhất của mình trong bữa tiệc."
+  },
+  {
+    "term": "groom",
+    "translation": "chú rể",
+    "phonetic": "/ɡruːm/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The handsome groom stood nervously at the altar waiting for his bride to arrive.",
+    "exampleTranslation": "Chú rể điển trai đứng bồn chồn ở lễ đường chờ cô dâu của mình đến."
+  },
+  {
+    "term": "tuxedo",
+    "translation": "áo ximôckinh",
+    "phonetic": "/tʌkˈsiː.dəʊ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He rented a classic black tuxedo for the formal wedding ceremony this Saturday.",
+    "exampleTranslation": "Anh ấy đã thuê một bộ áo ximôckinh màu đen cổ điển cho nghi lễ đám cưới trang trọng vào thứ Bảy tuần này."
+  },
+  {
+    "term": "party",
+    "translation": "bữa tiệc",
+    "phonetic": "/ˈpɑː.ti/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Everyone had a wonderful time dancing and singing at the wedding party last night.",
+    "exampleTranslation": "Mọi người đã có một khoảng thời gian tuyệt vời khi khiêu vũ và ca hát tại bữa tiệc đám cưới tối qua."
+  },
+  {
+    "term": "wedding",
+    "translation": "đám cưới",
+    "phonetic": "/ˈwed.ɪŋ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "They are planning a small and intimate wedding in a beautiful countryside garden.",
+    "exampleTranslation": "Họ đang lên kế hoạch cho một đám cưới nhỏ và thân mật trong một khu vườn ở nông thôn xinh đẹp."
+  },
+  {
+    "term": "wedding card",
+    "translation": "thiệp mời đám cưới",
+    "phonetic": "/ˈwed.ɪŋ kɑːd/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "We received a beautifully designed wedding card from our former college classmate yesterday.",
+    "exampleTranslation": "Hôm qua chúng tôi đã nhận được một tấm thiệp mời đám cưới được thiết kế đẹp mắt từ người bạn cùng lớp đại học cũ."
+  },
+  {
+    "term": "reception",
+    "translation": "tiệc chiêu đãi",
+    "phonetic": "/rɪˈsep.ʃən/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The wedding reception was held in a luxurious ballroom of the five-star hotel.",
+    "exampleTranslation": "Tiệc chiêu đãi đám cưới được tổ chức trong một phòng khiêu vũ sang trọng của khách sạn năm sao."
+  },
+  {
+    "term": "champagne",
+    "translation": "rượu sâm panh",
+    "phonetic": "/ʃæmˈpeɪn/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The guests raised their glasses of sparkling champagne to toast the happy couple.",
+    "exampleTranslation": "Các vị khách đã nâng ly rượu sâm panh nổ để chúc mừng cặp đôi hạnh phúc."
+  },
+  {
+    "term": "bouquet",
+    "translation": "bó hoa",
+    "phonetic": "/buˈkeɪ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The bridesmaid was lucky enough to catch the bride's beautiful flower bouquet.",
+    "exampleTranslation": "Phù dâu đã đủ may mắn để bắt được bó hoa đẹp đẽ của cô dâu."
+  },
+  {
+    "term": "married",
+    "translation": "đã kết hôn",
+    "phonetic": "/ˈmær.id/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "They have been happily married for over twenty years and still love each other deeply.",
+    "exampleTranslation": "Họ đã kết hôn hạnh phúc được hơn hai mươi năm và vẫn yêu nhau sâu sắc."
+  },
+  {
+    "term": "newlywed",
+    "translation": "người mới cưới",
+    "phonetic": "/ˈnjuː.li.wed/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The excited newlyweds set off on their romantic trip to Hawaii this morning.",
+    "exampleTranslation": "Những người mới cưới đầy hào hứng đã lên đường thực hiện chuyến đi lãng mạn của họ đến Hawaii sáng nay."
+  },
+  {
+    "term": "cake",
+    "translation": "bánh ngọt",
+    "phonetic": "/keɪk/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The magnificent three-tiered wedding cake was decorated with fresh white roses and pearls.",
+    "exampleTranslation": "Chiếc bánh ngọt đám cưới ba tầng tráng lệ được trang trí bằng những bông hồng trắng tươi và ngọc trai."
+  },
+  {
+    "term": "ring",
+    "translation": "nhẫn",
+    "phonetic": "/rɪŋ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The couple placed the wedding rings on each other's fingers to seal their marriage.",
+    "exampleTranslation": "Cặp đôi đã đeo những chiếc nhẫn cưới vào ngón tay nhau để gắn kết cuộc hôn nhân của họ."
+  },
+  {
+    "term": "emblem",
+    "translation": "biểu tượng",
+    "phonetic": "/ˈem.bləm/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "A pair of white doves is widely recognized as a beautiful emblem of peace and love.",
+    "exampleTranslation": "Một đôi chim bồ câu trắng được công nhận rộng rãi là một biểu tượng đẹp đẽ của hòa bình và tình yêu."
+  },
+  {
+    "term": "band",
+    "translation": "ban nhạc",
+    "phonetic": "/bænd/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The live band played romantic slow songs while the couple had their first dance.",
+    "exampleTranslation": "Ban nhạc sống đã chơi những bài hát chậm lãng mạn khi cặp đôi thực hiện điệu nhảy đầu tiên của họ."
+  },
+  {
+    "term": "congratulation",
+    "translation": "lời chúc mừng",
+    "phonetic": "/kənˌɡrætʃ.əˈleɪ.ʃən/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "We sent our warmest congratulations to the couple on their special wedding day.",
+    "exampleTranslation": "Chúng tôi đã gửi những lời chúc mừng nồng nhiệt nhất đến cặp đôi nhân ngày cưới đặc biệt của họ."
+  },
+  {
+    "term": "jewelry",
+    "translation": "trang sức",
+    "phonetic": "/ˈdʒuː.əl.ri/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The bride wore elegant gold jewelry that had been passed down through generations.",
+    "exampleTranslation": "Cô dâu đeo món trang sức vàng thanh lịch đã được truyền qua nhiều thế hệ."
+  },
+  {
+    "term": "wine",
+    "translation": "rượu vang",
+    "phonetic": "/waɪn/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "They served premium red and white wine during the formal wedding dinner course.",
+    "exampleTranslation": "Họ đã phục vụ rượu vang đỏ và trắng cao cấp trong bữa ăn tối đám cưới trang trọng."
+  },
+  {
+    "term": "dowry",
+    "translation": "của hồi môn",
+    "phonetic": "/ˈdaʊ.ri/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "In some traditional cultures, the groom's family prepares a valuable dowry for the bride.",
+    "exampleTranslation": "Trong một số nền văn hóa truyền thống, gia đình chú rể chuẩn bị của hồi môn có giá trị cho cô dâu."
+  },
+  {
+    "term": "honeymoon",
+    "translation": "tuần trăng mật",
+    "phonetic": "/ˈhʌn.i.muːn/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "They decided to spend their two-week honeymoon exploring the historic cities of Italy.",
+    "exampleTranslation": "Họ đã quyết định dành tuần trăng mật kéo dài hai tuần của mình để khám phá các thành phố lịch sử của Ý."
+  },
+  {
+    "term": "anniversary",
+    "translation": "ngày kỷ niệm",
+    "phonetic": "/ˌæn.ɪˈvɜː.sər.i/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "They are planning a grand party to celebrate their golden wedding anniversary next month.",
+    "exampleTranslation": "Họ đang lên kế hoạch tổ chức một bữa tiệc lớn để kỷ niệm ngày kỷ niệm đám cưới vàng của mình vào tháng tới."
+  },
+  {
+    "term": "brother-in-law",
+    "translation": "anh/em rể, anh/em chồng, anh/em vợ",
+    "phonetic": "/ˈbrʌð.ə.rɪn.lɔː/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "My helpful brother-in-law assisted us in setting up the decorations for the reception.",
+    "exampleTranslation": "Người anh rể hay giúp đỡ của tôi đã hỗ trợ chúng tôi dựng đồ trang trí cho tiệc chiêu đãi."
+  },
+  {
+    "term": "sister-in-law",
+    "translation": "chị/em dâu, chị/em chồng, chị/em vợ",
+    "phonetic": "/ˈsɪs.tə.rɪn.lɔː/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "My sister-in-law helped the bride choose her stunning white dress last month.",
+    "exampleTranslation": "Chị dâu của tôi đã giúp cô dâu chọn chiếc váy trắng lộng lẫy của cô ấy vào tháng trước."
+  },
+  {
+    "term": "engaged",
+    "translation": "đã đính ước, hứa hôn",
+    "phonetic": "/ɪnˈɡeɪdʒd/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "The young couple got engaged during a romantic trip to Paris last winter.",
+    "exampleTranslation": "Cặp đôi trẻ đã hứa hôn trong một chuyến đi lãng mạn đến Paris vào mùa đông năm ngoái."
+  },
+  {
+    "term": "couple",
+    "translation": "cặp đôi, đôi vợ chồng",
+    "phonetic": "/ˈuːp.əl/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The happy couple smiled brightly as they walked down the aisle together.",
+    "exampleTranslation": "Cặp đôi hạnh phúc mỉm cười rạng rỡ khi họ cùng nhau đi xuống lễ đường."
+  },
+  {
+    "term": "husband",
+    "translation": "chồng",
+    "phonetic": "/ˈhʌz.bənd/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She is very proud of her loving husband who always supports her dreams.",
+    "exampleTranslation": "Cô ấy rất tự hào về người chồng yêu quý của mình, người luôn ủng hộ những ước mơ của cô ấy."
+  },
+  {
+    "term": "wife",
+    "translation": "vợ",
+    "phonetic": "/waɪf/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He bought a beautiful bouquet of red roses for his beloved wife on Valentine's Day.",
+    "exampleTranslation": "Anh ấy đã mua một bó hoa hồng đỏ tuyệt đẹp cho người vợ yêu quý của mình vào ngày lễ tình nhân."
+  },
+  {
+    "term": "ceremony",
+    "translation": "nghi lễ, nghi thức",
+    "phonetic": "/ˈser.ɪ.mə.ni/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The beautiful wedding ceremony took place in a historic chapel on the hill.",
+    "exampleTranslation": "Nghi lễ đám cưới đẹp đẽ diễn ra trong một nhà nguyện lịch sử trên đồi."
+  },
+  {
+    "term": "betroth",
+    "translation": "hứa hôn, đính hôn",
+    "phonetic": "/bɪˈtrəʊð/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "The royal parents decided to betroth their children to secure peace between the kingdoms.",
+    "exampleTranslation": "Cha mẹ hoàng gia đã quyết định hứa hôn con cái của họ để đảm bảo hòa bình giữa các vương quốc."
+  }
+]

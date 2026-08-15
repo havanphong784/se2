@@ -17,6 +17,7 @@ export const users = pgTable(
   {
     id: uuid("id").defaultRandom().primaryKey(),
     email: text("email").notNull(),
+    passwordHash: text("password_hash"),
     displayName: text("display_name").notNull(),
     nativeLanguage: text("native_language").default("vi").notNull(),
     targetLanguage: text("target_language").default("en").notNull(),
@@ -72,7 +73,7 @@ export const words = pgTable(
     term: text("term").notNull(),
     translation: text("translation").notNull(),
     phonetic: text("phonetic").notNull(),
-    partOfSpeech: text("part_of_speech").notNull(),
+    partOfSpeech: text("part_of_speech").array().default(sql`'{}'::text[]`).notNull(),
     exampleSentence: text("example_sentence").notNull(),
     exampleTranslation: text("example_translation").notNull(),
     sortOrder: integer("sort_order").default(0).notNull(),

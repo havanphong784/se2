@@ -1,0 +1,182 @@
+[
+  {
+    "term": "bakery",
+    "translation": "tiệm bánh",
+    "phonetic": "/ˈbeɪ.kər.i/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The local bakery sells delicious freshly baked bread and sweet cakes every morning.",
+    "exampleTranslation": "Tiệm bánh địa phương bán bánh mì mới nướng và bánh ngọt thơm ngon vào mỗi buổi sáng."
+  },
+  {
+    "term": "bookshop",
+    "translation": "tiệm sách",
+    "phonetic": "/ˈbʊk.ʃɒp/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "I spent hours browsing through different sections of the quiet neighborhood bookshop.",
+    "exampleTranslation": "Tôi đã dành nhiều giờ tìm kiếm qua các gian hàng khác nhau của tiệm sách yên tĩnh trong khu phố."
+  },
+  {
+    "term": "butcher’s",
+    "translation": "cửa hàng thịt",
+    "phonetic": "/ˈbʊtʃ.ər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "My mother always buys high-quality fresh beef and pork from the local butcher’s.",
+    "exampleTranslation": "Mẹ tôi luôn mua thịt bò và thịt heo tươi chất lượng cao từ cửa hàng thịt ở địa phương."
+  },
+  {
+    "term": "candy store",
+    "translation": "cửa hàng kẹo",
+    "phonetic": "/ˈkæn.di ˌstɔːr/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "The children were extremely excited to visit the colorful candy store in town.",
+    "exampleTranslation": "Trẻ em đã vô cùng hào hứng khi ghé thăm cửa hàng kẹo đầy màu sắc trong thị trấn."
+  },
+  {
+    "term": "convenience store",
+    "translation": "cửa hàng tiện lợi",
+    "phonetic": "/kənˈviː.ni.əns ˌstɔːr/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "I bought some quick snacks and a bottle of cold water at the convenience store.",
+    "exampleTranslation": "Tôi đã mua vài món ăn nhẹ nhanh và một chai nước lạnh tại cửa hàng tiện lợi."
+  },
+  {
+    "term": "greengrocer",
+    "translation": "cửa hàng bán rau quả",
+    "phonetic": "/ˈɡriːŋ.ɡrəʊ.sər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "This friendly greengrocer sells various kinds of organic fresh vegetables and ripe fruits.",
+    "exampleTranslation": "Cửa hàng bán rau quả thân thiện này bán nhiều loại rau tươi hữu cơ và trái cây chín khác nhau."
+  },
+  {
+    "term": "flower shop",
+    "translation": "cửa hàng hoa",
+    "phonetic": "/flaʊər ʃɒp/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "He bought a beautiful bouquet of red roses from the local flower shop.",
+    "exampleTranslation": "Anh ấy đã mua một bó hồng đỏ tuyệt đẹp từ cửa hàng hoa ở địa phương."
+  },
+  {
+    "term": "store",
+    "translation": "cửa hàng",
+    "phonetic": "/ˌstɔːr/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The large department store was packed with customers during the festive holiday season.",
+    "exampleTranslation": "Cửa hàng bách hóa lớn chật kín khách hàng trong suốt mùa lễ hội tưng bừng."
+  },
+  {
+    "term": "gift shop",
+    "translation": "cửa hàng đồ lưu niệm",
+    "phonetic": "/ˈɡɪft ˌʃɒp/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "They stopped by the small museum gift shop to buy some lovely souvenirs.",
+    "exampleTranslation": "Họ đã ghé qua cửa hàng quà lưu niệm nhỏ của bảo tàng để mua một vài món quà lưu niệm dễ thương."
+  },
+  {
+    "term": "shop",
+    "translation": "cửa hàng",
+    "phonetic": "/ˌʃɒp/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She owns a small fashionable clothing shop in the very center of town.",
+    "exampleTranslation": "Cô ấy sở hữu một cửa hàng quần áo thời trang nhỏ ngay trung tâm thị trấn."
+  },
+  {
+    "term": "food stall",
+    "translation": "quán ăn",
+    "phonetic": "/fuːd stɔːl/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "We tried some famous local street food at a busy food stall last night.",
+    "exampleTranslation": "Chúng tôi đã thử một vài món ăn đường phố nổi tiếng ở địa phương tại một quán ăn nhộn nhịp vào tối qua."
+  },
+  {
+    "term": "fast food restaurant",
+    "translation": "cửa hàng thức ăn nhanh",
+    "phonetic": "/ˌfɑːst ˈfuːd ˌres.trɒnt/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "My younger brother loves to eat crispy fried chicken at the fast food restaurant.",
+    "exampleTranslation": "Em trai tôi thích ăn gà rán giòn rụm tại cửa hàng thức ăn nhanh."
+  },
+  {
+    "term": "dry-cleaner’s",
+    "translation": "tiệm giặt ủi",
+    "phonetic": "/ˌdraɪˈkliː.nəz/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He dropped off his expensive wool coat at the nearby dry-cleaner’s yesterday morning.",
+    "exampleTranslation": "Anh ấy đã gửi chiếc áo khoác len đắt tiền của mình tại tiệm giặt ủi gần đó vào sáng hôm qua."
+  },
+  {
+    "term": "shoe store",
+    "translation": "tiệm giày",
+    "phonetic": "/ʃuːˌstɔːr/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "She went to the modern shoe store to buy a new pair of leather boots.",
+    "exampleTranslation": "Cô ấy đã đi đến tiệm giày hiện đại để mua một đôi bốt da mới."
+  },
+  {
+    "term": "barbershop",
+    "translation": "tiệm cắt tóc nam",
+    "phonetic": "/ˈbɑː.bə.ʃɒp/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He usually goes to the local barbershop once a month to get his hair cut.",
+    "exampleTranslation": "Anh ấy thường đến tiệm cắt tóc nam ở địa phương mỗi tháng một lần để cắt tóc."
+  },
+  {
+    "term": "newspaper kiosk",
+    "translation": "sạp báo",
+    "phonetic": "/ˈnjuːzˌpeɪ.pər ˈkiː.ɒsk/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "My grandfather always buys his morning paper from the old newspaper kiosk on the corner.",
+    "exampleTranslation": "Ông tôi luôn mua tờ báo buổi sáng từ sạp báo cũ ở góc đường."
+  },
+  {
+    "term": "bookstall",
+    "translation": "quầy bán sách",
+    "phonetic": "/ˈbʊk.stɔːl/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "I found a very rare travel guide at a small bookstall near the station.",
+    "exampleTranslation": "Tôi đã tìm thấy một cuốn sách hướng dẫn du lịch rất hiếm tại một quầy bán sách nhỏ gần nhà ga."
+  },
+  {
+    "term": "sports center",
+    "translation": "trung tâm thể thao",
+    "phonetic": "/ˈspɔːrts ˌsen.t̬ɚ/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "Our school friends often play basketball at the local sports center on Saturday afternoons.",
+    "exampleTranslation": "Các bạn học của chúng tôi thường chơi bóng rổ tại trung tâm thể thao địa phương vào những chiều thứ Bảy."
+  }
+]

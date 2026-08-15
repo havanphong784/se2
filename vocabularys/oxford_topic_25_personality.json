@@ -1,0 +1,392 @@
+[
+  {
+    "term": "reliable",
+    "translation": "đáng tin cậy",
+    "phonetic": "/rɪˈlaɪəbəl/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "He is a reliable employee who always finishes his tasks on time.",
+    "exampleTranslation": "Anh ấy là một nhân viên đáng tin cậy, người luôn hoàn thành nhiệm vụ đúng hạn."
+  },
+  {
+    "term": "rude",
+    "translation": "thô lỗ",
+    "phonetic": "/ruːd/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "It is very rude to interrupt someone when they are speaking.",
+    "exampleTranslation": "Thật là thô lỗ khi ngắt lời ai đó khi họ đang nói."
+  },
+  {
+    "term": "selfish",
+    "translation": "ích kỷ",
+    "phonetic": "/ˈsɛlfɪʃ/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "She realized that her selfish behavior had hurt her best friend deeply.",
+    "exampleTranslation": "Cô ấy nhận ra rằng hành vi ích kỷ của mình đã làm tổn thương sâu sắc người bạn thân nhất."
+  },
+  {
+    "term": "sensitive",
+    "translation": "nhạy cảm",
+    "phonetic": "/ˈsɛnsɪtɪv/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "He is very sensitive to criticism and easily gets upset by feedback.",
+    "exampleTranslation": "Anh ấy rất nhạy cảm với những lời chỉ trích và dễ bị tổn thương bởi phản hồi."
+  },
+  {
+    "term": "stubborn",
+    "translation": "bướng bỉnh",
+    "phonetic": "/ˈstʌb.ərn/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "She is too stubborn to admit that her plan was wrong from the start.",
+    "exampleTranslation": "Cô ấy quá bướng bỉnh để thừa nhận rằng kế hoạch của mình đã sai ngay từ đầu."
+  },
+  {
+    "term": "patient",
+    "translation": "kiên nhẫn",
+    "phonetic": "/peɪʃənt/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "A good teacher needs to be patient with slow learners in class.",
+    "exampleTranslation": "Một giáo viên tốt cần phải kiên nhẫn với những học sinh tiếp thu chậm trong lớp."
+  },
+  {
+    "term": "humorous",
+    "translation": "hài hước",
+    "phonetic": "/ˈhjuː.mər.əs/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "His humorous stories made everyone at the party laugh out loud.",
+    "exampleTranslation": "Những câu chuyện hài hước của anh ấy đã làm mọi người trong bữa tiệc cười lớn."
+  },
+  {
+    "term": "sincere",
+    "translation": "chân thành",
+    "phonetic": "/sɪnˈsɪr/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "I want to express my sincere thanks for all your help.",
+    "exampleTranslation": "Tôi muốn bày tỏ lời cảm ơn chân thành vì tất cả sự giúp đỡ của bạn."
+  },
+  {
+    "term": "generous",
+    "translation": "hào phóng",
+    "phonetic": "/ˈʤɛnərəs/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "He is a generous man who often donates money to local charities.",
+    "exampleTranslation": "Anh ấy là một người đàn ông hào phóng, thường quyên góp tiền cho các tổ chức từ thiện địa phương."
+  },
+  {
+    "term": "honest",
+    "translation": "trung thực",
+    "phonetic": "/ˈɒn.ɪst/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "Please be honest with me and tell me the whole truth.",
+    "exampleTranslation": "Làm ơn hãy trung thực với tôi và nói cho tôi biết toàn bộ sự thật."
+  },
+  {
+    "term": "kind",
+    "translation": "tử tế, tốt bụng",
+    "phonetic": "/kaɪnd/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "She is a kind woman who always helps her elderly neighbors.",
+    "exampleTranslation": "Cô ấy là một người phụ nữ tốt bụng, luôn giúp đỡ những người hàng xóm lớn tuổi."
+  },
+  {
+    "term": "loyal",
+    "translation": "trung thành",
+    "phonetic": "/lɔɪəl/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "A loyal dog will stay by its owner's side through thick and thin.",
+    "exampleTranslation": "Một chú chó trung thành sẽ ở bên cạnh chủ nhân của mình dù có chuyện gì xảy ra."
+  },
+  {
+    "term": "modest",
+    "translation": "khiêm tốn",
+    "phonetic": "/ˈmɒd.ɪst/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "Despite winning the first prize, he remained very modest about his success.",
+    "exampleTranslation": "Mặc dù giành giải nhất, anh ấy vẫn rất khiêm tốn về thành công của mình."
+  },
+  {
+    "term": "nasty",
+    "translation": "khó chịu",
+    "phonetic": "/ˈnæsti/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "The weather turned nasty with heavy rain and strong cold winds.",
+    "exampleTranslation": "Thời tiết trở nên khó chịu với mưa to và gió lạnh thổi mạnh."
+  },
+  {
+    "term": "shy",
+    "translation": "nhút nhát",
+    "phonetic": "/ʃaɪ/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "The shy boy hid behind his mother when the guests arrived.",
+    "exampleTranslation": "Cậu bé nhút nhát nấp sau lưng mẹ khi khách khứa đến nhà."
+  },
+  {
+    "term": "sociable",
+    "translation": "hòa đồng",
+    "phonetic": "/soʊʃəbəl/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "She is highly sociable and makes new friends wherever she goes.",
+    "exampleTranslation": "Cô ấy vô cùng hòa đồng và kết bạn mới ở bất cứ nơi nào cô ấy đi."
+  },
+  {
+    "term": "reserved",
+    "translation": "rụt rè, dè dặt",
+    "phonetic": "/ˈθɔːt.fəl/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "He is quite reserved and prefers reading books to going to parties.",
+    "exampleTranslation": "Anh ấy khá dè dặt và thích đọc sách hơn là đi dự tiệc."
+  },
+  {
+    "term": "confident",
+    "translation": "tự tin",
+    "phonetic": "/ˈkɑnfədənt/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "She felt confident that she would pass the final exam easily.",
+    "exampleTranslation": "Cô ấy cảm thấy tự tin rằng mình sẽ vượt qua kỳ thi cuối kỳ một cách dễ dàng."
+  },
+  {
+    "term": "pleasant",
+    "translation": "lịch sự, hòa nhã",
+    "phonetic": "/ˈplɛzənt/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "We spent a very pleasant evening chatting with our old friends.",
+    "exampleTranslation": "Chúng tôi đã trải qua một buổi tối rất dễ chịu khi trò chuyện với những người bạn cũ."
+  },
+  {
+    "term": "clever",
+    "translation": "thông minh",
+    "phonetic": "/ˈklɛvər/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "The clever dog figured out how to open the back door by itself.",
+    "exampleTranslation": "Chú chó thông minh đã tự mình tìm ra cách mở cửa sau."
+  },
+  {
+    "term": "thoughtful",
+    "translation": "ân cần, chu đáo",
+    "phonetic": "/ˈθɔːt.fəl/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "It was very thoughtful of you to send me a birthday card.",
+    "exampleTranslation": "Bạn thật sự rất chu đáo khi gửi cho tôi một tấm thiệp chúc mừng sinh nhật."
+  },
+  {
+    "term": "proud",
+    "translation": "tự trọng",
+    "phonetic": "/praʊd/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "She was proud of her daughter's outstanding achievements at university.",
+    "exampleTranslation": "Cô ấy tự hào về những thành tựu xuất sắc của con gái mình ở trường đại học."
+  },
+  {
+    "term": "lazy",
+    "translation": "lười biếng",
+    "phonetic": "/ˈleɪzi/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "He is too lazy to clean his room even when it is extremely messy.",
+    "exampleTranslation": "Anh ấy quá lười biếng để dọn dẹp căn phòng của mình ngay cả khi nó cực kỳ bừa bộn."
+  },
+  {
+    "term": "crazy",
+    "translation": "ngu ngốc",
+    "phonetic": "/ˈkreɪzi/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "It was a crazy idea to drive through the storm at midnight.",
+    "exampleTranslation": "Đó là một ý tưởng điên rồ khi lái xe vượt qua bão vào lúc nửa đêm."
+  },
+  {
+    "term": "silly",
+    "translation": "ngốc nghếch",
+    "phonetic": "/ˈsɪli/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "Stop making silly mistakes on these simple math questions.",
+    "exampleTranslation": "Hãy ngừng phạm những lỗi ngớ ngẩn trong các câu hỏi toán đơn giản này."
+  },
+  {
+    "term": "bossy",
+    "translation": "hống hách",
+    "phonetic": "/ˈbɒs.i/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "No one likes his bossy attitude when he tells everyone what to do.",
+    "exampleTranslation": "Không ai thích thái độ hống hách của anh ta khi anh ta bảo mọi người phải làm gì."
+  },
+  {
+    "term": "gossip",
+    "translation": "người mách lẻo",
+    "phonetic": "/ˈgɒs.ɪp/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She is a terrible gossip who always spreads rumors about colleagues.",
+    "exampleTranslation": "Cô ấy là một kẻ buôn chuyện khủng khiếp, người luôn lan truyền tin đồn về đồng nghiệp."
+  },
+  {
+    "term": "extrovert",
+    "translation": "người hướng ngoại",
+    "phonetic": "/ˈɛk.strə.vɜːt/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "As an extrovert, he gains energy from spending time with large crowds.",
+    "exampleTranslation": "Là một người hướng ngoại, anh ấy lấy năng lượng từ việc dành thời gian cho đám đông lớn."
+  },
+  {
+    "term": "coward",
+    "translation": "người nhát gan",
+    "phonetic": "/kaʊərd/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The soldier was accused of being a coward for running away from the battle.",
+    "exampleTranslation": "Người lính bị buộc tội là một kẻ hèn nhát vì đã chạy trốn khỏi trận chiến."
+  },
+  {
+    "term": "big-head",
+    "translation": "người tự cao",
+    "phonetic": "/ˈbɪɡ hɛd/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Success made him a big-head who refuses to listen to anyone else.",
+    "exampleTranslation": "Thành công đã khiến anh ta trở thành một kẻ tự cao tự đại, không chịu lắng nghe ai khác."
+  },
+  {
+    "term": "snob",
+    "translation": "người hợm hĩnh",
+    "phonetic": "/snɒb/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She is such a snob that she only talks to wealthy people.",
+    "exampleTranslation": "Cô ấy là một kẻ hợm hĩnh đến mức chỉ nói chuyện với những người giàu có."
+  },
+  {
+    "term": "liar",
+    "translation": "người nói dối",
+    "phonetic": "/laɪər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He turned out to be a liar who fabricated his whole resume.",
+    "exampleTranslation": "Anh ta hóa ra là một kẻ nói dối đã ngụy tạo toàn bộ sơ yếu lý lịch của mình."
+  },
+  {
+    "term": "ambitious",
+    "translation": "tham vọng",
+    "phonetic": "/æmˈbɪʃəs/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "She is an ambitious young lawyer who wants to become a partner soon.",
+    "exampleTranslation": "Cô ấy là một luật sư trẻ tham vọng muốn sớm trở thành thành viên góp vốn."
+  },
+  {
+    "term": "introvert",
+    "translation": "người hướng nội",
+    "phonetic": "/ˈɪn.trə.vɜːt/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The introvert felt exhausted after spending the whole day at the noisy conference.",
+    "exampleTranslation": "Người hướng nội cảm thấy kiệt sức sau khi dành cả ngày tại hội nghị ồn ào."
+  },
+  {
+    "term": "stingy",
+    "translation": "keo kiệt",
+    "phonetic": "/ˈstɪnʤi/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "He is so stingy that he never leaves a tip for waiters.",
+    "exampleTranslation": "Anh ta keo kiệt đến mức không bao giờ để lại tiền típ cho bồi bàn."
+  },
+  {
+    "term": "arrogant",
+    "translation": "kiêu căng",
+    "phonetic": "/ˈær.ə.ɡənt/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "His arrogant behavior made him highly unpopular among his classmates.",
+    "exampleTranslation": "Hành vi kiêu ngạo của anh ấy đã khiến anh ấy cực kỳ không được lòng các bạn cùng lớp."
+  },
+  {
+    "term": "vain",
+    "translation": "tự phụ",
+    "phonetic": "/veɪn/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "She is so vain that she cannot pass a mirror without looking.",
+    "exampleTranslation": "Cô ấy tự phụ đến mức không thể đi qua gương mà không ngắm nhìn."
+  },
+  {
+    "term": "absent-minded",
+    "translation": "đãng trí",
+    "phonetic": "/ˌæb.sənt ˈmaɪn.dɪd/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "The absent-minded professor forgot his briefcase in the university lecture hall.",
+    "exampleTranslation": "Vị giáo sư đãng trí đã bỏ quên chiếc cặp của mình trong giảng đường đại học."
+  },
+  {
+    "term": "hostile",
+    "translation": "thù địch",
+    "phonetic": "/ˈhɒs.təl/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "They encountered a hostile crowd protesting outside the main entrance.",
+    "exampleTranslation": "Họ đã gặp phải một đám đông thù địch đang biểu tình bên ngoài lối vào chính."
+  }
+]

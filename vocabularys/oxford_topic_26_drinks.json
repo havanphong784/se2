@@ -1,0 +1,202 @@
+[
+  {
+    "term": "juice",
+    "translation": "nước ép",
+    "phonetic": "/dʒuːs/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She prefers fresh orange juice to carbonated sodas in the morning.",
+    "exampleTranslation": "Cô ấy thích nước cam tươi hơn là các loại nước ngọt có ga vào buổi sáng."
+  },
+  {
+    "term": "lemonade",
+    "translation": "nước chanh",
+    "phonetic": "/ˌlɛm.əˈneɪd/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Drinking cold lemonade is highly refreshing on a hot summer afternoon.",
+    "exampleTranslation": "Uống nước chanh lạnh cực kỳ sảng khoái vào một buổi chiều hè nóng bức."
+  },
+  {
+    "term": "beer",
+    "translation": "bia",
+    "phonetic": "/bɪr/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "They ordered a cold beer to celebrate their successful business deal.",
+    "exampleTranslation": "Họ đã gọi một ly bia lạnh để ăn mừng thương vụ kinh doanh thành công."
+  },
+  {
+    "term": "soda",
+    "translation": "sô-đa",
+    "phonetic": "/ˈsoʊdə/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He poured some sweet soda into a tall glass filled with ice.",
+    "exampleTranslation": "Anh ấy đã rót một ít nước sô-đa ngọt vào một chiếc ly cao đầy đá."
+  },
+  {
+    "term": "cider",
+    "translation": "rượu táo",
+    "phonetic": "/ˈsaɪdər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "We enjoyed drinking warm apple cider by the fireplace in winter.",
+    "exampleTranslation": "Chúng tôi thích uống rượu táo ấm bên lò sưởi vào mùa đông."
+  },
+  {
+    "term": "rum",
+    "translation": "rượu rum",
+    "phonetic": "/rʌm/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The bartender added a splash of dark rum to the cocktail mixture.",
+    "exampleTranslation": "Người pha chế đã thêm một chút rượu rum sẫm màu vào hỗn hợp cocktail."
+  },
+  {
+    "term": "ginger ale",
+    "translation": "nước gừng",
+    "phonetic": "/ˈʤɪnʤər eɪl/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "My mother always drinks hot ginger ale to soothe her upset stomach.",
+    "exampleTranslation": "Mẹ tôi luôn uống nước gừng nóng để làm dịu cơn đau dạ dày của mình."
+  },
+  {
+    "term": "champagne",
+    "translation": "rượu sâm panh",
+    "phonetic": "/ʃæmˈpeɪn/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "They popped a bottle of expensive champagne to celebrate the wedding anniversary.",
+    "exampleTranslation": "Họ đã khui một chai rượu sâm panh đắt tiền để kỷ niệm ngày cưới."
+  },
+  {
+    "term": "bitter",
+    "translation": "đắng",
+    "phonetic": "/ˈbɪtər/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "This dark chocolate has a very bitter taste that many people dislike.",
+    "exampleTranslation": "Thứ sô-cô-la đen này có vị rất đắng mà nhiều người không thích."
+  },
+  {
+    "term": "malt",
+    "translation": "mạch nha",
+    "phonetic": "/mɔːlt/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Malt is a key ingredient used in the brewing process of beer.",
+    "exampleTranslation": "Mạch nha là nguyên liệu chính được sử dụng trong quy trình nấu bia."
+  },
+  {
+    "term": "barley",
+    "translation": "lúa mạch",
+    "phonetic": "/ˈbɑːr.li/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Barley is widely cultivated around the world as a major food grain.",
+    "exampleTranslation": "Lúa mạch được trồng rộng rãi trên toàn thế giới như một loại ngũ cốc thực phẩm chính."
+  },
+  {
+    "term": "distillery",
+    "translation": "nhà máy rượu",
+    "phonetic": "/dɪˈstɪləri/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "They took a guided tour of the famous whiskey distillery in Scotland.",
+    "exampleTranslation": "Họ đã tham gia một chuyến tham quan có hướng dẫn đến nhà máy chưng cất rượu whisky nổi tiếng ở Scotland."
+  },
+  {
+    "term": "coffee",
+    "translation": "cà phê",
+    "phonetic": "/ˈkɔː.fi/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "I need a strong cup of black coffee to wake up every morning.",
+    "exampleTranslation": "Tôi cần một tách cà phê đen đậm đặc để tỉnh táo vào mỗi buổi sáng."
+  },
+  {
+    "term": "milk",
+    "translation": "sữa",
+    "phonetic": "/mɪlk/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Drinking a glass of warm milk before bed helps you sleep better.",
+    "exampleTranslation": "Uống một ly sữa ấm trước khi đi ngủ giúp bạn ngủ ngon hơn."
+  },
+  {
+    "term": "tea",
+    "translation": "trà",
+    "phonetic": "/tiː/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She poured hot water over the green tea leaves in her ceramic teapot.",
+    "exampleTranslation": "Cô ấy đã rót nước nóng lên lá trà xanh trong chiếc ấm trà gốm của mình."
+  },
+  {
+    "term": "red wine",
+    "translation": "rượu vang đỏ",
+    "phonetic": "/rɛd waɪn/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "Red wine pairs perfectly with a grilled beef steak for dinner.",
+    "exampleTranslation": "Rượu vang đỏ kết hợp hoàn hảo với bít tết bò nướng cho bữa tối."
+  },
+  {
+    "term": "non-alcoholic",
+    "translation": "không cồn",
+    "phonetic": "/ˌnɑːn ˌæl.kəˈhɒl.ɪk/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "They offer a wide selection of non-alcoholic drinks for non-drinkers.",
+    "exampleTranslation": "Họ cung cấp nhiều lựa chọn đồ uống không cồn cho những người không uống rượu."
+  },
+  {
+    "term": "full-cream",
+    "translation": "nguyên kem",
+    "phonetic": "/ˌfʊl ˈkriːm/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "My little sister always drinks full-cream milk to gain healthy weight.",
+    "exampleTranslation": "Em gái tôi luôn uống sữa nguyên kem để tăng cân khỏe mạnh."
+  },
+  {
+    "term": "herbal",
+    "translation": "thảo mộc",
+    "phonetic": "/ˈhɜːr.bəl/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "Herbal teas are well-known for their natural soothing and relaxing properties.",
+    "exampleTranslation": "Trà thảo mộc nổi tiếng với các đặc tính làm dịu và thư giãn tự nhiên."
+  },
+  {
+    "term": "mineral water",
+    "translation": "nước khoáng",
+    "phonetic": "/ˈmɪn.ər.əl ˈwɔː.tər/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "Drinking enough mineral water daily keeps your body well-hydrated and active.",
+    "exampleTranslation": "Uống đủ nước khoáng hàng ngày giúp cơ thể bạn đủ nước và năng động."
+  }
+]

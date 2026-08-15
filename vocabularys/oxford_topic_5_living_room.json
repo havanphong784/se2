@@ -1,0 +1,322 @@
+[
+  {
+    "term": "drapes",
+    "translation": "màn cửa",
+    "phonetic": "/dreɪps/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She drew the heavy velvet drapes to keep the cold wind out of the room.",
+    "exampleTranslation": "Cô ấy đã kéo những bức màn cửa bằng nhung dày để ngăn gió lạnh vào phòng."
+  },
+  {
+    "term": "cushion",
+    "translation": "đệm ngồi",
+    "phonetic": "/ˈkʊʃ.ən/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He placed a soft fabric cushion behind his back to make the chair more comfortable.",
+    "exampleTranslation": "Anh ấy đặt một tấm đệm ngồi bằng vải mềm phía sau lưng để giúp chiếc ghế ngồi thoải mái hơn."
+  },
+  {
+    "term": "sofa",
+    "translation": "ghế sô-pha",
+    "phonetic": "/ˈsəʊ.fə/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The family gathered on the spacious leather sofa to watch their favorite comedy show.",
+    "exampleTranslation": "Cả gia đình tụ họp trên chiếc ghế sô-pha bằng da rộng rãi để xem chương trình hài kịch yêu thích của họ."
+  },
+  {
+    "term": "rug",
+    "translation": "tấm thảm",
+    "phonetic": "/rʌɡ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "A beautiful hand-woven woollen rug was placed right in the center of the wooden floor.",
+    "exampleTranslation": "Một tấm thảm len dệt tay tuyệt đẹp được đặt ngay chính giữa sàn gỗ."
+  },
+  {
+    "term": "banister",
+    "translation": "lan can",
+    "phonetic": "/ˈbæn.ɪ.stər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Please hold onto the wooden banister while you walk down the slippery stairs.",
+    "exampleTranslation": "Vui lòng bám vào lan can bằng gỗ trong khi bạn đi xuống cầu thang trơn trượt."
+  },
+  {
+    "term": "bookcase",
+    "translation": "tủ sách",
+    "phonetic": "/ˈbʊk.keɪs/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He organized his extensive collection of history novels on the mahogany bookcase.",
+    "exampleTranslation": "Anh ấy đã sắp xếp bộ sưu tập tiểu thuyết lịch sử phong phú của mình lên chiếc tủ sách bằng gỗ gụ."
+  },
+  {
+    "term": "ceiling",
+    "translation": "trần nhà",
+    "phonetic": "/ˈsiː.lɪŋ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The high ceiling of the old palace was decorated with marvelous classical paintings.",
+    "exampleTranslation": "Trần nhà cao của cung điện cổ kính được trang trí bằng những bức tranh cổ điển tuyệt diệu."
+  },
+  {
+    "term": "clock",
+    "translation": "đồng hồ treo tường",
+    "phonetic": "/klɒk/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The vintage pendulum clock on the wall strikes loudly at the beginning of every hour.",
+    "exampleTranslation": "Chiếc đồng hồ treo tường có quả lắc cổ kính kêu rất to vào thời điểm bắt đầu mỗi giờ."
+  },
+  {
+    "term": "desk",
+    "translation": "bàn làm việc",
+    "phonetic": "/desk/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She cleared all the paper clutter from her desk before starting her new project.",
+    "exampleTranslation": "Cô ấy dọn dẹp tất cả giấy tờ bừa bộn trên bàn làm việc của mình trước khi bắt đầu dự án mới."
+  },
+  {
+    "term": "frame",
+    "translation": "khung (ảnh, cửa)",
+    "phonetic": "/freɪm/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "They selected a elegant golden frame for their grandparents' anniversary portrait.",
+    "exampleTranslation": "Họ đã chọn một chiếc khung mạ vàng thanh lịch cho bức chân dung kỷ niệm ngày cưới của ông bà."
+  },
+  {
+    "term": "lampshade",
+    "translation": "chụp đèn",
+    "phonetic": "/ˈlæmp.ʃeɪd/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The green glass lampshade softens the light and creates a warm, relaxing atmosphere.",
+    "exampleTranslation": "Chiếc chụp đèn bằng thủy tinh màu xanh lá cây làm dịu ánh sáng và tạo ra một bầu không khí ấm áp, thư thái."
+  },
+  {
+    "term": "mantelpiece",
+    "translation": "bệ lò sưởi",
+    "phonetic": "/ˈmæn.təl.piːs/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "They placed several framed family photographs and some scented candles on the mantelpiece.",
+    "exampleTranslation": "Họ đã đặt vài bức ảnh gia đình có lồng khung và một số cây nến thơm lên bệ lò sưởi."
+  },
+  {
+    "term": "painting",
+    "translation": "bức tranh",
+    "phonetic": "/ˈpeɪn.tɪŋ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "A colorful oil painting of the countryside was hanging above the main fireplace.",
+    "exampleTranslation": "Một bức tranh sơn dầu đầy màu sắc về nông thôn được treo phía trên lò sưởi chính."
+  },
+  {
+    "term": "remote control",
+    "translation": "điều khiển từ xa",
+    "phonetic": "/rɪˌməʊt kənˈtrəʊl/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "He searched under the sofa cushions for the television remote control.",
+    "exampleTranslation": "Anh ấy đã tìm kiếm dưới những tấm đệm ghế sô-pha để tìm chiếc điều khiển từ xa của tivi."
+  },
+  {
+    "term": "speaker",
+    "translation": "loa",
+    "phonetic": "/ˈspiː.kər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The sound quality of this brand new wireless speaker is absolutely outstanding.",
+    "exampleTranslation": "Chất lượng âm thanh của chiếc loa không dây hoàn toàn mới này thực sự rất vượt trội."
+  },
+  {
+    "term": "step",
+    "translation": "bậc thang",
+    "phonetic": "/step/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Be careful when you step on the wooden steps because they are quite steep.",
+    "exampleTranslation": "Hãy cẩn thận khi bạn bước lên các bậc thang bằng gỗ vì chúng khá dốc."
+  },
+  {
+    "term": "stereo system",
+    "translation": "dàn máy hát (có loa)",
+    "phonetic": "/ˈster.i.əʊ ˈsɪs.təm/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "He decided to play classical music on the high-fidelity stereo system.",
+    "exampleTranslation": "Anh ấy quyết định phát nhạc cổ điển trên dàn máy hát có chất lượng âm thanh trung thực cao."
+  },
+  {
+    "term": "stereo",
+    "translation": "máy xtê-rê-ô",
+    "phonetic": "/ˈster.i.əʊ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The old vintage stereo can still play cassette tapes with great sound quality.",
+    "exampleTranslation": "Chiếc máy xtê-rê-ô cổ vẫn có thể phát băng cassette với chất lượng âm thanh tuyệt vời."
+  },
+  {
+    "term": "television",
+    "translation": "ti vi",
+    "phonetic": "/ˈtel.ɪ.vɪʒ.ən/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The kids are allowed to watch television for only one hour after finishing homework.",
+    "exampleTranslation": "Trẻ em chỉ được phép xem tivi trong một giờ sau khi hoàn thành bài tập về nhà."
+  },
+  {
+    "term": "vase",
+    "translation": "cái bình, lọ",
+    "phonetic": "/vɑːz/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She filled the glass vase with clean water and arranged some fresh sunflowers inside.",
+    "exampleTranslation": "Cô ấy đổ đầy nước sạch vào chiếc bình thủy tinh và cắm vài bông hoa hướng dương tươi vào trong."
+  },
+  {
+    "term": "wall unit",
+    "translation": "tủ tường",
+    "phonetic": "/wɔːl ˈjuː.nɪt/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "The modern wall unit contains various cabinets for storing books and electronic devices.",
+    "exampleTranslation": "Chiếc tủ tường hiện đại chứa nhiều ngăn tủ để lưu trữ sách và các thiết bị điện tử."
+  },
+  {
+    "term": "lamp",
+    "translation": "đèn",
+    "phonetic": "/læmp/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He switched on the small desk lamp to continue reading his textbook late at night.",
+    "exampleTranslation": "Anh ấy đã bật chiếc đèn bàn nhỏ để tiếp tục đọc sách giáo khoa vào đêm muộn."
+  },
+  {
+    "term": "calendar",
+    "translation": "lịch",
+    "phonetic": "/ˈkæl.ən.dər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She marked the important meeting date on her large wall calendar with a red marker.",
+    "exampleTranslation": "Cô ấy đã đánh dấu ngày họp quan trọng trên tờ lịch treo tường lớn của mình bằng bút dạ màu đỏ."
+  },
+  {
+    "term": "fan",
+    "translation": "cái quạt",
+    "phonetic": "/fæn/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Please turn on the ceiling fan because the weather is extremely hot today.",
+    "exampleTranslation": "Vui lòng bật chiếc quạt trần lên vì thời tiết hôm nay cực kỳ nóng."
+  },
+  {
+    "term": "chair",
+    "translation": "cái ghế",
+    "phonetic": "/tʃeər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He pulled up an extra wooden chair so that his friend could sit down with us.",
+    "exampleTranslation": "Anh ấy kéo thêm một chiếc ghế gỗ phụ để bạn của mình có thể ngồi cùng với chúng tôi."
+  },
+  {
+    "term": "stool",
+    "translation": "ghế đẩu",
+    "phonetic": "/stuːl/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The artist sat on a high wooden stool while working on her master painting.",
+    "exampleTranslation": "Nghệ sĩ ngồi trên một chiếc ghế đẩu bằng gỗ cao trong khi thực hiện bức vẽ bậc thầy của mình."
+  },
+  {
+    "term": "ashtray",
+    "translation": "đồ gạt tàn thuốc",
+    "phonetic": "/ˈæʃ.treɪ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The ceramic ashtray on the balcony table was cleaned and emptied this morning.",
+    "exampleTranslation": "Chiếc đồ gạt tàn thuốc bằng gốm trên bàn ban công đã được lau dọn và đổ sạch vào sáng nay."
+  },
+  {
+    "term": "bookshelf",
+    "translation": "kệ sách",
+    "phonetic": "/ˈbʊk.ʃelf/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "I need to buy a larger bookshelf because my book collection is growing rapidly.",
+    "exampleTranslation": "Tôi cần mua một chiếc kệ sách lớn hơn vì bộ sưu tập sách của tôi đang tăng lên nhanh chóng."
+  },
+  {
+    "term": "fuse",
+    "translation": "cầu chì",
+    "phonetic": "/fjuːz/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The electrical system overloaded and we had to replace a blown fuse in the main box.",
+    "exampleTranslation": "Hệ thống điện bị quá tải và chúng tôi phải thay thế một chiếc cầu chì bị cháy trong hộp điện chính."
+  },
+  {
+    "term": "switch",
+    "translation": "công tắc",
+    "phonetic": "/swɪtʃ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The light switch is located right next to the entrance door of the living room.",
+    "exampleTranslation": "Công tắc đèn được đặt ngay bên cạnh cửa ra vào của phòng khách."
+  },
+  {
+    "term": "couch",
+    "translation": "trường kỷ",
+    "phonetic": "/kaʊtʃ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The comfortable velvet couch was the perfect spot for taking a quick afternoon nap.",
+    "exampleTranslation": "Chiếc trường kỷ bằng nhung thoải mái là địa điểm hoàn hảo để chợp mắt nhanh vào buổi chiều."
+  },
+  {
+    "term": "curtain",
+    "translation": "rèm cửa",
+    "phonetic": "/ˈkɜː.tən/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She chose beautiful floral curtains to decorate the wide windows of her new bedroom.",
+    "exampleTranslation": "Cô ấy đã chọn những bức rèm cửa hoa văn tuyệt đẹp để trang trí những ô cửa sổ rộng của phòng ngủ mới."
+  }
+]

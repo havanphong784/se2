@@ -98,7 +98,8 @@ export function VocabularyImportForm({
         <Badge variant="blue"><FileUp className="size-4" /> CSV hoặc JSON</Badge>
         <h2 className="mt-4 text-2xl font-extrabold text-eel-dark-blue">Chọn tệp từ vựng</h2>
         <p className="mt-2 text-sm font-bold leading-6 text-ash">
-          Bắt buộc có term và translation. Tối đa 2 MiB và 2.000 dòng.
+          Bắt buộc có term và translation. JSON nhận partOfSpeech dạng mảng; CSV nhận
+          danh sách phân cách bằng dấu phẩy. Tối đa 2 MiB và 2.000 dòng.
         </p>
         <div className="mt-4 rounded-xl border-2 border-[#eeeeee] bg-[#fafafa] p-4">
           <p className="text-sm font-extrabold text-eel-dark-blue">Chưa biết định dạng tệp?</p>
@@ -181,7 +182,7 @@ export function VocabularyImportForm({
             <div className="mt-5 max-h-[440px] overflow-auto">
               <table className="w-full min-w-[620px] text-left text-sm">
                 <thead><tr className="border-b-2 border-[#eeeeee] text-ash"><th className="p-3">Term</th><th className="p-3">Translation</th><th className="p-3">Loại từ</th><th className="p-3">Ví dụ</th></tr></thead>
-                <tbody>{preview.words.slice(0, 50).map((word, index) => <tr key={`${word.term}-${index}`} className="border-b border-[#eeeeee]"><td className="p-3 font-extrabold text-eel-dark-blue">{word.term}</td><td className="p-3 font-bold">{word.translation}</td><td className="p-3 text-ash">{word.partOfSpeech || "—"}</td><td className="max-w-xs p-3 text-ash">{word.exampleSentence || "—"}</td></tr>)}</tbody>
+                <tbody>{preview.words.slice(0, 50).map((word, index) => <tr key={`${word.term}-${index}`} className="border-b border-[#eeeeee]"><td className="p-3 font-extrabold text-eel-dark-blue">{word.term}</td><td className="p-3 font-bold">{word.translation}</td><td className="p-3 text-ash">{word.partOfSpeech.join(", ") || "—"}</td><td className="max-w-xs p-3 text-ash">{word.exampleSentence || "—"}</td></tr>)}</tbody>
               </table>
             </div>
           </>

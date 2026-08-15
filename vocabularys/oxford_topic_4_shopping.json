@@ -1,0 +1,423 @@
+[
+  {
+    "term": "customer",
+    "translation": "khách hàng",
+    "phonetic": "/ˈkʌs.tə.mər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The helpful cashier smiled warmly at every single customer in the queue.",
+    "exampleTranslation": "Người thu ngân phục vụ chu đáo mỉm cười ấm áp với mọi khách hàng trong hàng đợi."
+  },
+  {
+    "term": "cashier",
+    "translation": "nhân viên thu ngân",
+    "phonetic": "/kæʃˈɪər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The polite cashier carefully scanned all the items and handed me the receipt.",
+    "exampleTranslation": "Nhân viên thu ngân lịch sự đã quét cẩn thận tất cả các món hàng và đưa hóa đơn cho tôi."
+  },
+  {
+    "term": "attendant",
+    "translation": "người phục vụ",
+    "phonetic": "/əˈten.dənt/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The gas station attendant checked our car tyres and wished us a safe journey.",
+    "exampleTranslation": "Người phục vụ ở trạm xăng đã kiểm tra lốp xe của chúng tôi và chúc chúng tôi một hành trình an toàn."
+  },
+  {
+    "term": "manager",
+    "translation": "giám đốc, quản lý",
+    "phonetic": "/ˈmæn.ɪ.dʒər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "You should speak directly to the store manager if you want to request a refund.",
+    "exampleTranslation": "Bạn nên nói chuyện trực tiếp với người quản lý cửa hàng nếu bạn muốn yêu cầu hoàn tiền."
+  },
+  {
+    "term": "wallet",
+    "translation": "ví tiền",
+    "phonetic": "/ˈwɒl.ɪt/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He checked his back pocket and realized that his leather wallet was missing.",
+    "exampleTranslation": "Anh ấy kiểm tra túi sau và nhận ra rằng chiếc ví da của mình đã bị mất."
+  },
+  {
+    "term": "purse",
+    "translation": "ví tiền (nữ)",
+    "phonetic": "/pɜːs/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She opened her elegant purse to take out some coins for the bus fare.",
+    "exampleTranslation": "Cô ấy mở chiếc ví thanh lịch của mình để lấy ra vài đồng xu trả tiền xe buýt."
+  },
+  {
+    "term": "scale",
+    "translation": "cái cân",
+    "phonetic": "/skeɪl/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The vendor placed the fresh apples on the digital scale to calculate their weight.",
+    "exampleTranslation": "Người bán hàng đặt những quả táo tươi lên chiếc cân điện tử để tính toán trọng lượng của chúng."
+  },
+  {
+    "term": "counter",
+    "translation": "quầy hàng",
+    "phonetic": "/kaʊn.tər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Please leave your selected goods on the checkout counter and wait for your turn.",
+    "exampleTranslation": "Vui lòng để hàng hóa đã chọn lên quầy thanh toán và chờ đợi đến lượt của bạn."
+  },
+  {
+    "term": "barcode reader",
+    "translation": "máy đọc mã vạch",
+    "phonetic": "/ˈbɑːˌkəʊdˈriː.dər/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "The high-tech barcode reader instantly displayed the price of the product on the screen.",
+    "exampleTranslation": "Máy đọc mã vạch công nghệ cao hiển thị ngay lập tức giá của sản phẩm trên màn hình."
+  },
+  {
+    "term": "receipt",
+    "translation": "biên lai",
+    "phonetic": "/rɪˈsiːt/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "You must keep the purchase receipt if you want to exchange the damaged items later.",
+    "exampleTranslation": "Bạn phải giữ lại biên lai mua hàng nếu muốn đổi trả những món đồ bị hỏng sau này."
+  },
+  {
+    "term": "pay",
+    "translation": "trả tiền",
+    "phonetic": "/peɪ/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "Many customers prefer to pay with credit cards instead of carrying large amounts of cash.",
+    "exampleTranslation": "Nhiều khách hàng thích trả tiền bằng thẻ tín dụng hơn là mang theo lượng tiền mặt lớn."
+  },
+  {
+    "term": "expensive",
+    "translation": "đắt",
+    "phonetic": "/ɪkˈspen.sɪv/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "This designer jacket is far too expensive for my current monthly budget to afford.",
+    "exampleTranslation": "Chiếc áo khoác thiết kế này quá đắt so với ngân sách hàng tháng hiện tại của tôi."
+  },
+  {
+    "term": "cheap",
+    "translation": "rẻ",
+    "phonetic": "/tʃiːp/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "They managed to find a very cheap hotel near the center of the city.",
+    "exampleTranslation": "Họ đã xoay xở tìm được một khách sạn rất rẻ gần trung tâm thành phố."
+  },
+  {
+    "term": "discount",
+    "translation": "giảm giá",
+    "phonetic": "/dɪs.kaʊnt/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "They are offering a ten percent discount on all items during the holiday season.",
+    "exampleTranslation": "Họ đang áp dụng chương trình giảm giá mười phần trăm cho tất cả mặt hàng trong mùa lễ."
+  },
+  {
+    "term": "sell",
+    "translation": "bán",
+    "phonetic": "/sel/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "Local farmers gather here every Sunday to sell their organic fruits and fresh vegetables.",
+    "exampleTranslation": "Các nông dân địa phương tụ họp về đây mỗi Chủ Nhật để bán trái cây hữu cơ và rau tươi của họ."
+  },
+  {
+    "term": "price",
+    "translation": "giá cả",
+    "phonetic": "/praɪs/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The rising price of petroleum is affecting the cost of daily food transportation.",
+    "exampleTranslation": "Giá cả xăng dầu ngày càng tăng đang ảnh hưởng đến chi phí vận chuyển thực phẩm hàng ngày."
+  },
+  {
+    "term": "trolley",
+    "translation": "xe đẩy",
+    "phonetic": "/ˈtɒl.i/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She loaded a metal shopping trolley with groceries for the upcoming family dinner party.",
+    "exampleTranslation": "Cô ấy chất đầy thực phẩm lên một chiếc xe đẩy bằng kim loại cho bữa tiệc tối sắp tới của gia đình."
+  },
+  {
+    "term": "credit card",
+    "translation": "thẻ tín dụng",
+    "phonetic": "/ˈkred.ɪt ˌkɑːd/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "I accidentally swiped my credit card twice and had to contact the bank immediately.",
+    "exampleTranslation": "Tôi vô tình quẹt thẻ tín dụng hai lần và phải liên hệ với ngân hàng ngay lập tức."
+  },
+  {
+    "term": "cash",
+    "translation": "tiền mặt",
+    "phonetic": "/kæʃ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Do you have enough cash to buy these fresh ingredients from the local market?",
+    "exampleTranslation": "Bạn có đủ tiền mặt để mua những nguyên liệu tươi ngon này từ chợ địa phương không?"
+  },
+  {
+    "term": "shop",
+    "translation": "cửa hàng",
+    "phonetic": "/ʃɒp/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "They decided to open a small coffee shop in their peaceful home town.",
+    "exampleTranslation": "Họ quyết định mở một quán cà phê nhỏ tại thị trấn quê hương yên bình của mình."
+  },
+  {
+    "term": "money",
+    "translation": "tiền",
+    "phonetic": "/ˈmʌn.i/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "It takes a lot of time and money to build a successful startup business.",
+    "exampleTranslation": "Phải mất rất nhiều thời gian và tiền bạc để xây dựng một doanh nghiệp khởi nghiệp thành công."
+  },
+  {
+    "term": "basket",
+    "translation": "rổ, giỏ",
+    "phonetic": "/ˈbɑː.skɪt/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She carefully placed the fresh eggs into a woven bamboo basket on the kitchen table.",
+    "exampleTranslation": "Cô ấy cẩn thận đặt những quả trứng tươi vào một chiếc giỏ đan bằng tre trên bàn bếp."
+  },
+  {
+    "term": "bag",
+    "translation": "túi",
+    "phonetic": "/bæɡ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He carried a heavy canvas bag filled with reference books to the library.",
+    "exampleTranslation": "Anh ấy xách một chiếc túi vải bạt nặng trĩu đầy sách tham khảo đến thư viện."
+  },
+  {
+    "term": "buy",
+    "translation": "mua",
+    "phonetic": "/baɪ/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "We should go to the local market to buy some fresh seafood for dinner.",
+    "exampleTranslation": "Chúng ta nên đi chợ địa phương để mua một ít hải sản tươi ngon cho bữa tối."
+  },
+  {
+    "term": "greengrocer",
+    "translation": "cửa hàng bán rau quả",
+    "phonetic": "/ˈgriːŋ.grəʊ.sər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The friendly greengrocer always displays the freshest organic vegetables at the front of the shop.",
+    "exampleTranslation": "Người bán rau quả thân thiện luôn trưng bày những loại rau hữu cơ tươi ngon nhất ở phía trước cửa hàng."
+  },
+  {
+    "term": "housewares",
+    "translation": "đồ gia dụng",
+    "phonetic": "/ˈhaʊs.weəz/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The newly opened store has a wide range of kitchen appliances and high-quality housewares.",
+    "exampleTranslation": "Cửa hàng mới mở có rất nhiều thiết bị nhà bếp và đồ gia dụng chất lượng cao."
+  },
+  {
+    "term": "toy store",
+    "translation": "cửa hàng đồ chơi",
+    "phonetic": "/tɔɪ stɔːr/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "The children were extremely excited when they entered the giant toy store in the mall.",
+    "exampleTranslation": "Các em nhỏ vô cùng hào hứng khi bước vào cửa hàng đồ chơi khổng lồ trong trung tâm thương mại."
+  },
+  {
+    "term": "shopping mall",
+    "translation": "trung tâm mua sắm",
+    "phonetic": "/ˈʃɒp.ɪŋ ˌmɔːl/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "They spent the entire Saturday afternoon exploring the fashionable boutiques in the shopping mall.",
+    "exampleTranslation": "Họ đã dành trọn buổi chiều thứ Bảy để khám phá các cửa hàng thời trang trong trung tâm mua sắm."
+  },
+  {
+    "term": "grocery store",
+    "translation": "cửa hàng tạp hóa",
+    "phonetic": "/ˈgrəʊ.sər.i ˌstɔːr/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "I need to stop by the local grocery store to pick up some milk and bread.",
+    "exampleTranslation": "Tôi cần ghé qua cửa hàng tạp hóa địa phương để mua một ít sữa và bánh mì."
+  },
+  {
+    "term": "convenience store",
+    "translation": "cửa hàng tiện lợi",
+    "phonetic": "/kənˈviː.ni.əns ˌstɔːr/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "This twenty-four hour convenience store is located right across the street from my apartment.",
+    "exampleTranslation": "Cửa hàng tiện lợi mở cửa hai mươi tư giờ này nằm ngay bên kia đường đối diện với căn hộ của tôi."
+  },
+  {
+    "term": "bargain",
+    "translation": "mặc cả",
+    "phonetic": "/ˈbɑː.gɪn/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "You can always bargain with the local market vendors to get a better price.",
+    "exampleTranslation": "Bạn luôn có thể mặc cả với những người bán hàng ở chợ địa phương để có được mức giá tốt hơn."
+  },
+  {
+    "term": "refund",
+    "translation": "hoàn lại, trả lại",
+    "phonetic": "/ˈriː.fʌnd/",
+    "partOfSpeech": [
+      "danh từ",
+      "động từ"
+    ],
+    "exampleSentence": "The shop will issue a full refund if the customer returns the item within thirty days.",
+    "exampleTranslation": "Cửa hàng sẽ hoàn lại tiền đầy đủ nếu khách hàng trả lại món hàng trong vòng ba mươi ngày."
+  },
+  {
+    "term": "brochure",
+    "translation": "tập quảng cáo",
+    "phonetic": "/ˈbrəʊ.ʃər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Please read this detailed travel brochure to learn more about our exciting vacation packages.",
+    "exampleTranslation": "Vui lòng đọc tập quảng cáo du lịch chi tiết này để biết thêm về các gói kỳ nghỉ hấp dẫn của chúng tôi."
+  },
+  {
+    "term": "liquor store",
+    "translation": "quán rượu",
+    "phonetic": "/ˈlɪk.ə ˌstɔːr/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "The local liquor store requires everyone to show a valid ID before purchasing alcoholic drinks.",
+    "exampleTranslation": "Quán rượu địa phương yêu cầu mọi người xuất trình giấy tờ tùy thân hợp lệ trước khi mua đồ uống có cồn."
+  },
+  {
+    "term": "drugstore",
+    "translation": "tiệm thuốc",
+    "phonetic": "/ˈdrʌg.stɔːr/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She went to the drugstore to purchase some prescribed medicine for her grandmother.",
+    "exampleTranslation": "Cô ấy đã đến tiệm thuốc để mua một số loại thuốc được kê đơn cho bà của mình."
+  },
+  {
+    "term": "candy store",
+    "translation": "cửa hàng kẹo",
+    "phonetic": "/ˈkæn.di ˌstɔːr/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "The colorful sweet shop looked like a magical candy store from a childhood fairytale.",
+    "exampleTranslation": "Cửa hàng đồ ngọt đầy màu sắc trông giống như một cửa hàng kẹo kỳ diệu bước ra từ truyện cổ tích tuổi thơ."
+  },
+  {
+    "term": "gift shop",
+    "translation": "cửa hàng đồ lưu niệm",
+    "phonetic": "/ˈgɪft ˌʃɒp/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "I stopped by the museum gift shop to buy some unique souvenirs for my classmates.",
+    "exampleTranslation": "Tôi đã ghé qua cửa hàng đồ lưu niệm của bảo tàng để mua một vài món quà độc đáo cho các bạn cùng lớp."
+  },
+  {
+    "term": "pet shop",
+    "translation": "tiệm thú cưng",
+    "phonetic": "/pet ʃɒp/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "They visited the local pet shop to buy some healthy food and toys for their kitten.",
+    "exampleTranslation": "Họ đã đến tiệm thú cưng địa phương để mua một số thức ăn tốt cho sức khỏe và đồ chơi cho chú mèo con."
+  },
+  {
+    "term": "shoe shop",
+    "translation": "tiệm giày",
+    "phonetic": "/ʃuː ʃɒp/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "The shoe shop is having a major clearance sale with up to fifty percent discounts.",
+    "exampleTranslation": "Tiệm giày đang tổ chức một chương trình xả hàng lớn với mức giảm giá lên tới năm mươi phần trăm."
+  },
+  {
+    "term": "meat shop",
+    "translation": "cửa hàng thịt",
+    "phonetic": "/miːt ʃɒp/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "We always purchase our beef steak from this clean and reliable local meat shop.",
+    "exampleTranslation": "Chúng tôi luôn mua thịt bò bít tết từ cửa hàng thịt địa phương sạch sẽ và đáng tin cậy này."
+  },
+  {
+    "term": "florist",
+    "translation": "người bán hoa",
+    "phonetic": "/ˈflɒr.ɪst/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The creative florist arranged a stunning bouquet of red roses and white lilies.",
+    "exampleTranslation": "Người bán hoa sáng tạo đã cắm một bó hoa tuyệt đẹp gồm hồng đỏ và ly trắng."
+  },
+  {
+    "term": "butcher",
+    "translation": "người bán thịt",
+    "phonetic": "/ˈbʊtʃ.ər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The experienced butcher prepared the fresh cuts of meat according to the customer's request.",
+    "exampleTranslation": "Người bán thịt có kinh nghiệm đã chuẩn bị những miếng thịt tươi ngon cắt theo yêu cầu của khách hàng."
+  }
+]

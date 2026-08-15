@@ -1,0 +1,192 @@
+[
+  {
+    "term": "dusting",
+    "translation": "việc quét bụi",
+    "phonetic": "/ˈdʌs.tɪŋ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Dusting the old wooden bookshelves is my least favorite household chore.",
+    "exampleTranslation": "Quét bụi những kệ sách bằng gỗ cũ là công việc nhà tôi ít yêu thích nhất."
+  },
+  {
+    "term": "cooking",
+    "translation": "việc nấu ăn",
+    "phonetic": "/ˈkʊk.ɪŋ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She really enjoys cooking delicious healthy meals for her family every weekend.",
+    "exampleTranslation": "Cô ấy thực sự thích nấu những bữa ăn ngon và tốt cho sức khỏe cho gia đình vào mỗi cuối tuần."
+  },
+  {
+    "term": "ironing",
+    "translation": "việc ủi đồ",
+    "phonetic": "/ˈaɪə.nɪŋ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He listened to his favorite classical music while doing the weekly ironing.",
+    "exampleTranslation": "Anh ấy đã nghe bản nhạc cổ điển yêu thích của mình trong khi ủi đồ hàng tuần."
+  },
+  {
+    "term": "sweep",
+    "translation": "quét dọn",
+    "phonetic": "/swiːp/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "Please sweep the dusty kitchen floor before our dinner guests arrive tonight.",
+    "exampleTranslation": "Vui lòng quét sàn nhà bếp đầy bụi trước khi khách ăn tối của chúng ta đến tối nay."
+  },
+  {
+    "term": "wipe",
+    "translation": "chùi, lau sạch",
+    "phonetic": "/waɪp/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "You should use a clean damp cloth to wipe the dirty table.",
+    "exampleTranslation": "Bạn nên sử dụng một chiếc khăn ẩm sạch để lau sạch chiếc bàn bẩn."
+  },
+  {
+    "term": "throw out",
+    "translation": "vứt, bỏ đi",
+    "phonetic": "/θrəʊ aʊt/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "Remember to throw out the expired milk from the refrigerator this afternoon.",
+    "exampleTranslation": "Hãy nhớ vứt bỏ sữa đã hết hạn từ tủ lạnh vào chiều nay."
+  },
+  {
+    "term": "vacuum",
+    "translation": "hút bụi",
+    "phonetic": "/ˈvæk.juːm/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "You should vacuum the living room carpet to remove all the pet hair.",
+    "exampleTranslation": "Bạn nên hút bụi tấm thảm phòng khách để loại bỏ tất cả lông thú cưng."
+  },
+  {
+    "term": "cleaning",
+    "translation": "việc dọn dẹp",
+    "phonetic": "/ˈkliː.nɪŋ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "They spent the whole Saturday morning cleaning their messy bedrooms and bathrooms.",
+    "exampleTranslation": "Họ đã dành cả sáng thứ Bảy để dọn dẹp phòng ngủ và phòng tắm bừa bộn của mình."
+  },
+  {
+    "term": "polish",
+    "translation": "đánh bóng",
+    "phonetic": "/ˈpɒl.ɪʃ/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "He used a soft dry cloth to polish his black leather shoes.",
+    "exampleTranslation": "Anh ấy đã sử dụng một chiếc khăn khô mềm để đánh bóng đôi giày da màu đen của mình."
+  },
+  {
+    "term": "fold",
+    "translation": "gấp gọn, gập lại",
+    "phonetic": "/fəʊld/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "She helped her busy mother fold the clean laundry and put it away.",
+    "exampleTranslation": "Cô ấy đã giúp người mẹ bận rộn của mình xếp quần áo sạch và cất đi."
+  },
+  {
+    "term": "scrub",
+    "translation": "chà, cọ rửa",
+    "phonetic": "/skrʌb/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "We need to scrub the dirty bathroom tiles with a strong stiff brush.",
+    "exampleTranslation": "Chúng ta cần cọ rửa những viên gạch nhà tắm bẩn bằng một chiếc bàn chải cứng."
+  },
+  {
+    "term": "tighten",
+    "translation": "thắt, vặn (chặt)",
+    "phonetic": "/ˈtaɪ.tən/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "My father used a heavy screwdriver to tighten the loose screw on the chair.",
+    "exampleTranslation": "Bố tôi đã dùng một chiếc tua vít nặng để vặn chặt chiếc ốc vít bị lỏng trên ghế."
+  },
+  {
+    "term": "make the bed",
+    "translation": "dọn giường",
+    "phonetic": "/meɪk ðə bed/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "I always make the bed immediately after waking up early in the morning.",
+    "exampleTranslation": "Tôi luôn dọn giường ngay lập tức sau khi thức dậy sớm vào buổi sáng."
+  },
+  {
+    "term": "set the table",
+    "translation": "bày chén bát",
+    "phonetic": "/set ðəˈteɪ.bəl/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "Could you please help me set the table for our family dinner tonight?",
+    "exampleTranslation": "Bạn có thể vui lòng giúp tôi bày chén bát cho bữa tối gia đình chúng ta tối nay được không?"
+  },
+  {
+    "term": "clear the table",
+    "translation": "dọn dẹp chén bát",
+    "phonetic": "/klɪər ðəˈteɪ.bəl/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "After finishing our delicious dinner, we all helped to clear the table.",
+    "exampleTranslation": "Sau khi ăn xong bữa tối ngon miệng, tất cả chúng tôi đã giúp dọn dẹp bàn ăn."
+  },
+  {
+    "term": "mow the lawn",
+    "translation": "cắt cỏ",
+    "phonetic": "/məʊ ðə lɔːn/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "He mows the lawn every Sunday morning to keep the garden neat.",
+    "exampleTranslation": "Anh ấy cắt cỏ vào mỗi sáng Chủ nhật để giữ cho khu vườn luôn gọn gàng."
+  },
+  {
+    "term": "dishwashing",
+    "translation": "việc rửa chén",
+    "phonetic": "/dɪʃˈwɒʃ.ɪŋ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "We bought an automatic dishwasher to make the daily dishwashing much faster.",
+    "exampleTranslation": "Chúng tôi đã mua một chiếc máy rửa bát tự động để việc rửa chén hàng ngày nhanh hơn nhiều."
+  },
+  {
+    "term": "water the plants",
+    "translation": "tưới cây",
+    "phonetic": "/ˈwɔː.tər ðəˈplɑːnt/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "Don't forget to water the green plants before you leave for your vacation.",
+    "exampleTranslation": "Đừng quên tưới những cây xanh trước khi bạn lên đường đi nghỉ mát."
+  },
+  {
+    "term": "clean the kitchen",
+    "translation": "lau dọn bếp",
+    "phonetic": "/kliːn ðə ˈkɪʧən/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "They always clean the kitchen thoroughly after preparing a big family lunch.",
+    "exampleTranslation": "Họ luôn lau dọn bếp thật sạch sau khi chuẩn bị một bữa trưa lớn cho gia đình."
+  }
+]

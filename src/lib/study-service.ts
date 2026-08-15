@@ -65,7 +65,7 @@ export type StudySessionDto = {
     term: string;
     translation: string;
     phonetic: string;
-    partOfSpeech: string;
+    partOfSpeech: string[];
     exampleSentence: string;
     exampleTranslation: string;
     flashcardCompleted: boolean;

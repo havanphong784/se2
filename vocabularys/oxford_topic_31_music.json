@@ -1,0 +1,372 @@
+[
+  {
+    "term": "music",
+    "translation": "âm nhạc",
+    "phonetic": "/ˈmjuː.zɪk/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Listening to gentle classical music helps me study and concentrate much better.",
+    "exampleTranslation": "Nghe nhạc cổ điển nhẹ nhàng giúp tôi học tập và tập trung tốt hơn nhiều."
+  },
+  {
+    "term": "band",
+    "translation": "nhóm nhạc, ban nhạc",
+    "phonetic": "/bænd/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The popular rock band is planning to go on a world tour next year.",
+    "exampleTranslation": "Ban nhạc rock nổi tiếng đang có kế hoạch đi lưu diễn thế giới vào năm tới."
+  },
+  {
+    "term": "play",
+    "translation": "chơi (nhạc cụ)",
+    "phonetic": "/pleɪ/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "My younger brother wants to learn how to play the classical guitar.",
+    "exampleTranslation": "Em trai tôi muốn học cách chơi đàn ghi-ta cổ điển."
+  },
+  {
+    "term": "note",
+    "translation": "nốt nhạc",
+    "phonetic": "/noʊt/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She can read every single musical note on the sheet music easily.",
+    "exampleTranslation": "Cô ấy có thể đọc từng nốt nhạc trên bản nhạc một cách dễ dàng."
+  },
+  {
+    "term": "drum",
+    "translation": "trống",
+    "phonetic": "/drʌm/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He beats the drum loudly to keep the rhythm for the marching band.",
+    "exampleTranslation": "Anh ấy đánh trống thật to để giữ nhịp cho ban nhạc diễu hành."
+  },
+  {
+    "term": "playlist",
+    "translation": "danh sách bài hát",
+    "phonetic": "/ˈpleɪ.lɪst/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "I created a special playlist of relaxing songs for my long road trip.",
+    "exampleTranslation": "Tôi đã tạo một danh sách bài hát đặc biệt gồm các ca khúc thư giãn cho chuyến đi đường dài của mình."
+  },
+  {
+    "term": "musician",
+    "translation": "nhạc sĩ",
+    "phonetic": "/mjuˈzɪʃ.ən/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The talented musician composed a beautiful melody that touched everyone's heart.",
+    "exampleTranslation": "Nhạc sĩ tài hoa đã sáng tác một giai điệu tuyệt đẹp chạm đến trái tim của mọi người."
+  },
+  {
+    "term": "perform",
+    "translation": "trình diễn, biểu diễn",
+    "phonetic": "/pərˈfɔːrm/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "The opera singers will perform live on stage tomorrow evening.",
+    "exampleTranslation": "Các ca sĩ opera sẽ biểu diễn trực tiếp trên sân khấu vào tối mai."
+  },
+  {
+    "term": "rhythm",
+    "translation": "nhịp điệu",
+    "phonetic": "/ˈrɪð.əm/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "You need to follow the fast rhythm of the music while dancing salsa.",
+    "exampleTranslation": "Bạn cần tuân theo nhịp điệu nhanh của âm nhạc khi nhảy salsa."
+  },
+  {
+    "term": "dance",
+    "translation": "nhảy, khiêu vũ",
+    "phonetic": "/dæns/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "They love to dance together under the romantic lights of the ballroom.",
+    "exampleTranslation": "Họ thích nhảy cùng nhau dưới ánh đèn lãng mạn của phòng khiêu vũ."
+  },
+  {
+    "term": "listen",
+    "translation": "lắng nghe",
+    "phonetic": "/ˈlɪs.ən/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "Please listen carefully to the instructions before starting the exam.",
+    "exampleTranslation": "Vui lòng lắng nghe cẩn thận các hướng dẫn trước khi bắt đầu bài kiểm tra."
+  },
+  {
+    "term": "volume",
+    "translation": "âm lượng",
+    "phonetic": "/ˈvɑːl.juːm/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Could you please turn down the volume of the television a little bit?",
+    "exampleTranslation": "Bạn có thể vui lòng vặn nhỏ âm lượng của tivi xuống một chút được không?"
+  },
+  {
+    "term": "song",
+    "translation": "bài hát",
+    "phonetic": "/sɔːŋ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "This sweet song always reminds me of my beautiful childhood memories.",
+    "exampleTranslation": "Bài hát ngọt ngào này luôn gợi lại cho tôi những ký tự tuổi thơ tươi đẹp."
+  },
+  {
+    "term": "sing",
+    "translation": "hát, ca hát",
+    "phonetic": "/sɪŋ/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "She sings so beautifully that everyone in the room stopped to listen.",
+    "exampleTranslation": "Cô ấy hát hay đến mức mọi người trong phòng đều dừng lại để lắng nghe."
+  },
+  {
+    "term": "piano",
+    "translation": "đàn piano",
+    "phonetic": "/piˈæn.oʊ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She practiced playing the piano for three hours every day to prepare for the concert.",
+    "exampleTranslation": "Cô ấy đã tập đàn piano ba tiếng mỗi ngày để chuẩn bị cho buổi hòa nhạc."
+  },
+  {
+    "term": "guitar",
+    "translation": "đàn ghi-ta",
+    "phonetic": "/ɡɪˈtɑːr/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He brought his acoustic guitar to the beach and sang songs with friends.",
+    "exampleTranslation": "Anh ấy mang chiếc đàn ghi-ta acoustic ra bãi biển và hát những bài hát cùng bạn bè."
+  },
+  {
+    "term": "instrument",
+    "translation": "nhạc cụ",
+    "phonetic": "/ˈɪn.strə.mənt/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The violin is a very difficult musical instrument to master completely.",
+    "exampleTranslation": "Đàn vi-ô-lông là một nhạc cụ rất khó để có thể làm chủ hoàn toàn."
+  },
+  {
+    "term": "harmony",
+    "translation": "hoà âm",
+    "phonetic": "/ˈhɑːr.mə.ni/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The voices of the choir blended together in perfect harmony.",
+    "exampleTranslation": "Giọng hát của dàn hợp xướng hòa quyện vào nhau tạo nên một bản hòa âm hoàn hảo."
+  },
+  {
+    "term": "melody",
+    "translation": "giai điệu",
+    "phonetic": "/ˈmɛl.ə.di/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "I cannot get this catchy melody out of my head since this morning.",
+    "exampleTranslation": "Tôi không thể đưa giai điệu bắt tai này ra khỏi đầu mình kể từ sáng nay."
+  },
+  {
+    "term": "string",
+    "translation": "dây đàn",
+    "phonetic": "/strɪŋ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "One string of his acoustic guitar suddenly broke during the live performance.",
+    "exampleTranslation": "Một sợi dây đàn ghi-ta acoustic của anh ấy đột nhiên bị đứt trong buổi biểu diễn trực tiếp."
+  },
+  {
+    "term": "the brass",
+    "translation": "dàn kèn đồng",
+    "phonetic": "/ðə bræs/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "The powerful sound of the brass section dominated the orchestral symphony.",
+    "exampleTranslation": "Âm thanh mạnh mẽ của dàn kèn đồng đã chi phối toàn bộ bản giao hưởng của dàn nhạc."
+  },
+  {
+    "term": "symphony",
+    "translation": "bản giao hưởng",
+    "phonetic": "/ˈsɪm.fə.ni/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Beethoven's Ninth Symphony is widely considered one of the greatest musical achievements in history.",
+    "exampleTranslation": "Bản giao hưởng số chín của Beethoven được coi là một trong những thành tựu âm nhạc vĩ đại nhất trong lịch sử."
+  },
+  {
+    "term": "overture",
+    "translation": "khúc dạo đầu",
+    "phonetic": "/ˈoʊ.vər.tʃʊr/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The beautiful overture set a mysterious mood for the rest of the opera.",
+    "exampleTranslation": "Khúc dạo đầu tuyệt đẹp đã tạo nên bầu không khí bí ẩn cho phần còn lại của vở nhạc kịch."
+  },
+  {
+    "term": "conductor",
+    "translation": "nhạc trưởng",
+    "phonetic": "/kənˈdʌk.tər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The conductor waved his baton gracefully to guide the massive orchestra.",
+    "exampleTranslation": "Nhạc trưởng vẫy cây gậy chỉ huy một cách duyên dáng để hướng dẫn dàn nhạc đồ sộ."
+  },
+  {
+    "term": "composer",
+    "translation": "nhà soạn nhạc",
+    "phonetic": "/kəmˈpoʊ.zər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Mozart was a brilliant composer who started writing music at a very young age.",
+    "exampleTranslation": "Mozart là một nhà soạn nhạc xuất chúng, người đã bắt đầu viết nhạc từ khi còn rất nhỏ."
+  },
+  {
+    "term": "voice",
+    "translation": "giọng nói, giọng hát",
+    "phonetic": "/vɔɪs/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She has a very warm and gentle voice that is suitable for storytelling.",
+    "exampleTranslation": "Cô ấy có một giọng nói rất ấm áp và nhẹ nhàng, rất phù hợp để kể chuyện."
+  },
+  {
+    "term": "solo",
+    "translation": "bài đơn ca",
+    "phonetic": "/ˈsoʊ.loʊ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She performed a stunning violin solo during the second act of the concert.",
+    "exampleTranslation": "Cô ấy đã thực hiện một màn độc tấu vi-ô-lông tuyệt vời trong phần thứ hai của buổi hòa nhạc."
+  },
+  {
+    "term": "lead singer",
+    "translation": "ca sĩ hát chính",
+    "phonetic": "/liːd ˈsɪŋ.ər/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "The charismatic lead singer interacted enthusiastically with the audience throughout the show.",
+    "exampleTranslation": "Ca sĩ hát chính đầy lôi cuốn đã tương tác rất nhiệt tình với khán giả trong suốt buổi diễn."
+  },
+  {
+    "term": "guitarist",
+    "translation": "nghệ sĩ ghi-ta",
+    "phonetic": "/ɡɪˈtɑːr.ɪst/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The famous Spanish guitarist played a passionate flamenco piece for us.",
+    "exampleTranslation": "Nghệ sĩ ghi-ta người Tây Ban Nha nổi tiếng đã chơi một bản nhạc flamenco đầy nhiệt huyết cho chúng tôi."
+  },
+  {
+    "term": "drummer",
+    "translation": "người đánh trống",
+    "phonetic": "/ˈdrum.ər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The drummer kept a steady and energetic beat that got everyone dancing.",
+    "exampleTranslation": "Người đánh trống đã giữ một nhịp điệu ổn định và tràn đầy năng lượng khiến mọi người cùng nhảy múa."
+  },
+  {
+    "term": "lyrics",
+    "translation": "lời bài hát",
+    "phonetic": "/ˈlɪr.ɪks/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The poetic lyrics of this acoustic song were written by a famous writer.",
+    "exampleTranslation": "Lời bài hát đầy chất thơ của ca khúc acoustic này được viết bởi một nhà văn nổi tiếng."
+  },
+  {
+    "term": "chorus",
+    "translation": "điệp khúc",
+    "phonetic": "/ˈkɔːr.əs/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The catchy chorus of the pop song is very easy to sing along with.",
+    "exampleTranslation": "Đoạn điệp khúc bắt tai của bài hát pop này rất dễ để mọi người cùng hát theo."
+  },
+  {
+    "term": "opera",
+    "translation": "nhạc kịch, ô-pê-ra",
+    "phonetic": "/ˈɑː.pə.rə/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "We went to the historic theater to enjoy a famous Italian opera performance.",
+    "exampleTranslation": "Chúng tôi đã đến nhà hát lịch sử để thưởng thức một buổi biểu diễn nhạc kịch Ý nổi tiếng."
+  },
+  {
+    "term": "folk music",
+    "translation": "nhạc dân gian",
+    "phonetic": "/ˈfoʊk ˌmjuː.zɪk/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "Folk music reflects the traditional culture and history of ordinary people in a country.",
+    "exampleTranslation": "Nhạc dân gian phản ánh văn hóa truyền thống và lịch sử của những người dân thường ở một quốc gia."
+  },
+  {
+    "term": "album",
+    "translation": "tuyển tập ca khúc",
+    "phonetic": "/ˈæl.bəm/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The band is working hard in the studio to record their debut album.",
+    "exampleTranslation": "Ban nhạc đang làm việc chăm chỉ trong phòng thu để ghi âm tuyển tập ca khúc đầu tay của họ."
+  },
+  {
+    "term": "tune",
+    "translation": "giai điệu",
+    "phonetic": "/tjuːn/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She was humming a cheerful tune while washing the dishes in the kitchen.",
+    "exampleTranslation": "Cô ấy đang ngân nga một giai điệu vui vẻ khi đang rửa chén bát trong bếp."
+  },
+  {
+    "term": "violin",
+    "translation": "đàn vi-ô-lông",
+    "phonetic": "/ˌvaɪəˈlɪn/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He has been learning to play the violin since he was seven years old.",
+    "exampleTranslation": "Cậu ấy đã học cách chơi đàn vi-ô-lông từ khi cậu ấy mới bảy tuổi."
+  }
+]

@@ -1,0 +1,382 @@
+[
+  {
+    "term": "beef",
+    "translation": "thịt bò",
+    "phonetic": "/biːf/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The chef prepared a delicious grilled beef steak with garlic butter.",
+    "exampleTranslation": "Bếp trưởng đã chuẩn bị một món bít tết thịt bò nướng thơm ngon với bơ tỏi."
+  },
+  {
+    "term": "pork",
+    "translation": "thịt heo",
+    "phonetic": "/pɔːrk/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "My mother usually cooks braised pork with eggs for our family dinner.",
+    "exampleTranslation": "Mẹ tôi thường nấu món thịt heo kho tàu với trứng cho bữa tối gia đình."
+  },
+  {
+    "term": "bacon",
+    "translation": "thịt ba rọi xông khói",
+    "phonetic": "/ˈbeɪ.kən/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She loves eating crispy bacon with fried eggs and toast for breakfast.",
+    "exampleTranslation": "Cô ấy thích ăn thịt ba rọi xông khói giòn với trứng chiên và bánh mì nướng cho bữa sáng."
+  },
+  {
+    "term": "ham",
+    "translation": "thịt đùi, thịt xông khói",
+    "phonetic": "/hæm/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He made a delicious sandwich with fresh ham, cheese, and organic lettuce.",
+    "exampleTranslation": "Anh ấy đã làm một chiếc bánh mì kẹp thơm ngon với thịt đùi tươi, phô mai và xà lách hữu cơ."
+  },
+  {
+    "term": "yoghurt",
+    "translation": "sữa chua",
+    "phonetic": "/ˈjoʊ.ɡərt/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Eating fresh yoghurt with mixed berries is extremely good for your digestion.",
+    "exampleTranslation": "Ăn sữa chua tươi với các loại quả mọng cực kỳ tốt cho hệ tiêu hóa của bạn."
+  },
+  {
+    "term": "pie",
+    "translation": "bánh nướng",
+    "phonetic": "/paɪ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She baked a sweet apple pie to serve as dessert for the guests.",
+    "exampleTranslation": "Cô ấy đã nướng một chiếc bánh nướng táo ngọt ngào để làm món tráng miệng phục vụ thực khách."
+  },
+  {
+    "term": "bread",
+    "translation": "bánh mì",
+    "phonetic": "/brɛd/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The local bakery sells fresh bread that is crispy on the outside.",
+    "exampleTranslation": "Tiệm bánh địa phương bán bánh mì tươi giòn tan ở lớp vỏ bên ngoài."
+  },
+  {
+    "term": "cake",
+    "translation": "bánh ngọt",
+    "phonetic": "/keɪk/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "They ordered a beautiful chocolate cake for their daughter's birthday party.",
+    "exampleTranslation": "Họ đã đặt một chiếc bánh ngọt sô-cô-la tuyệt đẹp cho bữa tiệc sinh nhật của con gái họ."
+  },
+  {
+    "term": "chip",
+    "translation": "khoai tây chiên",
+    "phonetic": "/tʃɪp/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Children always enjoy eating crispy potato chips while watching their favorite cartoons.",
+    "exampleTranslation": "Trẻ em luôn thích ăn khoai tây chiên giòn khi xem những bộ phim hoạt hình yêu thích."
+  },
+  {
+    "term": "biscuit",
+    "translation": "bánh quy",
+    "phonetic": "/ˈbɪs.kɪt/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He usually enjoys a chocolate biscuit with his hot tea in the afternoon.",
+    "exampleTranslation": "Anh ấy thường thưởng thức một chiếc bánh quy sô-cô-la cùng với tách trà nóng vào buổi chiều."
+  },
+  {
+    "term": "noodle",
+    "translation": "mì, bún",
+    "phonetic": "/ˈnuː.dəl/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She cooked a big bowl of hot chicken noodle soup on this cold day.",
+    "exampleTranslation": "Cô ấy đã nấu một tô mì gà nóng hổi lớn vào ngày lạnh giá này."
+  },
+  {
+    "term": "butter",
+    "translation": "bơ",
+    "phonetic": "/ˈbʌt.ər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "You should spread a thin layer of salted butter on the toast.",
+    "exampleTranslation": "Bạn nên phết một lớp bơ mặn mỏng lên bánh mì nướng."
+  },
+  {
+    "term": "olive",
+    "translation": "quả ô liu",
+    "phonetic": "/ˈɒl.ɪv/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "They added some sliced black olives to the top of the homemade pizza.",
+    "exampleTranslation": "Họ đã thêm một số quả ô liu đen thái lát lên trên cùng của chiếc bánh pizza tự làm."
+  },
+  {
+    "term": "soy",
+    "translation": "đậu nành",
+    "phonetic": "/sɔɪ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Soy milk is a wonderful plant-based alternative for people who are lactose intolerant.",
+    "exampleTranslation": "Sữa đậu nành là một giải pháp thay thế tuyệt vời từ thực vật cho những người không dung nạp đường lactose."
+  },
+  {
+    "term": "flour",
+    "translation": "bột",
+    "phonetic": "/flaʊər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "You need to sift the white flour before mixing it with the eggs.",
+    "exampleTranslation": "Bạn cần rây bột mì trắng trước khi trộn với trứng."
+  },
+  {
+    "term": "lunch",
+    "translation": "bữa ăn trưa",
+    "phonetic": "/lʌntʃ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "We decided to have a healthy lunch at the new vegetarian restaurant downtown.",
+    "exampleTranslation": "Chúng tôi quyết định ăn một bữa trưa lành mạnh tại nhà hàng chay mới ở trung tâm thành phố."
+  },
+  {
+    "term": "mint",
+    "translation": "bạc hà",
+    "phonetic": "/mɪnt/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Adding fresh mint leaves to lemonade makes it taste much more refreshing.",
+    "exampleTranslation": "Thêm lá bạc hà tươi vào nước chanh làm cho nó có vị sảng khoái hơn nhiều."
+  },
+  {
+    "term": "vanilla",
+    "translation": "vani",
+    "phonetic": "/vəˈnɪl.ə/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The bakery uses natural vanilla extract to give the cakes a sweet fragrance.",
+    "exampleTranslation": "Tiệm bánh sử dụng chiết xuất vani tự nhiên để tạo hương thơm ngọt ngào cho những chiếc bánh ngọt."
+  },
+  {
+    "term": "candy",
+    "translation": "kẹo",
+    "phonetic": "/ˈkæn.di/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Parents should limit the amount of sweet candy their young children eat daily.",
+    "exampleTranslation": "Cha mẹ nên giới hạn lượng kẹo ngọt mà con nhỏ ăn hàng ngày."
+  },
+  {
+    "term": "popcorn",
+    "translation": "bỏng ngô",
+    "phonetic": "/ˈpɒp.kɔːrn/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "We bought a large bucket of salted popcorn to share during the movie.",
+    "exampleTranslation": "Chúng tôi đã mua một xô bỏng ngô mặn lớn để chia sẻ khi xem phim."
+  },
+  {
+    "term": "snack",
+    "translation": "bữa ăn nhẹ",
+    "phonetic": "/snæk/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He always eats a small snack like an apple before going to the gym.",
+    "exampleTranslation": "Anh ấy luôn ăn một bữa ăn nhẹ nhỏ như một quả táo trước khi đi tập thể dục."
+  },
+  {
+    "term": "barbecue",
+    "translation": "tiệc nướng ngoài trời",
+    "phonetic": "/ˈbɑːr.bɪ.kjuː/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Our family usually hosts a backyard barbecue during the warm summer weekends.",
+    "exampleTranslation": "Gia đình chúng tôi thường tổ chức tiệc nướng ngoài trời ở sân sau vào những dịp cuối tuần mùa hè ấm áp."
+  },
+  {
+    "term": "fast food",
+    "translation": "thức ăn nhanh",
+    "phonetic": "/ˌfæst ˈfuːd/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "Fast food is very convenient but eating it too often is bad for your health.",
+    "exampleTranslation": "Thức ăn nhanh rất tiện lợi nhưng ăn quá thường xuyên sẽ có hại cho sức khỏe của bạn."
+  },
+  {
+    "term": "junk food",
+    "translation": "đồ ăn vặt",
+    "phonetic": "/ˈdʒʌŋk ˌfuːd/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "Teenagers are advised to reduce their intake of junk food and fizzy drinks.",
+    "exampleTranslation": "Các bạn thanh thiếu niên được khuyên nên giảm lượng tiêu thụ đồ ăn vặt và đồ uống có ga."
+  },
+  {
+    "term": "frozen food",
+    "translation": "thực phẩm đông lạnh",
+    "phonetic": "/ˈfroʊ.zən ˌfuːd/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "Supermarkets offer a wide variety of frozen food for busy people who lack time.",
+    "exampleTranslation": "Các siêu thị cung cấp nhiều loại thực phẩm đông lạnh cho những người bận rộn thiếu thời gian."
+  },
+  {
+    "term": "health food",
+    "translation": "thực phẩm tự nhiên",
+    "phonetic": "/ˈhɛlθ ˌfuːd/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "Organic vegetables and grains are popular items sold at the local health food store.",
+    "exampleTranslation": "Rau hữu cơ và các loại ngũ cốc là những mặt hàng phổ biến được bán tại cửa hàng thực phẩm tự nhiên địa phương."
+  },
+  {
+    "term": "distinctive",
+    "translation": "đặc trưng, khác biệt",
+    "phonetic": "/dɪˈstɪŋk.tɪv/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "Durian has a very distinctive smell that some people love while others dislike.",
+    "exampleTranslation": "Sầu riêng có một mùi rất đặc trưng mà một số người yêu thích trong khi những người khác lại ghét."
+  },
+  {
+    "term": "flavor",
+    "translation": "hương vị",
+    "phonetic": "/ˈfleɪ.vər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The chef added secret spices to enhance the rich flavor of the beef soup.",
+    "exampleTranslation": "Bếp trưởng đã thêm các gia vị bí mật để tăng cường hương vị đậm đà của món súp thịt bò."
+  },
+  {
+    "term": "balanced diet",
+    "translation": "chế độ ăn uống cân bằng",
+    "phonetic": "/ˈbæl.ənst ˈdaɪ.ət/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "Maintaining a balanced diet is crucial for staying healthy and energetic throughout the day.",
+    "exampleTranslation": "Duy trì một chế độ ăn uống cân bằng là điều tối quan trọng để giữ sức khỏe và tràn đầy năng lượng suốt cả ngày."
+  },
+  {
+    "term": "stale",
+    "translation": "ôi, thiu",
+    "phonetic": "/steɪl/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "This bread has gone stale because it was left on the counter for three days.",
+    "exampleTranslation": "Chiếc bánh mì này đã bị ôi thiu vì bị để trên quầy trong ba ngày."
+  },
+  {
+    "term": "sour",
+    "translation": "chua",
+    "phonetic": "/ˈsaʊ.ər/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "These green grapes are very sour so I prefer to eat the sweet red ones.",
+    "exampleTranslation": "Những quả nho xanh này rất chua nên tôi thích ăn những quả nho đỏ ngọt hơn."
+  },
+  {
+    "term": "burnt",
+    "translation": "cháy, khét",
+    "phonetic": "/bɜːrnt/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "The toast was completely burnt and had a very bitter taste when he bit it.",
+    "exampleTranslation": "Chiếc bánh mì nướng đã bị cháy khét hoàn toàn và có vị rất đắng khi anh ấy cắn nó."
+  },
+  {
+    "term": "overdone",
+    "translation": "quá chín, rục",
+    "phonetic": "/ˌoʊ.vərˈdʌn/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "The steak was overdone and became very tough to chew because he left it on the grill too long.",
+    "exampleTranslation": "Miếng bít tết đã bị quá chín và trở nên rất dai để nhai vì anh ấy đã để nó trên vỉ nướng quá lâu."
+  },
+  {
+    "term": "underdone",
+    "translation": "chưa chín, tái",
+    "phonetic": "/ˌʌn.dərˈdʌn/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "The chicken was still underdone near the bone, so we had to put it back in the oven.",
+    "exampleTranslation": "Thịt gà vẫn còn chưa chín gần phần xương, vì vậy chúng tôi phải bỏ nó lại vào lò nướng."
+  },
+  {
+    "term": "full",
+    "translation": "no",
+    "phonetic": "/fʊl/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "I am so full after eating that huge dinner that I cannot eat any dessert.",
+    "exampleTranslation": "Tôi đã quá no sau khi ăn bữa tối khổng lồ đó đến nỗi tôi không thể ăn thêm bất kỳ món tráng miệng nào."
+  },
+  {
+    "term": "veal",
+    "translation": "thịt bê",
+    "phonetic": "/viːl/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The high-end Italian restaurant is famous for serving traditional veal dishes with white wine.",
+    "exampleTranslation": "Nhà hàng Ý cao cấp nổi tiếng với việc phục vụ các món thịt bê truyền thống kèm với rượu vang trắng."
+  },
+  {
+    "term": "cereal",
+    "translation": "ngũ cốc",
+    "phonetic": "/ˈsɪər.i.əl/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He poured some cold milk over his favorite cereal for a quick breakfast.",
+    "exampleTranslation": "Anh ấy đã rót một ít sữa lạnh lên món ngũ cốc yêu thích của mình để có một bữa sáng nhanh chóng."
+  },
+  {
+    "term": "hot dog",
+    "translation": "bánh mì kẹp xúc xích",
+    "phonetic": "/ˈhɒt dɒɡ/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "He bought a warm hot dog with mustard and ketchup at the sports stadium.",
+    "exampleTranslation": "Anh ấy đã mua một chiếc bánh mì kẹp xúc xích ấm nóng với mù tạt và sốt cà chua tại sân vận động thể thao."
+  }
+]

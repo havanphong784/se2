@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
@@ -9,6 +10,7 @@ import {
   Flame,
   Headphones,
   Home,
+  LogIn,
   Mic2,
   Puzzle,
   Settings,
@@ -36,6 +38,18 @@ function isCurrent(pathname: string, href: string) {
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const inPractice = pathname.startsWith("/vocabulary/practice");
+  const [user, setUser] = useState<{ displayName: string; isDemo: boolean } | null>(null);
+
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.user) {
+          setUser({ displayName: data.user.displayName, isDemo: data.user.isDemo });
+        }
+      })
+      .catch(() => {});
+  }, [pathname]);
 
   return (
     <div className="min-h-svh bg-white">
@@ -80,23 +94,35 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
           <div className="m-4 space-y-3 border-t-2 border-[#ededed] pt-4">
             <div className="flex items-center justify-between px-2">
-              <div className="flex items-center gap-2">
-                <span className="grid size-10 place-items-center rounded-xl border-2 border-[#ffe48a] bg-[#fffaf0] text-lg">
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="grid size-10 shrink-0 place-items-center rounded-xl border-2 border-[#ffe48a] bg-[#fffaf0] text-lg">
                   🌱
                 </span>
-                <div>
-                  <p className="text-sm font-extrabold text-charcoal">Minh Anh</p>
-                  <p className="text-xs font-bold text-ash">Trình độ A2</p>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-extrabold text-charcoal">
+                    {user?.displayName ?? "Minh Anh"}
+                  </p>
+                  <p className="text-xs font-bold text-ash">
+                    {user?.isDemo ? "Demo User" : "Tài khoản cá nhân"}
+                  </p>
                 </div>
               </div>
               <Link
                 href="/settings"
                 aria-label="Cài đặt"
-                className="grid size-11 place-items-center rounded-xl text-ash hover:bg-[#f7f7f7] focus-visible:ring-4 focus-visible:ring-lingot-lime/40"
+                className="grid size-10 shrink-0 place-items-center rounded-xl text-ash hover:bg-[#f7f7f7] focus-visible:ring-4 focus-visible:ring-lingot-lime/40"
               >
                 <Settings className="size-5" />
               </Link>
             </div>
+            {user?.isDemo && (
+              <Link
+                href="/login"
+                className="flex items-center justify-center gap-1.5 rounded-xl border-2 border-ecto-green bg-ecto-green px-3 py-1.5 text-xs font-extrabold text-white transition-transform active:translate-y-0.5"
+              >
+                <LogIn className="size-4" /> Đăng nhập
+              </Link>
+            )}
             <Badge variant="warning" className="w-full justify-center py-2">
               <Flame className="size-4 fill-current" /> 12 ngày liên tiếp
             </Badge>

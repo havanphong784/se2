@@ -2,10 +2,29 @@ import { eq } from "drizzle-orm";
 
 import type { getDb } from "@/db";
 import { users } from "@/db/schema";
+import { AUTH_COOKIE_NAME } from "@/lib/auth";
+import { cookies } from "next/headers";
 
 export const demoEmail = process.env.DEMO_USER_EMAIL ?? "demo@vocabloom.vn";
 
 export async function getDemoUser(db: NonNullable<ReturnType<typeof getDb>>) {
+  try {
+    const cookieStore = await cookies();
+    const userId = cookieStore.get(AUTH_COOKIE_NAME)?.value;
+
+    if (userId && isUuid(userId)) {
+      const [user] = await db
+        .select({ id: users.id, displayName: users.displayName })
+        .from(users)
+        .where(eq(users.id, userId))
+        .limit(1);
+
+      if (user) return user;
+    }
+  } catch {
+    // Fallback when outside request scope
+  }
+
   const [user] = await db
     .select({ id: users.id, displayName: users.displayName })
     .from(users)

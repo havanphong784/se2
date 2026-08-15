@@ -1,0 +1,372 @@
+[
+  {
+    "term": "stadium",
+    "translation": "sân vận động",
+    "phonetic": "/ˈsteɪdiəm/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The modern stadium was packed with thousands of excited fans waiting for the match.",
+    "exampleTranslation": "Sân vận động hiện đại chật kín hàng ngàn người hâm mộ hào hứng chờ đợi trận đấu."
+  },
+  {
+    "term": "stand",
+    "translation": "khán đài",
+    "phonetic": "/stænd/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The spectators in the main stand cheered loudly when the home team scored a goal.",
+    "exampleTranslation": "Khán giả trên khán đài chính đã reo hò vang dội khi đội chủ nhà ghi bàn."
+  },
+  {
+    "term": "pitch",
+    "translation": "sân",
+    "phonetic": "/pɪʧ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Heavy rain before the football game made the grass pitch very muddy and slippery.",
+    "exampleTranslation": "Mưa lớn trước trận đấu bóng đá đã khiến sân cỏ rất bùn lầy và trơn trượt."
+  },
+  {
+    "term": "touchline",
+    "translation": "đường biên",
+    "phonetic": "/ˈtʌtʃ.laɪn/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The coach stood near the touchline to shout instructions to his players on the field.",
+    "exampleTranslation": "Huấn luyện viên đứng gần đường biên để hét hướng dẫn cho các cầu thủ trên sân."
+  },
+  {
+    "term": "penalty area",
+    "translation": "khu phạt đền",
+    "phonetic": "/ˈpɛnəlti ˈɛriə/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "The defender committed a dangerous foul inside the penalty area, resulting in a penalty kick.",
+    "exampleTranslation": "Hậu vệ đã phạm lỗi nguy hiểm trong khu vực phạt đền, dẫn đến một quả phạt đền."
+  },
+  {
+    "term": "goal",
+    "translation": "khung thành",
+    "phonetic": "/goʊl/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The striker aimed for the top corner of the goal and scored a beautiful point.",
+    "exampleTranslation": "Tiền đạo nhắm vào góc cao của khung thành và ghi một điểm tuyệt đẹp."
+  },
+  {
+    "term": "penalty",
+    "translation": "phạt đền",
+    "phonetic": "/ˈpɛnəlti/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The star player calmly stepped up to take the crucial penalty in the final minute.",
+    "exampleTranslation": "Cầu thủ ngôi sao bình tĩnh bước lên thực hiện quả phạt đền quan trọng ở phút cuối cùng."
+  },
+  {
+    "term": "corner kick",
+    "translation": "cú đá phạt góc",
+    "phonetic": "/ˈkɔːr.nər kɪk/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "He crossed the ball beautifully from a corner kick, allowing his teammate to head it in.",
+    "exampleTranslation": "Anh ấy tạt bóng đẹp mắt từ cú đá phạt góc, tạo điều kiện cho đồng đội đánh đầu vào."
+  },
+  {
+    "term": "free kick",
+    "translation": "đá phạt trực tiếp",
+    "phonetic": "/ˌfriː ˈkɪk/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "He scored a spectacular goal directly from a free kick outside the box.",
+    "exampleTranslation": "Anh ấy đã ghi một bàn thắng ngoạn mục trực tiếp từ cú đá phạt trực tiếp bên ngoài vòng cấm."
+  },
+  {
+    "term": "indirect free kick",
+    "translation": "đá phạt gián tiếp",
+    "phonetic": "/ˌɪn.daɪˈrɛkt ˌfriː ˈkɪk/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "The referee awarded an indirect free kick because of a dangerous play by the goalkeeper.",
+    "exampleTranslation": "Trọng tài đã cho hưởng một quả đá phạt gián tiếp vì pha chơi bóng nguy hiểm của thủ môn."
+  },
+  {
+    "term": "kick off",
+    "translation": "bắt đầu, lăn bóng",
+    "phonetic": "/ˈkɪk .ɔːf/",
+    "partOfSpeech": [
+      "cụm động từ"
+    ],
+    "exampleSentence": "The referee blew his whistle to kick off the highly anticipated championship match.",
+    "exampleTranslation": "Trọng tài nổi còi bắt đầu lăn bóng trận đấu tranh chức vô địch được mong đợi từ lâu."
+  },
+  {
+    "term": "offside",
+    "translation": "việt vị",
+    "phonetic": "/ˌɒfˈsaɪd/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The striker’s goal was disallowed because the assistant referee flagged him for offside.",
+    "exampleTranslation": "Bàn thắng của tiền đạo không được công nhận vì trọng tài biên đã phất cờ báo việt vị."
+  },
+  {
+    "term": "corner flag",
+    "translation": "cờ cắm tại góc sân bóng",
+    "phonetic": "/ˈkɔːr.nər flæɡ/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "The winger ran all the way to the corner flag to celebrate his winning goal.",
+    "exampleTranslation": "Cầu thủ chạy cánh chạy một mạch đến chỗ cờ cắm tại góc sân bóng để ăn mừng bàn thắng quyết định."
+  },
+  {
+    "term": "bet",
+    "translation": "cá độ",
+    "phonetic": "/bɛt/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "He lost a lot of money when he decided to bet on the wrong football team.",
+    "exampleTranslation": "Anh ấy đã mất rất nhiều tiền khi quyết định cá độ vào đội bóng sai."
+  },
+  {
+    "term": "the bench",
+    "translation": "băng ghế dự bị",
+    "phonetic": "/ðə bɛnʧ/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "The star player had to sit on the bench because of his recent ankle injury.",
+    "exampleTranslation": "Cầu thủ ngôi sao đã phải ngồi trên băng ghế dự bị vì chấn thương cổ chân gần đây."
+  },
+  {
+    "term": "foul",
+    "translation": "lỗi, pha phạm lỗi",
+    "phonetic": "/faʊl/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The referee stopped the game immediately after a severe foul from behind on the winger.",
+    "exampleTranslation": "Trọng tài dừng trận đấu ngay lập tức sau một pha phạm lỗi nghiêm trọng từ phía sau đối với cầu thủ chạy cánh."
+  },
+  {
+    "term": "goal line",
+    "translation": "vạch kẻ (khung thành)",
+    "phonetic": "/ˈɡoʊl laɪn/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "The defender managed to kick the ball away just before it fully crossed the goal line.",
+    "exampleTranslation": "Hậu vệ đã kịp phá bóng đi ngay trước khi nó hoàn toàn vượt qua vạch kẻ khung thành."
+  },
+  {
+    "term": "shoot",
+    "translation": "ném, sút",
+    "phonetic": "/ʃuːt/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "The midfielder decided to shoot from long distance, but the ball went over the crossbar.",
+    "exampleTranslation": "Tiền vệ quyết định sút từ khoảng cách xa, nhưng bóng đã đi vọt xà ngang."
+  },
+  {
+    "term": "goalkeeper",
+    "translation": "thủ môn",
+    "phonetic": "/ˈɡoʊlˌkiː.pər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The skilled goalkeeper made a brilliant save to keep the score tied at zero-zero.",
+    "exampleTranslation": "Thủ môn tài năng đã có một pha cứu thua xuất sắc để giữ tỉ số hòa không-không."
+  },
+  {
+    "term": "defender",
+    "translation": "hậu vệ",
+    "phonetic": "/dɪˈfɛn.dər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The tall defender used his physical strength to stop the quick striker from advancing.",
+    "exampleTranslation": "Hậu vệ cao to đã sử dụng sức mạnh thể chất của mình để ngăn cản tiền đạo nhanh nhẹn tiến lên."
+  },
+  {
+    "term": "centre back",
+    "translation": "trung vệ",
+    "phonetic": "/ˈsɛn.tər bæk/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "He played as a solid centre back and organized the team’s defense very effectively.",
+    "exampleTranslation": "Anh ấy đã chơi như một trung vệ vững chắc và tổ chức hàng thủ của đội rất hiệu quả."
+  },
+  {
+    "term": "midfielder",
+    "translation": "trung vệ",
+    "phonetic": "/ˈmɪdˌfiːl.dər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The midfielder controlled the tempo of the game with his accurate passes and vision.",
+    "exampleTranslation": "Trung vệ (tiền vệ) đã kiểm soát nhịp độ trận đấu bằng những đường chuyền chính xác và tầm nhìn của mình."
+  },
+  {
+    "term": "attacking midfielder",
+    "translation": "tiền vệ tấn công",
+    "phonetic": "/əˈtæk.ɪŋ ˈmɪdˌfiːl.dər/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "The creative attacking midfielder provided many goal-scoring opportunities for the strikers during the game.",
+    "exampleTranslation": "Tiền vệ tấn công sáng tạo đã tạo ra nhiều cơ hội ghi bàn cho các tiền đạo trong suốt trận đấu."
+  },
+  {
+    "term": "winger",
+    "translation": "cầu thủ chạy biên",
+    "phonetic": "/ˈwɪŋ.ər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The fast winger easily ran past the defender and crossed the ball into the box.",
+    "exampleTranslation": "Cầu thủ chạy biên nhanh nhẹn dễ dàng chạy qua hậu vệ và tạt bóng vào vòng cấm."
+  },
+  {
+    "term": "referee",
+    "translation": "trọng tài",
+    "phonetic": "/ˌrɛf.əˈriː/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The professional referee kept full control of the intense match with calm authority.",
+    "exampleTranslation": "Trọng tài chuyên nghiệp đã kiểm soát hoàn toàn trận đấu căng thẳng bằng sự uy nghiêm bình tĩnh."
+  },
+  {
+    "term": "commentator",
+    "translation": "bình luận viên",
+    "phonetic": "/ˈkɒm.ənˌteɪ.tər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The television commentator explained the team’s complex tactical strategies to the viewers at home.",
+    "exampleTranslation": "Bình luận viên truyền hình giải thích các chiến thuật phức tạp của đội cho người xem tại nhà."
+  },
+  {
+    "term": "supporter",
+    "translation": "cổ động viên",
+    "phonetic": "/səˈpɔːr.tər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Every loyal supporter wore the team’s bright red jersey and cheered throughout the entire match.",
+    "exampleTranslation": "Mỗi cổ động viên trung thành đều mặc chiếc áo đỏ tươi của đội và cổ vũ trong suốt trận đấu."
+  },
+  {
+    "term": "linesman",
+    "translation": "trọng tài biên",
+    "phonetic": "/ˈlaɪnz.mən/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The linesman raised his flag immediately to indicate that a player was in an offside position.",
+    "exampleTranslation": "Trọng tài biên đã giơ cờ ngay lập tức để chỉ ra rằng một cầu thủ đang ở vị trí việt vị."
+  },
+  {
+    "term": "hooligan",
+    "translation": "kẻ côn đồ, quá khích",
+    "phonetic": "/huː.lɪ.ɡən/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The police quickly arrested a violent hooligan who started a fight outside the stadium.",
+    "exampleTranslation": "Cảnh sát nhanh chóng bắt giữ một kẻ côn đồ quá khích bạo lực đã khơi mào cuộc ẩu đả bên ngoài sân vận động."
+  },
+  {
+    "term": "red card",
+    "translation": "thẻ đỏ",
+    "phonetic": "/ˈrɛd kɑːrd/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "He received a direct red card and was sent off the field for his dangerous tackle.",
+    "exampleTranslation": "Anh ấy đã nhận một chiếc thẻ đỏ trực tiếp và bị đuổi khỏi sân vì pha tắc bóng nguy hiểm của mình."
+  },
+  {
+    "term": "yellow card",
+    "translation": "thẻ vàng",
+    "phonetic": "/ˈjɛl.oʊ kɑːrd/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "The referee showed him a yellow card as a serious warning for his persistent fouls.",
+    "exampleTranslation": "Trọng tài đã phạt anh một chiếc thẻ vàng như một lời cảnh cáo nghiêm khắc vì liên tục phạm lỗi."
+  },
+  {
+    "term": "coach",
+    "translation": "huấn luyện viên",
+    "phonetic": "/koʊtʃ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The team's head coach spent hours analyzing the opponent's previous matches to prepare.",
+    "exampleTranslation": "Huấn luyện viên trưởng của đội đã dành nhiều giờ phân tích các trận đấu trước của đối thủ để chuẩn bị."
+  },
+  {
+    "term": "reserve team",
+    "translation": "đội dự bị",
+    "phonetic": "/rɪˈzɜːrv tiːm/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "Many young talented players must gain valuable experience by playing for the reserve team first.",
+    "exampleTranslation": "Nhiều cầu thủ trẻ tài năng phải tích lũy kinh nghiệm quý giá bằng cách chơi cho đội dự bị trước."
+  },
+  {
+    "term": "caution",
+    "translation": "lời cảnh cáo",
+    "phonetic": "/ˈkɔː.ʃən/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The referee gave him a verbal caution instead of showing a card for that mild foul.",
+    "exampleTranslation": "Trọng tài đã đưa ra một lời cảnh cáo bằng lời thay vì rút thẻ cho pha phạm lỗi nhẹ đó."
+  },
+  {
+    "term": "stimulant",
+    "translation": "chất kích thích",
+    "phonetic": "/ˈstɪm.jʊ.lənt/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The professional athlete was banned from competing after testing positive for a banned stimulant.",
+    "exampleTranslation": "Vận động viên chuyên nghiệp đã bị cấm thi đấu sau khi có kết quả xét nghiệm dương tính với chất kích thích bị cấm."
+  },
+  {
+    "term": "strategy",
+    "translation": "chiến lược",
+    "phonetic": "/ˈstræt.ə.dʒi/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The clever coach devised an effective defensive strategy to stop the opponent's strong attack.",
+    "exampleTranslation": "Huấn luyện viên thông minh đã vạch ra một chiến lược phòng ngự hiệu quả để ngăn chặn hàng công mạnh của đối thủ."
+  },
+  {
+    "term": "striker",
+    "translation": "tiền đạo",
+    "phonetic": "/ˈstraɪ.kər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The lethal striker scored three brilliant goals to win the match for his home team.",
+    "exampleTranslation": "Tiền đạo sát thủ đã ghi ba bàn thắng xuất sắc để mang về chiến thắng cho đội nhà."
+  }
+]

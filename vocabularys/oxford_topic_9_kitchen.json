@@ -1,0 +1,352 @@
+[
+  {
+    "term": "dishwasher",
+    "translation": "máy rửa chén",
+    "phonetic": "/ˈdɪʃˌwɒʃ.ər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "We decided to load the dirty plates into the dishwasher after finishing our big family dinner.",
+    "exampleTranslation": "Chúng tôi quyết định xếp những chiếc đĩa bẩn vào máy rửa bát sau khi kết thúc bữa tối lớn của gia đình."
+  },
+  {
+    "term": "dish drainer",
+    "translation": "kệ để chén bát",
+    "phonetic": "/dɪʃ ˈdreɪ.nər/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "He washed the glasses by hand and carefully placed them on the stainless steel dish drainer.",
+    "exampleTranslation": "Anh ấy đã rửa những chiếc ly bằng tay và cẩn thận đặt chúng lên chiếc kệ úp bát đĩa bằng thép không gỉ."
+  },
+  {
+    "term": "steamer",
+    "translation": "nồi hấp",
+    "phonetic": "/ˈstiː.mər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She used a bamboo steamer to cook the traditional pork dumplings for breakfast this morning.",
+    "exampleTranslation": "Cô ấy đã sử dụng một chiếc xửng hấp bằng tre để nấu món há cảo thịt heo truyền thống cho bữa sáng nay."
+  },
+  {
+    "term": "colander",
+    "translation": "cái chao",
+    "phonetic": "/ˈkɒl.ən.dər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Please pour the hot boiled pasta into a large colander to drain all the excess water.",
+    "exampleTranslation": "Vui lòng đổ mì ống đã luộc nóng vào một chiếc rổ có lỗ lớn (cái chao) để xả hết nước thừa."
+  },
+  {
+    "term": "lid",
+    "translation": "nắp, vung",
+    "phonetic": "/lɪd/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Remember to cover the boiling pot with a lid to keep the soup warm and flavorful.",
+    "exampleTranslation": "Hãy nhớ đậy nắp chiếc nồi đang sôi lại để giữ cho món súp luôn nóng hổi và đậm đà hương vị."
+  },
+  {
+    "term": "blender",
+    "translation": "máy xay sinh tố",
+    "phonetic": "/ˈblen.dər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She blended fresh strawberries and yogurt in the high-speed blender to make a healthy breakfast drink.",
+    "exampleTranslation": "Cô ấy đã xay dâu tây tươi và sữa chua bằng chiếc máy xay sinh tố tốc độ cao để làm đồ uống bổ dưỡng cho bữa sáng."
+  },
+  {
+    "term": "pot",
+    "translation": "nồi",
+    "phonetic": "/pɒt/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "My mother is simmering a big pot of traditional beef noodle soup on the stove right now.",
+    "exampleTranslation": "Mẹ tôi đang ninh một nồi súp phở bò truyền thống lớn trên bếp lò vào lúc này."
+  },
+  {
+    "term": "toaster",
+    "translation": "lò nướng bánh",
+    "phonetic": "/ˈtəʊ.stər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He put two slices of whole wheat bread into the electric toaster to make crunchy toast.",
+    "exampleTranslation": "Anh ấy đã cho hai lát bánh mì nguyên cám vào chiếc lò nướng bánh mì điện để làm bánh mì nướng giòn."
+  },
+  {
+    "term": "dishtowel",
+    "translation": "khăn lau chén",
+    "phonetic": "/ˈdɪʃ.taʊəl/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She grabbed a clean cotton dishtowel to dry the wet coffee mugs before putting them away.",
+    "exampleTranslation": "Cô ấy đã lấy một chiếc khăn lau chén bằng cotton sạch để lau khô những chiếc cốc cà phê ướt trước khi cất chúng đi."
+  },
+  {
+    "term": "refrigerator",
+    "translation": "tủ lạnh",
+    "phonetic": "/rɪˈfrɪdʒ.ər.eɪ.tər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "We need to go to the grocery store because there is almost no fresh food left in our refrigerator.",
+    "exampleTranslation": "Chúng tôi cần đi đến cửa hàng tạp hóa vì hầu như không còn thức ăn tươi nào trong tủ lạnh của chúng tôi."
+  },
+  {
+    "term": "freezer",
+    "translation": "tủ đông",
+    "phonetic": "/ˈfriː.zər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Please put the tub of chocolate ice cream back into the freezer before it completely melts.",
+    "exampleTranslation": "Làm ơn hãy cất hộp kem sô-cô-la trở lại tủ đông trước khi nó bị chảy hoàn toàn."
+  },
+  {
+    "term": "cabinet",
+    "translation": "tủ (có nhiều ngăn)",
+    "phonetic": "/ˈkæb.ɪ.nət/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She arranged the spice jars neatly on the top shelf of the wooden kitchen cabinet.",
+    "exampleTranslation": "Cô ấy đã sắp xếp những chiếc lọ gia vị một cách ngăn nắp trên kệ trên cùng của tủ bếp bằng gỗ."
+  },
+  {
+    "term": "microwave",
+    "translation": "lò vi sóng",
+    "phonetic": "/ˈmaɪ.krə.weɪv/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "You can quickly reheat your leftover pizza in the microwave for about one or two minutes.",
+    "exampleTranslation": "Bạn có thể hâm nóng nhanh chóng món bánh pizza thừa của mình bằng lò vi sóng trong khoảng một đến hai phút."
+  },
+  {
+    "term": "bowl",
+    "translation": "bát, chén",
+    "phonetic": "/bəʊl/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He poured some milk over his cereal in a large ceramic bowl for a quick breakfast.",
+    "exampleTranslation": "Anh ấy đã đổ một ít sữa lên ngũ cốc của mình trong một chiếc bát sứ lớn cho một bữa sáng nhanh gọn."
+  },
+  {
+    "term": "cutting board",
+    "translation": "thớt",
+    "phonetic": "/ˈkʌt.ɪŋ ˌbɔːd/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "She chopped the fresh carrots and onions carefully on a wooden cutting board with a sharp knife.",
+    "exampleTranslation": "Cô ấy đã thái những củ cà rốt và hành tây tươi một cách cẩn thận trên một chiếc thớt gỗ bằng một con dao sắc."
+  },
+  {
+    "term": "stove",
+    "translation": "bếp lò",
+    "phonetic": "/stəʊv/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Be careful when you are cooking near the hot stove as the burners remain hot after use.",
+    "exampleTranslation": "Hãy cẩn thận khi bạn đang nấu ăn gần chiếc bếp lò nóng vì các đầu đốt vẫn nóng sau khi sử dụng."
+  },
+  {
+    "term": "coffee maker",
+    "translation": "máy pha cà phê",
+    "phonetic": "/ˈkɒf.i ˌmeɪ.kər/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "We programmed our automatic coffee maker to start brewing fresh espresso at exactly six o'clock every morning.",
+    "exampleTranslation": "Chúng tôi đã lập trình chiếc máy pha cà phê tự động của mình để bắt đầu pha cà phê espresso tươi vào đúng sáu giờ mỗi sáng."
+  },
+  {
+    "term": "oven",
+    "translation": "lò, lò nướng",
+    "phonetic": "/ˈʌv.ən/",
+    "partOfSpeech": [
+      "trạng từ"
+    ],
+    "exampleSentence": "She preheated the convection oven to three hundred and fifty degrees before baking the delicious chocolate cake.",
+    "exampleTranslation": "Cô ấy đã làm nóng trước lò nướng đối lưu đến ba trăm năm mươi độ trước khi nướng chiếc bánh sô-cô-la thơm ngon."
+  },
+  {
+    "term": "oven cleaner",
+    "translation": "nước tẩy rửa lò",
+    "phonetic": "/ˈʌv.ən ˈkliː.nər/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "He wore thick rubber gloves while spraying the strong chemical oven cleaner inside the greasy oven.",
+    "exampleTranslation": "Anh ấy đã đeo găng tay cao su dày trong khi xịt nước tẩy rửa lò hóa chất mạnh vào bên trong chiếc lò nướng đầy dầu mỡ."
+  },
+  {
+    "term": "jar",
+    "translation": "lọ",
+    "phonetic": "/dʒɑːr/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The old sweet shop had a beautiful glass jar filled with colorful retro hard candies on the counter.",
+    "exampleTranslation": "Cửa hàng kẹo cũ có một chiếc lọ thủy tinh xinh đẹp chứa đầy những viên kẹo cứng cổ điển nhiều màu sắc trên quầy."
+  },
+  {
+    "term": "sink",
+    "translation": "bồn rửa bát",
+    "phonetic": "/sɪŋk/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "There are several dirty dishes and silverware piled high in the kitchen sink waiting to be washed.",
+    "exampleTranslation": "Có một vài chiếc đĩa bẩn và bộ đồ ăn bằng bạc chất cao trong bồn rửa bát nhà bếp đang chờ được rửa."
+  },
+  {
+    "term": "dish rack",
+    "translation": "khay để ráo chén đĩa",
+    "phonetic": "/ˈdɪʃ ˌræk/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "After washing the plates, she neatly organized them in the plastic dish rack next to the sink.",
+    "exampleTranslation": "Sau khi rửa đĩa, cô ấy sắp xếp chúng ngăn nắp vào khay nhựa để ráo bát đĩa bên cạnh bồn rửa."
+  },
+  {
+    "term": "sponge",
+    "translation": "bọt biển",
+    "phonetic": "/spʌndʒ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He applied some liquid dishwashing soap onto the yellow sponge to scrub the greasy frying pan.",
+    "exampleTranslation": "Anh ấy đã đổ một ít nước rửa chén dạng lỏng lên miếng bọt biển màu vàng để cọ rửa chiếc chảo rán đầy dầu mỡ."
+  },
+  {
+    "term": "chopstick",
+    "translation": "đũa",
+    "phonetic": "/ˈtʃɒp.stɪk/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She was still learning how to hold a pair of wooden chopsticks correctly to eat ramen.",
+    "exampleTranslation": "Cô ấy vẫn đang học cách cầm một đôi đũa gỗ đúng cách để ăn mì ramen."
+  },
+  {
+    "term": "pan",
+    "translation": "chảo",
+    "phonetic": "/pæn/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He poured a spoonful of olive oil into the non-stick pan before frying the fresh eggs.",
+    "exampleTranslation": "Anh ấy đã đổ một thìa dầu ô liu vào chảo chống dính trước khi chiên những quả trứng tươi."
+  },
+  {
+    "term": "cooker",
+    "translation": "bếp, nồi nấu",
+    "phonetic": "/ˈkʊk.ər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "We bought a modern multi-functional electric pressure cooker to prepare stews and soups much faster.",
+    "exampleTranslation": "Chúng tôi đã mua một chiếc nồi áp suất điện đa năng hiện đại để chế biến các món hầm và súp nhanh hơn nhiều."
+  },
+  {
+    "term": "mug",
+    "translation": "cốc lớn",
+    "phonetic": "/mʌɡ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He held a warm ceramic mug of hot cocoa between both hands on a chilly winter morning.",
+    "exampleTranslation": "Anh ấy cầm một cốc sứ ấm đựng ca cao nóng giữa hai tay vào một buổi sáng mùa đông se lạnh."
+  },
+  {
+    "term": "kettle",
+    "translation": "ấm đun nước",
+    "phonetic": "/ˈket.əl/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The whistle of the boiling kettle announced that the water was hot enough to make tea.",
+    "exampleTranslation": "Tiếng còi của chiếc ấm đun nước sôi báo hiệu rằng nước đã đủ nóng để pha trà."
+  },
+  {
+    "term": "glass",
+    "translation": "ly",
+    "phonetic": "/ɡlɑːs/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She filled a tall glass with ice and cold water to refresh herself after the long run.",
+    "exampleTranslation": "Cô ấy đã rót đầy một ly nước cao với đá và nước lạnh để giải nhiệt sau chuyến chạy dài."
+  },
+  {
+    "term": "teapot",
+    "translation": "ấm pha trà",
+    "phonetic": "/ˈtiː.pɒt/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She carefully poured the fragrant jasmine tea from the porcelain teapot into small cups for her guests.",
+    "exampleTranslation": "Cô ấy đã cẩn thận rót trà lài thơm ngát từ chiếc ấm trà bằng sứ vào các chén nhỏ cho khách của mình."
+  },
+  {
+    "term": "grill",
+    "translation": "vỉ nướng",
+    "phonetic": "/grɪl/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He cleaned the charcoal grill thoroughly before placing the seasoned beef steaks onto the hot metal grate.",
+    "exampleTranslation": "Anh ấy đã lau chùi vỉ nướng than một cách kỹ lượng trước khi đặt các miếng thịt bò đã ướp gia vị lên vỉ kim loại nóng."
+  },
+  {
+    "term": "tray",
+    "translation": "cái khay, cái mâm",
+    "phonetic": "/treɪ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The polite waiter carried a large silver tray loaded with glasses of champagne to the guests.",
+    "exampleTranslation": "Người phục vụ lịch sự đã bưng một chiếc khay bạc lớn chất đầy những ly rượu sâm panh đến cho các vị khách."
+  },
+  {
+    "term": "whisk",
+    "translation": "máy đánh trứng",
+    "phonetic": "/wɪsk/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She used a metal hand whisk to beat the egg whites until they formed stiff peaks.",
+    "exampleTranslation": "Cô ấy đã sử dụng một chiếc phới lồng cầm tay bằng kim loại để đánh lòng trắng trứng cho đến khi chúng tạo bông cứng."
+  },
+  {
+    "term": "knife",
+    "translation": "dao",
+    "phonetic": "/naɪf/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Keep the chef's knife extremely sharp so that you can slice through vegetables smoothly and safely.",
+    "exampleTranslation": "Hãy giữ cho con dao đầu bếp luôn cực kỳ sắc bén để bạn có thể thái các loại rau củ một cách trơn tru và an toàn."
+  },
+  {
+    "term": "spoon",
+    "translation": "muỗng, thìa",
+    "phonetic": "/spuːn/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She stirred the warm soup gently with a wooden spoon before tasting it to adjust the spices.",
+    "exampleTranslation": "Cô ấy đã khuấy nhẹ món súp ấm bằng một chiếc thìa gỗ trước khi nếm thử để điều chỉnh gia vị."
+  }
+]

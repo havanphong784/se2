@@ -1,0 +1,552 @@
+[
+  {
+    "term": "fever",
+    "translation": "sốt",
+    "phonetic": "/ˈfiːvɚ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The young child has a high fever and needs to see a doctor immediately.",
+    "exampleTranslation": "Đứa trẻ nhỏ bị sốt cao và cần phải đi khám bác sĩ ngay lập tức."
+  },
+  {
+    "term": "cough",
+    "translation": "ho",
+    "phonetic": "/kɔf/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She has had a persistent cough for more than two weeks now.",
+    "exampleTranslation": "Cô ấy đã bị ho dai dẳng trong hơn hai tuần nay rồi."
+  },
+  {
+    "term": "hurt",
+    "translation": "đau",
+    "phonetic": "/hɜːt/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "My knees hurt whenever I try to run up the stairs quickly.",
+    "exampleTranslation": "Đầu gối của tôi bị đau mỗi khi tôi cố gắng chạy lên cầu thang nhanh chóng."
+  },
+  {
+    "term": "swollen",
+    "translation": "bị sưng",
+    "phonetic": "/ˈswoʊlən/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "His ankle became swollen after he tripped over a rock during the football match.",
+    "exampleTranslation": "Cổ chân của anh ấy đã bị sưng lên sau khi anh ấy vấp phải một hòn đá trong trận đấu bóng đá."
+  },
+  {
+    "term": "pus",
+    "translation": "mủ",
+    "phonetic": "/pʌs/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The wound was filled with yellow pus and looked extremely infected.",
+    "exampleTranslation": "Vết thương đầy mủ màu vàng và trông có vẻ bị nhiễm trùng nghiêm trọng."
+  },
+  {
+    "term": "graze",
+    "translation": "trầy xước (da)",
+    "phonetic": "/Greiz/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "He managed to graze his knee when he fell off his bicycle yesterday afternoon.",
+    "exampleTranslation": "Anh ấy đã bị trầy xước đầu gối khi ngã xe đạp vào chiều hôm qua."
+  },
+  {
+    "term": "headache",
+    "translation": "đau đầu",
+    "phonetic": "/ˈhɛdeɪk/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Taking a short nap can sometimes help to relieve a painful headache.",
+    "exampleTranslation": "Chợp mắt một lát đôi khi có thể giúp giảm cơn đau đầu khó chịu."
+  },
+  {
+    "term": "insomnia",
+    "translation": "chứng mất ngủ",
+    "phonetic": "/ɪnˈsɑːmniə/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Many people suffer from chronic insomnia due to high levels of stress at work.",
+    "exampleTranslation": "Nhiều người phải chịu đựng chứng mất ngủ mãn tính do mức độ căng thẳng cao trong công việc."
+  },
+  {
+    "term": "rash",
+    "translation": "phát ban",
+    "phonetic": "/ræʃ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She developed a red rash on her arm after touching some wild plants.",
+    "exampleTranslation": "Cô ấy bị phát ban đỏ trên cánh tay sau khi chạm vào một số loại cây dại."
+  },
+  {
+    "term": "black eye",
+    "translation": "thâm mắt",
+    "phonetic": "/blæk aɪ/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "He got a nasty black eye during the boxing match last night.",
+    "exampleTranslation": "Anh ấy đã bị thâm mắt khá nặng trong trận đấu quyền anh tối qua."
+  },
+  {
+    "term": "bruise",
+    "translation": "vết thâm",
+    "phonetic": "/bruːz/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The purple bruise on her leg will take a few days to heal completely.",
+    "exampleTranslation": "Vết thâm màu tím trên chân cô ấy sẽ mất vài ngày để lành lại hoàn toàn."
+  },
+  {
+    "term": "constipation",
+    "translation": "táo bón",
+    "phonetic": "/ˌkɑːnstɪˈpeɪʃn/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Drinking more water and eating fiber can help prevent painful constipation.",
+    "exampleTranslation": "Uống nhiều nước hơn và ăn nhiều chất xơ có thể giúp ngăn ngừa chứng táo bón gây đau đớn."
+  },
+  {
+    "term": "diarrhea",
+    "translation": "tiêu chảy",
+    "phonetic": "/ˌdaɪəˈriːə/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Eating contaminated food is a very common cause of severe diarrhea.",
+    "exampleTranslation": "Ăn thức ăn bị ô nhiễm là một nguyên nhân rất phổ biến gây ra bệnh tiêu chảy nặng."
+  },
+  {
+    "term": "sore eyes",
+    "translation": "đau mắt",
+    "phonetic": "/’so:r ais/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "Working too long in front of a computer screen can cause sore eyes.",
+    "exampleTranslation": "Làm việc quá lâu trước màn hình máy tính có thể gây đau mắt."
+  },
+  {
+    "term": "runny nose",
+    "translation": "sổ mũi",
+    "phonetic": "/rʌniɳ nəʊz/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "He always gets a runny nose when the weather suddenly changes in winter.",
+    "exampleTranslation": "Anh ấy luôn bị sổ mũi khi thời tiết đột ngột thay đổi vào mùa đông."
+  },
+  {
+    "term": "sniffle",
+    "translation": "sổ mũi",
+    "phonetic": "/sniflz/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "The young girl began to sniffle because she had a mild cold.",
+    "exampleTranslation": "Cô bé bắt đầu sổ mũi sụt sịt vì bị cảm lạnh nhẹ."
+  },
+  {
+    "term": "sneeze",
+    "translation": "hắt hơi",
+    "phonetic": "/sni:z/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "The bright sunlight always makes me want to sneeze when I go outside.",
+    "exampleTranslation": "Ánh sáng mặt trời rực rỡ luôn khiến tôi muốn hắt hơi khi đi ra ngoài."
+  },
+  {
+    "term": "bad breath",
+    "translation": "hôi miệng",
+    "phonetic": "/bæd breθ/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "Brushing your tongue regularly is very important to prevent embarrassing bad breath.",
+    "exampleTranslation": "Chải lưỡi thường xuyên là điều rất quan trọng để ngăn ngừa chứng hôi miệng gây ngượng ngùng."
+  },
+  {
+    "term": "earache",
+    "translation": "đau tai",
+    "phonetic": "/’iəreik/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The little baby was crying because of a painful earache caused by infection.",
+    "exampleTranslation": "Đứa bé đang khóc vì bị đau tai dữ dội do nhiễm trùng gây ra."
+  },
+  {
+    "term": "nausea",
+    "translation": "chứng buồn nôn",
+    "phonetic": "/’ɔ:sjə/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The constant motion of the small boat gave her a strong feeling of nausea.",
+    "exampleTranslation": "Sự chao đảo liên tục của chiếc thuyền nhỏ đã khiến cô ấy cảm thấy buồn nôn dữ dội."
+  },
+  {
+    "term": "eating disorder",
+    "translation": "rối loạn ăn uống",
+    "phonetic": "/ˈiːtɪŋ dɪsˈɔːrdər/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "Therapy is often required to help people recover from a dangerous eating disorder.",
+    "exampleTranslation": "Trị liệu tâm lý thường được yêu cầu để giúp mọi người hồi phục khỏi chứng rối loạn ăn uống nguy hiểm."
+  },
+  {
+    "term": "asthma",
+    "translation": "hen, suyễn",
+    "phonetic": "/ˈæzmə/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He always carries his inhaler with him because of his chronic asthma.",
+    "exampleTranslation": "Anh ấy luôn mang theo ống hít bên mình vì căn bệnh hen suyễn mãn tính."
+  },
+  {
+    "term": "backache",
+    "translation": "bệnh đau lưng",
+    "phonetic": "/ˈbækeɪk bəʊn/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Sitting in an uncomfortable chair for hours can lead to a severe backache.",
+    "exampleTranslation": "Ngồi trên một chiếc ghế không thoải mái trong nhiều giờ liền có thể dẫn đến bệnh đau lưng nghiêm trọng."
+  },
+  {
+    "term": "chill",
+    "translation": "cảm lạnh",
+    "phonetic": "/tʃɪl/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She caught a sudden chill after walking home in the pouring rain yesterday.",
+    "exampleTranslation": "Cô ấy bị cảm lạnh đột ngột sau khi đi bộ về nhà dưới trời mưa như trút nước ngày hôm qua."
+  },
+  {
+    "term": "fever virus",
+    "translation": "sốt siêu vi",
+    "phonetic": "/’fi:və ‘vaiərəs/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "The doctor diagnosed him with a common fever virus and advised rest.",
+    "exampleTranslation": "Bác sĩ chẩn đoán anh ấy bị nhiễm sốt siêu vi thông thường và khuyên nên nghỉ ngơi."
+  },
+  {
+    "term": "allergy",
+    "translation": "dị ứng",
+    "phonetic": "/ˈælərdʒi/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "My sister has a severe allergy to peanuts and must be very careful.",
+    "exampleTranslation": "Em gái tôi bị dị ứng nghiêm trọng với đậu phộng và phải cực kỳ cẩn thận."
+  },
+  {
+    "term": "paralyse",
+    "translation": "liệt",
+    "phonetic": "/ˈpærəlaɪz/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "The terrible stroke unfortunately managed to paralyse the entire left side of his body.",
+    "exampleTranslation": "Cơn đột quỵ kinh hoàng không may đã làm liệt toàn bộ nửa người bên trái của ông ấy."
+  },
+  {
+    "term": "infected",
+    "translation": "nhiễm trùng",
+    "phonetic": "/in’dʤekʃn/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "If you do not clean that deep cut, it will definitely become infected.",
+    "exampleTranslation": "Nếu bạn không làm sạch vết cắt sâu đó, nó chắc chắn sẽ bị nhiễm trùng."
+  },
+  {
+    "term": "inflamed",
+    "translation": "bị viêm",
+    "phonetic": "/ɪnˈfleɪmd/",
+    "partOfSpeech": [
+      "tính từ"
+    ],
+    "exampleSentence": "Her throat was red and inflamed, making it very painful to swallow food.",
+    "exampleTranslation": "Cổ họng cô ấy đỏ và bị viêm, khiến việc nuốt thức ăn vô cùng đau đớn."
+  },
+  {
+    "term": "gout",
+    "translation": "bệnh gút",
+    "phonetic": "/ɡaʊt/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He has to limit his red meat consumption to manage his painful gout.",
+    "exampleTranslation": "Anh ấy phải hạn chế tiêu thụ thịt đỏ để kiểm soát bệnh gút đau đớn của mình."
+  },
+  {
+    "term": "hepatitis",
+    "translation": "viêm gan",
+    "phonetic": "/ˌhepəˈtaɪtɪs/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Heavy drinking over many years can lead to chronic and dangerous hepatitis.",
+    "exampleTranslation": "Uống rượu bia nặng trong nhiều năm có thể dẫn đến bệnh viêm gan mãn tính nguy hiểm."
+  },
+  {
+    "term": "lump",
+    "translation": "u bướu",
+    "phonetic": "/lʌmp/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She felt a small hard lump on her neck and decided to visit a doctor.",
+    "exampleTranslation": "Cô ấy cảm thấy một u bướu nhỏ và cứng trên cổ nên quyết định đi khám bác sĩ."
+  },
+  {
+    "term": "insect bite",
+    "translation": "côn trùng đốt",
+    "phonetic": "/ˈɪn.sekt baɪt/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "Apply some soothing cream to the insect bite to stop the intense itching.",
+    "exampleTranslation": "Hãy bôi một ít kem làm dịu lên chỗ côn trùng đốt để ngăn cơn ngứa ngáy dữ dội."
+  },
+  {
+    "term": "stomachache",
+    "translation": "đau dạ dày",
+    "phonetic": "/ˈstʌmək-eɪk/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Drinking warm ginger tea can help to soothe a painful stomachache quickly.",
+    "exampleTranslation": "Uống trà gừng ấm có thể giúp xoa dịu cơn đau dạ dày một cách nhanh chóng."
+  },
+  {
+    "term": "toothache",
+    "translation": "đau răng",
+    "phonetic": "/ˈtuːθ.eɪk/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "A severe toothache kept him awake all night until he could see the dentist.",
+    "exampleTranslation": "Cơn đau răng nghiêm trọng khiến anh ấy mất ngủ cả đêm cho đến khi gặp nha sĩ."
+  },
+  {
+    "term": "high blood pressure",
+    "translation": "cao huyết áp",
+    "phonetic": "/haɪ blʌd ˈpreʃ.əʳ/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "Exercising regularly and reducing salt intake can help control high blood pressure effectively.",
+    "exampleTranslation": "Tập thể dục thường xuyên và giảm lượng muối có thể giúp kiểm soát tình trạng cao huyết áp hiệu quả."
+  },
+  {
+    "term": "sore throat",
+    "translation": "viêm họng",
+    "phonetic": "/sɔːʳ θrəʊt/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "Drinking warm water with honey is a great natural remedy for a sore throat.",
+    "exampleTranslation": "Uống nước ấm pha mật ong là một phương thuốc tự nhiên tuyệt vời cho bệnh viêm họng."
+  },
+  {
+    "term": "sprain",
+    "translation": "bong gân",
+    "phonetic": "/spreɪn/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The doctor told him that a severe joint sprain requires several weeks of rest.",
+    "exampleTranslation": "Bác sĩ nói với anh ấy rằng chấn thương bong gân khớp nghiêm trọng đòi hỏi vài tuần nghỉ ngơi."
+  },
+  {
+    "term": "burn",
+    "translation": "bỏng",
+    "phonetic": "/bɜːn/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She put her burnt finger under cold running water to soothe the painful burn.",
+    "exampleTranslation": "Cô ấy đặt ngón tay bị bỏng dưới vòi nước lạnh để làm dịu vết bỏng đau đớn."
+  },
+  {
+    "term": "malaria",
+    "translation": "sốt rét",
+    "phonetic": "/məˈleriə/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "People traveling to tropical countries should take medicine to prevent dangerous malaria.",
+    "exampleTranslation": "Những người du lịch đến các quốc gia nhiệt đới nên uống thuốc để phòng ngừa bệnh sốt rét nguy hiểm."
+  },
+  {
+    "term": "scabies",
+    "translation": "bệnh ghẻ",
+    "phonetic": "/ˈskeɪbiːz/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The doctor prescribed a special medicated cream to treat the highly contagious scabies.",
+    "exampleTranslation": "Bác sĩ đã kê đơn một loại kem bôi đặc trị để điều trị bệnh ghẻ lây lan mạnh."
+  },
+  {
+    "term": "smallpox",
+    "translation": "bệnh đậu mùa",
+    "phonetic": "/ˈsmɔːlpɑːks/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Smallpox was a deadly infectious disease that was successfully eradicated worldwide in 1980.",
+    "exampleTranslation": "Bệnh đậu mùa từng là căn bệnh truyền nhiễm chết người đã được xóa sổ thành công trên toàn thế giới vào năm 1980."
+  },
+  {
+    "term": "heart attack",
+    "translation": "nhồi máu cơ tim",
+    "phonetic": "/hɑːrt əˈtæk/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "He was rushed to the hospital after experiencing chest pain from a heart attack.",
+    "exampleTranslation": "Anh ấy được đưa đi cấp cứu tại bệnh viện sau khi trải qua cơn đau ngực do nhồi máu cơ tim."
+  },
+  {
+    "term": "tuberculosis",
+    "translation": "bệnh lao",
+    "phonetic": "/tuːˌbɜːrkjəˈloʊsɪs/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Tuberculosis is a bacterial infection that primarily affects the lungs of a patient.",
+    "exampleTranslation": "Bệnh lao là một tình trạng nhiễm trùng do vi khuẩn, chủ yếu gây ảnh hưởng đến phổi của bệnh nhân."
+  },
+  {
+    "term": "diabetes",
+    "translation": "bệnh tiểu đường",
+    "phonetic": "/,daiə’bi:tiz/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Managing your daily sugar intake is very crucial when living with diabetes.",
+    "exampleTranslation": "Kiểm soát lượng đường nạp vào hàng ngày là vô cùng quan trọng khi sống chung với bệnh tiểu đường."
+  },
+  {
+    "term": "cancer",
+    "translation": "bệnh ung thư",
+    "phonetic": "/ˈænsər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Early detection and modern medical treatments can save many patients from deadly cancer.",
+    "exampleTranslation": "Phát hiện sớm và các phương pháp điều trị y tế hiện đại có thể cứu sống nhiều bệnh nhân khỏi bệnh ung thư chết người."
+  },
+  {
+    "term": "pneumonia",
+    "translation": "viêm phổi",
+    "phonetic": "/nuːˈmoʊniə/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The elderly man was admitted to the intensive care unit with severe pneumonia.",
+    "exampleTranslation": "Cụ ông đã được đưa vào đơn vị chăm sóc đặc biệt do bị viêm phổi nặng."
+  },
+  {
+    "term": "chicken pox",
+    "translation": "bệnh thủy đậu",
+    "phonetic": "/ˈtʃɪkɪn pɑːks/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "Most children are now vaccinated against chicken pox to prevent painful itchy blisters.",
+    "exampleTranslation": "Hầu hết trẻ em hiện nay đều được tiêm vắc-xin phòng bệnh thủy đậu để ngăn ngừa các mụn nước ngứa ngáy đau đớn."
+  },
+  {
+    "term": "depression",
+    "translation": "trầm cảm",
+    "phonetic": "/dɪˈpreʃn/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Regular exercise and counseling can help individuals overcome their clinical depression effectively.",
+    "exampleTranslation": "Tập thể dục thường xuyên và tham vấn tâm lý có thể giúp mọi người vượt qua chứng trầm cảm lâm sàng một cách hiệu quả."
+  },
+  {
+    "term": "low blood pressure",
+    "translation": "huyết áp thấp",
+    "phonetic": "/loʊ blʌd ˈpreʃər/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "She often feels dizzy because of her chronic low blood pressure.",
+    "exampleTranslation": "Cô ấy thường xuyên cảm thấy chóng mặt vì chứng huyết áp thấp mãn tính của mình."
+  },
+  {
+    "term": "hypertension",
+    "translation": "huyết áp cao",
+    "phonetic": "/ˌhaɪ.pəˈten.ʃən/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Doctors often recommend a low-sodium diet for patients who suffer from severe hypertension.",
+    "exampleTranslation": "Bác sĩ thường khuyên dùng chế độ ăn ít muối cho các bệnh nhân bị huyết áp cao nghiêm trọng."
+  },
+  {
+    "term": "measles",
+    "translation": "bệnh sởi",
+    "phonetic": "/ˈmiːzlz/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "A fever and a red skin rash are two very common symptoms of measles.",
+    "exampleTranslation": "Sốt và phát ban đỏ trên da là hai triệu chứng rất phổ biến của bệnh sởi."
+  },
+  {
+    "term": "migraine",
+    "translation": "bệnh đau nửa đầu",
+    "phonetic": "/ˈmaɪɡreɪn/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She had to lie down in a dark and quiet room during her painful migraine.",
+    "exampleTranslation": "Cô ấy phải nằm nghỉ trong một căn phòng tối và yên tĩnh khi bị cơn đau nửa đầu hành hạ."
+  },
+  {
+    "term": "mumps",
+    "translation": "bệnh quai bị",
+    "phonetic": "/mʌmps/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The young boy had swollen cheeks because he was suffering from mumps.",
+    "exampleTranslation": "Cậu bé bị sưng má do đang mắc bệnh quai bị."
+  },
+  {
+    "term": "rheumatism",
+    "translation": "bệnh thấp khớp",
+    "phonetic": "/ˈruːmətɪzəm/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The elderly woman uses a walking stick to help with her painful joint rheumatism.",
+    "exampleTranslation": "Cụ bà sử dụng một cây gậy chống để giúp cải thiện bệnh thấp khớp gây đau khớp của mình."
+  }
+]

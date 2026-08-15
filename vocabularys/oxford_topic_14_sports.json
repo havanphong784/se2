@@ -1,0 +1,342 @@
+[
+  {
+    "term": "sport",
+    "translation": "thể thao",
+    "phonetic": "/spɔːrt/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Playing a regular sport is an excellent way to maintain a healthy body and mind.",
+    "exampleTranslation": "Chơi một môn thể thao thường xuyên là một cách tuyệt vời để duy trì cơ thể và tinh thần khỏe mạnh."
+  },
+  {
+    "term": "skiing",
+    "translation": "trượt tuyết",
+    "phonetic": "/ˈskiː.ɪŋ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "They go skiing in the Swiss Alps every year during their winter vacation.",
+    "exampleTranslation": "Họ đi trượt tuyết ở dãy Alps của Thụy Sĩ hàng năm vào kỳ nghỉ đông của mình."
+  },
+  {
+    "term": "ice skating",
+    "translation": "trượt băng",
+    "phonetic": "/ˈaɪs ˌskeɪ.tɪŋ/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "The children love to go ice skating on the frozen lake during the cold winter days.",
+    "exampleTranslation": "Trẻ em thích đi trượt băng trên hồ đóng băng vào những ngày đông lạnh giá."
+  },
+  {
+    "term": "horse racing",
+    "translation": "đua ngựa",
+    "phonetic": "/ˈhɔːrs ˌreɪ.sɪŋ/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "Many people gather at the stadium to watch the exciting annual horse racing event.",
+    "exampleTranslation": "Nhiều người tập trung tại sân vận động để xem sự kiện đua ngựa thường niên đầy kịch tính."
+  },
+  {
+    "term": "running",
+    "translation": "chạy",
+    "phonetic": "/ˈrʌn.ɪŋ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He started running every morning to improve his physical stamina and overall health.",
+    "exampleTranslation": "Anh ấy bắt đầu chạy bộ mỗi sáng để cải thiện thể lực và sức khỏe tổng thể."
+  },
+  {
+    "term": "walking",
+    "translation": "đi bộ, tản bộ",
+    "phonetic": "/ˈwɔː.kɪŋ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Taking a walking tour is a great way to explore the beauty of this historic city.",
+    "exampleTranslation": "Đi bộ tham quan là một cách tuyệt vời để khám phá vẻ đẹp của thành phố lịch sử này."
+  },
+  {
+    "term": "water sports",
+    "translation": "thể thao dưới nước",
+    "phonetic": "/ˈwɔː.tər spɔːrts/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "This beautiful beach resort offers a wide variety of exciting water sports for tourists.",
+    "exampleTranslation": "Khu nghỉ dưỡng bãi biển tuyệt đẹp này cung cấp nhiều môn thể thao dưới nước thú vị cho khách du lịch."
+  },
+  {
+    "term": "boxing",
+    "translation": "quyền anh",
+    "phonetic": "/ˈbɒk.sɪŋ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He has been training hard in the gym to prepare for his first professional boxing match.",
+    "exampleTranslation": "Anh ấy đã tập luyện chăm chỉ trong phòng tập để chuẩn bị cho trận đấu quyền anh chuyên nghiệp đầu tiên của mình."
+  },
+  {
+    "term": "swimming",
+    "translation": "bơi lội",
+    "phonetic": "/ˈswɪm.ɪŋ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Swimming is considered to be one of the best full-body workouts for people of all ages.",
+    "exampleTranslation": "Bơi lội được coi là một trong những bài tập toàn thân tốt nhất cho mọi lứa tuổi."
+  },
+  {
+    "term": "football",
+    "translation": "bóng đá",
+    "phonetic": "/ˈfʊt.bɔːl/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Millions of passionate fans around the world watched the exciting football World Cup final.",
+    "exampleTranslation": "Hàng triệu người hâm mộ cuồng nhiệt trên khắp thế giới đã xem trận chung kết giải vô địch bóng đá thế giới đầy kịch tính."
+  },
+  {
+    "term": "basketball",
+    "translation": "bóng rổ",
+    "phonetic": "/ˈbæs.kɪtˌbɔːl/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He practiced throwing the ball into the hoop for hours to improve his basketball skills.",
+    "exampleTranslation": "Anh ấy đã luyện tập ném bóng vào rổ hàng giờ liền để cải thiện kỹ năng bóng rổ của mình."
+  },
+  {
+    "term": "badminton",
+    "translation": "cầu lông",
+    "phonetic": "/ˈbæd.mɪn.tən/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "My family often plays badminton together in the backyard on Sunday afternoons.",
+    "exampleTranslation": "Gia đình tôi thường chơi cầu lông cùng nhau ở sân sau vào các buổi chiều Chủ Nhật."
+  },
+  {
+    "term": "tennis",
+    "translation": "quần vợt",
+    "phonetic": "/ˈtɛn.ɪs/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The professional tennis players competed intensely under the hot summer sun yesterday.",
+    "exampleTranslation": "Các vận động viên quần vợt chuyên nghiệp đã thi đấu căng thẳng dưới ánh nắng mùa hè oi ả ngày hôm qua."
+  },
+  {
+    "term": "table tennis",
+    "translation": "bóng bàn",
+    "phonetic": "/ˈteɪ.bəl ˈtɛn.ɪs/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "Playing table tennis requires fast reflexes and quick hand-eye coordination.",
+    "exampleTranslation": "Chơi bóng bàn đòi hỏi phản xạ nhanh nhạy và sự phối hợp tay mắt nhanh chóng."
+  },
+  {
+    "term": "baseball",
+    "translation": "bóng chày",
+    "phonetic": "/ˈbeɪs.bɔːl/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He hit a spectacular home run during the final baseball game of the season.",
+    "exampleTranslation": "Anh ấy đã đánh một cú home run ngoạn mục trong trận đấu bóng chày cuối cùng của mùa giải."
+  },
+  {
+    "term": "cycling",
+    "translation": "đua xe đạp, đạp xe",
+    "phonetic": "/ˈsaɪ.klɪŋ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Cycling is not only a fantastic exercise but also an environmentally friendly way to travel.",
+    "exampleTranslation": "Đạp xe không chỉ là một bài tập thể dục tuyệt vời mà còn là một cách di chuyển thân thiện với môi trường."
+  },
+  {
+    "term": "golf",
+    "translation": "đánh gôn",
+    "phonetic": "/ɡɑːlf/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The wealthy businessman spent his entire weekend playing golf at the luxury resort.",
+    "exampleTranslation": "Doanh nhân giàu có đã dành cả cuối tuần để chơi gôn tại khu nghỉ dưỡng sang trọng."
+  },
+  {
+    "term": "contact sport",
+    "translation": "thể thao tiếp xúc",
+    "phonetic": "/ˈkɒn.tækt spɔːrt/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "Rugby is a highly physical contact sport that requires players to wear protective gear.",
+    "exampleTranslation": "Bóng bầu dục là một môn thể thao tiếp xúc có va chạm thể xác cao đòi hỏi người chơi phải mặc đồ bảo hộ."
+  },
+  {
+    "term": "water polo",
+    "translation": "bóng nước",
+    "phonetic": "/ˈwɔː.tər ˈpoʊ.loʊ/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "Water polo is a challenging team sport that is played in a deep swimming pool.",
+    "exampleTranslation": "Bóng nước là một môn thể thao đồng đội đầy thử thách được chơi trong một bể bơi sâu."
+  },
+  {
+    "term": "archery",
+    "translation": "bắn cung",
+    "phonetic": "/ˈɑːr.tʃər.i/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Archery requires a high level of concentration, focus, and a very steady hand.",
+    "exampleTranslation": "Bắn cung đòi hỏi mức độ tập trung cao, sự chú ý và một bàn tay rất vững vàng."
+  },
+  {
+    "term": "weightlifting",
+    "translation": "cử tạ",
+    "phonetic": "/ˈweɪtˌlɪf.tɪŋ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The strong athlete won a gold medal after setting a new record in weightlifting.",
+    "exampleTranslation": "Vận động viên khỏe mạnh đã giành được huy chương vàng sau khi thiết lập kỷ lục mới trong môn cử tạ."
+  },
+  {
+    "term": "wrestling",
+    "translation": "đấu vật",
+    "phonetic": "/ˈrɛs.lɪŋ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Professional wrestling combines athletic ability with theatrical performance to entertain the audience.",
+    "exampleTranslation": "Đấu vật chuyên nghiệp kết hợp khả năng thể thao với biểu diễn sân khấu để giải trí cho khán giả."
+  },
+  {
+    "term": "bowling",
+    "translation": "bóng gỗ",
+    "phonetic": "/ˈboʊ.lɪŋ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "We decided to go bowling with our close friends on Friday night for fun.",
+    "exampleTranslation": "Chúng tôi quyết định đi chơi bóng gỗ cùng những người bạn thân vào tối thứ Sáu để giải trí."
+  },
+  {
+    "term": "lacrosse",
+    "translation": "bóng vợt",
+    "phonetic": "/leˈkrɒs/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Lacrosse is a fast-paced sport that is very popular in many high schools and colleges.",
+    "exampleTranslation": "Bóng vợt là một môn thể thao có nhịp độ nhanh rất phổ biến ở nhiều trường trung học và đại học."
+  },
+  {
+    "term": "hockey",
+    "translation": "khúc côn cầu",
+    "phonetic": "/ˈhɒk.i/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The ice hockey players skated incredibly fast across the ice to chase the puck.",
+    "exampleTranslation": "Các cầu thủ khúc côn cầu trên băng đã trượt băng cực nhanh để đuổi theo quả bóng dẹt."
+  },
+  {
+    "term": "referee",
+    "translation": "trọng tài",
+    "phonetic": "/ˌrɛf.əˈriː/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The soccer referee made a controversial decision that angered many supporters in the stadium.",
+    "exampleTranslation": "Trọng tài bóng đá đã đưa ra một quyết định gây tranh cãi làm phẫn nộ nhiều cổ động viên trên sân vận động."
+  },
+  {
+    "term": "dart",
+    "translation": "ném phi tiêu",
+    "phonetic": "/dɑːrt/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He carefully aimed and threw the sharp dart directly at the center of the board.",
+    "exampleTranslation": "Anh ấy cẩn thận nhắm và ném chiếc phi tiêu sắc nhọn trực tiếp vào tâm của bảng gỗ."
+  },
+  {
+    "term": "synchronized swimming",
+    "translation": "bơi nghệ thuật",
+    "phonetic": "/ˈsɪŋ.krə.naɪzd ˈswɪm.ɪŋ/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "Synchronized swimming requires the swimmers to perform beautiful dance movements in perfect harmony under water.",
+    "exampleTranslation": "Bơi nghệ thuật đòi hỏi các vận động viên phải thực hiện các động tác vũ đạo đẹp mắt trong sự hòa hợp hoàn hảo dưới nước."
+  },
+  {
+    "term": "SEA Games",
+    "translation": "hội thể thao đông nam",
+    "phonetic": "/ˈsiː ˌɡeɪmz/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "The SEA Games is a major multi-sport event held every two years for Southeast Asian nations.",
+    "exampleTranslation": "SEA Games là một sự kiện thể thao đa môn lớn được tổ chức hai năm một lần cho các quốc gia Đông Nam Á."
+  },
+  {
+    "term": "host",
+    "translation": "đăng cai, tổ chức",
+    "phonetic": "/hoʊst/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "Vietnam was very proud to host the regional sporting event with great success.",
+    "exampleTranslation": "Việt Nam đã rất tự hào khi đăng cai tổ chức sự kiện thể thao khu vực với thành công rực rỡ."
+  },
+  {
+    "term": "wushu",
+    "translation": "(môn) võ wushu",
+    "phonetic": "/ˈwuː.ʃuː/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She has been practicing wushu since she was a little child to develop flexibility and strength.",
+    "exampleTranslation": "Cô ấy đã tập luyện wushu từ khi còn là một đứa trẻ để phát triển sự dẻo dai và sức mạnh."
+  },
+  {
+    "term": "sportsmanship",
+    "translation": "tinh thần thể thao",
+    "phonetic": "/ˈspɔːrts.mənˌʃɪp/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Shaking hands after a difficult match is a beautiful display of true sportsmanship.",
+    "exampleTranslation": "Bắt tay sau một trận đấu khó khăn là một biểu hiện đẹp đẽ của tinh thần thể thao đích thực."
+  },
+  {
+    "term": "captain",
+    "translation": "đội trưởng",
+    "phonetic": "/ˈæp.tən/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The team captain led his teammates to an impressive victory in the tournament.",
+    "exampleTranslation": "Đội trưởng đội tuyển đã dẫn dắt các đồng đội của mình đến một chiến thắng ấn tượng trong giải đấu."
+  },
+  {
+    "term": "cross-country",
+    "translation": "chạy việt dã",
+    "phonetic": "/ˌkrɒsˈkʌn.tri/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Running a cross-country race requires high stamina because of the uneven natural terrain.",
+    "exampleTranslation": "Chạy một cuộc đua việt dã đòi hỏi sức bền cao vì địa hình tự nhiên không bằng phẳng."
+  }
+]

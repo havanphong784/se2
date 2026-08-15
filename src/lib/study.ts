@@ -18,6 +18,7 @@ export type StudyWord = {
   id: string;
   term: string;
   translation: string;
+  status?: WordStatus;
   learnedAt: string | null;
   reviewStage: ReviewStage;
   lastReviewedAt: string | null;

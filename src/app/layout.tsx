@@ -28,8 +28,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="vi">
-      <body className={`${nunito.variable} ${baloo.variable}`}>
+    <html lang="vi" suppressHydrationWarning>
+      <body className={`${nunito.variable} ${baloo.variable}`} suppressHydrationWarning>
         <AppShell>{children}</AppShell>
       </body>
     </html>

@@ -1,0 +1,162 @@
+[
+  {
+    "term": "play",
+    "translation": "vở kịch",
+    "phonetic": "/pleɪ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "They bought tickets to see a famous shakespearean play at the national theater.",
+    "exampleTranslation": "Họ đã mua vé để xem một vở kịch nổi tiếng của Shakespeare tại nhà hát quốc gia."
+  },
+  {
+    "term": "circus",
+    "translation": "rạp xiếc",
+    "phonetic": "/sɜː.kəs/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The children were extremely excited to see the acrobats and clowns at the circus.",
+    "exampleTranslation": "Trẻ em đã vô cùng hào hứng khi được xem các diễn viên nhào lộn và chú hề ở rạp xiếc."
+  },
+  {
+    "term": "stadium",
+    "translation": "sân vận động",
+    "phonetic": "/ˈsteɪ.di.əm/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "Thousands of enthusiastic fans gathered at the stadium to cheer for their home team.",
+    "exampleTranslation": "Hàng nghìn người hâm mộ cuồng nhiệt đã tụ tập tại sân vận động để cổ vũ cho đội nhà."
+  },
+  {
+    "term": "orchestra",
+    "translation": "ban nhạc, dàn nhạc",
+    "phonetic": "/ˈɔː.kɪ.strə/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The symphony orchestra performed a beautiful classical piece that moved the entire audience.",
+    "exampleTranslation": "Dàn nhạc giao hương đã trình diễn một tác phẩm cổ điển tuyệt đẹp khiến toàn bộ khán giả xúc động."
+  },
+  {
+    "term": "scene",
+    "translation": "phân cảnh",
+    "phonetic": "/siːn/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The opening scene of the movie was shot in a beautiful ancient castle.",
+    "exampleTranslation": "Phân cảnh mở đầu của bộ phim được quay tại một lâu đài cổ kính tuyệt đẹp."
+  },
+  {
+    "term": "opera",
+    "translation": "nhạc kịch, ô-pê-ra",
+    "phonetic": "/ˈɒp.ər.ə/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "She has been training for years to sing a leading role in the opera.",
+    "exampleTranslation": "Cô ấy đã được đào tạo trong nhiều năm để hát một vai chính trong vở nhạc kịch."
+  },
+  {
+    "term": "theater",
+    "translation": "nhà hát",
+    "phonetic": "/ˈθɪə.tər/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The local theater is hosting a special charity performance this Saturday evening.",
+    "exampleTranslation": "Nhà hát địa phương đang tổ chức một buổi biểu diễn từ thiện đặc biệt vào tối thứ Bảy này."
+  },
+  {
+    "term": "applaud",
+    "translation": "vỗ tay (tán thưởng)",
+    "phonetic": "/əˈplɔːd/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "The audience stood up to applaud the performers after the spectacular show ended.",
+    "exampleTranslation": "Khán giả đã đứng dậy vỗ tay tán thưởng các nghệ sĩ sau khi chương trình ngoạn mục kết thúc."
+  },
+  {
+    "term": "perform",
+    "translation": "trình diễn, biểu diễn",
+    "phonetic": "/pəˈfɔːm/",
+    "partOfSpeech": [
+      "động từ"
+    ],
+    "exampleSentence": "The talented young musicians are going to perform live on stage tonight.",
+    "exampleTranslation": "Các nhạc sĩ trẻ tài năng sẽ biểu diễn trực tiếp trên sân khấu tối nay."
+  },
+  {
+    "term": "exhibit",
+    "translation": "vật triển lãm",
+    "phonetic": "/ɪɡˈzɪb.ɪt/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "The museum’s newest art exhibit features rare paintings from the nineteenth century.",
+    "exampleTranslation": "Triển lãm nghệ thuật mới nhất của bảo tàng trưng bày những bức tranh quý hiếm từ thế kỷ mười chín."
+  },
+  {
+    "term": "art gallery",
+    "translation": "phòng triển lãm",
+    "phonetic": "/ˈɑːt ˌɡæl.ər.i/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "They spent the entire afternoon browsing through the beautiful paintings in the art gallery.",
+    "exampleTranslation": "Họ đã dành cả buổi chiều để duyệt xem những bức tranh tuyệt đẹp trong phòng triển lãm nghệ thuật."
+  },
+  {
+    "term": "comedy",
+    "translation": "hài kịch",
+    "phonetic": "/ˈkɒm.ə.di/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "We wanted to watch a lighthearted comedy to relax after a stressful week.",
+    "exampleTranslation": "Chúng tôi muốn xem một bộ phim hài nhẹ nhàng để thư giãn sau một tuần căng thẳng."
+  },
+  {
+    "term": "chamber music",
+    "translation": "nhạc thính phòng",
+    "phonetic": "/ˈtʃeɪm.bə ˌmjuː.zɪk/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "The classical chamber music was played by a small group of talented string players.",
+    "exampleTranslation": "Bản nhạc thính phòng cổ điển được chơi bởi một nhóm nhỏ các nghệ sĩ chơi nhạc cụ dây tài năng."
+  },
+  {
+    "term": "casino",
+    "translation": "sòng bạc",
+    "phonetic": "/kəˈsiː.nəʊ/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "He decided to try his luck at the blackjack table in the casino.",
+    "exampleTranslation": "Anh ấy quyết định thử vận may của mình tại bàn chơi bài blackjack trong sòng bạc."
+  },
+  {
+    "term": "pub",
+    "translation": "quán rượu",
+    "phonetic": "/pʌb/",
+    "partOfSpeech": [
+      "danh từ"
+    ],
+    "exampleSentence": "We met our old friends at the local pub for a quiet drink.",
+    "exampleTranslation": "Chúng tôi đã gặp lại những người bạn cũ tại quán rượu địa phương để uống nước trò chuyện yên tĩnh."
+  },
+  {
+    "term": "concert hall",
+    "translation": "phòng hoà nhạc",
+    "phonetic": "/ˈkɒn.sət ˌhɔːl/",
+    "partOfSpeech": [
+      "cụm danh từ"
+    ],
+    "exampleSentence": "The newly built concert hall has excellent acoustics for classical music performances.",
+    "exampleTranslation": "Phòng hòa nhạc mới xây có hệ thống âm thanh tuyệt vời cho các buổi biểu diễn nhạc cổ điển."
+  }
+]

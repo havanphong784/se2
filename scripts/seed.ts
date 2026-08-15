@@ -1,4 +1,6 @@
-import { sql } from "drizzle-orm";
+import fs from "node:fs";
+import path from "node:path";
+import { and, eq, isNull, notInArray, or, sql } from "drizzle-orm";
 
 import { closeDb, getDb } from "../src/db";
 import {
@@ -9,65 +11,9 @@ import {
   wordProgress,
   words,
 } from "../src/db/schema";
+import { hashPassword } from "../src/lib/auth-crypto";
 
-const deckSeeds = [
-  {
-    slug: "giao-tiep-hang-ngay",
-    title: "Giao tiếp hằng ngày",
-    description: "Những từ đầu tiên để chào hỏi và trò chuyện lịch sự.",
-    level: "A1",
-    words: [
-      ["hello", "xin chào", "/həˈləʊ/", "thán từ", "Hello, nice to meet you.", "Xin chào, rất vui được gặp bạn."],
-      ["goodbye", "tạm biệt", "/ˌɡʊdˈbaɪ/", "thán từ", "Goodbye, see you tomorrow.", "Tạm biệt, hẹn gặp bạn ngày mai."],
-      ["please", "làm ơn", "/pliːz/", "thán từ", "Please open the window.", "Làm ơn mở cửa sổ."],
-      ["thank you", "cảm ơn", "/ˈθæŋk juː/", "cụm từ", "Thank you for your help.", "Cảm ơn bạn đã giúp đỡ."],
-      ["sorry", "xin lỗi", "/ˈsɒr.i/", "tính từ", "I am sorry I am late.", "Tôi xin lỗi vì đã đến muộn."],
-      ["welcome", "chào mừng", "/ˈwel.kəm/", "thán từ", "Welcome to our class.", "Chào mừng bạn đến với lớp học."],
-    ],
-  },
-  {
-    slug: "gia-dinh-va-ban-be",
-    title: "Gia đình & bạn bè",
-    description: "Gọi tên những người thân quen xung quanh bạn.",
-    level: "A1",
-    words: [
-      ["family", "gia đình", "/ˈfæm.əl.i/", "danh từ", "My family lives in Da Nang.", "Gia đình tôi sống ở Đà Nẵng."],
-      ["mother", "mẹ", "/ˈmʌð.ər/", "danh từ", "My mother loves gardening.", "Mẹ tôi thích làm vườn."],
-      ["father", "bố", "/ˈfɑː.ðər/", "danh từ", "Her father is a teacher.", "Bố cô ấy là giáo viên."],
-      ["sister", "chị/em gái", "/ˈsɪs.tər/", "danh từ", "My sister studies English.", "Chị gái tôi học tiếng Anh."],
-      ["brother", "anh/em trai", "/ˈbrʌð.ər/", "danh từ", "His brother plays football.", "Em trai anh ấy chơi bóng đá."],
-      ["friend", "bạn bè", "/frend/", "danh từ", "Lan is my best friend.", "Lan là bạn thân nhất của tôi."],
-    ],
-  },
-  {
-    slug: "do-an-va-thuc-uong",
-    title: "Đồ ăn & thức uống",
-    description: "Từ vựng quen thuộc cho bữa ăn và lúc gọi món.",
-    level: "A1",
-    words: [
-      ["water", "nước", "/ˈwɔː.tər/", "danh từ", "Can I have some water?", "Tôi có thể xin một ít nước không?"],
-      ["rice", "cơm/gạo", "/raɪs/", "danh từ", "We eat rice every day.", "Chúng tôi ăn cơm mỗi ngày."],
-      ["bread", "bánh mì", "/bred/", "danh từ", "This bread is still warm.", "Ổ bánh mì này vẫn còn ấm."],
-      ["coffee", "cà phê", "/ˈkɒf.i/", "danh từ", "She drinks coffee in the morning.", "Cô ấy uống cà phê vào buổi sáng."],
-      ["apple", "quả táo", "/ˈæp.əl/", "danh từ", "I put an apple in my bag.", "Tôi để một quả táo vào túi."],
-      ["delicious", "ngon", "/dɪˈlɪʃ.əs/", "tính từ", "The soup is delicious.", "Món súp rất ngon."],
-    ],
-  },
-  {
-    slug: "du-lich-co-ban",
-    title: "Du lịch cơ bản",
-    description: "Các từ thiết yếu cho một chuyến đi tự tin hơn.",
-    level: "A2",
-    words: [
-      ["airport", "sân bay", "/ˈeə.pɔːt/", "danh từ", "We arrived at the airport early.", "Chúng tôi đến sân bay sớm."],
-      ["hotel", "khách sạn", "/həʊˈtel/", "danh từ", "Our hotel is near the beach.", "Khách sạn của chúng tôi gần bãi biển."],
-      ["ticket", "vé", "/ˈtɪk.ɪt/", "danh từ", "I bought a train ticket.", "Tôi đã mua một vé tàu."],
-      ["passport", "hộ chiếu", "/ˈpɑːs.pɔːt/", "danh từ", "Please show me your passport.", "Vui lòng cho tôi xem hộ chiếu của bạn."],
-      ["train", "tàu hỏa", "/treɪn/", "danh từ", "The train leaves at nine.", "Tàu khởi hành lúc chín giờ."],
-      ["direction", "phương hướng/chỉ đường", "/dɪˈrek.ʃən/", "danh từ", "Could you give me directions?", "Bạn có thể chỉ đường cho tôi không?"],
-    ],
-  },
-] as const;
+import { TOPIC_METADATA, type RawWord } from "../src/lib/topic-metadata";
 
 function dateDaysAgo(days: number) {
   const date = new Date();
@@ -80,50 +26,110 @@ function dateKey(date: Date) {
   return date.toISOString().slice(0, 10);
 }
 
+function loadVocabularyFiles() {
+  const dir = path.join(process.cwd(), "vocabularys");
+  const files = fs.readdirSync(dir).filter((f) => f.endsWith(".json"));
+
+  files.sort((a, b) => {
+    const numA = Number.parseInt(a.match(/topic_(\d+)_/)?.[1] ?? "0", 10);
+    const numB = Number.parseInt(b.match(/topic_(\d+)_/)?.[1] ?? "0", 10);
+    return numA - numB;
+  });
+
+  return files.map((fileName) => {
+    const slugKey = fileName.replace(".json", "");
+    const rawSlug = slugKey.replace(/^oxford_topic_\d+_/, "");
+    const slug = rawSlug.replaceAll("_", "-");
+    const fullPath = path.join(dir, fileName);
+    const rawContent = fs.readFileSync(fullPath, "utf8");
+    const rawWords: RawWord[] = JSON.parse(rawContent);
+
+    const meta = TOPIC_METADATA[rawSlug] ?? {
+      title: slug.replaceAll("-", " "),
+      description: `Bộ từ vựng chủ đề ${slug}.`,
+      level: "A1",
+      emoji: "📖",
+    };
+
+    return {
+      fileName,
+      rawSlug,
+      slug,
+      meta,
+      words: rawWords,
+    };
+  });
+}
+
 async function seed() {
   const db = getDb();
-
   if (!db) {
-    throw new Error("DATABASE_URL is required to seed the database.");
+    throw new Error("DATABASE_URL is required to seed database.");
   }
 
   const now = new Date();
+  const topics = loadVocabularyFiles();
 
   await db.transaction(async (tx) => {
+    const defaultPasswordHash = hashPassword("12345678");
+
+    // 1. Upsert users
     const [demoUser] = await tx
       .insert(users)
       .values({
         email: process.env.DEMO_USER_EMAIL ?? "demo@vocabloom.vn",
         displayName: "Minh Anh",
+        passwordHash: defaultPasswordHash,
       })
       .onConflictDoUpdate({
         target: users.email,
-        set: { displayName: "Minh Anh", updatedAt: now },
+        set: { displayName: "Minh Anh", passwordHash: defaultPasswordHash, updatedAt: now },
       })
       .returning({ id: users.id });
+
+    await tx
+      .insert(users)
+      .values({
+        email: "havanphong784@gmail.com",
+        displayName: "Hà Văn Phong",
+        passwordHash: defaultPasswordHash,
+      })
+      .onConflictDoUpdate({
+        target: users.email,
+        set: { displayName: "Hà Văn Phong", passwordHash: defaultPasswordHash, updatedAt: now },
+      });
 
     const seededDecks: { id: string; slug: string }[] = [];
     const seededWords: { id: string; deckId: string }[] = [];
 
-    for (const [deckIndex, deckSeed] of deckSeeds.entries()) {
+    // 2. Clean up any decks owned by demoUser or legacy unowned decks not in standard 36 topics
+    const validSlugs = topics.map((t) => t.slug);
+    await tx
+      .delete(decks)
+      .where(
+        or(
+          eq(decks.ownerId, demoUser.id),
+          and(isNull(decks.ownerId), notInArray(decks.slug, validSlugs)),
+        ),
+      );
+    for (const [deckIndex, topic] of topics.entries()) {
       const [deck] = await tx
         .insert(decks)
         .values({
           ownerId: null,
-          slug: deckSeed.slug,
-          title: deckSeed.title,
-          description: deckSeed.description,
-          level: deckSeed.level,
+          slug: topic.slug,
+          title: topic.meta.title,
+          description: topic.meta.description,
+          level: topic.meta.level,
           sortOrder: deckIndex,
         })
         .onConflictDoUpdate({
           target: decks.slug,
           targetWhere: sql`${decks.ownerId} is null`,
           set: {
-            ownerId: null,
-            title: deckSeed.title,
-            description: deckSeed.description,
-            level: deckSeed.level,
+            title: topic.meta.title,
+            description: topic.meta.description,
+            level: topic.meta.level,
             sortOrder: deckIndex,
             updatedAt: now,
           },
@@ -132,29 +138,27 @@ async function seed() {
 
       seededDecks.push(deck);
 
-      for (const [wordIndex, wordSeed] of deckSeed.words.entries()) {
-        const [term, translation, phonetic, partOfSpeech, exampleSentence, exampleTranslation] =
-          wordSeed;
+      for (const [wordIndex, item] of topic.words.entries()) {
         const [word] = await tx
           .insert(words)
           .values({
             deckId: deck.id,
-            term,
-            translation,
-            phonetic,
-            partOfSpeech,
-            exampleSentence,
-            exampleTranslation,
+            term: item.term,
+            translation: item.translation,
+            phonetic: item.phonetic,
+            partOfSpeech: item.partOfSpeech ?? [],
+            exampleSentence: item.exampleSentence,
+            exampleTranslation: item.exampleTranslation,
             sortOrder: wordIndex,
           })
           .onConflictDoUpdate({
             target: [words.deckId, words.term],
             set: {
-              translation,
-              phonetic,
-              partOfSpeech,
-              exampleSentence,
-              exampleTranslation,
+              translation: item.translation,
+              phonetic: item.phonetic,
+              partOfSpeech: item.partOfSpeech ?? [],
+              exampleSentence: item.exampleSentence,
+              exampleTranslation: item.exampleTranslation,
               sortOrder: wordIndex,
               updatedAt: now,
             },
@@ -165,8 +169,9 @@ async function seed() {
       }
     }
 
-    for (const [index, word] of seededWords.slice(0, 12).entries()) {
-      const mastery = Math.min(100, 25 + index * 7);
+    // 3. Seed demo user progress for first 15 words
+    for (const [index, wordItem] of seededWords.slice(0, 15).entries()) {
+      const mastery = Math.min(100, 25 + index * 5);
       const lastReviewedAt = dateDaysAgo(index % 5);
       const nextReviewAt = dateDaysAgo(-(1 + (index % 4)));
 
@@ -174,7 +179,7 @@ async function seed() {
         .insert(wordProgress)
         .values({
           userId: demoUser.id,
-          wordId: word.id,
+          wordId: wordItem.id,
           status: "learning",
           mastery,
           intervalDays: index % 3 === 0 ? 30 : index % 3 === 1 ? 7 : 3,
@@ -204,6 +209,7 @@ async function seed() {
         });
     }
 
+    // 4. Seed demo study sessions
     const sessionStats = [
       { daysAgo: 6, reviewed: 6, correct: 4, seconds: 420, xp: 40 },
       { daysAgo: 4, reviewed: 8, correct: 6, seconds: 540, xp: 60 },
@@ -214,9 +220,7 @@ async function seed() {
     for (const [index, session] of sessionStats.entries()) {
       const startedAt = dateDaysAgo(session.daysAgo);
       startedAt.setUTCHours(12, 0, 0, 0);
-      const completedAt = new Date(
-        startedAt.getTime() + session.seconds * 1_000,
-      );
+      const completedAt = new Date(startedAt.getTime() + session.seconds * 1000);
 
       await tx
         .insert(studySessions)
@@ -249,6 +253,7 @@ async function seed() {
         });
     }
 
+    // 5. Seed demo daily activity
     const dailyStats = [
       [6, 6, 3, 4, 40, 420],
       [5, 4, 2, 3, 30, 300],
@@ -288,7 +293,7 @@ async function seed() {
   });
 
   console.log(
-    `Seeded ${deckSeeds.length} decks and ${deckSeeds.reduce((total, deck) => total + deck.words.length, 0)} words for demo@vocabloom.vn.`,
+    `Successfully seeded ${topics.length} system default decks with ${topics.reduce((acc, t) => acc + t.words.length, 0)} total words.`,
   );
 }
 
