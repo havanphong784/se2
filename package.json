@@ -11,6 +11,7 @@
     "typecheck": "tsc --noEmit",
     "test": "node --import tsx --test src/db/index.test.ts src/lib/data.test.ts src/lib/study.test.ts src/lib/vocabulary-import.test.ts src/lib/ipa/ipa.test.ts",
     "db:generate": "drizzle-kit generate",
+    "db:push": "node --env-file=.env.local node_modules/drizzle-kit/bin.cjs push",
     "db:migrate": "node --env-file=.env.local node_modules/drizzle-kit/bin.cjs migrate",
     "db:seed": "node --env-file=.env.local --import tsx scripts/seed.ts",
     "db:studio": "node --env-file=.env.local node_modules/drizzle-kit/bin.cjs studio",
