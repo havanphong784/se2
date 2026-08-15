@@ -25,10 +25,10 @@ export default async function VocabularyPage() {
   const todayMinutes = getTodayStudyMinutes(todayActivity);
 
   return (
-    <div className="mx-auto w-full max-w-[1200px] px-5 py-8 md:px-8 lg:py-10 space-y-8">
+    <div className="mx-auto w-full max-w-[1200px] px-5 py-8 md:px-8 lg:py-10">
       <DataSourceNotice source={learningResult.source} />
 
-      <header className="grid gap-6 border-b-2 border-border pb-6 lg:grid-cols-[1fr_auto] lg:items-end">
+      <header className="mb-8 grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
         <div>
           <div className="mb-3 flex flex-wrap items-center gap-2">
             <Badge className="gap-1.5 text-xs font-extrabold">
@@ -38,16 +38,16 @@ export default async function VocabularyPage() {
               {decks.length} bộ từ vựng
             </Badge>
           </div>
-          <h1 className="font-display text-balance text-[40px] font-extrabold leading-[1.08] text-eel-dark-blue md:text-[52px]">
+          <h1 className="font-display text-balance text-[36px] font-extrabold leading-[1.08] text-eel-dark-blue md:text-[44px]">
             Gieo từ mới, nhớ thật lâu.
           </h1>
-          <p className="mt-3 max-w-2xl text-pretty text-base font-bold leading-7 text-ash">
+          <p className="mt-3 max-w-2xl text-pretty text-base font-bold leading-7 text-charcoal">
             Học theo chủ đề và chăm sóc từng mầm từ vựng đến khi hoa nở rộ.
           </p>
         </div>
 
-        <div className="grid min-w-64 rounded-xl border-2 border-graphite bg-white sm:grid-cols-2">
-          <div className="flex items-center gap-3 border-b-2 border-graphite px-4 py-3 sm:border-b-0 sm:border-r-2">
+        <div className="grid min-w-64 rounded-xl border-2 border-[#e5e5e5] bg-white sm:grid-cols-2">
+          <div className="flex items-center gap-3 border-b-2 border-[#eeeeee] px-4 py-3 sm:border-b-0 sm:border-r-2">
             <Brain className="size-5 shrink-0 text-ecto-green" />
             <div>
               <p className="text-xs font-extrabold uppercase tracking-[0.08em] text-ash">Đã thuộc</p>
@@ -65,10 +65,7 @@ export default async function VocabularyPage() {
       </header>
 
       <section aria-label="Công cụ học tập" className="grid gap-5 md:grid-cols-3">
-        <article className={cn(
-          "flex flex-col justify-between rounded-xl border-2 border-b-4 bg-white p-5",
-          totalDue > 0 ? "border-ecto-green" : "border-graphite",
-        )}>
+        <article className="flex flex-col justify-between rounded-xl border-2 border-[#e5e5e5] bg-white p-5">
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-3">
               <span className={cn(
@@ -85,12 +82,12 @@ export default async function VocabularyPage() {
             </div>
             <div>
               <h2 className="text-xl font-extrabold text-eel-dark-blue">Ôn tập SRS</h2>
-              <p className="mt-1.5 text-sm font-bold leading-6 text-ash">
+              <p className="mt-1.5 text-sm font-bold leading-6 text-charcoal">
                 Ôn đúng thời điểm để giữ từ vựng trong trí nhớ dài hạn.
               </p>
             </div>
           </div>
-          <div className="mt-5 border-t-2 border-border pt-4">
+          <div className="mt-5 border-t-2 border-[#eeeeee] pt-4">
             {totalDue > 0 ? (
               <Link
                 href="/vocabulary/practice?mode=review"
@@ -110,7 +107,7 @@ export default async function VocabularyPage() {
           </div>
         </article>
 
-        <article className="flex flex-col justify-between rounded-xl border-2 border-b-4 border-macaw-blue bg-white p-5">
+        <article className="flex flex-col justify-between rounded-xl border-2 border-[#e5e5e5] bg-white p-5">
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-3">
               <span className="grid size-12 place-items-center rounded-xl border-2 border-macaw-blue text-macaw-blue">
@@ -120,12 +117,12 @@ export default async function VocabularyPage() {
             </div>
             <div>
               <h2 className="text-xl font-extrabold text-eel-dark-blue">Dịch từ mới</h2>
-              <p className="mt-1.5 text-sm font-bold leading-6 text-ash">
+              <p className="mt-1.5 text-sm font-bold leading-6 text-charcoal">
                 Tra nghĩa, IPA, loại từ và lưu ngay vào bộ từ cá nhân.
               </p>
             </div>
           </div>
-          <div className="mt-5 border-t-2 border-border pt-4">
+          <div className="mt-5 border-t-2 border-[#eeeeee] pt-4">
             <Link
               href="/vocabulary/translate"
               className={buttonVariants({ variant: "blue", size: "sm", className: "w-full justify-between" })}
@@ -135,7 +132,7 @@ export default async function VocabularyPage() {
           </div>
         </article>
 
-        <article className="flex flex-col justify-between rounded-xl border-2 border-b-4 border-lingot-lime bg-white p-5">
+        <article className="flex flex-col justify-between rounded-xl border-2 border-[#e5e5e5] bg-white p-5">
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-3">
               <span className="grid size-12 place-items-center rounded-xl border-2 border-lingot-lime text-charcoal">
@@ -145,12 +142,12 @@ export default async function VocabularyPage() {
             </div>
             <div>
               <h2 className="text-xl font-extrabold text-eel-dark-blue">Nhập từ vựng</h2>
-              <p className="mt-1.5 text-sm font-bold leading-6 text-ash">
+              <p className="mt-1.5 text-sm font-bold leading-6 text-charcoal">
                 Tạo nhanh bộ từ cá nhân từ danh sách CSV hoặc JSON có sẵn.
               </p>
             </div>
           </div>
-          <div className="mt-5 border-t-2 border-border pt-4">
+          <div className="mt-5 border-t-2 border-[#eeeeee] pt-4">
             <Link
               href="/vocabulary/import"
               className={buttonVariants({ variant: "outline", size: "sm", className: "w-full justify-between" })}
@@ -161,13 +158,12 @@ export default async function VocabularyPage() {
         </article>
       </section>
 
-      {/* Vocabulary Library Grid Section */}
-      <section className="pt-4" aria-labelledby="deck-library-title">
+      <section className="mt-12" aria-labelledby="deck-library-title">
         <div>
-          <p className="text-xs font-extrabold uppercase tracking-[0.08em] text-macaw-blue">
+          <p className="text-xs font-extrabold uppercase tracking-[0.08em] text-ecto-green">
             Khu vườn tri thức
           </p>
-          <h2 id="deck-library-title" className="mt-1 font-display text-[28px] font-extrabold text-eel-dark-blue md:text-[34px]">
+          <h2 id="deck-library-title" className="mt-1 font-display text-[32px] font-extrabold text-eel-dark-blue">
             Bộ từ vựng của bạn
           </h2>
         </div>

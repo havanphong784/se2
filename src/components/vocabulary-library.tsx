@@ -146,7 +146,7 @@ export function VocabularyLibrary({ decks }: { decks: VocabularyDeck[] }) {
                 "min-h-11 shrink-0 rounded-xl border-2 px-4 text-sm font-extrabold transition-[background-color,border-color,color,transform] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-lingot-lime/50 active:translate-y-0.5",
                 level === item
                   ? "border-ecto-green bg-ecto-green text-white"
-                  : "border-graphite bg-white text-charcoal hover:border-lingot-lime",
+                  : "border-[#e5e5e5] bg-white text-charcoal hover:border-lingot-lime",
               )}
             >
               {item}
@@ -185,10 +185,9 @@ export function VocabularyLibrary({ decks }: { decks: VocabularyDeck[] }) {
                 <button
                   type="button"
                   onClick={(event) => openDeck(deck, event.currentTarget)}
-                  className="group flex h-full w-full flex-col overflow-hidden rounded-xl border-2 border-graphite bg-white text-left transition-[border-color,transform] hover:-translate-y-0.5 hover:border-lingot-lime focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-lingot-lime/50 motion-reduce:transform-none"
+                  className="group flex h-full w-full flex-col rounded-xl border-2 border-[#e5e5e5] bg-white text-left transition-[border-color,transform] hover:-translate-y-0.5 hover:border-lingot-lime focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-lingot-lime/50 motion-reduce:transform-none"
                   aria-label={`Xem chi tiết bộ từ ${deck.title}, trình độ ${deck.level}, hoàn thành ${progress.percent}%`}
                 >
-                  <span className="h-2 w-full bg-eel-light transition-colors group-hover:bg-lingot-lime" aria-hidden="true" />
                   <span className="flex flex-1 flex-col p-5">
                     <span className="flex items-start justify-between gap-3">
                       <span className="flex items-center gap-3">
@@ -214,7 +213,7 @@ export function VocabularyLibrary({ decks }: { decks: VocabularyDeck[] }) {
                     <span className="mt-4 block text-xl font-extrabold leading-tight text-eel-dark-blue transition-colors group-hover:text-ecto-green">
                       {deck.title}
                     </span>
-                    <span className="mt-1.5 line-clamp-2 block min-h-10 text-sm font-bold leading-5 text-ash">
+                    <span className="mt-1.5 line-clamp-2 block min-h-10 text-sm font-bold leading-5 text-charcoal">
                       {deck.description || "Bộ từ vựng giúp bạn mở rộng vốn từ theo chủ đề."}
                     </span>
 
@@ -229,7 +228,7 @@ export function VocabularyLibrary({ decks }: { decks: VocabularyDeck[] }) {
                       />
                     </span>
 
-                    <span className="mt-4 flex items-center justify-between border-t-2 border-border pt-3 text-sm font-extrabold">
+                    <span className="mt-4 flex items-center justify-between border-t-2 border-[#eeeeee] pt-3 text-sm font-extrabold">
                       <span className="flex items-center gap-1.5 text-ash">
                         <BookOpen className="size-4 text-macaw-blue" /> {deck.words.length} từ
                       </span>
@@ -244,7 +243,7 @@ export function VocabularyLibrary({ decks }: { decks: VocabularyDeck[] }) {
           })}
         </motion.div>
       ) : (
-        <div className="mt-8 flex min-h-64 flex-col items-center justify-center rounded-xl border-2 border-dashed border-graphite px-5 text-center">
+        <div className="mt-8 flex min-h-64 flex-col items-center justify-center rounded-xl border-2 border-dashed border-[#e5e5e5] bg-[#fbfff8] px-5 text-center">
           <span className="grid size-16 place-items-center rounded-xl border-2 border-eel-light text-ecto-green">
             <Sprout className="size-8" />
           </span>
@@ -317,9 +316,9 @@ function DeckDetailsDialog({
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: shouldReduceMotion ? 1 : 0.97, y: shouldReduceMotion ? 0 : 8 }}
         transition={{ duration: shouldReduceMotion ? 0 : 0.18 }}
-        className="relative z-10 max-h-[calc(100vh-2rem)] w-full max-w-lg overflow-y-auto rounded-xl border-2 border-graphite bg-white p-6"
+        className="relative z-10 max-h-[calc(100vh-2rem)] w-full max-w-lg overflow-y-auto rounded-xl border-2 border-[#e5e5e5] bg-white p-6"
       >
-        <div className="flex items-start justify-between gap-4 border-b-2 border-graphite pb-4">
+        <div className="flex items-start justify-between gap-4 border-b-2 border-[#eeeeee] pb-4">
           <div className="flex min-w-0 items-center gap-3">
             <span
               className={cn(
@@ -344,18 +343,18 @@ function DeckDetailsDialog({
             ref={closeButtonRef}
             type="button"
             onClick={onClose}
-            className="grid size-10 shrink-0 place-items-center rounded-xl border-2 border-graphite text-charcoal transition-colors hover:border-lingot-lime focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-lingot-lime/50"
+            className="grid size-10 shrink-0 place-items-center rounded-xl border-2 border-[#e5e5e5] text-charcoal transition-colors hover:border-lingot-lime focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-lingot-lime/50"
             aria-label="Đóng"
           >
             <X className="size-5" />
           </button>
         </div>
 
-        <p id={descriptionId} className="mt-4 text-sm font-bold leading-6 text-ash">
+        <p id={descriptionId} className="mt-4 text-sm font-bold leading-6 text-charcoal">
           {deck.description || "Bộ từ vựng được xây dựng để giúp bạn ghi nhớ hiệu quả theo phương pháp lặp lại ngắt quãng."}
         </p>
 
-        <div className="mt-5 rounded-xl border-2 border-graphite bg-white p-4">
+        <div className="mt-5 rounded-xl border-2 border-eel-light bg-[#fbfff8] p-4">
           <div className="flex items-center justify-between gap-3 text-sm font-extrabold text-eel-dark-blue">
             <span>Tiến độ bộ từ</span>
             <span className="text-lg text-ecto-green tabular-nums">{progress.percent}%</span>
@@ -366,7 +365,7 @@ function DeckDetailsDialog({
             className="mt-3"
           />
 
-          <div className="mt-4 grid grid-cols-3 divide-x-2 divide-graphite border-2 border-graphite text-center">
+          <div className="mt-4 grid grid-cols-3 divide-x-2 divide-[#eeeeee] rounded-xl border-2 border-[#e5e5e5] bg-white text-center">
             <div className="px-2 py-3">
               <p className="text-lg font-extrabold text-ecto-green">{progress.mastered}</p>
               <p className="text-xs font-bold text-ash">Đã thuộc</p>
