@@ -40,6 +40,12 @@ export default async function VocabularyPage() {
         </div>
         <div className="flex flex-col gap-3 sm:flex-row">
           <Link
+            href="/vocabulary/translate"
+            className={buttonVariants({ variant: "outline", size: "lg", className: "w-full sm:w-auto" })}
+          >
+            <Sparkles /> Dịch từ mới
+          </Link>
+          <Link
             href="/vocabulary/import"
             className={buttonVariants({ variant: "secondary", size: "lg", className: "w-full sm:w-auto" })}
           >

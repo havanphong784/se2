@@ -142,7 +142,7 @@ async function seed() {
             term,
             translation,
             phonetic,
-            partOfSpeech,
+            partOfSpeech: partOfSpeech ? [partOfSpeech] : [],
             exampleSentence,
             exampleTranslation,
             sortOrder: wordIndex,
@@ -152,7 +152,7 @@ async function seed() {
             set: {
               translation,
               phonetic,
-              partOfSpeech,
+              partOfSpeech: partOfSpeech ? [partOfSpeech] : [],
               exampleSentence,
               exampleTranslation,
               sortOrder: wordIndex,

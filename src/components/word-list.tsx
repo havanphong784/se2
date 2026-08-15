@@ -157,7 +157,7 @@ export function WordList({ words: initialWords }: { words: VocabularyWord[] }) {
                     <Badge variant={status.variant}>{status.label}</Badge>
                   </div>
                   <p className="mt-1 text-sm font-bold text-ash">
-                    {word.phonetic} · {word.partOfSpeech}
+                    {[word.phonetic, word.partOfSpeech.join(", ")].filter(Boolean).join(" · ")}
                   </p>
                 </div>
               </div>

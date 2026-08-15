@@ -236,8 +236,10 @@ export function CustomStudySession({
           <Card className="mx-auto flex w-full max-w-[600px] flex-col overflow-hidden border-eel-light border-b-4 shadow-lg sm:min-h-[450px]">
             <CardHeader className="min-h-12 justify-center border-b-2 border-[#f0f0f0] bg-[#fbfff8] px-5 py-2.5">
               <div className="flex w-full items-center justify-between gap-3">
-                <Badge variant="blue">{currentWord.partOfSpeech}</Badge>
-                <span className="text-xs font-extrabold text-ash tabular-nums">
+                {currentWord.partOfSpeech.length > 0 && (
+                  <Badge variant="blue">{currentWord.partOfSpeech.join(", ")}</Badge>
+                )}
+                <span className="ml-auto text-xs font-extrabold text-ash tabular-nums">
                   {currentIndex + 1} / {sessionWords.length}
                 </span>
               </div>

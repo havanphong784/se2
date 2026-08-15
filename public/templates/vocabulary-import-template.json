@@ -3,7 +3,7 @@
     "term": "hello",
     "translation": "xin chào",
     "phonetic": "/həˈləʊ/",
-    "partOfSpeech": "thán từ",
+    "partOfSpeech": ["thán từ", "tính từ"],
     "exampleSentence": "Hello, friend.",
     "exampleTranslation": "Xin chào, bạn."
   },
