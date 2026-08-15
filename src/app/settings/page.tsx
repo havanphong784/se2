@@ -1,11 +1,11 @@
-import { eq } from "drizzle-orm";
 import Link from "next/link";
-import { LogIn, LogOut, Settings, UserCheck } from "lucide-react";
+import { LogIn, Settings, UserCheck } from "lucide-react";
 
 import { getDb } from "@/db";
 import { getCurrentAuthUser } from "@/lib/auth";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
+import { LogoutButton } from "@/components/logout-button";
 
 export default async function SettingsPage() {
   const db = getDb();
@@ -75,18 +75,5 @@ export default async function SettingsPage() {
         </p>
       </div>
     </div>
-  );
-}
-
-function LogoutButton() {
-  return (
-    <form action="/api/auth/logout" method="POST">
-      <button
-        type="submit"
-        className={buttonVariants({ variant: "danger", size: "sm", className: "w-full justify-center gap-1.5" })}
-      >
-        <LogOut className="size-4" /> Đăng xuất (về Demo)
-      </button>
-    </form>
   );
 }
