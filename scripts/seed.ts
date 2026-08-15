@@ -10,6 +10,8 @@ import {
   words,
 } from "../src/db/schema";
 
+import { hashPassword } from "../src/lib/auth-crypto";
+
 const deckSeeds = [
   {
     slug: "giao-tiep-hang-ngay",
@@ -90,17 +92,32 @@ async function seed() {
   const now = new Date();
 
   await db.transaction(async (tx) => {
+    const defaultPasswordHash = hashPassword("12345678");
+
     const [demoUser] = await tx
       .insert(users)
       .values({
         email: process.env.DEMO_USER_EMAIL ?? "demo@vocabloom.vn",
         displayName: "Minh Anh",
+        passwordHash: defaultPasswordHash,
       })
       .onConflictDoUpdate({
         target: users.email,
-        set: { displayName: "Minh Anh", updatedAt: now },
+        set: { displayName: "Minh Anh", passwordHash: defaultPasswordHash, updatedAt: now },
       })
       .returning({ id: users.id });
+
+    await tx
+      .insert(users)
+      .values({
+        email: "havanphong784@gmail.com",
+        displayName: "Hà Văn Phong",
+        passwordHash: defaultPasswordHash,
+      })
+      .onConflictDoUpdate({
+        target: users.email,
+        set: { displayName: "Hà Văn Phong", passwordHash: defaultPasswordHash, updatedAt: now },
+      });
 
     const seededDecks: { id: string; slug: string }[] = [];
     const seededWords: { id: string; deckId: string }[] = [];

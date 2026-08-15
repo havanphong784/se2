@@ -17,6 +17,7 @@ export const users = pgTable(
   {
     id: uuid("id").defaultRandom().primaryKey(),
     email: text("email").notNull(),
+    passwordHash: text("password_hash"),
     displayName: text("display_name").notNull(),
     nativeLanguage: text("native_language").default("vi").notNull(),
     targetLanguage: text("target_language").default("en").notNull(),
