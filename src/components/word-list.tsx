@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AlertTriangle, Check, CheckCircle2, Search, Volume2, X } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -28,10 +28,30 @@ export function WordList({ words: initialWords }: { words: VocabularyWord[] }) {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<"all" | WordStatus>("all");
   const [words, setWords] = useState(initialWords);
+  const [prevInitialWords, setPrevInitialWords] = useState(initialWords);
   const [markingIds, setMarkingIds] = useState<Set<string>>(new Set());
+
+  // Đồng bộ state khi initialWords thay đổi reference từ ngoài
+  if (initialWords !== prevInitialWords) {
+    setPrevInitialWords(initialWords);
+    setWords(initialWords);
+  }
 
   // State quản lý Modal xác nhận bỏ qua từ
   const [confirmWord, setConfirmWord] = useState<VocabularyWord | null>(null);
+
+  // Đóng modal bằng phím Escape
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setConfirmWord(null);
+      }
+    };
+    if (confirmWord) {
+      window.addEventListener("keydown", handleKeyDown);
+      return () => window.removeEventListener("keydown", handleKeyDown);
+    }
+  }, [confirmWord]);
 
   const markAsKnown = useCallback(
     async (wordId: string) => {
@@ -49,29 +69,31 @@ export function WordList({ words: initialWords }: { words: VocabularyWord[] }) {
         if (!response.ok) {
           // Hoàn tác nếu server lỗi
           setWords((prev) =>
-            prev.map((w) =>
-              w.id === wordId
-                ? {
-                    ...w,
-                    status: initialWords.find((iw) => iw.id === wordId)?.status ?? "new",
-                    mastery: initialWords.find((iw) => iw.id === wordId)?.mastery ?? 0,
-                  }
-                : w,
-            ),
+            prev.map((w) => {
+              if (w.id !== wordId) return w;
+              const original = initialWords.find((iw) => iw.id === wordId);
+              return {
+                ...w,
+                status: original?.status ?? "new",
+                mastery: original?.mastery ?? 0,
+                reviewStage: original?.reviewStage ?? 0,
+              };
+            }),
           );
         }
       } catch {
         // Hoàn tác nếu gặp lỗi mạng
         setWords((prev) =>
-          prev.map((w) =>
-            w.id === wordId
-              ? {
-                  ...w,
-                  status: initialWords.find((iw) => iw.id === wordId)?.status ?? "new",
-                  mastery: initialWords.find((iw) => iw.id === wordId)?.mastery ?? 0,
-                }
-              : w,
-          ),
+          prev.map((w) => {
+            if (w.id !== wordId) return w;
+            const original = initialWords.find((iw) => iw.id === wordId);
+            return {
+              ...w,
+              status: original?.status ?? "new",
+              mastery: original?.mastery ?? 0,
+              reviewStage: original?.reviewStage ?? 0,
+            };
+          }),
         );
       } finally {
         setMarkingIds((prev) => {
@@ -92,13 +114,13 @@ export function WordList({ words: initialWords }: { words: VocabularyWord[] }) {
   };
 
   const filteredWords = useMemo(() => {
-    const normalized = query.trim().toLocaleLowerCase("vi");
+    const normalized = query.trim().normalize("NFC").toLocaleLowerCase("vi");
     return words.filter(
       (word) =>
         (filter === "all" || word.status === filter) &&
         (!normalized ||
-          word.term.toLowerCase().includes(normalized) ||
-          word.translation.toLocaleLowerCase("vi").includes(normalized)),
+          word.term.normalize("NFC").toLowerCase().includes(normalized) ||
+          word.translation.normalize("NFC").toLocaleLowerCase("vi").includes(normalized)),
     );
   }, [filter, query, words]);
 
@@ -157,7 +179,7 @@ export function WordList({ words: initialWords }: { words: VocabularyWord[] }) {
                     <Badge variant={status.variant}>{status.label}</Badge>
                   </div>
                   <p className="mt-1 text-sm font-bold text-ash">
-                    {[word.phonetic, word.partOfSpeech.join(", ")].filter(Boolean).join(" · ")}
+                    {[word.phonetic, (word.partOfSpeech ?? []).join(", ")].filter(Boolean).join(" · ")}
                   </p>
                 </div>
               </div>
@@ -206,7 +228,12 @@ export function WordList({ words: initialWords }: { words: VocabularyWord[] }) {
 
       {/* Confirmation Dialog Cảnh báo khuynh hướng tiêu cực khi bỏ qua bài học */}
       {confirmWord && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm animate-in fade-in duration-200">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="confirm-dialog-title"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm animate-in fade-in duration-200"
+        >
           <div className="relative w-full max-w-md overflow-hidden rounded-2xl border-2 border-eel-light bg-white p-6 shadow-2xl md:p-8">
             <button
               type="button"
@@ -221,7 +248,7 @@ export function WordList({ words: initialWords }: { words: VocabularyWord[] }) {
                 <AlertTriangle className="size-6" />
               </span>
               <div>
-                <h2 className="font-display text-xl font-extrabold text-eel-dark-blue">
+                <h2 id="confirm-dialog-title" className="font-display text-xl font-extrabold text-eel-dark-blue">
                   Bỏ qua bài học từ này?
                 </h2>
                 <p className="text-xs font-bold text-ash">Cảnh báo khuynh hướng bỏ qua lộ trình</p>

@@ -1,3 +1,5 @@
+import { vnDateKey } from "@/lib/utils";
+
 const DAY_MS = 24 * 60 * 60 * 1_000;
 
 export type WordStatus = "new" | "learning" | "mastered";
@@ -34,11 +36,7 @@ export function isLearnedToday(learnedAt: string | null, now = new Date()) {
   if (!learnedAt) return false;
   const date = new Date(learnedAt);
   if (Number.isNaN(date.getTime())) return false;
-  return (
-    date.getUTCFullYear() === now.getUTCFullYear() &&
-    date.getUTCMonth() === now.getUTCMonth() &&
-    date.getUTCDate() === now.getUTCDate()
-  );
+  return vnDateKey(date) === vnDateKey(now);
 }
 
 export function selectRandomWords<T>(items: T[], count: number | "all") {
@@ -96,13 +94,19 @@ export function compareReviewPriority(
     const parsed = Date.parse(value);
     return Number.isFinite(parsed) ? parsed : Number.POSITIVE_INFINITY;
   };
+  const leftDue = time(left.nextReviewAt, Number.POSITIVE_INFINITY);
+  const rightDue = time(right.nextReviewAt, Number.POSITIVE_INFINITY);
   const dueDifference =
-    time(left.nextReviewAt, Number.POSITIVE_INFINITY) -
-    time(right.nextReviewAt, Number.POSITIVE_INFINITY);
+    leftDue === Number.POSITIVE_INFINITY && rightDue === Number.POSITIVE_INFINITY
+      ? 0
+      : leftDue - rightDue;
   if (dueDifference !== 0) return dueDifference;
+  const leftRev = time(left.lastReviewedAt, Number.NEGATIVE_INFINITY);
+  const rightRev = time(right.lastReviewedAt, Number.NEGATIVE_INFINITY);
   const reviewDifference =
-    time(left.lastReviewedAt, Number.NEGATIVE_INFINITY) -
-    time(right.lastReviewedAt, Number.NEGATIVE_INFINITY);
+    leftRev === Number.NEGATIVE_INFINITY && rightRev === Number.NEGATIVE_INFINITY
+      ? 0
+      : leftRev - rightRev;
   return reviewDifference || left.id.localeCompare(right.id);
 }
 
@@ -123,6 +127,7 @@ export function moveFirstToEnd<T>(queue: T[]) {
 }
 
 export function normalizeAnswer(value: string) {
+  if (typeof value !== "string" || !value.trim()) return "";
   return value
     .normalize("NFKC")
     .trim()

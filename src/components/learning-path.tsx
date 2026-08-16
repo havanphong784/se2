@@ -7,11 +7,19 @@ import { deckProgress, type VocabularyDeck } from "@/lib/demo-data";
 
 export function LearningPath({ decks }: { decks: VocabularyDeck[] }) {
   return (
-    <ol className="relative mt-6 space-y-4 before:absolute before:bottom-7 before:left-[27px] before:top-7 before:w-1 before:rounded-xl before:bg-eel-light">
+    <ol
+      className={`relative mt-6 space-y-4 ${
+        decks.length > 1
+          ? "before:absolute before:bottom-7 before:left-[27px] before:top-7 before:w-1 before:rounded-xl before:bg-eel-light"
+          : ""
+      }`}
+    >
       {decks.map((deck, index) => {
         const progress = deckProgress(deck);
         const started = progress.percent > 0;
-        const available = index < 3 || started;
+        const prevDeckProgress = index > 0 ? deckProgress(decks[index - 1]) : null;
+        const available =
+          index === 0 || (prevDeckProgress !== null && prevDeckProgress.percent >= 100);
 
         return (
           <li key={deck.id} className="relative flex gap-4">

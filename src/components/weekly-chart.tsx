@@ -23,7 +23,7 @@ function ChartTooltip({
 }) {
   if (!active || !payload?.length) return null;
   const item = payload[0].payload;
-  const total = item.reviewed + item.learned;
+  const total = (item.reviewed ?? 0) + (item.learned ?? 0);
   return (
     <div className="rounded-xl border-2 border-eel-light bg-white px-3 py-2 text-sm font-extrabold text-charcoal">
       <p>{label}</p>

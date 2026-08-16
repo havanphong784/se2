@@ -81,7 +81,7 @@ export default async function DashboardPage() {
     weekday: "long",
     day: "numeric",
     month: "long",
-    timeZone: "UTC",
+    timeZone: "Asia/Ho_Chi_Minh",
   }).format(new Date());
 
   return (

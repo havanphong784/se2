@@ -15,6 +15,7 @@ export const VN_WEEKDAYS = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
  * Dùng cho streak + weekly calendar thay vì UTC key trước đây.
  */
 export function vnDateKey(date = new Date()): string {
+  if (Number.isNaN(date.getTime())) return "";
   return new Intl.DateTimeFormat("en-CA", { timeZone: VN_TZ }).format(date);
 }
 
@@ -59,11 +60,13 @@ export function vnDateKeyOffset(offset: number, base = new Date()): string {
 
 /** Trả `dd/MM` cho một `Date` (lấy phần UTC). */
 export function vnDayLabel(date: Date): string {
+  if (Number.isNaN(date.getTime())) return "";
   return `${String(date.getUTCDate()).padStart(2, "0")}/${String(date.getUTCMonth() + 1).padStart(2, "0")}`;
 }
 
 /** Weekday ngắn CN–T7 cho `Date` (lấy phần UTC). */
 export function vnWeekdayLabel(date: Date): string {
+  if (Number.isNaN(date.getTime())) return "";
   return VN_WEEKDAYS[date.getUTCDay()];
 }
 
