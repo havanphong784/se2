@@ -15,6 +15,7 @@ import {
 
 import { DataSourceNotice } from "@/components/data-source-notice";
 import { LearningPath } from "@/components/learning-path";
+import { WeeklyReviewCalendar } from "@/components/weekly-review-calendar";
 import { WordGardenIllustration } from "@/components/word-garden-illustration";
 import { WeeklyChart } from "@/components/weekly-chart";
 import { Badge } from "@/components/ui/badge";
@@ -25,7 +26,7 @@ import { getLearningData } from "@/lib/data";
 import { getCurrentAuthUser } from "@/lib/auth";
 import { getDb } from "@/db";
 import { isDueForReview } from "@/lib/study";
-import { cn } from "@/lib/utils";
+import { cn, vnCalendarWeek, vnDateKey, vnDayLabel, vnWeekdayLabel } from "@/lib/utils";
 
 export default async function DashboardPage() {
   const db = getDb();
@@ -46,11 +47,41 @@ export default async function DashboardPage() {
   const now = new Date();
   const dueWords = allWords.filter((word) => isDueForReview(word, now));
   const activeDays = activity.filter((item) => item.reviewed > 0 || item.learned > 0).length;
+
+  // Panel "ôn tuần này" (T2–CN): ô quá khứ hiển thị số đã ôn (reviewed),
+  // ô hôm nay/tương lai hiển thị số từ cần ôn lũy tiến (due <= hết ngày đó).
+  const weekDates = vnCalendarWeek(now);
+  const weekDays = weekDates.map((date) => vnWeekdayLabel(date));
+  const weekFullDates = weekDates.map((date) => vnDayLabel(date));
+  const todayKey = vnDateKey(now);
+  const reviewedByDate = new Map(
+    activity.map((item) => [`${item.day}-${item.fullDate}`, item.reviewed]),
+  );
+  const weekReviewed = weekDates.map((date, index) => {
+    const key = `${weekDays[index]}-${weekFullDates[index]}`;
+    return reviewedByDate.get(key) ?? 0;
+  });
+  // Hết ngày D = đầu ngày D+1 (UTC) — khớp isDueForReview dùng <= now.
+  const weekDue = weekDates.map((date) => {
+    const endOfDay = new Date(date);
+    endOfDay.setUTCDate(endOfDay.getUTCDate() + 1);
+    return allWords.filter((word) => {
+      if (
+        !word.learnedAt ||
+        word.status === "mastered" ||
+        word.reviewCompletedAt ||
+        !word.nextReviewAt
+      )
+        return false;
+      const dueAt = Date.parse(word.nextReviewAt);
+      return Number.isFinite(dueAt) && dueAt <= endOfDay.getTime();
+    }).length;
+  });
   const dateLabel = new Intl.DateTimeFormat("vi-VN", {
     weekday: "long",
     day: "numeric",
     month: "long",
-    timeZone: "UTC",
+    timeZone: "Asia/Ho_Chi_Minh",
   }).format(new Date());
 
   return (
@@ -193,6 +224,31 @@ export default async function DashboardPage() {
             Khám phá bộ từ <ArrowRight />
           </Link>
         </div>
+      </section>
+
+      <section className="mt-10" aria-labelledby="review-week-title">
+        <Card>
+          <CardHeader className="flex-row items-start justify-between gap-4">
+            <div>
+              <p className="text-xs font-extrabold uppercase tracking-[0.08em] text-ecto-green">
+                Lịch ôn
+              </p>
+              <CardTitle id="review-week-title" className="mt-1 text-[24px]">
+                Ôn tuần này
+              </CardTitle>
+            </div>
+            <Badge variant="neutral">{weekDue[weekDue.length - 1]} từ đến hạn CN</Badge>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <WeeklyReviewCalendar
+              days={weekDays}
+              fullDates={weekFullDates}
+              reviewed={weekReviewed}
+              due={weekDue}
+              todayIndex={weekDates.findIndex((date) => vnDateKey(date) === todayKey)}
+            />
+          </CardContent>
+        </Card>
       </section>
 
       <section className="mt-12" aria-labelledby="path-title">

@@ -10,7 +10,8 @@ function Progress({
   "aria-label": ariaLabel,
   ...props
 }: React.ComponentProps<"div"> & { value?: number | null }) {
-  const safeValue = Math.min(100, Math.max(0, value ?? 0));
+  const rawValue = typeof value === "number" && !Number.isNaN(value) ? value : 0;
+  const safeValue = Math.min(100, Math.max(0, rawValue));
 
   return (
     <div

@@ -40,6 +40,15 @@ export type DailyActivity = {
   studySeconds?: number;
 };
 
+export type Streak = {
+  /** Chuỗi ngày liên tục học tính đến hiện tại. */
+  current: number;
+  /** Chuỗi dài nhất từng đạt. */
+  best: number;
+  /** Trạng thái chuỗi hiện tại. */
+  status: "active" | "at-risk" | "broken";
+};
+
 const word = (
   deck: string,
   term: string,
@@ -62,11 +71,15 @@ const word = (
   status,
   mastery,
   intervalDays,
-  learnedAt: status === "new" ? null : new Date(0).toISOString(),
+  learnedAt: status === "new" ? null : new Date(Date.now() - 3 * 86400000).toISOString(),
   reviewStage: status === "mastered" ? 3 : 0,
-  lastReviewedAt: status === "new" ? null : new Date(0).toISOString(),
-  nextReviewAt: status === "new" || status === "mastered" ? null : new Date(0).toISOString(),
-  reviewCompletedAt: status === "mastered" ? new Date(0).toISOString() : null,
+  lastReviewedAt: status === "new" ? null : new Date(Date.now() - 86400000).toISOString(),
+  nextReviewAt:
+    status === "new" || status === "mastered"
+      ? null
+      : new Date(Date.now() + (intervalDays || 1) * 86400000).toISOString(),
+  reviewCompletedAt:
+    status === "mastered" ? new Date(Date.now() - 86400000).toISOString() : null,
 });
 
 export const DEMO_DECKS: VocabularyDeck[] = Object.entries(TOPIC_METADATA).map(
@@ -142,7 +155,16 @@ export const DEMO_ACTIVITY: DailyActivity[] = [
   { day: "CN", fullDate: "12/07", reviewed: 6, learned: 3, xp: 40, studySeconds: 360 },
 ];
 
+export const DEMO_STREAK: Streak = {
+  current: 6,
+  best: 7,
+  status: "active",
+};
+
 export function deckProgress(deck: VocabularyDeck) {
+  if (!deck.words || deck.words.length === 0) {
+    return { mastered: 0, learning: 0, fresh: 0, percent: 100 };
+  }
   const mastered = deck.words.filter(
     (item) => item.status === "mastered" || Boolean(item.reviewCompletedAt),
   ).length;

@@ -35,7 +35,13 @@ function isCurrent(pathname: string, href: string) {
   return href === "/" ? pathname === "/" : pathname.startsWith(href);
 }
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+export function AppShell({
+  children,
+  streakDays = 7,
+}: {
+  children: React.ReactNode;
+  streakDays?: number;
+}) {
   const pathname = usePathname();
   const inPractice = pathname.startsWith("/vocabulary/practice");
   const [user, setUser] = useState<{ displayName: string; isDemo: boolean } | null>(null);
@@ -124,7 +130,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </Link>
             )}
             <Badge variant="warning" className="w-full justify-center py-2">
-              <Flame className="size-4 fill-current" /> 12 ngày liên tiếp
+              <Flame className="size-4 fill-current" /> {streakDays} ngày liên tiếp
             </Badge>
           </div>
         </aside>
@@ -137,7 +143,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </Link>
           <div className="flex items-center gap-2">
             <Badge variant="warning">
-              <Flame className="size-4 fill-current" /> 12
+              <Flame className="size-4 fill-current" /> {streakDays}
             </Badge>
             <span className="grid size-9 place-items-center rounded-xl border-2 border-eel-light bg-[#f7fff1]">
               🌱
