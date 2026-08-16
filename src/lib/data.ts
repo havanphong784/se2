@@ -10,11 +10,20 @@ import { dailyActivity, decks, wordProgress, words } from "@/db/schema";
 import {
   DEMO_ACTIVITY,
   DEMO_DECKS,
+  DEMO_STREAK,
   type DailyActivity as ActivityItem,
+  type Streak,
   type VocabularyDeck,
   type VocabularyWord,
 } from "@/lib/demo-data";
 import { getDemoUser } from "@/lib/server-data";
+import {
+  vnDateKey,
+  vnDateKeyOffset,
+  vnDayLabel,
+  vnWeekDates,
+  vnWeekdayLabel,
+} from "@/lib/utils";
 
 export type DataSource = "database" | "demo-unconfigured" | "demo-unavailable";
 
@@ -27,6 +36,7 @@ export type DataResult<T> = {
 export type LearningData = {
   decks: VocabularyDeck[];
   activity: ActivityItem[];
+  streak: Streak;
 };
 
 function result<T>(data: T, source: DataSource): DataResult<T> {
@@ -41,30 +51,100 @@ function fallbackActivity() {
   return structuredClone(DEMO_ACTIVITY);
 }
 
-function fallbackLearningData(source: Exclude<DataSource, "database">): DataResult<LearningData> {
-  return result({ decks: fallbackDecks(), activity: fallbackActivity() }, source);
+function fallbackStreak() {
+  return structuredClone(DEMO_STREAK);
 }
 
-function recentUtcDates() {
-  const today = new Date();
-  today.setUTCHours(0, 0, 0, 0);
-  return Array.from({ length: 7 }, (_, index) => {
-    const date = new Date(today);
-    date.setUTCDate(today.getUTCDate() - (6 - index));
-    return date;
-  });
+function fallbackLearningData(source: Exclude<DataSource, "database">): DataResult<LearningData> {
+  return result(
+    { decks: fallbackDecks(), activity: fallbackActivity(), streak: fallbackStreak() },
+    source,
+  );
 }
 
 function emptyRecentActivity(): ActivityItem[] {
-  const weekdays = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
-  return recentUtcDates().map((date) => ({
-    day: weekdays[date.getUTCDay()],
-    fullDate: `${String(date.getUTCDate()).padStart(2, "0")}/${String(date.getUTCMonth() + 1).padStart(2, "0")}`,
+  return vnWeekDates().map((date) => ({
+    day: vnWeekdayLabel(date),
+    fullDate: vnDayLabel(date),
     reviewed: 0,
     learned: 0,
     xp: 0,
     studySeconds: 0,
   }));
+}
+
+type ActivityRow = {
+  activityDate: string;
+  reviewedCount: number;
+  learnedCount: number;
+  xpEarned: number;
+};
+
+function isDayActive(row: ActivityRow | undefined): row is ActivityRow {
+  return Boolean(row && (row.reviewedCount > 0 || row.learnedCount > 0 || row.xpEarned > 0));
+}
+
+/**
+ * Tính streak từ danh sách `dailyActivity` rows.
+ * - `current`: chuỗi liên tục tính ngược từ hôm nay. Nếu hôm nay chưa active
+ *   nhưng hôm qua active thì vẫn giữ (status "at-risk", hôm nay vẫn còn thời gian học).
+ *   Một ô gap 2 ngày liên tục (hôm nay + hôm qua đều không active) → 0.
+ * - `best`: chuỗi dài nhất từng có trong toàn bộ rows.
+ * - `status`: "active" (hôm nay đang active) / "at-risk" (hôm qua active, hôm nay chưa)
+ *   / "broken" (đã đứt, phải học lại để reset).
+ */
+export function computeStreak(rows: ActivityRow[]): Streak {
+  const todayKey = vnDateKey();
+  const yesterdayKey = vnDateKeyOffset(-1);
+  const byDate = new Map(rows.map((row) => [row.activityDate, row]));
+
+  const isActive = (key: string) => isDayActive(byDate.get(key));
+
+  // current streak: đếm ngược liên tục
+  let current = 0;
+  if (isActive(yesterdayKey) && !isActive(todayKey)) {
+    // Hôm qua active, hôm nay chưa → streak còn giữ giá trị hôm qua, at-risk.
+    let cursor = -1;
+    while (isActive(vnDateKeyOffset(cursor))) {
+      current += 1;
+      cursor -= 1;
+    }
+  } else {
+    let cursor = 0;
+    while (isActive(vnDateKeyOffset(cursor))) {
+      current += 1;
+      cursor -= 1;
+    }
+  }
+
+  // best streak: quét toàn bộ keys hiện có theo thứ tự ngày
+  const sortedKeys = [...byDate.keys()].sort();
+  let best = 0;
+  let run = 0;
+  let prevKey: string | null = null;
+  for (const key of sortedKeys) {
+    if (!isActive(key)) {
+      run = 0;
+      prevKey = key;
+      continue;
+    }
+    if (prevKey && key === vnDateKeyOffset(1, new Date(prevKey))) {
+      run += 1;
+    } else {
+      run = 1;
+    }
+    best = Math.max(best, run);
+    prevKey = key;
+  }
+  best = Math.max(best, current);
+
+  const status: Streak["status"] = isActive(todayKey)
+    ? "active"
+    : current > 0
+      ? "at-risk"
+      : "broken";
+
+  return { current, best, status };
 }
 
 async function loadDecks(
@@ -146,33 +226,44 @@ async function loadDecks(
   return [...loadedDecks.values()];
 }
 
-async function loadActivity(
+async function loadActivityData(
   db: NonNullable<ReturnType<typeof getDb>>,
   user: Awaited<ReturnType<typeof getDemoUser>>,
-): Promise<ActivityItem[]> {
-  if (!user) return emptyRecentActivity();
+): Promise<{ activity: ActivityItem[]; streak: Streak }> {
+  if (!user) return { activity: emptyRecentActivity(), streak: computeStreak([]) };
 
-  const dates = recentUtcDates();
-  const startKey = dates[0].toISOString().slice(0, 10);
+  // Lấy 30 ngày gần nhất để tính streak best + current chính xác hơn,
+  // nhưng UI weekly chỉ hiển thị 7 ngày cuối.
+  const streakStartKey = vnDateKeyOffset(-29);
   const rows = await db
-    .select()
+    .select({
+      activityDate: dailyActivity.activityDate,
+      reviewedCount: dailyActivity.reviewedCount,
+      learnedCount: dailyActivity.learnedCount,
+      xpEarned: dailyActivity.xpEarned,
+    })
     .from(dailyActivity)
-    .where(and(eq(dailyActivity.userId, user.id), gte(dailyActivity.activityDate, startKey)))
+    .where(and(eq(dailyActivity.userId, user.id), gte(dailyActivity.activityDate, streakStartKey)))
     .orderBy(asc(dailyActivity.activityDate));
 
+  const streak = computeStreak(rows);
+
+  const dates = vnWeekDates();
   const byDate = new Map(rows.map((row) => [row.activityDate, row]));
-  const weekdays = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
-  return dates.map((date) => {
-    const row = byDate.get(date.toISOString().slice(0, 10));
+  const activity = dates.map((date) => {
+    const key = vnDateKey(date);
+    const row = byDate.get(key);
     return {
-      day: weekdays[date.getUTCDay()],
-      fullDate: `${String(date.getUTCDate()).padStart(2, "0")}/${String(date.getUTCMonth() + 1).padStart(2, "0")}`,
+      day: vnWeekdayLabel(date),
+      fullDate: vnDayLabel(date),
       reviewed: row?.reviewedCount ?? 0,
       learned: row?.learnedCount ?? 0,
       xp: row?.xpEarned ?? 0,
-      studySeconds: row?.studySeconds ?? 0,
+      studySeconds: 0,
     };
   });
+
+  return { activity, streak };
 }
 
 export async function getLearningData(): Promise<DataResult<LearningData>> {
@@ -182,12 +273,12 @@ export async function getLearningData(): Promise<DataResult<LearningData>> {
 
   try {
     const user = await getDemoUser(db);
-    const [loadedDecks, activity] = await Promise.all([
+    const [loadedDecks, { activity, streak }] = await Promise.all([
       loadDecks(db, user),
-      loadActivity(db, user),
+      loadActivityData(db, user),
     ]);
     markDatabaseAvailable();
-    return result({ decks: loadedDecks, activity }, "database");
+    return result({ decks: loadedDecks, activity, streak }, "database");
   } catch (error) {
     markDatabaseFailure(error);
     return fallbackLearningData("demo-unavailable");

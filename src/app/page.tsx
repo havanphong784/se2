@@ -15,6 +15,7 @@ import {
 
 import { DataSourceNotice } from "@/components/data-source-notice";
 import { LearningPath } from "@/components/learning-path";
+import { WeeklyCalendar } from "@/components/weekly-calendar";
 import { WordGardenIllustration } from "@/components/word-garden-illustration";
 import { WeeklyChart } from "@/components/weekly-chart";
 import { Badge } from "@/components/ui/badge";
@@ -33,7 +34,7 @@ export default async function DashboardPage() {
   const displayName = authUser?.displayName ?? "Minh Anh";
 
   const learning = await getLearningData();
-  const { decks, activity } = learning.data;
+  const { decks, activity, streak } = learning.data;
   const allWords = decks.flatMap((deck) => deck.words);
   const mastered = allWords.filter((word) => word.reviewCompletedAt).length;
   const learningCount = allWords.filter(
@@ -45,7 +46,12 @@ export default async function DashboardPage() {
   const goalPercent = Math.min(100, Math.round((learnedToday / dailyGoal) * 100));
   const now = new Date();
   const dueWords = allWords.filter((word) => isDueForReview(word, now));
-  const activeDays = activity.filter((item) => item.reviewed > 0 || item.learned > 0).length;
+  const streakLabel =
+    streak.status === "active"
+      ? "Đang cháy"
+      : streak.status === "at-risk"
+        ? "Sắp đứt — học ngay!"
+        : "Đã đứt";
   const dateLabel = new Intl.DateTimeFormat("vi-VN", {
     weekday: "long",
     day: "numeric",
@@ -65,8 +71,19 @@ export default async function DashboardPage() {
             Chào {displayName}, mình nở thêm vài từ nhé!
           </h1>
         </div>
-        <div className="flex items-center gap-2 text-sm font-extrabold text-ash">
-          <Flame className="size-5 fill-[#ffb020] text-[#ffb020]" /> Đã học {activeDays}/7 ngày gần đây
+        <div className="flex flex-col items-end gap-1 text-sm font-extrabold">
+          <div className="flex items-center gap-2 text-charcoal">
+            <Flame className="size-5 fill-[#ffb020] text-[#ffb020]" />
+            <span className="text-eel-dark-blue">{streak.current} ngày liên tiếp</span>
+          </div>
+          <div className="flex items-center gap-2 text-ash">
+            <Badge
+              variant={streak.status === "broken" ? "neutral" : streak.status === "active" ? "default" : "warning"}
+            >
+              {streakLabel}
+            </Badge>
+            <span className="text-ash">Kỷ lục {streak.best} ngày</span>
+          </div>
         </div>
       </header>
 
@@ -169,7 +186,10 @@ export default async function DashboardPage() {
             </Badge>
           </CardHeader>
           <CardContent className="pt-0">
-            <WeeklyChart data={activity} />
+            <WeeklyCalendar data={activity} />
+            <div className="mt-5">
+              <WeeklyChart data={activity} />
+            </div>
           </CardContent>
         </Card>
 

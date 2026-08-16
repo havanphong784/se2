@@ -40,6 +40,15 @@ export type DailyActivity = {
   studySeconds?: number;
 };
 
+export type Streak = {
+  /** Chuỗi ngày liên tục học tính đến hiện tại. */
+  current: number;
+  /** Chuỗi dài nhất từng đạt. */
+  best: number;
+  /** Trạng thái chuỗi hiện tại. */
+  status: "active" | "at-risk" | "broken";
+};
+
 const word = (
   deck: string,
   term: string,
@@ -141,6 +150,12 @@ export const DEMO_ACTIVITY: DailyActivity[] = [
   { day: "T7", fullDate: "11/07", reviewed: 18, learned: 9, xp: 130, studySeconds: 780 },
   { day: "CN", fullDate: "12/07", reviewed: 6, learned: 3, xp: 40, studySeconds: 360 },
 ];
+
+export const DEMO_STREAK: Streak = {
+  current: 6,
+  best: 7,
+  status: "active",
+};
 
 export function deckProgress(deck: VocabularyDeck) {
   const mastered = deck.words.filter(
