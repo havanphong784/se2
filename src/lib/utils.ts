@@ -66,3 +66,27 @@ export function vnDayLabel(date: Date): string {
 export function vnWeekdayLabel(date: Date): string {
   return VN_WEEKDAYS[date.getUTCDay()];
 }
+
+/**
+ * Trả 7 `Date` theo tuần lịch VN (T2–CN) chứa ngày `base`, từ T2 đến CN
+ * (cũ → mới), snap 00:00 UTC. Dùng cho panel "ôn tuần này": ô quá khứ
+ * hiển thị số đã ôn, ô hôm nay/tương lai hiển thị số từ cần ôn lũy tiến.
+ */
+export function vnCalendarWeek(base = new Date()): Date[] {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: VN_TZ,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(base);
+  const get = (type: string) => Number(parts.find((p) => p.type === type)?.value);
+  const today = new Date(Date.UTC(get("year"), get("month") - 1, get("day")));
+  const diffToMonday = (today.getUTCDay() + 6) % 7;
+  const monday = new Date(today);
+  monday.setUTCDate(today.getUTCDate() - diffToMonday);
+  return Array.from({ length: 7 }, (_, index) => {
+    const date = new Date(monday);
+    date.setUTCDate(monday.getUTCDate() + index);
+    return date;
+  });
+}

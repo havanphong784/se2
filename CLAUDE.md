@@ -1,12 +1,19 @@
 # Project Workflow & Architecture Guidelines
 
 ## 1. Hierarchical Multi-Agent Task Delegation
-- **Main Agent (Primary Large Model)**:
+- **Main Agent (Large-Context Model, e.g. nvidia/z-ai/glm-5.2)**:
   - Responsible for overall architecture, workflow management, complex state/backend logic, system integration, and final code verification.
-  - Controls task breakdown and delegates bounded subtasks to specialized subagents.
-- **Subagents (Small / Fast / Scoped Models)**:
-  - Delegate smaller, well-scoped tasks (e.g., UI component styling, layout tweaks, mechanical file edits, focused UI implementations) using the `Agent` tool with targeted context and appropriate model allocation.
+  - Holds full conversation context; designs the main flow of the web app, then breaks it down and delegates bounded subtasks to specialized subagents.
+- **Subagents (Small / Fast / Scoped Models, e.g. antigravity)**:
+  - Delegate smaller, well-scoped, low-context tasks using the `Agent` tool with targeted context and appropriate model allocation:
+    - UI component styling, layout tweaks, focused UI implementations.
+    - Small helper functions, utility modules, mechanical edits (renames, type fixes, format-preserving tweaks).
   - Subagents focus on execution within their assigned scope without modifying high-level architecture.
+- **Delegation flow**:
+  1. Main agent reads the full codebase surface and designs the main web flow (routing, data layer, page composition).
+  2. Main agent breaks work into bounded units (e.g. "Style `WeeklyReviewCalendar` grid", "Add `vnCalendarWeek` helper").
+  3. Each unit is sent to a small-context subagent with only the context it needs — relevant file excerpts, the design tokens/contracts, and a crisp acceptance criteria — never the whole conversation.
+  4. Subagent returns the localized change; main agent integrates, then runs `npm run build` + `npm test` for verification.
 
 ## 2. Verification & Git Policy
 - **Testing & Build Verification**:
