@@ -108,9 +108,12 @@ export function CustomPracticeDialog({
           role="dialog"
           aria-modal="true"
           aria-labelledby="custom-practice-title"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setOpen(false);
+          }}
         >
-          <div className="relative w-full max-w-lg overflow-hidden rounded-xl border-2 border-b-4 border-eel-light bg-white p-6 md:p-8">
+          <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-xl border-2 border-b-4 border-eel-light bg-white p-6 md:p-8">
             <button
               type="button"
               onClick={() => setOpen(false)}
