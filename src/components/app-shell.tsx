@@ -147,17 +147,34 @@ export function AppShell({
       )}
 
       {!inPractice && (
-        <header className="fixed inset-x-0 top-0 z-40 flex h-16 items-center justify-between border-b-2 border-[#ededed] bg-white px-4 lg:hidden">
+        <header className="fixed inset-x-0 top-0 z-40 flex h-16 items-center justify-between border-b-2 border-[#ededed] bg-white px-3 sm:px-4 lg:hidden">
           <Link href="/" aria-label="VocaBloom - Trang tổng quan">
             <BrandName compact />
           </Link>
-          <div className="flex items-center gap-2">
-            <Badge variant="warning">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <Badge variant="warning" className="h-9 px-2.5 text-xs font-extrabold">
               <Flame className="size-4 fill-current" /> {streakDays}
             </Badge>
-            <span className="grid size-9 place-items-center rounded-xl border-2 border-eel-light bg-[#f7fff1]">
-              🌱
-            </span>
+            {user?.isDemo ? (
+              <Link
+                href="/login"
+                className="flex h-9 items-center gap-1.5 rounded-xl border-2 border-b-4 border-ecto-green border-b-[#46a302] bg-ecto-green px-3 text-xs font-extrabold text-white transition-transform active:translate-y-0.5"
+              >
+                <LogIn className="size-3.5" /> Đăng nhập
+              </Link>
+            ) : (
+              <Link
+                href="/settings"
+                aria-label="Cài đặt tài khoản"
+                className="flex h-9 items-center gap-1.5 rounded-xl border-2 border-b-4 border-eel-light border-b-[#c4f0a0] bg-[#f7fff1] px-2.5 text-xs font-extrabold text-charcoal transition-transform active:translate-y-0.5"
+              >
+                <span>🌱</span>
+                <span className="max-w-[90px] truncate text-eel-dark-blue sm:max-w-[140px]">
+                  {user?.displayName ?? "Tài khoản"}
+                </span>
+                <Settings className="size-3.5 text-ash" />
+              </Link>
+            )}
           </div>
         </header>
       )}
