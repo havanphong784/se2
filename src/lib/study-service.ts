@@ -11,6 +11,7 @@ import {
   words,
 } from "@/db/schema";
 import { getDemoUser } from "@/lib/server-data";
+import { vnDateKeyOffset } from "@/lib/utils";
 import {
   evaluateStudyAnswer,
   normalizeAnswer,
@@ -185,7 +186,7 @@ export async function createStudySession(
                 eq(wordProgress.userId, user.id),
                 sql`${wordProgress.learnedAt} is not null`,
                 isNull(wordProgress.reviewCompletedAt),
-                lte(wordProgress.nextReviewAt, now),
+                sql`${wordProgress.nextReviewAt} < ${vnDateKeyOffset(1, now)}`,
               ),
             )
             .orderBy(
