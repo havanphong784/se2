@@ -56,7 +56,7 @@ export function isDueForReview(
   progress: Pick<StudyWord, "learnedAt" | "nextReviewAt" | "reviewCompletedAt"> & {
     status?: WordStatus;
   },
-  now: Date,
+  now = new Date(),
 ) {
   if (
     !progress.learnedAt ||
@@ -65,8 +65,10 @@ export function isDueForReview(
     !progress.nextReviewAt
   )
     return false;
-  const dueAt = Date.parse(progress.nextReviewAt);
-  return Number.isFinite(dueAt) && dueAt <= now.getTime();
+  const dueDate = new Date(progress.nextReviewAt);
+  if (Number.isNaN(dueDate.getTime())) return false;
+  // Đến hạn nếu thời điểm đã qua HOẶC ngày đến hạn <= ngày hiện tại (múi giờ VN)
+  return dueDate.getTime() <= now.getTime() || vnDateKey(dueDate) <= vnDateKey(now);
 }
 
 export function getTodayStudyMinutes(activityItem?: {
