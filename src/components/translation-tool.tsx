@@ -291,7 +291,7 @@ export function TranslationTool({
     <div className="grid gap-8 lg:grid-cols-12">
       {/* Left Column: Translation Workspace (8 cols) */}
       <div className="space-y-6 lg:col-span-8">
-        <Card className="border-eel-light border-b-4 shadow-sm">
+        <Card className="border-eel-light border-b-4">
           <CardHeader className="bg-[#fbfff8] pb-4 border-b border-[#eeeeee]">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <Badge variant="blue" className="gap-1.5 text-xs font-extrabold">
@@ -505,7 +505,7 @@ export function TranslationTool({
         </Card>
 
         {/* Topic suggestions */}
-        <Card className="border-eel-light border-b-4 shadow-sm bg-[#fbfff8]">
+        <Card className="border-eel-light border-b-4 bg-[#fbfff8]">
           <CardContent className="p-5">
             <div className="flex items-center gap-2 mb-3 text-xs font-extrabold uppercase tracking-wider text-ash">
               <Sparkles className="size-4 text-ecto-green" /> Từ vựng gợi ý theo chủ đề nhanh
@@ -529,7 +529,7 @@ export function TranslationTool({
       {/* Right Column: History & Quick Deck Access (4 cols) */}
       <div className="space-y-6 lg:col-span-4">
         {/* Recent Translation History */}
-        <Card className="border-eel-light border-b-4 shadow-sm">
+        <Card className="border-eel-light border-b-4">
           <CardHeader className="pb-3 border-b border-[#eeeeee]">
             <CardTitle className="flex items-center justify-between text-base font-extrabold text-eel-dark-blue">
               <span className="flex items-center gap-2">
@@ -581,7 +581,7 @@ export function TranslationTool({
         </Card>
 
         {/* Personal Decks Summary */}
-        <Card className="border-eel-light border-b-4 shadow-sm bg-[#fafafa]">
+        <Card className="border-eel-light border-b-4 bg-[#fafafa]">
           <CardHeader className="pb-3 border-b border-[#eeeeee]">
             <CardTitle className="flex items-center justify-between text-base font-extrabold text-eel-dark-blue">
               <span className="flex items-center gap-2">
@@ -617,7 +617,7 @@ export function TranslationTool({
         </Card>
 
         {/* Helpful Tips Card */}
-        <Card className="border-eel-light border-b-4 shadow-sm bg-[#f0f9ff]">
+        <Card className="border-eel-light border-b-4 bg-[#f0f9ff]">
           <CardContent className="p-4 space-y-2">
             <div className="flex items-center gap-2 text-xs font-black uppercase text-macaw-blue">
               <Lightbulb className="size-4" /> Mẹo học từ vựng hiệu quả
@@ -634,7 +634,7 @@ export function TranslationTool({
       {/* Modal dialog for adding word to deck */}
       {showDeckModal && result && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
-          <Card className="w-full max-w-lg border-eel-light border-b-4 shadow-xl max-h-[90vh] overflow-y-auto">
+          <Card className="w-full max-w-lg border-eel-light border-b-4 max-h-[90vh] overflow-y-auto">
             <CardHeader className="bg-[#fbfff8] border-b border-[#f0f0f0]">
               <CardTitle className="flex items-center gap-2 text-xl font-black text-eel-dark-blue">
                 <FolderPlus className="size-5 text-macaw-blue" />

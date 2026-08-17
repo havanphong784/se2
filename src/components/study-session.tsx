@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowLeft,
   ArrowRight,
@@ -66,7 +67,7 @@ function isEditableTarget(target: EventTarget | null) {
 
 function ShortcutKey({ children }: { children: React.ReactNode }) {
   return (
-    <kbd className="rounded-md border border-current/25 bg-white/70 px-1.5 py-0.5 font-mono text-[0.7rem] font-extrabold leading-none shadow-sm">
+    <kbd className="rounded border border-[#d0d0d0] bg-[#f5f5f5] px-1.5 py-0.5 font-mono text-[11px] font-extrabold text-charcoal">
       {children}
     </kbd>
   );
@@ -378,7 +379,7 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
     const available = mode === "learn" ? deck?.words.filter((word) => !word.learnedAt).length ?? 0 : null;
     return (
       <main className="grid min-h-svh place-items-center bg-[linear-gradient(180deg,#f8fff3_0%,#ffffff_55%)] px-5 py-10">
-        <Card className="w-full max-w-xl border-eel-light bg-white/95 shadow-[0_12px_40px_rgba(67,143,14,0.08)]">
+        <Card className="w-full max-w-xl border-eel-light bg-white/95">
           <CardContent className="p-6 text-center md:p-9">
             <span className="mx-auto grid size-16 place-items-center rounded-full bg-[#efffe5]">
               <Sprout className="size-9 text-ecto-green" />
@@ -409,7 +410,7 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
   if (session.status === "completed") {
     return (
       <main className="grid min-h-svh place-items-center bg-[linear-gradient(180deg,#f3ffe9,#fff)] px-5 text-center">
-        <Card className="max-w-xl border-eel-light shadow-[0_16px_50px_rgba(67,143,14,0.1)]">
+        <Card className="max-w-xl border-eel-light">
           <CardContent className="p-8 md:p-10">
             <span className="mx-auto grid size-20 place-items-center rounded-full bg-[#eaffdc]"><Check className="size-11 text-ecto-green" /></span>
             <h1 className="mt-5 font-display text-4xl font-extrabold text-eel-dark-blue">Hoàn thành phiên học</h1>
@@ -428,86 +429,487 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
   const progress = Math.round(((mode === "learn" ? completedUnits : session.words.filter((word) => word.typingCompleted).length) / Math.max(1, totalUnits)) * 100);
 
   return (
-    <div className="min-h-svh bg-[linear-gradient(180deg,#fbfff8_0%,#fff_40%)]">
-      <header className="border-b-2 border-[#eeeeee] bg-white/90 backdrop-blur">
-        <div className="mx-auto flex min-h-20 max-w-[980px] items-center gap-3 px-4">
-          <Link href={deck ? `/vocabulary/${deck.slug}` : "/vocabulary"} onClick={closeSession} aria-label="Đóng phiên học" className="grid size-11 place-items-center rounded-xl text-ash hover:bg-[#f5f5f5]"><X /></Link>
-          <div className="flex-1"><div className="mb-1.5 flex justify-between text-xs font-extrabold text-ash"><span>{phaseLabel}</span><span>{progress}%</span></div><Progress value={progress} aria-label={`${phaseLabel}: ${progress}%`} className="h-3" /></div>
-          <Button type="button" variant={autoSpeakEnabled ? "outline" : "secondary"} size="sm" aria-pressed={autoSpeakEnabled} aria-keyshortcuts="M" aria-label={autoSpeakEnabled ? "Tắt tự động phát âm" : "Bật tự động phát âm"} disabled={!speechSupported} onClick={toggleAutoSpeak} className="px-3 sm:px-4">
-            {autoSpeakEnabled ? <Volume2 /> : <VolumeX />}<span className="hidden sm:inline">Tự phát âm</span><ShortcutKey>M</ShortcutKey>
+    <div className="flex min-h-svh flex-col bg-[#fcfdfa]">
+      {/* Top Navigation Bar */}
+      <header className="sticky top-0 z-30 border-b-2 border-[#eeeeee] bg-white/95 backdrop-blur">
+        <div className="mx-auto flex h-18 max-w-4xl items-center gap-4 px-4 sm:h-20 sm:px-6">
+          <Link
+            href={deck ? `/vocabulary/${deck.slug}` : "/vocabulary"}
+            onClick={closeSession}
+            aria-label="Đóng phiên học"
+            className="grid size-10 shrink-0 place-items-center rounded-xl text-ash transition-colors hover:bg-[#f5f5f5] hover:text-charcoal sm:size-11"
+          >
+            <X className="size-5 sm:size-6" />
+          </Link>
+
+          <div className="flex-1">
+            <div className="mb-1.5 flex items-center justify-between text-xs font-black">
+              <span className="flex items-center gap-1.5 text-eel-dark-blue">
+                <span className="inline-block size-2 rounded-full bg-ecto-green" />
+                {phaseLabel}
+              </span>
+              <span className="font-extrabold text-ash tabular-nums">{progress}%</span>
+            </div>
+            <Progress value={progress} aria-label={`${phaseLabel}: ${progress}%`} className="h-3.5 bg-[#ebebeb]" />
+          </div>
+
+          <Button
+            type="button"
+            variant={autoSpeakEnabled ? "outline" : "secondary"}
+            size="sm"
+            aria-pressed={autoSpeakEnabled}
+            aria-keyshortcuts="M"
+            aria-label={autoSpeakEnabled ? "Tắt tự động phát âm" : "Bật tự động phát âm"}
+            disabled={!speechSupported}
+            onClick={toggleAutoSpeak}
+            className="h-10 px-3 sm:px-4"
+          >
+            {autoSpeakEnabled ? <Volume2 className="size-4 text-ecto-green" /> : <VolumeX className="size-4 text-ash" />}
+            <span className="hidden text-xs font-black sm:inline">Tự phát âm</span>
           </Button>
         </div>
       </header>
 
-      <main className="mx-auto flex min-h-[calc(100svh-80px)] max-w-[860px] flex-col justify-center px-5 py-8">
+      {/* Main Content Area */}
+      <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col justify-start px-4 pt-6 pb-40 sm:px-6 sm:pt-10">
+        {/* FLASHCARD PHASE */}
         {session.phase === "flashcard" && currentWord && (
-          <Card ref={promptRef} tabIndex={-1} className="mx-auto flex w-full max-w-[600px] flex-col overflow-hidden border-eel-light border-b-4 outline-none shadow-[0_12px_35px_rgba(30,70,20,0.07)] focus-visible:ring-4 focus-visible:ring-eel-light sm:min-h-[450px]">
-            <CardHeader className="min-h-12 justify-center border-b-2 border-[#f0f0f0] bg-[#fbfff8] px-5 py-2.5">
-              <div className="flex w-full items-center justify-between gap-3">
-                {currentWord.partOfSpeech.length > 0 && <Badge variant="blue" className="min-w-0 whitespace-normal text-left">{currentWord.partOfSpeech.join(", ")}</Badge>}
-                <span className="ml-auto shrink-0 text-xs font-extrabold text-ash tabular-nums">{flashcardIndex + 1} / {session.words.length}</span>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentWord.id}
+              initial={{ opacity: 0, x: 20, scale: 0.98 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={{ opacity: 0, x: -20, scale: 0.98 }}
+              transition={{ duration: 0.22, ease: [0.23, 1, 0.32, 1] }}
+              ref={promptRef}
+              tabIndex={-1}
+              className="mx-auto flex w-full max-w-lg flex-col overflow-hidden rounded-xl border-2 border-b-4 border-[#e5e5e5] border-b-[#dedede] bg-white outline-none focus-visible:ring-4 focus-visible:ring-lingot-lime/40"
+            >
+              {/* Card Top Meta */}
+              <div className="flex items-center justify-between border-b-2 border-[#f0f0f0] bg-[#fafafa] px-5 py-3">
+                <div className="flex items-center gap-1.5">
+                  {currentWord.partOfSpeech.map((pos) => (
+                    <Badge key={pos} variant="blue" className="text-[11px] font-black">
+                      {pos}
+                    </Badge>
+                  ))}
+                </div>
+                <span className="text-xs font-black text-ash tabular-nums">
+                  {flashcardIndex + 1} / {session.words.length} từ
+                </span>
               </div>
-            </CardHeader>
-            <CardContent className="flex flex-1 flex-col p-5 text-center sm:p-6">
-              <div className="flex flex-wrap items-center justify-center gap-3">
-                <h1 className="min-w-0 break-words font-display text-4xl font-extrabold text-eel-dark-blue sm:text-5xl">{currentWord.term}</h1>
-                <Button type="button" variant="blue" size="icon" className="size-10 shrink-0" onClick={() => speakEnglish(currentWord.term, "slow")} aria-label={`Nghe ${currentWord.term}`} aria-keyshortcuts="P" disabled={!speechSupported}><Volume2 /><span className="sr-only">Phím P</span></Button>
+
+              {/* Card Body */}
+              <div className="flex flex-1 flex-col items-center p-6 text-center sm:p-8">
+                {/* Term & Audio */}
+                <div className="flex items-center justify-center gap-3">
+                  <h1 className="font-display text-4xl font-black text-eel-dark-blue sm:text-5xl">
+                    {currentWord.term}
+                  </h1>
+                  <button
+                    type="button"
+                    onClick={() => speakEnglish(currentWord.term, "slow")}
+                    aria-label={`Nghe phát âm ${currentWord.term}`}
+                    aria-keyshortcuts="P"
+                    disabled={!speechSupported}
+                    title="Nghe phát âm chậm (Phím P)"
+                    className="grid size-11 shrink-0 place-items-center rounded-xl border-2 border-macaw-blue border-b-4 border-b-[#168bc2] bg-[#f4fbff] text-macaw-blue transition-transform hover:scale-105 active:translate-y-0.5"
+                  >
+                    <Volume2 className="size-5" />
+                  </button>
+                </div>
+
+                {currentWord.phonetic && (
+                  <p className="mt-1 font-mono text-sm font-black text-macaw-blue">
+                    {currentWord.phonetic}
+                  </p>
+                )}
+
+                {/* Translation Highlight Box */}
+                <div className="mt-6 w-full rounded-xl border-2 border-b-4 border-lingot-lime border-b-[#8ed459] bg-[#f7fff1] py-4 px-5">
+                  <p className="text-[10px] font-black uppercase tracking-wider text-[#438f0e]/80">
+                    Nghĩa tiếng Việt
+                  </p>
+                  <p className="mt-0.5 font-display text-2xl font-black text-eel-dark-blue sm:text-3xl">
+                    {currentWord.translation}
+                  </p>
+                </div>
+
+                {/* Example Sentence Box */}
+                {currentWord.exampleSentence && (
+                  <div className="mt-3.5 w-full rounded-xl border-2 border-b-4 border-[#eeeeee] border-b-[#dedede] bg-[#fafafa] p-4 text-left sm:p-5">
+                    <p className="text-[10px] font-black uppercase tracking-wider text-ash">
+                      Câu ví dụ
+                    </p>
+                    <p className="mt-1 text-sm font-extrabold leading-relaxed text-charcoal">
+                      {highlightTermInExample(currentWord.exampleSentence, currentWord.term).map((part, index) =>
+                        part.highlighted ? (
+                          <strong key={`${part.text}-${index}`} className="font-black text-ecto-green underline decoration-2 underline-offset-2">
+                            {part.text}
+                          </strong>
+                        ) : (
+                          <span key={`${part.text}-${index}`}>{part.text}</span>
+                        ),
+                      )}
+                    </p>
+                    {currentWord.exampleTranslation && (
+                      <p className="mt-1 text-xs font-bold text-ash">
+                        {currentWord.exampleTranslation}
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
-              <p className="mt-1.5 text-base font-extrabold text-macaw-blue">{currentWord.phonetic}</p>
-              <div className="mt-4 rounded-xl border-2 border-lingot-lime/70 bg-[#f7fff1] px-4 py-4"><p className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#438f0e]">Nghĩa tiếng Việt</p><p className="mt-1 text-2xl font-extrabold text-[#438f0e]">{currentWord.translation}</p></div>
-              <div className="mt-3 rounded-xl border-2 border-[#eeeeee] bg-[#fcfcfc] p-4 text-left">
-                <p className="mb-1.5 text-xs font-extrabold uppercase tracking-[0.12em] text-ash">Ví dụ</p>
-                <p className="font-bold leading-6 text-charcoal">{highlightTermInExample(currentWord.exampleSentence, currentWord.term).map((part, index) => part.highlighted ? <strong key={`${part.text}-${index}`} className="font-extrabold text-eel-dark-blue">{part.text}</strong> : <span key={`${part.text}-${index}`}>{part.text}</span>)}</p>
-                <p className="mt-1.5 text-sm font-bold text-ash">{currentWord.exampleTranslation}</p>
+
+              {/* Card Footer Actions */}
+              <div className="grid grid-cols-2 gap-3 border-t-2 border-[#f0f0f0] bg-[#fafafa] p-4 sm:p-5">
+                <Button
+                  variant="secondary"
+                  size="default"
+                  className="w-full"
+                  disabled={saving || flashcardIndex === 0}
+                  onClick={() => setFlashcardIndex((index) => index - 1)}
+                  aria-keyshortcuts="ArrowLeft"
+                >
+                  <ArrowLeft className="size-4" /> Lùi
+                </Button>
+                <Button
+                  size="default"
+                  className="w-full"
+                  disabled={saving}
+                  onClick={() => void nextFlashcard()}
+                  aria-keyshortcuts="ArrowRight"
+                >
+                  <span>{flashcardIndex === session.words.length - 1 ? "Trắc nghiệm" : "Tiếp theo"}</span>
+                  <ArrowRight className="size-4" />
+                </Button>
               </div>
-            </CardContent>
-            <CardFooter className="mt-auto grid min-h-[68px] grid-cols-2 gap-3 border-t-2 border-[#f0f0f0] bg-[#fcfcfc] p-3 sm:p-4">
-              <Button variant="secondary" size="lg" className="w-full" disabled={saving || flashcardIndex === 0} onClick={() => setFlashcardIndex((index) => index - 1)} aria-keyshortcuts="ArrowLeft"><ArrowLeft /> Lùi <span className="hidden sm:inline"><ShortcutKey>←</ShortcutKey></span></Button>
-              <Button size="lg" className="w-full px-3" disabled={saving} onClick={() => void nextFlashcard()} aria-keyshortcuts="ArrowRight"><span className="truncate">{flashcardIndex === session.words.length - 1 ? "Sang trắc nghiệm" : "Tiếp"}</span> <span className="hidden sm:inline"><ShortcutKey>→</ShortcutKey></span> <ArrowRight /></Button>
-            </CardFooter>
-          </Card>
+            </motion.div>
+          </AnimatePresence>
         )}
 
+        {/* MULTIPLE CHOICE PHASE */}
         {session.phase === "multiple_choice" && currentWord && (
-          <section aria-labelledby="quiz-prompt">
-            <div ref={promptRef} tabIndex={-1} className="mb-7 rounded-xl text-center outline-none focus-visible:ring-4 focus-visible:ring-eel-light"><Badge variant="blue"><Headphones className="size-4" /> Chọn nghĩa đúng</Badge><h1 id="quiz-prompt" className="mt-4 font-display text-5xl font-extrabold text-eel-dark-blue sm:text-6xl">{currentWord.term}</h1><button type="button" onClick={() => speakEnglish(currentWord.term, "normal")} className="mt-3 inline-flex items-center gap-2 font-extrabold text-macaw-blue hover:underline" disabled={!speechSupported} aria-keyshortcuts="P"><Volume2 className="size-5" /> {currentWord.phonetic} <ShortcutKey>P</ShortcutKey></button></div>
-            <div className="grid gap-3 sm:grid-cols-2" role="group" aria-label={`Chọn nghĩa của ${currentWord.term}`}>
-              {options.map((option, index) => {
-                const selected = feedback?.selectedWordId === option.id;
-                const expected = feedback?.result.expectedAnswer === option.translation;
-                const stateClass = feedback ? expected ? "border-ecto-green bg-[#f2ffe9] text-[#438f0e]" : selected ? "border-[#ff6b6b] bg-[#fff3f3] text-[#b93636]" : "border-[#dedede] bg-white text-ash opacity-65" : "border-[#dedede] bg-white text-charcoal hover:-translate-y-0.5 hover:border-macaw-blue hover:bg-[#f5fbff]";
-                const letter = String.fromCharCode(65 + index);
-                return <button key={option.id} type="button" disabled={saving || Boolean(feedback)} onClick={() => chooseOption(option.id)} aria-keyshortcuts={`${index + 1} ${letter}`} className={cn("flex min-h-24 items-center gap-4 rounded-xl border-2 border-b-4 px-5 text-left text-lg font-extrabold transition motion-reduce:transition-none", stateClass)}><span className="grid size-9 shrink-0 place-items-center rounded-lg border-2 border-current text-sm">{letter}</span><span className="flex-1">{option.translation}</span>{!feedback && <ShortcutKey>{index + 1}</ShortcutKey>}{feedback && expected && <CheckCircle2 className="text-ecto-green" />}{feedback && selected && !expected && <XCircle className="text-[#d94e4e]" />}</button>;
-              })}
-            </div>
-          </section>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentWord.id}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -16 }}
+              transition={{ duration: 0.22, ease: [0.23, 1, 0.32, 1] }}
+              className="mx-auto w-full max-w-xl"
+            >
+              {/* Prompt Header */}
+              <div ref={promptRef} tabIndex={-1} className="mb-6 text-center outline-none">
+                <Badge variant="blue" className="gap-1.5 px-3 py-1 text-xs font-black">
+                  <Headphones className="size-3.5" /> Chọn nghĩa đúng
+                </Badge>
+                <h1 id="quiz-prompt" className="mt-3 font-display text-4xl font-black text-eel-dark-blue sm:text-5xl">
+                  {currentWord.term}
+                </h1>
+                <button
+                  type="button"
+                  onClick={() => speakEnglish(currentWord.term, "normal")}
+                  className="mt-1.5 inline-flex items-center gap-1.5 font-mono text-xs font-black text-macaw-blue transition-colors hover:text-[#087db4]"
+                  disabled={!speechSupported}
+                  aria-keyshortcuts="P"
+                >
+                  <Volume2 className="size-3.5" /> {currentWord.phonetic}
+                </button>
+              </div>
+
+              {/* Options Grid */}
+              <div className="grid gap-3 sm:grid-cols-2" role="group" aria-label={`Chọn nghĩa của ${currentWord.term}`}>
+                {options.map((option, index) => {
+                  const selected = feedback?.selectedWordId === option.id;
+                  const expected = feedback?.result.expectedAnswer === option.translation;
+                  const letter = String.fromCharCode(65 + index);
+
+                  let stateClass = "border-[#e5e5e5] border-b-[#dedede] bg-white text-charcoal hover:-translate-y-0.5 hover:border-macaw-blue hover:border-b-[#168bc2] hover:bg-[#f4fbff]";
+                  let badgeClass = "border-[#e5e5e5] bg-[#fafafa] text-ash";
+
+                  if (feedback) {
+                    if (expected) {
+                      stateClass = "border-ecto-green border-b-[#46a302] bg-[#f2ffe9] text-[#438f0e]";
+                      badgeClass = "border-ecto-green bg-ecto-green text-white";
+                    } else if (selected && !expected) {
+                      stateClass = "border-[#ff6b6b] border-b-[#d94e4e] bg-[#fff3f3] text-[#b93636]";
+                      badgeClass = "border-[#ff6b6b] bg-[#ff6b6b] text-white";
+                    } else {
+                      stateClass = "border-[#e5e5e5] border-b-[#dedede] bg-white text-ash/40 opacity-50";
+                      badgeClass = "border-[#e5e5e5] bg-[#fafafa] text-ash/40";
+                    }
+                  }
+
+                  return (
+                    <motion.button
+                      key={option.id}
+                      type="button"
+                      disabled={saving || Boolean(feedback)}
+                      onClick={() => chooseOption(option.id)}
+                      aria-keyshortcuts={`${index + 1} ${letter}`}
+                      animate={
+                        feedback
+                          ? expected
+                            ? { scale: [1, 1.03, 1] }
+                            : selected
+                              ? { x: [0, -6, 6, -4, 4, 0] }
+                              : {}
+                          : {}
+                      }
+                      transition={{ duration: 0.3 }}
+                      className={cn(
+                        "flex min-h-[72px] items-center justify-between gap-3 rounded-xl border-2 border-b-4 p-4 text-left text-sm font-black transition-colors active:translate-y-0.5 sm:text-base",
+                        stateClass,
+                      )}
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <span className={cn("grid size-7 shrink-0 place-items-center rounded-lg border-2 text-xs font-black", badgeClass)}>
+                          {letter}
+                        </span>
+                        <span className="font-extrabold text-charcoal">{option.translation}</span>
+                      </div>
+
+                      {feedback && expected && (
+                        <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 400, damping: 20 }}>
+                          <CheckCircle2 className="size-5 text-ecto-green shrink-0" />
+                        </motion.span>
+                      )}
+                      {feedback && selected && !expected && (
+                        <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 400, damping: 20 }}>
+                          <XCircle className="size-5 text-[#d94e4e] shrink-0" />
+                        </motion.span>
+                      )}
+                    </motion.button>
+                  );
+                })}
+              </div>
+            </motion.div>
+          </AnimatePresence>
         )}
 
+        {/* TYPING PHASE */}
         {session.phase === "typing" && currentWord && (
-          <Card ref={promptRef} tabIndex={-1} className={cn("mx-auto w-full max-w-2xl border-b-4 outline-none shadow-[0_12px_35px_rgba(30,70,20,0.07)] focus-visible:ring-4 focus-visible:ring-eel-light", feedback?.result.isCorrect === true && "border-ecto-green", feedback?.result.isCorrect === false && "border-[#ff6b6b]")}>
-            <CardContent className="p-6 text-center md:p-10">
-              <Badge variant="blue">Nhập từ tiếng Anh</Badge>
-              <p className="mt-6 text-sm font-extrabold uppercase tracking-[0.12em] text-ash">Nghĩa tiếng Việt</p>
-              <h1 className="mt-3 font-display text-4xl font-extrabold text-[#438f0e] sm:text-5xl">{currentWord.translation}</h1>
-              <form onSubmit={submitTyping} className="mt-8">
-                <label className="block text-left"><span className="mb-2 block text-sm font-extrabold text-charcoal">Câu trả lời của bạn</span><Input ref={inputRef} autoFocus value={answer} onChange={(event) => setAnswer(event.target.value)} placeholder="Nhập từ tiếng Anh…" className={cn("h-16 text-center text-xl font-extrabold", feedback?.result.isCorrect === true && "border-ecto-green bg-[#f7fff1]", feedback?.result.isCorrect === false && "border-[#ff6b6b] bg-[#fff7f7]")} disabled={saving || Boolean(feedback)} maxLength={256} /></label>
-                <p className="mt-2 text-sm font-bold text-ash">Không phân biệt chữ hoa, chữ thường và khoảng trắng thừa.</p>
-                {!feedback && <Button type="submit" size="lg" className="mt-5 w-full" disabled={saving || !answer.trim()}>{saving ? "Đang kiểm tra…" : "Kiểm tra"} <ArrowRight /></Button>}
-              </form>
-            </CardContent>
-          </Card>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentWord.id}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{
+                opacity: 1,
+                y: 0,
+                x: feedback?.result.isCorrect === false ? [0, -8, 8, -6, 6, -3, 3, 0] : 0,
+                scale: feedback?.result.isCorrect === true ? [1, 1.02, 1] : 1,
+              }}
+              exit={{ opacity: 0, y: -16 }}
+              transition={{ duration: 0.3 }}
+              ref={promptRef}
+              tabIndex={-1}
+              className={cn(
+                "mx-auto w-full max-w-lg rounded-xl border-2 border-b-4 bg-white p-6 outline-none sm:p-8",
+                feedback?.result.isCorrect === true
+                  ? "border-ecto-green border-b-[#46a302]"
+                  : feedback?.result.isCorrect === false
+                    ? "border-[#ff6b6b] border-b-[#d94e4e]"
+                    : "border-[#e5e5e5] border-b-[#dedede]",
+              )}
+            >
+              <div className="text-center">
+                <Badge variant="blue" className="text-xs font-black">
+                  Gõ từ tiếng Anh
+                </Badge>
+                <p className="mt-4 text-[11px] font-black uppercase tracking-wider text-ash">
+                  Nghĩa tiếng Việt
+                </p>
+                <h1 className="mt-1 font-display text-3xl font-black text-eel-dark-blue sm:text-4xl">
+                  {currentWord.translation}
+                </h1>
+
+                <form onSubmit={submitTyping} className="mt-6">
+                  <label className="block text-left">
+                    <span className="mb-1.5 block text-xs font-black text-ash">
+                      Nhập từ tiếng Anh tương ứng:
+                    </span>
+                    <Input
+                      ref={inputRef}
+                      autoFocus
+                      value={answer}
+                      onChange={(event) => setAnswer(event.target.value)}
+                      placeholder="Gõ từ tiếng Anh…"
+                      className={cn(
+                        "h-14 text-center font-display text-2xl font-black text-eel-dark-blue transition-colors",
+                        feedback?.result.isCorrect === true && "border-ecto-green bg-[#f7fff1] text-[#438f0e]",
+                        feedback?.result.isCorrect === false && "border-[#ff6b6b] bg-[#fff7f7] text-[#b93636]",
+                      )}
+                      disabled={saving || Boolean(feedback)}
+                      maxLength={256}
+                    />
+                  </label>
+
+                  {!feedback && (
+                    <Button
+                      type="submit"
+                      size="lg"
+                      className="mt-4 w-full"
+                      disabled={saving || !answer.trim()}
+                    >
+                      <span>{saving ? "Đang kiểm tra…" : "Kiểm tra"}</span> <ArrowRight className="size-4" />
+                    </Button>
+                  )}
+                </form>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        )}
+
+      </main>
+
+      {/* DOCKED BOTTOM FEEDBACK BAR (Fixed position so question content NEVER jumps) */}
+      <AnimatePresence>
+        {feedback && (
+          <motion.div
+            initial={{ y: "100%", opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: "100%", opacity: 0 }}
+            transition={{ type: "spring", stiffness: 450, damping: 32 }}
+            ref={feedbackRef}
+            tabIndex={-1}
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+            className={cn(
+              "fixed inset-x-0 bottom-0 z-40 border-t-2 p-4 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] outline-none sm:p-5",
+              feedback.result.isCorrect
+                ? "border-ecto-green bg-[#f2ffe9]"
+                : "border-[#ff6b6b] bg-[#fff3f3]",
+            )}
+          >
+            <div className="mx-auto flex max-w-2xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-start gap-3">
+                {feedback.result.isCorrect ? (
+                  <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 450, damping: 20 }}>
+                    <CheckCircle2 className="mt-0.5 size-6 shrink-0 text-ecto-green" />
+                  </motion.div>
+                ) : (
+                  <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 450, damping: 20 }}>
+                    <XCircle className="mt-0.5 size-6 shrink-0 text-[#d94e4e]" />
+                  </motion.div>
+                )}
+                <div>
+                  <h2 className={cn("text-lg font-black sm:text-xl", feedback.result.isCorrect ? "text-[#438f0e]" : "text-[#b93636]")}>
+                    {feedback.result.isCorrect ? "Chính xác! Tuyệt vời" : "Chưa chính xác"}
+                  </h2>
+                  {!feedback.result.isCorrect && (
+                    <p className="mt-0.5 text-xs font-bold text-charcoal sm:text-sm">
+                      Đáp án đúng: <strong className="font-black text-eel-dark-blue text-sm sm:text-base">{feedback.result.expectedAnswer}</strong>
+                    </p>
+                  )}
+                  {!feedback.result.isCorrect && feedback.result.phase === "typing" && currentWord?.phonetic.trim() && (
+                    <p className="mt-0.5 font-mono text-xs font-black text-macaw-blue">
+                      {currentWord.phonetic}
+                    </p>
+                  )}
+                  {feedback.submittedAnswer && !feedback.result.isCorrect && (
+                    <p className="mt-0.5 text-xs font-bold text-ash">
+                      Bạn đã nhập: <span className="line-through">{feedback.submittedAnswer}</span>
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 sm:shrink-0">
+                {session.phase === "typing" && (
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="icon"
+                    onClick={() => speakEnglish(feedback.result.expectedAnswer, "normal")}
+                    aria-label={`Nghe ${feedback.result.expectedAnswer}`}
+                    aria-keyshortcuts="P"
+                    disabled={!speechSupported}
+                    className="size-11"
+                  >
+                    <Volume2 className="size-4 text-macaw-blue" />
+                  </Button>
+                )}
+                <Button
+                  type="button"
+                  size="default"
+                  variant={feedback.result.isCorrect ? "default" : "danger"}
+                  onClick={continueAfterFeedback}
+                  aria-keyshortcuts="Enter"
+                  className="w-full sm:w-auto sm:min-w-[140px]"
+                >
+                  <span>Tiếp tục</span> <ArrowRight className="size-4" />
+                </Button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {error && (
+        <div className="mx-auto mt-5 w-full max-w-xl rounded-xl border-2 border-[#ffb4b4] bg-[#fff7f7] p-4 text-center font-bold text-[#c43e3e]" role="alert">
+          <p>{error}</p>
+          {pendingEvent && (
+            <Button type="button" variant="danger" size="sm" className="mt-3" disabled={saving} onClick={() => void submitAnswer(pendingEvent)}>
+              Thử lại
+            </Button>
+          )}
+        </div>
+      )}
+
+      {/* BOTTOM SHORTCUT GUIDANCE BAR */}
+      <footer className="mt-8 flex flex-wrap items-center justify-center gap-3 text-xs font-bold text-ash">
+        {session.phase === "flashcard" && (
+          <>
+            <span className="inline-flex items-center gap-1">
+              <ShortcutKey>←</ShortcutKey> <ShortcutKey>→</ShortcutKey> Chuyển thẻ
+            </span>
+            <span>•</span>
+            <span className="inline-flex items-center gap-1">
+              <ShortcutKey>P</ShortcutKey> Nghe phát âm
+            </span>
+            <span>•</span>
+            <span className="inline-flex items-center gap-1">
+              <ShortcutKey>M</ShortcutKey> Tự phát âm
+            </span>
+          </>
+        )}
+
+        {session.phase === "multiple_choice" && !feedback && (
+          <>
+            <span className="inline-flex items-center gap-1">
+              <ShortcutKey>1</ShortcutKey>–<ShortcutKey>4</ShortcutKey> hoặc <ShortcutKey>A</ShortcutKey>–<ShortcutKey>D</ShortcutKey> Chọn đáp án
+            </span>
+            <span>•</span>
+            <span className="inline-flex items-center gap-1">
+              <ShortcutKey>P</ShortcutKey> Nghe lại
+            </span>
+          </>
+        )}
+
+        {session.phase === "typing" && !feedback && (
+          <span className="inline-flex items-center gap-1">
+            <ShortcutKey>Enter</ShortcutKey> Kiểm tra câu trả lời
+          </span>
         )}
 
         {feedback && (
-          <div ref={feedbackRef} tabIndex={-1} role="status" aria-live="polite" aria-atomic="true" className={cn("mt-6 rounded-xl border-2 border-b-4 p-5 outline-none sm:flex sm:items-center sm:justify-between sm:gap-5", feedback.result.isCorrect ? "border-ecto-green bg-[#f2ffe9]" : "border-[#ff6b6b] bg-[#fff3f3]")}>
-            <div className="flex gap-3">{feedback.result.isCorrect ? <CheckCircle2 className="mt-0.5 size-7 shrink-0 text-ecto-green" /> : <XCircle className="mt-0.5 size-7 shrink-0 text-[#d94e4e]" />}<div><h2 className={cn("text-xl font-extrabold", feedback.result.isCorrect ? "text-[#438f0e]" : "text-[#b93636]")}>{feedback.result.isCorrect ? "Chính xác!" : "Chưa đúng"}</h2>{!feedback.result.isCorrect && <p className="mt-1 font-bold text-charcoal">Đáp án đúng: <strong>{feedback.result.expectedAnswer}</strong></p>}{!feedback.result.isCorrect && feedback.result.phase === "typing" && currentWord?.phonetic.trim() && <p className="mt-1 font-extrabold text-macaw-blue">{currentWord.phonetic}</p>}{feedback.submittedAnswer && !feedback.result.isCorrect && <p className="mt-1 text-sm font-bold text-ash">Bạn đã nhập: {feedback.submittedAnswer}</p>}</div></div>
-            <div className="mt-4 flex gap-2 sm:mt-0">{session.phase === "typing" && <Button type="button" variant="secondary" size="icon" onClick={() => speakEnglish(feedback.result.expectedAnswer, "normal")} aria-label={`Nghe ${feedback.result.expectedAnswer}`} aria-keyshortcuts="P" disabled={!speechSupported}><Volume2 /><span className="sr-only">Phím P</span></Button>}<Button type="button" size="lg" onClick={continueAfterFeedback} aria-keyshortcuts="Enter">Tiếp tục <ShortcutKey>Enter</ShortcutKey> <ArrowRight /></Button></div>
-          </div>
+          <>
+            <span className="inline-flex items-center gap-1">
+              <ShortcutKey>Enter</ShortcutKey> Chuyển tiếp
+            </span>
+            {session.phase === "typing" && (
+              <>
+                <span>•</span>
+                <span className="inline-flex items-center gap-1">
+                  <ShortcutKey>P</ShortcutKey> Nghe phát âm
+                </span>
+              </>
+            )}
+          </>
         )}
-
-        {error && <div className="mt-5 rounded-xl border-2 border-[#ffb4b4] bg-[#fff7f7] p-4 text-center font-bold text-[#c43e3e]" role="alert"><p>{error}</p>{pendingEvent && <Button type="button" variant="danger" size="sm" className="mt-3" disabled={saving} onClick={() => void submitAnswer(pendingEvent)}>Thử lại</Button>}</div>}
-        {!feedback && !error && session.phase !== "flashcard" && <p className="mt-5 flex items-center justify-center gap-2 text-center text-sm font-bold text-ash"><Lightbulb className="size-4 text-[#b47b00]" /> Từ trả lời sai sẽ quay lại cuối phần luyện tập.</p>}
-      </main>
+      </footer>
     </div>
   );
 }

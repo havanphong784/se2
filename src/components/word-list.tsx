@@ -13,15 +13,18 @@ import { cn } from "@/lib/utils";
 
 const filters: Array<{ value: "all" | WordStatus; label: string }> = [
   { value: "all", label: "Tất cả" },
-  { value: "new", label: "Mới" },
+  { value: "new", label: "Chưa học" },
   { value: "learning", label: "Đang học" },
   { value: "mastered", label: "Đã thuộc" },
 ];
 
-const statusLabels: Record<WordStatus, { label: string; variant: "neutral" | "blue" | "default" }> = {
-  new: { label: "Mới", variant: "neutral" },
-  learning: { label: "Đang học", variant: "blue" },
-  mastered: { label: "Đã thuộc", variant: "default" },
+const statusConfig: Record<
+  WordStatus,
+  { label: string; badgeVariant: "neutral" | "blue" | "default" }
+> = {
+  new: { label: "Mới", badgeVariant: "neutral" },
+  learning: { label: "Đang học", badgeVariant: "blue" },
+  mastered: { label: "Đã thuộc", badgeVariant: "default" },
 };
 
 export function WordList({ words: initialWords }: { words: VocabularyWord[] }) {
@@ -39,6 +42,16 @@ export function WordList({ words: initialWords }: { words: VocabularyWord[] }) {
 
   // State quản lý Modal xác nhận bỏ qua từ
   const [confirmWord, setConfirmWord] = useState<VocabularyWord | null>(null);
+
+  // Đếm theo từng trạng thái
+  const counts = useMemo(() => {
+    return {
+      all: words.length,
+      new: words.filter((w) => w.status === "new").length,
+      learning: words.filter((w) => w.status === "learning").length,
+      mastered: words.filter((w) => w.status === "mastered").length,
+    };
+  }, [words]);
 
   // Đóng modal bằng phím Escape
   useEffect(() => {
@@ -125,116 +138,172 @@ export function WordList({ words: initialWords }: { words: VocabularyWord[] }) {
   }, [filter, query, words]);
 
   return (
-    <div>
-      <div className="flex flex-col gap-4 border-b-2 border-[#eeeeee] pb-5 lg:flex-row lg:items-center lg:justify-between">
-        <label className="relative block w-full lg:max-w-sm">
-          <span className="sr-only">Tìm trong bộ từ</span>
-          <Search className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-ash" />
+    <div className="space-y-4">
+      {/* Search & Filter Toolbar */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <label className="relative block w-full sm:max-w-sm">
+          <span className="sr-only">Tìm kiếm từ vựng</span>
+          <Search className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-ash" />
           <Input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Tìm trong bộ từ…"
-            className="pl-12"
+            placeholder="Tìm theo từ hoặc nghĩa tiếng Việt…"
+            className="h-11 pl-10 text-sm font-bold"
           />
         </label>
+
+        {/* Filter Pills with Counts */}
         <div className="flex gap-2 overflow-x-auto pb-1" role="group" aria-label="Lọc trạng thái từ">
-          {filters.map((item) => (
-            <button
-              key={item.value}
-              type="button"
-              aria-pressed={filter === item.value}
-              onClick={() => setFilter(item.value)}
-              className={cn(
-                "min-h-11 shrink-0 rounded-xl border-2 px-3.5 text-xs font-extrabold focus-visible:ring-4 focus-visible:ring-lingot-lime/40",
-                filter === item.value
-                  ? "border-macaw-blue bg-[#f3fbff] text-[#087db4]"
-                  : "border-[#dedede] text-ash",
-              )}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
-      </div>
+          {filters.map((item) => {
+            const count = counts[item.value];
+            const isActive = filter === item.value;
 
-      <div className="divide-y-2 divide-[#eeeeee]">
-        {filteredWords.map((word) => {
-          const status = statusLabels[word.status];
-          return (
-            <article key={word.id} className="grid gap-4 py-5 md:grid-cols-[1.05fr_1fr_auto] md:items-center">
-              <div className="flex min-w-0 items-center gap-3">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="icon"
-                  onClick={() => speakEnglish(word.term, "slow")}
-                  aria-label={`Nghe phát âm ${word.term}`}
-                  className="shrink-0 text-macaw-blue"
-                >
-                  <Volume2 />
-                </Button>
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h2 className="text-lg font-extrabold text-eel-dark-blue">{word.term}</h2>
-                    <Badge variant={status.variant}>{status.label}</Badge>
-                  </div>
-                  <p className="mt-1 text-sm font-bold text-ash">
-                    {[word.phonetic, (word.partOfSpeech ?? []).join(", ")].filter(Boolean).join(" · ")}
-                  </p>
-                </div>
-              </div>
-              <div>
-                <p className="font-extrabold text-charcoal">{word.translation}</p>
-                <p className="mt-1 line-clamp-1 text-sm font-semibold italic text-ash">
-                  “{word.exampleSentence}”
-                </p>
-              </div>
-              <div className="flex items-center gap-3">
-                <Progress value={word.mastery} className="h-3 w-28 md:w-36" />
-                <span className="w-9 text-right text-xs font-extrabold text-ash tabular-nums">
-                  {word.mastery}%
-                </span>
-                {word.status !== "mastered" ? (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    disabled={markingIds.has(word.id)}
-                    onClick={() => setConfirmWord(word)}
-                    title="Bỏ qua từ đã thuộc trước đó"
-                    className="h-8 min-h-8 shrink-0 px-2 text-[11px] font-bold text-[#888888] hover:text-charcoal border border-transparent hover:border-[#e5e5e5] hover:bg-[#f8f8f8]"
-                  >
-                    <Check className="size-3.5" />
-                    <span className="hidden sm:inline">Bỏ qua</span>
-                  </Button>
-                ) : (
-                  <span className="inline-flex items-center gap-1 text-xs font-bold text-ecto-green">
-                    <CheckCircle2 className="size-4" />
-                    <span className="hidden sm:inline">Đã thuộc</span>
-                  </span>
+            return (
+              <button
+                key={item.value}
+                type="button"
+                aria-pressed={isActive}
+                onClick={() => setFilter(item.value)}
+                className={cn(
+                  "inline-flex min-h-10 items-center gap-1.5 rounded-xl border-2 px-3.5 text-xs font-black transition-all active:translate-y-0.5",
+                  isActive
+                    ? "border-macaw-blue border-b-4 border-b-[#168bc2] bg-[#f4fbff] text-macaw-blue"
+                    : "border-[#e5e5e5] border-b-4 border-b-[#dedede] bg-white text-ash hover:border-macaw-blue hover:text-eel-dark-blue",
                 )}
-              </div>
-            </article>
-          );
-        })}
+              >
+                <span>{item.label}</span>
+                <span
+                  className={cn(
+                    "rounded-md px-1.5 py-0.5 text-[10px] tabular-nums font-black leading-none",
+                    isActive ? "bg-macaw-blue text-white" : "bg-[#f0f0f0] text-ash",
+                  )}
+                >
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      {!filteredWords.length && (
-        <div className="py-14 text-center">
-          <p className="text-lg font-extrabold text-eel-dark-blue">Không có từ phù hợp</p>
-          <p className="mt-2 font-bold text-ash">Thử đổi từ khóa hoặc trạng thái lọc.</p>
+      {/* Unified Word Table / List Container */}
+      <div className="overflow-hidden rounded-xl border-2 border-b-4 border-[#e5e5e5] border-b-[#dedede] bg-white">
+        {/* Table Header */}
+        <div className="hidden grid-cols-12 gap-4 border-b-2 border-[#eeeeee] bg-[#fafafa] px-6 py-3 text-xs font-black uppercase tracking-wider text-ash md:grid">
+          <div className="col-span-4">Từ vựng &amp; Phát âm</div>
+          <div className="col-span-5">Nghĩa tiếng Việt &amp; Ví dụ</div>
+          <div className="col-span-3 text-right">Tiến độ &amp; Trạng thái</div>
         </div>
-      )}
 
-      {/* Confirmation Dialog Cảnh báo khuynh hướng tiêu cực khi bỏ qua bài học */}
+        {/* Rows */}
+        <div className="divide-y divide-[#f0f0f0]">
+          {filteredWords.map((word) => {
+            const config = statusConfig[word.status];
+            const isMastered = word.status === "mastered";
+
+            return (
+              <article
+                key={word.id}
+                className="grid gap-3 p-4.5 transition-colors hover:bg-[#fbfff8] sm:p-5 md:grid-cols-12 md:items-center md:gap-4"
+              >
+                {/* Column 1: Audio + English Term + Phonetic */}
+                <div className="flex items-center gap-3.5 md:col-span-4">
+                  <button
+                    type="button"
+                    onClick={() => speakEnglish(word.term, "slow")}
+                    aria-label={`Nghe phát âm ${word.term}`}
+                    title="Nghe phát âm chuẩn"
+                    className="grid size-9 shrink-0 place-items-center rounded-xl border-2 border-[#bfe9fd] border-b-4 border-b-[#8cd2f5] bg-[#f4fbff] text-macaw-blue transition-transform hover:scale-105 active:translate-y-0.5"
+                  >
+                    <Volume2 className="size-4" />
+                  </button>
+
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-baseline gap-2">
+                      <h3 className="font-display text-lg font-black text-eel-dark-blue">
+                        {word.term}
+                      </h3>
+                      {word.partOfSpeech?.[0] && (
+                        <span className="text-[11px] font-bold italic text-ash">
+                          ({word.partOfSpeech[0]})
+                        </span>
+                      )}
+                    </div>
+                    {word.phonetic && (
+                      <p className="font-mono text-xs font-bold text-macaw-blue">
+                        {word.phonetic}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Column 2: Vietnamese Translation + Example Sentence */}
+                <div className="min-w-0 md:col-span-5">
+                  <p className="text-base font-extrabold text-charcoal">
+                    {word.translation}
+                  </p>
+                  {word.exampleSentence && (
+                    <p className="mt-0.5 line-clamp-1 text-xs font-bold italic text-ash/80">
+                      &ldquo;{word.exampleSentence}&rdquo;
+                    </p>
+                  )}
+                </div>
+
+                {/* Column 3: Status, Mastery Progress & Action Button */}
+                <div className="flex items-center justify-between gap-3 border-t border-[#f5f5f5] pt-2 md:col-span-3 md:justify-end md:border-t-0 md:pt-0">
+                  <div className="flex items-center gap-2">
+                    <Progress value={word.mastery} className="h-2 w-16 sm:w-20" />
+                    <span className="w-7 text-right text-[11px] font-black text-ash tabular-nums">
+                      {word.mastery}%
+                    </span>
+                  </div>
+
+                  <div>
+                    {isMastered ? (
+                      <Badge className="gap-1 border-ecto-green bg-ecto-green text-[11px] font-black text-white">
+                        <CheckCircle2 className="size-3" /> Đã thuộc
+                      </Badge>
+                    ) : (
+                      <button
+                        type="button"
+                        disabled={markingIds.has(word.id)}
+                        onClick={() => setConfirmWord(word)}
+                        title="Đánh dấu từ này là đã thuộc"
+                        className="inline-flex min-h-8 items-center gap-1 rounded-xl border-2 border-b-4 border-[#e5e5e5] border-b-[#dedede] bg-white px-2.5 text-[11px] font-black text-ash transition-all hover:border-ecto-green hover:border-b-[#46a302] hover:text-[#438f0e] active:translate-y-0.5"
+                      >
+                        <Check className="size-3" strokeWidth={3} />
+                        <span>Đã biết</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+
+        {/* Empty State */}
+        {!filteredWords.length && (
+          <div className="p-12 text-center">
+            <p className="font-display text-lg font-black text-eel-dark-blue">
+              Không tìm thấy từ vựng nào
+            </p>
+            <p className="mt-1 text-xs font-bold text-ash">
+              Thử từ khóa khác hoặc chuyển bộ lọc sang &ldquo;Tất cả&rdquo;.
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Confirmation Dialog */}
       {confirmWord && (
         <div
           role="dialog"
           aria-modal="true"
           aria-labelledby="confirm-dialog-title"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
         >
-          <div className="relative w-full max-w-md overflow-hidden rounded-2xl border-2 border-eel-light bg-white p-6 shadow-2xl md:p-8">
+          <div className="relative w-full max-w-md overflow-hidden rounded-xl border-2 border-b-4 border-eel-light bg-white p-6 md:p-8">
             <button
               type="button"
               onClick={() => setConfirmWord(null)}
@@ -295,3 +364,4 @@ export function WordList({ words: initialWords }: { words: VocabularyWord[] }) {
     </div>
   );
 }
+

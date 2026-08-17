@@ -1,4 +1,5 @@
 import { TOPIC_METADATA } from "@/lib/topic-metadata";
+import { vnDayLabel, vnWeekDates, vnWeekdayLabel } from "@/lib/utils";
 
 export type WordStatus = "new" | "learning" | "mastered";
 
@@ -145,15 +146,29 @@ export const DEMO_DECKS: VocabularyDeck[] = Object.entries(TOPIC_METADATA).map(
   },
 );
 
-export const DEMO_ACTIVITY: DailyActivity[] = [
-  { day: "T2", fullDate: "06/07", reviewed: 8, learned: 4, xp: 55, studySeconds: 420 },
-  { day: "T3", fullDate: "07/07", reviewed: 12, learned: 6, xp: 85, studySeconds: 540 },
-  { day: "T4", fullDate: "08/07", reviewed: 7, learned: 3, xp: 45, studySeconds: 300 },
-  { day: "T5", fullDate: "09/07", reviewed: 15, learned: 8, xp: 110, studySeconds: 660 },
-  { day: "T6", fullDate: "10/07", reviewed: 10, learned: 5, xp: 75, studySeconds: 480 },
-  { day: "T7", fullDate: "11/07", reviewed: 18, learned: 9, xp: 130, studySeconds: 780 },
-  { day: "CN", fullDate: "12/07", reviewed: 6, learned: 3, xp: 40, studySeconds: 360 },
+const DEMO_METRICS = [
+  { reviewed: 8, learned: 4, xp: 55, studySeconds: 420 },
+  { reviewed: 12, learned: 6, xp: 85, studySeconds: 540 },
+  { reviewed: 7, learned: 3, xp: 45, studySeconds: 300 },
+  { reviewed: 15, learned: 8, xp: 110, studySeconds: 660 },
+  { reviewed: 10, learned: 5, xp: 75, studySeconds: 480 },
+  { reviewed: 18, learned: 9, xp: 130, studySeconds: 780 },
+  { reviewed: 6, learned: 3, xp: 40, studySeconds: 360 },
 ];
+
+export function getDemoActivity(): DailyActivity[] {
+  const dates = vnWeekDates();
+  return dates.map((date, index) => {
+    const metrics = DEMO_METRICS[index % DEMO_METRICS.length];
+    return {
+      day: vnWeekdayLabel(date),
+      fullDate: vnDayLabel(date),
+      ...metrics,
+    };
+  });
+}
+
+export const DEMO_ACTIVITY: DailyActivity[] = getDemoActivity();
 
 export const DEMO_STREAK: Streak = {
   current: 6,

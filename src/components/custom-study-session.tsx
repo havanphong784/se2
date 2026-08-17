@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowLeft,
   ArrowRight,
@@ -9,7 +10,6 @@ import {
   CheckCircle2,
   Headphones,
   RotateCcw,
-  Sparkles,
   Volume2,
   VolumeX,
   X,
@@ -24,7 +24,6 @@ import { Progress } from "@/components/ui/progress";
 import type { VocabularyDeck, VocabularyWord } from "@/lib/demo-data";
 import {
   createMultipleChoiceOptions,
-  getStudyShortcutAction,
   getStudySpeechSpeed,
   highlightTermInExample,
   isTypingAnswerCorrect,
@@ -36,7 +35,7 @@ import { cancelEnglishSpeech, canSpeakEnglish, speakEnglish } from "@/lib/speech
 import { cn } from "@/lib/utils";
 
 type CustomStudySessionProps = {
-  deck: VocabularyDeck;
+  deck?: VocabularyDeck;
   wordsLearnedToday: VocabularyWord[];
   countParam?: string;
   typeParam?: string;
@@ -48,6 +47,8 @@ export function CustomStudySession({
   countParam,
   typeParam,
 }: CustomStudySessionProps) {
+  // deck optional: chế độ cross-deck (ôn tất cả từ học hôm nay) không gắn deck cụ thể.
+  const homeHref = deck ? `/vocabulary/${deck.slug}` : "/vocabulary";
   const initialPhase: StudyPhase =
     typeParam === "multiple_choice" || typeParam === "typing" ? typeParam : "flashcard";
 
@@ -102,9 +103,11 @@ export function CustomStudySession({
               Chưa có từ mới học hôm nay
             </h1>
             <p className="text-ash font-bold">
-              Bạn chưa học từ mới nào trong bộ “{deck.title}” hôm nay. Hãy học từ mới trước khi ôn tập!
+              {deck
+                ? `Bạn chưa học từ mới nào trong bộ “${deck.title}” hôm nay. Hãy học từ mới trước khi ôn tập!`
+                : "Bạn chưa học từ mới nào trong ngày hôm nay. Hãy học từ mới trước khi ôn tập!"}
             </p>
-            <Link href={`/vocabulary/${deck.slug}`} className={buttonVariants({ size: "lg" })}>
+            <Link href={homeHref} className={buttonVariants({ size: "lg" })}>
               <ArrowLeft /> Quay lại bộ từ
             </Link>
           </CardContent>
@@ -121,7 +124,7 @@ export function CustomStudySession({
   if (isCompleted) {
     return (
       <main className="grid min-h-svh place-items-center bg-[linear-gradient(180deg,#f3ffe9,#fff)] px-5 text-center">
-        <Card className="max-w-xl border-eel-light shadow-lg">
+        <Card className="max-w-xl border-2 border-b-4 border-eel-light">
           <CardContent className="p-8 md:p-10">
             <span className="mx-auto grid size-20 place-items-center rounded-full bg-[#eaffdc]">
               <Check className="size-11 text-ecto-green" />
@@ -133,10 +136,13 @@ export function CustomStudySession({
               Hoàn thành ôn tập từ mới học!
             </h1>
             <p className="mt-3 font-bold leading-7 text-ash">
-              Bạn đã ôn lại xong {sessionWords.length} từ trong bộ “{deck.title}”. Lưu ý: Dữ liệu phiên này không tính vào tiến độ hay XP.
+              Bạn đã ôn lại xong {sessionWords.length} từ{" "}
+              {deck
+                ? `trong bộ “${deck.title}”. Lưu ý: Dữ liệu phiên này không tính vào tiến độ hay XP.`
+                : "(tất cả bộ từ). Lưu ý: Dữ liệu phiên này không tính vào tiến độ hay XP."}
             </p>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
-              <Link href={`/vocabulary/${deck.slug}`} className={buttonVariants({ size: "lg" })}>
+              <Link href={homeHref} className={buttonVariants({ size: "lg" })}>
                 Quay lại bộ từ
               </Link>
             </div>
@@ -200,239 +206,386 @@ export function CustomStudySession({
         : "Nhập từ (Tự chọn)";
 
   return (
-    <div className="min-h-svh bg-[linear-gradient(180deg,#fbfff8_0%,#fff_40%)]">
-      <header className="border-b-2 border-[#eeeeee] bg-white/90 backdrop-blur">
-        <div className="mx-auto flex min-h-20 max-w-[980px] items-center gap-3 px-4">
+    <div className="flex min-h-svh flex-col bg-[#fcfdfa]">
+      {/* Top Header */}
+      <header className="sticky top-0 z-30 border-b-2 border-[#eeeeee] bg-white/95 backdrop-blur">
+        <div className="mx-auto flex h-18 max-w-4xl items-center gap-4 px-4 sm:h-20 sm:px-6">
           <Link
-            href={`/vocabulary/${deck.slug}`}
-            className="grid size-11 place-items-center rounded-xl text-ash hover:bg-[#f5f5f5]"
+            href={homeHref}
+            className="grid size-10 shrink-0 place-items-center rounded-xl text-ash transition-colors hover:bg-[#f5f5f5] hover:text-charcoal sm:size-11"
           >
-            <X />
+            <X className="size-5 sm:size-6" />
           </Link>
+
           <div className="flex-1">
-            <div className="mb-1.5 flex justify-between text-xs font-extrabold text-ash">
-              <span className="flex items-center gap-1.5">
-                <RotateCcw className="size-3.5 text-macaw-blue" /> {phaseTitle}
+            <div className="mb-1.5 flex items-center justify-between text-xs font-black">
+              <span className="flex items-center gap-1.5 text-eel-dark-blue">
+                <RotateCcw className="size-3.5 text-macaw-blue" />
+                {phaseTitle}
               </span>
-              <span>{progress}%</span>
+              <span className="font-extrabold text-ash tabular-nums">{progress}%</span>
             </div>
-            <Progress value={progress} className="h-3" />
+            <Progress value={progress} className="h-3.5 bg-[#ebebeb]" />
           </div>
+
           <Button
             type="button"
             variant={autoSpeakEnabled ? "outline" : "secondary"}
             size="sm"
             onClick={() => setAutoSpeakEnabled(!autoSpeakEnabled)}
-            className="px-3"
+            className="h-10 px-3 sm:px-4"
           >
-            {autoSpeakEnabled ? <Volume2 /> : <VolumeX />}
+            {autoSpeakEnabled ? <Volume2 className="size-4 text-ecto-green" /> : <VolumeX className="size-4 text-ash" />}
+            <span className="hidden text-xs font-black sm:inline">Tự phát âm</span>
           </Button>
         </div>
       </header>
 
-      <main className="mx-auto flex min-h-[calc(100svh-80px)] max-w-[860px] flex-col justify-center px-5 py-8">
+      {/* Main Content Area */}
+      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col justify-start px-4 pt-6 pb-36 sm:px-6 sm:pt-10">
         {/* FLASHCARD */}
         {initialPhase === "flashcard" && currentWord && (
-          <Card className="mx-auto flex w-full max-w-[600px] flex-col overflow-hidden border-eel-light border-b-4 shadow-lg sm:min-h-[450px]">
-            <CardHeader className="min-h-12 justify-center border-b-2 border-[#f0f0f0] bg-[#fbfff8] px-5 py-2.5">
-              <div className="flex w-full items-center justify-between gap-3">
-                {currentWord.partOfSpeech.length > 0 && (
-                  <Badge variant="blue">{currentWord.partOfSpeech.join(", ")}</Badge>
-                )}
-                <span className="ml-auto text-xs font-extrabold text-ash tabular-nums">
-                  {currentIndex + 1} / {sessionWords.length}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentWord.id}
+              initial={{ opacity: 0, x: 20, scale: 0.98 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={{ opacity: 0, x: -20, scale: 0.98 }}
+              transition={{ duration: 0.22, ease: [0.23, 1, 0.32, 1] }}
+              className="mx-auto flex w-full max-w-xl flex-col overflow-hidden rounded-xl border-2 border-b-4 border-eel-light border-b-[#bde897] bg-white"
+            >
+              <div className="flex items-center justify-between border-b-2 border-[#f0f0f0] bg-[#fafdf8] px-6 py-3.5">
+                <div className="flex items-center gap-2">
+                  {currentWord.partOfSpeech.length > 0 && (
+                    <Badge variant="blue" className="text-xs font-black">
+                      {currentWord.partOfSpeech.join(", ")}
+                    </Badge>
+                  )}
+                </div>
+                <span className="text-xs font-black text-ash tabular-nums">
+                  {currentIndex + 1} / {sessionWords.length} từ
                 </span>
               </div>
-            </CardHeader>
-            <CardContent className="flex flex-1 flex-col p-5 text-center sm:p-6">
-              <div className="flex flex-wrap items-center justify-center gap-3">
-                <h1 className="font-display text-4xl font-extrabold text-eel-dark-blue sm:text-5xl">
-                  {currentWord.term}
-                </h1>
+
+              <div className="flex flex-1 flex-col p-6 text-center sm:p-8">
+                <div className="flex items-center justify-center gap-3">
+                  <h1 className="font-display text-4xl font-black text-eel-dark-blue sm:text-5xl">
+                    {currentWord.term}
+                  </h1>
+                  <button
+                    type="button"
+                    onClick={() => speakEnglish(currentWord.term, "slow")}
+                    aria-label={`Nghe phát âm ${currentWord.term}`}
+                    title="Nghe phát âm chậm"
+                    className="grid size-11 shrink-0 place-items-center rounded-xl border-2 border-macaw-blue border-b-4 border-b-[#168bc2] bg-[#f4fbff] text-macaw-blue transition-transform hover:scale-105 active:translate-y-0.5"
+                  >
+                    <Volume2 className="size-5" />
+                  </button>
+                </div>
+
+                {currentWord.phonetic && (
+                  <p className="mt-1 font-mono text-base font-black text-macaw-blue">
+                    {currentWord.phonetic}
+                  </p>
+                )}
+
+                <div className="mt-6 rounded-xl border-2 border-b-4 border-lingot-lime border-b-[#8ed459] bg-[#f7fff1] p-5">
+                  <p className="text-[11px] font-black uppercase tracking-wider text-[#438f0e]">
+                    Nghĩa tiếng Việt
+                  </p>
+                  <p className="mt-1 font-display text-2xl font-black text-eel-dark-blue sm:text-3xl">
+                    {currentWord.translation}
+                  </p>
+                </div>
+
+                {currentWord.exampleSentence && (
+                  <div className="mt-4 rounded-xl border-2 border-b-4 border-[#eeeeee] border-b-[#dedede] bg-[#fafafa] p-4 text-left sm:p-5">
+                    <p className="text-[10px] font-black uppercase tracking-wider text-ash">
+                      Câu ví dụ
+                    </p>
+                    <p className="mt-1 text-sm font-extrabold leading-relaxed text-charcoal sm:text-base">
+                      {highlightTermInExample(
+                        currentWord.exampleSentence,
+                        currentWord.term,
+                      ).map((part, idx) =>
+                        part.highlighted ? (
+                          <strong key={idx} className="font-black text-ecto-green underline decoration-2 underline-offset-2">
+                            {part.text}
+                          </strong>
+                        ) : (
+                          <span key={idx}>{part.text}</span>
+                        ),
+                      )}
+                    </p>
+                    {currentWord.exampleTranslation && (
+                      <p className="mt-1 text-xs font-bold text-ash sm:text-sm">
+                        {currentWord.exampleTranslation}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 border-t-2 border-[#f0f0f0] bg-[#fafafa] p-4 sm:p-5">
                 <Button
-                  type="button"
-                  variant="blue"
-                  size="icon"
-                  className="size-10"
-                  onClick={() => speakEnglish(currentWord.term, "slow")}
+                  variant="secondary"
+                  size="lg"
+                  disabled={currentIndex === 0}
+                  onClick={() => setCurrentIndex((i) => i - 1)}
                 >
-                  <Volume2 />
+                  <ArrowLeft className="size-4" /> Lùi
+                </Button>
+                <Button
+                  size="lg"
+                  onClick={() => setCurrentIndex((i) => i + 1)}
+                >
+                  <span>{currentIndex === sessionWords.length - 1 ? "Hoàn thành" : "Tiếp theo"}</span>
+                  <ArrowRight className="size-4" />
                 </Button>
               </div>
-              <p className="mt-1.5 text-base font-extrabold text-macaw-blue">
-                {currentWord.phonetic}
-              </p>
-              <div className="mt-4 rounded-xl border-2 border-lingot-lime/70 bg-[#f7fff1] px-4 py-4">
-                <p className="text-xs font-extrabold uppercase tracking-wider text-[#438f0e]">
-                  Nghĩa tiếng Việt
-                </p>
-                <p className="mt-1 text-2xl font-extrabold text-[#438f0e]">
-                  {currentWord.translation}
-                </p>
-              </div>
-              <div className="mt-3 rounded-xl border-2 border-[#eeeeee] bg-[#fcfcfc] p-4 text-left">
-                <p className="mb-1 text-xs font-extrabold uppercase tracking-wider text-ash">
-                  Ví dụ
-                </p>
-                <p className="font-bold leading-6 text-charcoal">
-                  {highlightTermInExample(
-                    currentWord.exampleSentence,
-                    currentWord.term,
-                  ).map((part, idx) =>
-                    part.highlighted ? (
-                      <strong key={idx} className="font-extrabold text-eel-dark-blue">
-                        {part.text}
-                      </strong>
-                    ) : (
-                      <span key={idx}>{part.text}</span>
-                    ),
-                  )}
-                </p>
-                <p className="mt-1 text-sm font-bold text-ash">
-                  {currentWord.exampleTranslation}
-                </p>
-              </div>
-            </CardContent>
-            <CardFooter className="mt-auto grid min-h-[68px] grid-cols-2 gap-3 border-t-2 border-[#f0f0f0] bg-[#fcfcfc] p-3 sm:p-4">
-              <Button
-                variant="secondary"
-                size="lg"
-                disabled={currentIndex === 0}
-                onClick={() => setCurrentIndex((i) => i - 1)}
-              >
-                <ArrowLeft /> Lùi
-              </Button>
-              <Button
-                size="lg"
-                onClick={() => setCurrentIndex((i) => i + 1)}
-              >
-                {currentIndex === sessionWords.length - 1 ? "Hoàn thành" : "Tiếp"} <ArrowRight />
-              </Button>
-            </CardFooter>
-          </Card>
+            </motion.div>
+          </AnimatePresence>
         )}
 
         {/* MULTIPLE CHOICE */}
         {initialPhase === "multiple_choice" && currentWord && (
-          <section aria-labelledby="quiz-prompt">
-            <div className="mb-7 rounded-xl text-center">
-              <Badge variant="blue">
-                <Headphones className="size-4" /> Chọn nghĩa đúng
-              </Badge>
-              <h1 id="quiz-prompt" className="mt-4 font-display text-5xl font-extrabold text-eel-dark-blue">
-                {currentWord.term}
-              </h1>
-              <button
-                type="button"
-                onClick={() => speakEnglish(currentWord.term, "normal")}
-                className="mt-3 inline-flex items-center gap-2 font-extrabold text-macaw-blue hover:underline"
-              >
-                <Volume2 className="size-5" /> {currentWord.phonetic}
-              </button>
-            </div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentWord.id}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -16 }}
+              transition={{ duration: 0.22, ease: [0.23, 1, 0.32, 1] }}
+              className="mx-auto w-full max-w-2xl"
+            >
+              <div className="mb-8 text-center">
+                <Badge variant="blue" className="gap-1.5 px-3 py-1 text-xs font-black">
+                  <Headphones className="size-3.5" /> Chọn nghĩa đúng cho từ
+                </Badge>
+                <h1 id="quiz-prompt" className="mt-4 font-display text-4xl font-black text-eel-dark-blue sm:text-5xl">
+                  {currentWord.term}
+                </h1>
+                <button
+                  type="button"
+                  onClick={() => speakEnglish(currentWord.term, "normal")}
+                  className="mt-2 inline-flex items-center gap-2 font-mono text-sm font-black text-macaw-blue transition-colors hover:text-[#087db4]"
+                >
+                  <Volume2 className="size-4" /> {currentWord.phonetic}
+                </button>
+              </div>
 
-            <div className="grid gap-3 sm:grid-cols-2">
-              {options.map((option, index) => {
-                const selected = selectedOptionId === option.id;
-                const expected = currentWord.id === option.id;
-                const stateClass = feedback
-                  ? expected
-                    ? "border-ecto-green bg-[#f2ffe9] text-[#438f0e]"
-                    : selected
-                      ? "border-[#ff6b6b] bg-[#fff3f3] text-[#b93636]"
-                      : "border-[#dedede] bg-white text-ash opacity-65"
-                  : "border-[#dedede] bg-white text-charcoal hover:border-macaw-blue hover:bg-[#f5fbff]";
-                const letter = String.fromCharCode(65 + index);
+              <div className="grid gap-3 sm:grid-cols-2">
+                {options.map((option, index) => {
+                  const selected = selectedOptionId === option.id;
+                  const expected = currentWord.id === option.id;
+                  const letter = String.fromCharCode(65 + index);
 
-                return (
-                  <button
-                    key={option.id}
-                    type="button"
-                    disabled={Boolean(feedback)}
-                    onClick={() => handleChooseOption(option.id)}
-                    className={cn(
-                      "flex min-h-24 items-center gap-4 rounded-xl border-2 border-b-4 px-5 text-left text-lg font-extrabold transition",
-                      stateClass,
-                    )}
-                  >
-                    <span className="grid size-9 shrink-0 place-items-center rounded-lg border-2 border-current text-sm">
-                      {letter}
-                    </span>
-                    <span className="flex-1">{option.translation}</span>
-                    {feedback && expected && <CheckCircle2 className="text-ecto-green" />}
-                    {feedback && selected && !expected && <XCircle className="text-[#d94e4e]" />}
-                  </button>
-                );
-              })}
-            </div>
-          </section>
+                  let stateClass = "border-[#e5e5e5] border-b-[#dedede] bg-white text-charcoal hover:-translate-y-0.5 hover:border-macaw-blue hover:border-b-[#168bc2] hover:bg-[#f4fbff]";
+                  let badgeClass = "border-[#e5e5e5] bg-[#fafafa] text-ash";
+
+                  if (feedback) {
+                    if (expected) {
+                      stateClass = "border-ecto-green border-b-[#46a302] bg-[#f2ffe9] text-[#438f0e]";
+                      badgeClass = "border-ecto-green bg-ecto-green text-white";
+                    } else if (selected && !expected) {
+                      stateClass = "border-[#ff6b6b] border-b-[#d94e4e] bg-[#fff3f3] text-[#b93636]";
+                      badgeClass = "border-[#ff6b6b] bg-[#ff6b6b] text-white";
+                    } else {
+                      stateClass = "border-[#e5e5e5] border-b-[#dedede] bg-white text-ash/60 opacity-60";
+                      badgeClass = "border-[#e5e5e5] bg-[#fafafa] text-ash/60";
+                    }
+                  }
+
+                  return (
+                    <motion.button
+                      key={option.id}
+                      type="button"
+                      disabled={Boolean(feedback)}
+                      onClick={() => handleChooseOption(option.id)}
+                      animate={
+                        feedback
+                          ? expected
+                            ? { scale: [1, 1.03, 1] }
+                            : selected
+                              ? { x: [0, -6, 6, -4, 4, 0] }
+                              : {}
+                          : {}
+                      }
+                      transition={{ duration: 0.3 }}
+                      className={cn(
+                        "flex min-h-20 items-center justify-between gap-3.5 rounded-xl border-2 border-b-4 p-4 text-left text-base font-black transition-all sm:min-h-22 sm:p-5",
+                        stateClass,
+                      )}
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <span className={cn("grid size-8 shrink-0 place-items-center rounded-lg border-2 text-xs font-black", badgeClass)}>
+                          {letter}
+                        </span>
+                        <span className="truncate text-base sm:text-lg">{option.translation}</span>
+                      </div>
+                      {feedback && expected && (
+                        <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 400, damping: 20 }}>
+                          <CheckCircle2 className="size-5 text-ecto-green shrink-0" />
+                        </motion.span>
+                      )}
+                      {feedback && selected && !expected && (
+                        <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 400, damping: 20 }}>
+                          <XCircle className="size-5 text-[#d94e4e] shrink-0" />
+                        </motion.span>
+                      )}
+                    </motion.button>
+                  );
+                })}
+              </div>
+            </motion.div>
+          </AnimatePresence>
         )}
 
         {/* TYPING */}
         {initialPhase === "typing" && currentWord && (
-          <Card className={cn("mx-auto w-full max-w-2xl border-b-4 shadow-lg", feedback?.isCorrect === true && "border-ecto-green", feedback?.isCorrect === false && "border-[#ff6b6b]")}>
-            <CardContent className="p-6 text-center md:p-10">
-              <Badge variant="blue">Nhập từ tiếng Anh</Badge>
-              <p className="mt-6 text-sm font-extrabold uppercase tracking-wider text-ash">
-                Nghĩa tiếng Việt
-              </p>
-              <h1 className="mt-3 font-display text-4xl font-extrabold text-[#438f0e] sm:text-5xl">
-                {currentWord.translation}
-              </h1>
-              <form onSubmit={handleSubmitTyping} className="mt-8">
-                <Input
-                  autoFocus
-                  value={answer}
-                  onChange={(e) => setAnswer(e.target.value)}
-                  placeholder="Nhập từ tiếng Anh…"
-                  className={cn(
-                    "h-16 text-center text-xl font-extrabold",
-                    feedback?.isCorrect === true && "border-ecto-green bg-[#f7fff1]",
-                    feedback?.isCorrect === false && "border-[#ff6b6b] bg-[#fff7f7]",
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentWord.id}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{
+                opacity: 1,
+                y: 0,
+                x: feedback?.isCorrect === false ? [0, -8, 8, -6, 6, -3, 3, 0] : 0,
+                scale: feedback?.isCorrect === true ? [1, 1.02, 1] : 1,
+              }}
+              exit={{ opacity: 0, y: -16 }}
+              transition={{ duration: 0.3 }}
+              className={cn(
+                "mx-auto w-full max-w-xl rounded-xl border-2 border-b-4 bg-white p-6 sm:p-8",
+                feedback?.isCorrect === true
+                  ? "border-ecto-green border-b-[#46a302]"
+                  : feedback?.isCorrect === false
+                    ? "border-[#ff6b6b] border-b-[#d94e4e]"
+                    : "border-eel-light border-b-[#bde897]",
+              )}
+            >
+              <div className="text-center">
+                <Badge variant="blue" className="text-xs font-black">
+                  Gõ từ tiếng Anh
+                </Badge>
+                <p className="mt-4 text-xs font-black uppercase tracking-wider text-ash">
+                  Nghĩa tiếng Việt
+                </p>
+                <h1 className="mt-1 font-display text-3xl font-black text-eel-dark-blue sm:text-4xl">
+                  {currentWord.translation}
+                </h1>
+
+                <form onSubmit={handleSubmitTyping} className="mt-7">
+                  <label className="block text-left">
+                    <span className="mb-2 block text-xs font-black uppercase tracking-wider text-ash">
+                      Nhập câu trả lời của bạn:
+                    </span>
+                    <Input
+                      autoFocus
+                      value={answer}
+                      onChange={(e) => setAnswer(e.target.value)}
+                      placeholder="Nhập từ tiếng Anh…"
+                      className={cn(
+                        "h-16 text-center font-display text-2xl font-black text-eel-dark-blue transition-colors",
+                        feedback?.isCorrect === true && "border-ecto-green bg-[#f7fff1] text-[#438f0e]",
+                        feedback?.isCorrect === false && "border-[#ff6b6b] bg-[#fff7f7] text-[#b93636]",
+                      )}
+                      disabled={Boolean(feedback)}
+                    />
+                  </label>
+
+                  {!feedback && (
+                    <Button
+                      type="submit"
+                      size="lg"
+                      className="mt-5 w-full"
+                      disabled={!answer.trim()}
+                    >
+                      <span>Kiểm tra đáp án</span> <ArrowRight />
+                    </Button>
                   )}
-                  disabled={Boolean(feedback)}
-                />
-                {!feedback && (
-                  <Button type="submit" size="lg" className="mt-5 w-full" disabled={!answer.trim()}>
-                    Kiểm tra <ArrowRight />
-                  </Button>
-                )}
-              </form>
-            </CardContent>
-          </Card>
+                </form>
+              </div>
+            </motion.div>
+          </AnimatePresence>
         )}
 
-        {/* FEEDBACK BOTTOM BAR */}
+        {/* BOTTOM SHORTCUT GUIDANCE BAR */}
+        <footer className="mt-8 flex flex-wrap items-center justify-center gap-3 text-xs font-bold text-ash">
+          {initialPhase === "flashcard" && (
+            <span className="inline-flex items-center gap-1">
+              Bấm <strong className="font-extrabold text-charcoal">Tiếp theo</strong> để chuyển thẻ
+            </span>
+          )}
+          {initialPhase === "multiple_choice" && !feedback && (
+            <span className="inline-flex items-center gap-1">
+              Chọn đáp án phù hợp từ các lựa chọn trên
+            </span>
+          )}
+          {initialPhase === "typing" && !feedback && (
+            <span className="inline-flex items-center gap-1">
+              Nhấn <strong className="font-extrabold text-charcoal">Enter</strong> để kiểm tra
+            </span>
+          )}
+          {feedback && (
+            <span className="inline-flex items-center gap-1">
+              Nhấn <strong className="font-extrabold text-charcoal">Tiếp tục</strong> để sang câu tiếp theo
+            </span>
+          )}
+        </footer>
+      </main>
+
+      {/* DOCKED BOTTOM FEEDBACK BAR (Fixed to prevent content jumping) */}
+      <AnimatePresence>
         {feedback && (
-          <div
+          <motion.div
+            initial={{ y: "100%", opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: "100%", opacity: 0 }}
+            transition={{ type: "spring", stiffness: 450, damping: 32 }}
             className={cn(
-              "mt-6 rounded-xl border-2 border-b-4 p-5 sm:flex sm:items-center sm:justify-between sm:gap-5",
-              feedback.isCorrect ? "border-ecto-green bg-[#f2ffe9]" : "border-[#ff6b6b] bg-[#fff3f3]",
+              "fixed inset-x-0 bottom-0 z-40 border-t-2 p-4 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] outline-none sm:p-5",
+              feedback.isCorrect
+                ? "border-ecto-green bg-[#f2ffe9]"
+                : "border-[#ff6b6b] bg-[#fff3f3]",
             )}
           >
-            <div className="flex gap-3">
-              {feedback.isCorrect ? (
-                <CheckCircle2 className="mt-0.5 size-7 shrink-0 text-ecto-green" />
-              ) : (
-                <XCircle className="mt-0.5 size-7 shrink-0 text-[#d94e4e]" />
-              )}
-              <div>
-                <h2 className={cn("text-xl font-extrabold", feedback.isCorrect ? "text-[#438f0e]" : "text-[#b93636]")}>
-                  {feedback.isCorrect ? "Chính xác!" : "Chưa đúng"}
-                </h2>
-                {!feedback.isCorrect && (
-                  <p className="mt-1 font-bold text-charcoal">
-                    Đáp án đúng: <strong>{feedback.expectedAnswer}</strong>
-                  </p>
+            <div className="mx-auto flex max-w-2xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-start gap-3">
+                {feedback.isCorrect ? (
+                  <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 450, damping: 20 }}>
+                    <CheckCircle2 className="mt-0.5 size-7 shrink-0 text-ecto-green" />
+                  </motion.div>
+                ) : (
+                  <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 450, damping: 20 }}>
+                    <XCircle className="mt-0.5 size-7 shrink-0 text-[#d94e4e]" />
+                  </motion.div>
                 )}
+                <div>
+                  <h2 className={cn("text-lg font-black sm:text-xl", feedback.isCorrect ? "text-[#438f0e]" : "text-[#b93636]")}>
+                    {feedback.isCorrect ? "Chính xác! Tuyệt vời" : "Chưa chính xác"}
+                  </h2>
+                  {!feedback.isCorrect && (
+                    <p className="mt-1 text-sm font-bold text-charcoal">
+                      Đáp án đúng: <strong className="font-black text-eel-dark-blue text-base">{feedback.expectedAnswer}</strong>
+                    </p>
+                  )}
+                </div>
               </div>
+
+              <Button
+                type="button"
+                size="lg"
+                variant={feedback.isCorrect ? "default" : "danger"}
+                onClick={handleContinue}
+                className="w-full sm:w-auto sm:min-w-[140px]"
+              >
+                <span>Tiếp tục</span> <ArrowRight className="size-4" />
+              </Button>
             </div>
-            <Button size="lg" onClick={handleContinue} className="mt-4 sm:mt-0">
-              Tiếp tục <ArrowRight />
-            </Button>
-          </div>
+          </motion.div>
         )}
-      </main>
+      </AnimatePresence>
     </div>
   );
 }

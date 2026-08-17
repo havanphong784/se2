@@ -37,7 +37,7 @@ function isCurrent(pathname: string, href: string) {
 
 export function AppShell({
   children,
-  streakDays = 7,
+  streakDays: initialStreakDays,
 }: {
   children: React.ReactNode;
   streakDays?: number;
@@ -45,6 +45,7 @@ export function AppShell({
   const pathname = usePathname();
   const inPractice = pathname.startsWith("/vocabulary/practice");
   const [user, setUser] = useState<{ displayName: string; isDemo: boolean } | null>(null);
+  const [streakDays, setStreakDays] = useState<number>(initialStreakDays ?? 0);
 
   useEffect(() => {
     fetch("/api/auth/me")
@@ -52,6 +53,15 @@ export function AppShell({
       .then((data) => {
         if (data.user) {
           setUser({ displayName: data.user.displayName, isDemo: data.user.isDemo });
+        }
+      })
+      .catch(() => {});
+
+    fetch("/api/streak")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.streak && typeof data.streak.current === "number") {
+          setStreakDays(data.streak.current);
         }
       })
       .catch(() => {});

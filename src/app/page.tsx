@@ -15,7 +15,7 @@ import {
 
 import { DataSourceNotice } from "@/components/data-source-notice";
 import { LearningPath } from "@/components/learning-path";
-import { WeeklyReviewCalendar } from "@/components/weekly-review-calendar";
+import { ReviewCalendarPanel } from "@/components/review-calendar-panel";
 import { WordGardenIllustration } from "@/components/word-garden-illustration";
 import { WeeklyChart } from "@/components/weekly-chart";
 import { Badge } from "@/components/ui/badge";
@@ -26,7 +26,14 @@ import { getLearningData } from "@/lib/data";
 import { getCurrentAuthUser } from "@/lib/auth";
 import { getDb } from "@/db";
 import { isDueForReview } from "@/lib/study";
-import { cn, vnCalendarWeek, vnDateKey, vnDayLabel, vnWeekdayLabel } from "@/lib/utils";
+import {
+  cn,
+  vnCalendarMonth,
+  vnCalendarWeek,
+  vnDateKey,
+  vnDayLabel,
+  vnWeekdayLabel,
+} from "@/lib/utils";
 
 export default async function DashboardPage() {
   const db = getDb();
@@ -34,7 +41,7 @@ export default async function DashboardPage() {
   const displayName = authUser?.displayName ?? "Minh Anh";
 
   const learning = await getLearningData();
-  const { decks, activity } = learning.data;
+  const { decks, activity, streak } = learning.data;
   const allWords = decks.flatMap((deck) => deck.words);
   const mastered = allWords.filter((word) => word.reviewCompletedAt).length;
   const learningCount = allWords.filter(
@@ -49,7 +56,8 @@ export default async function DashboardPage() {
   const activeDays = activity.filter((item) => item.reviewed > 0 || item.learned > 0).length;
 
   // Panel "ôn tuần này" (T2–CN): ô quá khứ hiển thị số đã ôn (reviewed),
-  // ô hôm nay/tương lai hiển thị số từ cần ôn lũy tiến (due <= hết ngày đó).
+  // ô hôm nay/tương lai hiển thị số từ đến hạn ĐÚNG ngày đó (nextReviewAt
+  // rơi vào ngày D theo múi giờ VN, không cộng dồn).
   const weekDates = vnCalendarWeek(now);
   const weekDays = weekDates.map((date) => vnWeekdayLabel(date));
   const weekFullDates = weekDates.map((date) => vnDayLabel(date));
@@ -61,10 +69,8 @@ export default async function DashboardPage() {
     const key = `${weekDays[index]}-${weekFullDates[index]}`;
     return reviewedByDate.get(key) ?? 0;
   });
-  // Hết ngày D = đầu ngày D+1 (UTC) — khớp isDueForReview dùng <= now.
   const weekDue = weekDates.map((date) => {
-    const endOfDay = new Date(date);
-    endOfDay.setUTCDate(endOfDay.getUTCDate() + 1);
+    const dayKey = vnDateKey(date);
     return allWords.filter((word) => {
       if (
         !word.learnedAt ||
@@ -73,10 +79,51 @@ export default async function DashboardPage() {
         !word.nextReviewAt
       )
         return false;
-      const dueAt = Date.parse(word.nextReviewAt);
-      return Number.isFinite(dueAt) && dueAt <= endOfDay.getTime();
+      const due = new Date(word.nextReviewAt);
+      if (Number.isNaN(due.getTime())) return false;
+      return vnDateKey(due) === dayKey;
     }).length;
   });
+
+  // Data cho Lịch ôn Tháng (F3)
+  const monthInfo = vnCalendarMonth(now);
+  const monthDaysData = monthInfo.days.map((date) => {
+    const dayKey = vnDateKey(date);
+    const dayNumber = date.getUTCDate();
+    const weekday = vnWeekdayLabel(date);
+    const isPast = dayKey < todayKey;
+    const isToday = dayKey === todayKey;
+    const isFuture = dayKey > todayKey;
+
+    const fullDateLabel = vnDayLabel(date);
+    const reviewed = reviewedByDate.get(`${weekday}-${fullDateLabel}`) ?? 0;
+    const due = allWords.filter((word) => {
+      if (
+        !word.learnedAt ||
+        word.status === "mastered" ||
+        word.reviewCompletedAt ||
+        !word.nextReviewAt
+      )
+        return false;
+      const dueDate = new Date(word.nextReviewAt);
+      if (Number.isNaN(dueDate.getTime())) return false;
+      return vnDateKey(dueDate) === dayKey;
+    }).length;
+
+    return {
+      date: dayKey,
+      dayNumber,
+      weekday,
+      reviewed,
+      due,
+      isPast,
+      isToday,
+      isFuture,
+    };
+  });
+
+  const totalDueMonth = monthDaysData.reduce((sum, d) => sum + d.due, 0);
+
   const dateLabel = new Intl.DateTimeFormat("vi-VN", {
     weekday: "long",
     day: "numeric",
@@ -97,12 +144,12 @@ export default async function DashboardPage() {
           </h1>
         </div>
         <div className="flex items-center gap-2 text-sm font-extrabold text-ash">
-          <Flame className="size-5 fill-[#ffb020] text-[#ffb020]" /> Đã học {activeDays}/7 ngày gần đây
+          <Flame className="size-5 fill-[#ffb020] text-[#ffb020]" /> Chuỗi {streak.current} ngày • Đã học {activeDays}/7 ngày gần đây
         </div>
       </header>
 
       <section aria-labelledby="daily-mission" className="grid gap-5 lg:grid-cols-[1.55fr_0.8fr]">
-        <div className="relative overflow-hidden rounded-xl border-2 border-eel-light bg-[#fbfff8] p-6 md:min-h-[310px] md:p-8">
+        <div className="relative overflow-hidden rounded-xl border-2 border-b-4 border-eel-light border-b-[#c4f0a0] bg-[#fbfff8] p-6 md:min-h-[310px] md:p-8">
           <div className="relative z-10 max-w-[570px] md:pr-44">
             <Badge className="mb-4">
               <Sparkles className="size-4" /> Bài học hôm nay
@@ -204,7 +251,7 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <div className="rounded-xl border-2 border-macaw-blue p-5">
+        <div className="rounded-xl border-2 border-b-4 border-macaw-blue border-b-[#168bc2] bg-white p-5">
           <p className="text-xs font-extrabold uppercase tracking-[0.08em] text-macaw-blue">
             Gợi ý nhỏ
           </p>
@@ -234,18 +281,25 @@ export default async function DashboardPage() {
                 Lịch ôn
               </p>
               <CardTitle id="review-week-title" className="mt-1 text-[24px]">
-                Ôn tuần này
+                Lịch ôn tập
               </CardTitle>
             </div>
-            <Badge variant="neutral">{weekDue[weekDue.length - 1]} từ đến hạn CN</Badge>
           </CardHeader>
           <CardContent className="pt-0">
-            <WeeklyReviewCalendar
-              days={weekDays}
-              fullDates={weekFullDates}
-              reviewed={weekReviewed}
-              due={weekDue}
-              todayIndex={weekDates.findIndex((date) => vnDateKey(date) === todayKey)}
+            <ReviewCalendarPanel
+              weekly={{
+                days: weekDays,
+                fullDates: weekFullDates,
+                reviewed: weekReviewed,
+                due: weekDue,
+                todayIndex: weekDates.findIndex((date) => vnDateKey(date) === todayKey),
+              }}
+              monthly={{
+                monthLabel: monthInfo.monthLabel,
+                startOffset: monthInfo.startOffset,
+                days: monthDaysData,
+                totalDueMonth,
+              }}
             />
           </CardContent>
         </Card>

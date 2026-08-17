@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Link from "next/link";
 import {
   ArrowRight,
   Brain,
@@ -20,7 +21,7 @@ import type { StudyPhase } from "@/lib/study";
 import { cn } from "@/lib/utils";
 
 type CustomPracticeDialogProps = {
-  deck: VocabularyDeck;
+  deck?: VocabularyDeck;
   wordsLearnedToday: VocabularyWord[];
 };
 
@@ -30,12 +31,26 @@ export function CustomPracticeDialog({
 }: CustomPracticeDialogProps) {
   const [open, setOpen] = useState(false);
   const totalToday = wordsLearnedToday.length;
+  // Cross-deck (deck === undefined): ôn TẤT CẢ từ học hôm nay ở mọi bộ, không gắn deck cụ thể.
+  const scopeLabel = deck ? deck.title : "Tất cả bộ từ vựng";
 
   const countOptions = [5, 10, 15, 20].filter((c) => c < totalToday);
   const [selectedCount, setSelectedCount] = useState<number | "all">(
     countOptions[0] ?? "all",
   );
   const [selectedPhase, setSelectedPhase] = useState<StudyPhase>("flashcard");
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setOpen(false);
+      }
+    };
+    if (open) {
+      window.addEventListener("keydown", handleKeyDown);
+      return () => window.removeEventListener("keydown", handleKeyDown);
+    }
+  }, [open]);
 
   if (totalToday === 0) {
     return (
@@ -89,12 +104,21 @@ export function CustomPracticeDialog({
       </Button>
 
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="relative w-full max-w-lg overflow-hidden rounded-2xl border-2 border-eel-light bg-white p-6 shadow-2xl md:p-8">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="custom-practice-title"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setOpen(false);
+          }}
+        >
+          <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-xl border-2 border-b-4 border-eel-light bg-white p-6 md:p-8">
             <button
               type="button"
               onClick={() => setOpen(false)}
               className="absolute right-4 top-4 grid size-9 place-items-center rounded-xl text-ash hover:bg-[#f0f0f0]"
+              aria-label="Đóng hộp thoại"
             >
               <X className="size-5" />
             </button>
@@ -107,14 +131,18 @@ export function CustomPracticeDialog({
                 <Badge variant="blue" className="mb-1">
                   Tự chọn • Không tính điểm
                 </Badge>
-                <h2 className="font-display text-2xl font-extrabold text-eel-dark-blue">
+                <h2 id="custom-practice-title" className="font-display text-2xl font-extrabold text-eel-dark-blue">
                   Ôn lại từ mới học hôm nay
                 </h2>
               </div>
             </div>
 
             <p className="mt-3 text-sm font-bold text-ash">
-              Bộ từ: <strong className="text-charcoal">{deck.title}</strong> •
+              {deck ? (
+                <>Bộ từ: <strong className="text-charcoal">{scopeLabel}</strong> • </>
+              ) : (
+                <>Phạm vi: <strong className="text-charcoal">{scopeLabel}</strong> • </>
+              )}
               Có {totalToday} từ vừa học hôm nay.
             </p>
 
@@ -124,11 +152,12 @@ export function CustomPracticeDialog({
                 <label className="mb-2 block text-xs font-extrabold uppercase tracking-wider text-ash">
                   1. Số lượng từ ôn tập
                 </label>
-                <div className="grid grid-cols-4 gap-2">
+                <div className="grid grid-cols-4 gap-2" role="group" aria-label="Chọn số lượng từ ôn tập">
                   {countOptions.map((count) => (
                     <button
                       key={count}
                       type="button"
+                      aria-pressed={selectedCount === count}
                       onClick={() => setSelectedCount(count)}
                       className={cn(
                         "flex min-h-12 flex-col items-center justify-center rounded-xl border-2 border-b-4 font-extrabold transition",
@@ -142,6 +171,7 @@ export function CustomPracticeDialog({
                   ))}
                   <button
                     type="button"
+                    aria-pressed={selectedCount === "all"}
                     onClick={() => setSelectedCount("all")}
                     className={cn(
                       "flex min-h-12 flex-col items-center justify-center rounded-xl border-2 border-b-4 font-extrabold transition",
@@ -160,7 +190,7 @@ export function CustomPracticeDialog({
                 <label className="mb-2 block text-xs font-extrabold uppercase tracking-wider text-ash">
                   2. Chọn kiểu ôn tập (1 trong 3 kiểu)
                 </label>
-                <div className="grid gap-2.5">
+                <div className="grid gap-2.5" role="group" aria-label="Chọn kiểu ôn tập">
                   {phaseOptions.map((opt) => {
                     const Icon = opt.icon;
                     const selected = selectedPhase === opt.id;
@@ -168,6 +198,7 @@ export function CustomPracticeDialog({
                       <button
                         key={opt.id}
                         type="button"
+                        aria-pressed={selected}
                         onClick={() => setSelectedPhase(opt.id)}
                         className={cn(
                           "flex items-center gap-3.5 rounded-xl border-2 border-b-4 p-3.5 text-left transition",
@@ -213,15 +244,19 @@ export function CustomPracticeDialog({
               </div>
 
               {/* Action button */}
-              <a
-                href={`/vocabulary/practice?mode=custom&deck=${deck.slug}&count=${selectedCount}&type=${selectedPhase}`}
+              <Link
+                href={
+                  deck
+                    ? `/vocabulary/practice?mode=custom&deck=${deck.slug}&count=${selectedCount}&type=${selectedPhase}`
+                    : `/vocabulary/practice?mode=custom&count=${selectedCount}&type=${selectedPhase}`
+                }
                 className={cn(
                   buttonVariants({ size: "lg" }),
                   "w-full justify-center text-center",
                 )}
               >
                 Bắt đầu ôn tập <ArrowRight />
-              </a>
+              </Link>
             </div>
           </div>
         </div>

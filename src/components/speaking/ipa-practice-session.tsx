@@ -133,7 +133,7 @@ export function IpaPracticeSession() {
           {selectedSound ? (
             <IpaSoundDetail sound={selectedSound} />
           ) : (
-            <div className="grid h-64 place-items-center rounded-2xl border-2 border-dashed border-[#e5e5e5] bg-white p-6 text-center text-sm font-bold text-ash">
+            <div className="grid h-64 place-items-center rounded-xl border-2 border-dashed border-[#e5e5e5] bg-white p-6 text-center text-sm font-bold text-ash">
               Chọn một âm bất kỳ từ cột bên trái để xem thông tin chi tiết.
             </div>
           )}
