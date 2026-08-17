@@ -71,12 +71,15 @@ export default async function VocabularyPage() {
         <article className="flex flex-col justify-between rounded-xl border-2 border-[#e5e5e5] bg-white p-5">
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-3">
-              <span className={cn(
-                "grid size-12 place-items-center rounded-xl border-2",
-                totalDue > 0
-                  ? "border-eel-light text-ecto-green"
-                  : "border-border text-ash",
-              )}>
+              <span
+                aria-hidden="true"
+                className={cn(
+                  "grid size-12 place-items-center rounded-xl border-2",
+                  totalDue > 0
+                    ? "border-eel-light text-ecto-green"
+                    : "border-border text-ash",
+                )}
+              >
                 <RotateCcw className="size-6" />
               </span>
               <Badge variant={totalDue > 0 ? "default" : "neutral"}>
@@ -113,12 +116,15 @@ export default async function VocabularyPage() {
         <article className="flex flex-col justify-between rounded-xl border-2 border-[#e5e5e5] bg-white p-5">
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-3">
-              <span className={cn(
-                "grid size-12 place-items-center rounded-xl border-2",
-                learnedTodayCount > 0
-                  ? "border-lingot-lime text-ecto-green"
-                  : "border-border text-ash",
-              )}>
+              <span
+                aria-hidden="true"
+                className={cn(
+                  "grid size-12 place-items-center rounded-xl border-2",
+                  learnedTodayCount > 0
+                    ? "border-eel-light text-ecto-green"
+                    : "border-border text-ash",
+                )}
+              >
                 <CalendarCheck className="size-6" />
               </span>
               <Badge variant={learnedTodayCount > 0 ? "default" : "neutral"}>
@@ -150,7 +156,7 @@ export default async function VocabularyPage() {
         <article className="flex flex-col justify-between rounded-xl border-2 border-[#e5e5e5] bg-white p-5">
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-3">
-              <span className="grid size-12 place-items-center rounded-xl border-2 border-macaw-blue text-macaw-blue">
+              <span aria-hidden="true" className="grid size-12 place-items-center rounded-xl border-2 border-macaw-blue text-macaw-blue">
                 <Sparkles className="size-6" />
               </span>
               <Badge variant="blue">Tra cứu &amp; Dịch</Badge>
@@ -175,7 +181,7 @@ export default async function VocabularyPage() {
         <article className="flex flex-col justify-between rounded-xl border-2 border-[#e5e5e5] bg-white p-5">
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-3">
-              <span className="grid size-12 place-items-center rounded-xl border-2 border-lingot-lime text-charcoal">
+              <span aria-hidden="true" className="grid size-12 place-items-center rounded-xl border-2 border-lingot-lime text-charcoal">
                 <FileUp className="size-6" />
               </span>
               <Badge variant="neutral">CSV / JSON</Badge>

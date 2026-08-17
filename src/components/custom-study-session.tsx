@@ -9,7 +9,6 @@ import {
   CheckCircle2,
   Headphones,
   RotateCcw,
-  Sparkles,
   Volume2,
   VolumeX,
   X,
@@ -24,7 +23,6 @@ import { Progress } from "@/components/ui/progress";
 import type { VocabularyDeck, VocabularyWord } from "@/lib/demo-data";
 import {
   createMultipleChoiceOptions,
-  getStudyShortcutAction,
   getStudySpeechSpeed,
   highlightTermInExample,
   isTypingAnswerCorrect,
@@ -125,7 +123,7 @@ export function CustomStudySession({
   if (isCompleted) {
     return (
       <main className="grid min-h-svh place-items-center bg-[linear-gradient(180deg,#f3ffe9,#fff)] px-5 text-center">
-        <Card className="max-w-xl border-eel-light shadow-lg">
+        <Card className="max-w-xl border-2 border-b-4 border-eel-light">
           <CardContent className="p-8 md:p-10">
             <span className="mx-auto grid size-20 place-items-center rounded-full bg-[#eaffdc]">
               <Check className="size-11 text-ecto-green" />
@@ -240,7 +238,7 @@ export function CustomStudySession({
       <main className="mx-auto flex min-h-[calc(100svh-80px)] max-w-[860px] flex-col justify-center px-5 py-8">
         {/* FLASHCARD */}
         {initialPhase === "flashcard" && currentWord && (
-          <Card className="mx-auto flex w-full max-w-[600px] flex-col overflow-hidden border-eel-light border-b-4 shadow-lg sm:min-h-[450px]">
+          <Card className="mx-auto flex w-full max-w-[600px] flex-col overflow-hidden border-2 border-b-4 border-eel-light sm:min-h-[450px]">
             <CardHeader className="min-h-12 justify-center border-b-2 border-[#f0f0f0] bg-[#fbfff8] px-5 py-2.5">
               <div className="flex w-full items-center justify-between gap-3">
                 {currentWord.partOfSpeech.length > 0 && (
@@ -377,7 +375,7 @@ export function CustomStudySession({
 
         {/* TYPING */}
         {initialPhase === "typing" && currentWord && (
-          <Card className={cn("mx-auto w-full max-w-2xl border-b-4 shadow-lg", feedback?.isCorrect === true && "border-ecto-green", feedback?.isCorrect === false && "border-[#ff6b6b]")}>
+          <Card className={cn("mx-auto w-full max-w-2xl border-2 border-b-4", feedback?.isCorrect === true && "border-ecto-green", feedback?.isCorrect === false && "border-[#ff6b6b]", !feedback && "border-eel-light")}>
             <CardContent className="p-6 text-center md:p-10">
               <Badge variant="blue">Nhập từ tiếng Anh</Badge>
               <p className="mt-6 text-sm font-extrabold uppercase tracking-wider text-ash">

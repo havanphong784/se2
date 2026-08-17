@@ -11,6 +11,7 @@ import {
   DEMO_ACTIVITY,
   DEMO_DECKS,
   DEMO_STREAK,
+  getDemoActivity,
   type DailyActivity as ActivityItem,
   type Streak,
   type VocabularyDeck,
@@ -48,7 +49,7 @@ function fallbackDecks() {
 }
 
 function fallbackActivity() {
-  return structuredClone(DEMO_ACTIVITY);
+  return getDemoActivity();
 }
 
 function fallbackStreak() {

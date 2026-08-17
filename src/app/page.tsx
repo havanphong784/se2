@@ -34,7 +34,7 @@ export default async function DashboardPage() {
   const displayName = authUser?.displayName ?? "Minh Anh";
 
   const learning = await getLearningData();
-  const { decks, activity } = learning.data;
+  const { decks, activity, streak } = learning.data;
   const allWords = decks.flatMap((deck) => deck.words);
   const mastered = allWords.filter((word) => word.reviewCompletedAt).length;
   const learningCount = allWords.filter(
@@ -97,7 +97,7 @@ export default async function DashboardPage() {
           </h1>
         </div>
         <div className="flex items-center gap-2 text-sm font-extrabold text-ash">
-          <Flame className="size-5 fill-[#ffb020] text-[#ffb020]" /> Đã học {activeDays}/7 ngày gần đây
+          <Flame className="size-5 fill-[#ffb020] text-[#ffb020]" /> Chuỗi {streak.current} ngày • Đã học {activeDays}/7 ngày gần đây
         </div>
       </header>
 

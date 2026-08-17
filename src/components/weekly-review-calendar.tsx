@@ -37,13 +37,13 @@ export function WeeklyReviewCalendar({
           <li
             key={`${day}-${fullDates[index]}`}
             className={cn(
-              "flex min-h-[88px] flex-col items-center justify-between rounded-xl border-2 p-1.5 transition-all duration-150 motion-reduce:transition-none sm:min-h-[104px] sm:p-2.5",
-              isPast && "border-[#f0f0f0] bg-[#f9f9fa] text-ash/80",
+              "flex min-h-[88px] flex-col items-center justify-between rounded-xl border-2 border-b-4 p-1.5 transition-all duration-150 motion-reduce:transition-none sm:min-h-[104px] sm:p-2.5",
+              isPast && "border-[#f0f0f0] border-b-[#e8e8e8] bg-[#f9f9fa] text-ash/80",
               isToday &&
-                "-translate-y-0.5 border-macaw-blue border-b-4 border-b-eel-light bg-ecto-green text-white",
+                "-translate-y-0.5 border-macaw-blue border-b-eel-light bg-ecto-green text-white",
               !isPast &&
                 !isToday &&
-                "border-eel-light border-b-4 border-b-lingot-lime bg-eel-light text-eel-dark-blue",
+                "border-eel-light border-b-lingot-lime bg-eel-light text-eel-dark-blue",
             )}
             aria-label={
               isToday
@@ -63,7 +63,7 @@ export function WeeklyReviewCalendar({
                 <span
                   className={cn(
                     "text-[11px] font-extrabold uppercase tracking-wide",
-                    isPast ? "text-ash" : isToday ? "text-white/90" : "text-eel-dark-blue/80",
+                    isPast ? "text-ash" : "text-eel-dark-blue/80",
                   )}
                 >
                   {day}
@@ -95,7 +95,7 @@ export function WeeklyReviewCalendar({
                       : "text-lg font-extrabold text-eel-dark-blue sm:text-xl",
                 )}
               >
-                {count > 0 ? count : isPast ? "–" : "0"}
+                {count > 0 ? count : "–"}
               </span>
               <span
                 className={cn(
