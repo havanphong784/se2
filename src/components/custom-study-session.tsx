@@ -36,7 +36,7 @@ import { cancelEnglishSpeech, canSpeakEnglish, speakEnglish } from "@/lib/speech
 import { cn } from "@/lib/utils";
 
 type CustomStudySessionProps = {
-  deck: VocabularyDeck;
+  deck?: VocabularyDeck;
   wordsLearnedToday: VocabularyWord[];
   countParam?: string;
   typeParam?: string;
@@ -48,6 +48,8 @@ export function CustomStudySession({
   countParam,
   typeParam,
 }: CustomStudySessionProps) {
+  // deck optional: chế độ cross-deck (ôn tất cả từ học hôm nay) không gắn deck cụ thể.
+  const homeHref = deck ? `/vocabulary/${deck.slug}` : "/vocabulary";
   const initialPhase: StudyPhase =
     typeParam === "multiple_choice" || typeParam === "typing" ? typeParam : "flashcard";
 
@@ -102,9 +104,11 @@ export function CustomStudySession({
               Chưa có từ mới học hôm nay
             </h1>
             <p className="text-ash font-bold">
-              Bạn chưa học từ mới nào trong bộ “{deck.title}” hôm nay. Hãy học từ mới trước khi ôn tập!
+              {deck
+                ? `Bạn chưa học từ mới nào trong bộ “${deck.title}” hôm nay. Hãy học từ mới trước khi ôn tập!`
+                : "Bạn chưa học từ mới nào trong ngày hôm nay. Hãy học từ mới trước khi ôn tập!"}
             </p>
-            <Link href={`/vocabulary/${deck.slug}`} className={buttonVariants({ size: "lg" })}>
+            <Link href={homeHref} className={buttonVariants({ size: "lg" })}>
               <ArrowLeft /> Quay lại bộ từ
             </Link>
           </CardContent>
@@ -133,10 +137,13 @@ export function CustomStudySession({
               Hoàn thành ôn tập từ mới học!
             </h1>
             <p className="mt-3 font-bold leading-7 text-ash">
-              Bạn đã ôn lại xong {sessionWords.length} từ trong bộ “{deck.title}”. Lưu ý: Dữ liệu phiên này không tính vào tiến độ hay XP.
+              Bạn đã ôn lại xong {sessionWords.length} từ{" "}
+              {deck
+                ? `trong bộ “${deck.title}”. Lưu ý: Dữ liệu phiên này không tính vào tiến độ hay XP.`
+                : "(tất cả bộ từ). Lưu ý: Dữ liệu phiên này không tính vào tiến độ hay XP."}
             </p>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
-              <Link href={`/vocabulary/${deck.slug}`} className={buttonVariants({ size: "lg" })}>
+              <Link href={homeHref} className={buttonVariants({ size: "lg" })}>
                 Quay lại bộ từ
               </Link>
             </div>
@@ -204,7 +211,7 @@ export function CustomStudySession({
       <header className="border-b-2 border-[#eeeeee] bg-white/90 backdrop-blur">
         <div className="mx-auto flex min-h-20 max-w-[980px] items-center gap-3 px-4">
           <Link
-            href={`/vocabulary/${deck.slug}`}
+            href={homeHref}
             className="grid size-11 place-items-center rounded-xl text-ash hover:bg-[#f5f5f5]"
           >
             <X />

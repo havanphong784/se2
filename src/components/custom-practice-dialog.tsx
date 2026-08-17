@@ -20,7 +20,7 @@ import type { StudyPhase } from "@/lib/study";
 import { cn } from "@/lib/utils";
 
 type CustomPracticeDialogProps = {
-  deck: VocabularyDeck;
+  deck?: VocabularyDeck;
   wordsLearnedToday: VocabularyWord[];
 };
 
@@ -30,6 +30,8 @@ export function CustomPracticeDialog({
 }: CustomPracticeDialogProps) {
   const [open, setOpen] = useState(false);
   const totalToday = wordsLearnedToday.length;
+  // Cross-deck (deck === undefined): ôn TẤT CẢ từ học hôm nay ở mọi bộ, không gắn deck cụ thể.
+  const scopeLabel = deck ? deck.title : "Tất cả bộ từ vựng";
 
   const countOptions = [5, 10, 15, 20].filter((c) => c < totalToday);
   const [selectedCount, setSelectedCount] = useState<number | "all">(
@@ -114,7 +116,11 @@ export function CustomPracticeDialog({
             </div>
 
             <p className="mt-3 text-sm font-bold text-ash">
-              Bộ từ: <strong className="text-charcoal">{deck.title}</strong> •
+              {deck ? (
+                <>Bộ từ: <strong className="text-charcoal">{scopeLabel}</strong> • </>
+              ) : (
+                <>Phạm vi: <strong className="text-charcoal">{scopeLabel}</strong> • </>
+              )}
               Có {totalToday} từ vừa học hôm nay.
             </p>
 
@@ -214,7 +220,11 @@ export function CustomPracticeDialog({
 
               {/* Action button */}
               <a
-                href={`/vocabulary/practice?mode=custom&deck=${deck.slug}&count=${selectedCount}&type=${selectedPhase}`}
+                href={
+                  deck
+                    ? `/vocabulary/practice?mode=custom&deck=${deck.slug}&count=${selectedCount}&type=${selectedPhase}`
+                    : `/vocabulary/practice?mode=custom&count=${selectedCount}&type=${selectedPhase}`
+                }
                 className={cn(
                   buttonVariants({ size: "lg" }),
                   "w-full justify-center text-center",

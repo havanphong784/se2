@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Brain, Clock3, FileUp, RotateCcw, Sparkles, Sprout } from "lucide-react";
+import { ArrowRight, Brain, CalendarCheck, Clock3, FileUp, RotateCcw, Sparkles, Sprout } from "lucide-react";
 
+import { CustomPracticeDialog } from "@/components/custom-practice-dialog";
 import { DataSourceNotice } from "@/components/data-source-notice";
 import { VocabularyLibrary } from "@/components/vocabulary-library";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { getLearningData } from "@/lib/data";
-import { getTodayStudyMinutes, isDueForReview } from "@/lib/study";
+import { getTodayStudyMinutes, isDueForReview, isLearnedToday } from "@/lib/study";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "Học từ vựng" };
@@ -18,6 +19,8 @@ export default async function VocabularyPage() {
   const words = decks.flatMap((deck) => deck.words);
   const now = new Date();
   const totalDue = words.filter((word) => isDueForReview(word, now)).length;
+  const wordsLearnedToday = words.filter((word) => isLearnedToday(word.learnedAt, now));
+  const learnedTodayCount = wordsLearnedToday.length;
   const mastered = words.filter(
     (word) => word.status === "mastered" || Boolean(word.reviewCompletedAt),
   ).length;
@@ -64,7 +67,7 @@ export default async function VocabularyPage() {
         </div>
       </header>
 
-      <section aria-label="Công cụ học tập" className="grid gap-5 md:grid-cols-3">
+      <section aria-label="Công cụ học tập" className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
         <article className="flex flex-col justify-between rounded-xl border-2 border-[#e5e5e5] bg-white p-5">
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-3">
@@ -81,9 +84,9 @@ export default async function VocabularyPage() {
               </Badge>
             </div>
             <div>
-              <h2 className="text-xl font-extrabold text-eel-dark-blue">Ôn tập SRS</h2>
+              <h2 className="text-xl font-extrabold text-eel-dark-blue">Ôn từ đến hạn</h2>
               <p className="mt-1.5 text-sm font-bold leading-6 text-charcoal">
-                Ôn đúng thời điểm để giữ từ vựng trong trí nhớ dài hạn.
+                Những từ sắp quên, đúng lịch ôn lại theo cấp độ ghi nhớ.
               </p>
             </div>
           </div>
@@ -102,6 +105,43 @@ export default async function VocabularyPage() {
                 className: "w-full cursor-default justify-between",
               })}>
                 Không có từ đến hạn
+              </span>
+            )}
+          </div>
+        </article>
+
+        <article className="flex flex-col justify-between rounded-xl border-2 border-[#e5e5e5] bg-white p-5">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between gap-3">
+              <span className={cn(
+                "grid size-12 place-items-center rounded-xl border-2",
+                learnedTodayCount > 0
+                  ? "border-lingot-lime text-ecto-green"
+                  : "border-border text-ash",
+              )}>
+                <CalendarCheck className="size-6" />
+              </span>
+              <Badge variant={learnedTodayCount > 0 ? "default" : "neutral"}>
+                {learnedTodayCount > 0 ? `${learnedTodayCount} từ hôm nay` : "Chưa có từ mới"}
+              </Badge>
+            </div>
+            <div>
+              <h2 className="text-xl font-extrabold text-eel-dark-blue">Ôn lại từ mới hôm nay</h2>
+              <p className="mt-1.5 text-sm font-bold leading-6 text-charcoal">
+                Lướt lại nhanh tất cả từ vựng bạn vừa học trong ngày, gộp từ mọi bộ từ.
+              </p>
+            </div>
+          </div>
+          <div className="mt-5 border-t-2 border-[#eeeeee] pt-4">
+            {learnedTodayCount > 0 ? (
+              <CustomPracticeDialog wordsLearnedToday={wordsLearnedToday} />
+            ) : (
+              <span className={buttonVariants({
+                variant: "secondary",
+                size: "sm",
+                className: "w-full cursor-default justify-between",
+              })}>
+                Chưa có từ mới học
               </span>
             )}
           </div>
@@ -156,6 +196,7 @@ export default async function VocabularyPage() {
             </Link>
           </div>
         </article>
+
       </section>
 
       <section className="mt-12" aria-labelledby="deck-library-title">

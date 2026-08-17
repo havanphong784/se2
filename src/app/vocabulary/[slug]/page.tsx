@@ -3,7 +3,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight, BookOpen, Clock3, Leaf, Trophy } from "lucide-react";
 
-import { CustomPracticeDialog } from "@/components/custom-practice-dialog";
 import { DataSourceNotice } from "@/components/data-source-notice";
 import { WordList } from "@/components/word-list";
 import { Badge } from "@/components/ui/badge";
@@ -11,7 +10,6 @@ import { buttonVariants } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { getDeckResult } from "@/lib/data";
 import { deckProgress } from "@/lib/demo-data";
-import { isLearnedToday } from "@/lib/study";
 
 type DeckPageProps = { params: Promise<{ slug: string }> };
 
@@ -25,7 +23,6 @@ export default async function DeckPage({ params }: DeckPageProps) {
   const deck = deckResult.data;
   if (!deck) notFound();
   const progress = deckProgress(deck);
-  const wordsLearnedToday = deck.words.filter((word) => isLearnedToday(word.learnedAt));
 
   return (
     <div className="mx-auto w-full max-w-[1100px] px-5 py-8 md:px-8 lg:py-10">
@@ -59,7 +56,6 @@ export default async function DeckPage({ params }: DeckPageProps) {
             >
               Học ngay <ArrowRight />
             </Link>
-            <CustomPracticeDialog deck={deck} wordsLearnedToday={wordsLearnedToday} />
           </div>
         </div>
       </section>
