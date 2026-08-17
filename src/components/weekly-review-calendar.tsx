@@ -4,10 +4,10 @@ import { cn } from "@/lib/utils";
 
 /**
  * Lưới 7 ô (T2–CN) cho panel "Ôn tuần này".
- * - Ô quá khứ (index < todayIndex): mờ, số từ đã ôn (`reviewed`) + nhãn "đã ôn".
- * - Ô hôm nay + tương lai (index >= todayIndex): nổi bật ecto-green,
- *   số từ đến hạn cần ôn lũy tiến (`due`) + nhãn "cần ôn".
- * - Ô hôm nay viền macaw-blue để highlight riêng.
+ * - Ô quá khứ (index < todayIndex): mờ (grey), số từ đã ôn (`reviewed`) + nhãn "đã ôn".
+ * - Ô hôm nay (index === todayIndex): xanh nổi bật ecto-green + viền macaw-blue,
+ *   số từ đến hạn ngày đó (`due`) + nhãn "cần ôn".
+ * - Ô tương lai (index > todayIndex): xanh nhạt lingot-lime, số từ đến hạn ngày đó (`due`).
  *
  * Dữ liệu do server truyền vào (đã tính theo tuần lịch VN), component chỉ render.
  */
@@ -38,12 +38,12 @@ export function WeeklyReviewCalendar({
             key={`${day}-${fullDates[index]}`}
             className={cn(
               "flex min-h-[88px] flex-col items-center justify-between rounded-xl border-2 p-1.5 transition-all duration-150 motion-reduce:transition-none sm:min-h-[104px] sm:p-2.5",
-              isPast && "border-[#e5e5e5] bg-[#f5f5f7] text-ash",
+              isPast && "border-[#f0f0f0] bg-[#f9f9fa] text-ash/80",
               isToday &&
                 "-translate-y-0.5 border-macaw-blue border-b-4 border-b-eel-light bg-ecto-green text-white",
               !isPast &&
                 !isToday &&
-                "border-ecto-green border-b-4 border-b-[#3e9602] bg-ecto-green text-white",
+                "border-eel-light border-b-4 border-b-lingot-lime bg-eel-light text-eel-dark-blue",
             )}
             aria-label={
               isToday
@@ -63,7 +63,7 @@ export function WeeklyReviewCalendar({
                 <span
                   className={cn(
                     "text-[11px] font-extrabold uppercase tracking-wide",
-                    isPast ? "text-ash" : "text-white/90",
+                    isPast ? "text-ash" : isToday ? "text-white/90" : "text-eel-dark-blue/80",
                   )}
                 >
                   {day}
@@ -76,7 +76,7 @@ export function WeeklyReviewCalendar({
                     ? "text-ash/60"
                     : isToday
                       ? "text-eel-light"
-                      : "text-white/75",
+                      : "text-eel-dark-blue/60",
                 )}
               >
                 {fullDates[index]}
@@ -92,7 +92,7 @@ export function WeeklyReviewCalendar({
                     ? "text-xl font-black text-white sm:text-2xl"
                     : isPast
                       ? "text-lg font-extrabold text-ash sm:text-xl"
-                      : "text-lg font-extrabold text-white sm:text-xl",
+                      : "text-lg font-extrabold text-eel-dark-blue sm:text-xl",
                 )}
               >
                 {count > 0 ? count : isPast ? "–" : "0"}
@@ -104,7 +104,7 @@ export function WeeklyReviewCalendar({
                     ? "text-ash/60"
                     : isToday
                       ? "text-eel-light"
-                      : "text-white/75",
+                      : "text-eel-dark-blue/60",
                 )}
               >
                 {isPast ? "đã ôn" : "cần ôn"}

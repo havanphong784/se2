@@ -49,7 +49,8 @@ export default async function DashboardPage() {
   const activeDays = activity.filter((item) => item.reviewed > 0 || item.learned > 0).length;
 
   // Panel "ôn tuần này" (T2–CN): ô quá khứ hiển thị số đã ôn (reviewed),
-  // ô hôm nay/tương lai hiển thị số từ cần ôn lũy tiến (due <= hết ngày đó).
+  // ô hôm nay/tương lai hiển thị số từ đến hạn ĐÚNG ngày đó (nextReviewAt
+  // rơi vào ngày D theo múi giờ VN, không cộng dồn).
   const weekDates = vnCalendarWeek(now);
   const weekDays = weekDates.map((date) => vnWeekdayLabel(date));
   const weekFullDates = weekDates.map((date) => vnDayLabel(date));
@@ -61,10 +62,8 @@ export default async function DashboardPage() {
     const key = `${weekDays[index]}-${weekFullDates[index]}`;
     return reviewedByDate.get(key) ?? 0;
   });
-  // Hết ngày D = đầu ngày D+1 (UTC) — khớp isDueForReview dùng <= now.
   const weekDue = weekDates.map((date) => {
-    const endOfDay = new Date(date);
-    endOfDay.setUTCDate(endOfDay.getUTCDate() + 1);
+    const dayKey = vnDateKey(date);
     return allWords.filter((word) => {
       if (
         !word.learnedAt ||
@@ -73,8 +72,9 @@ export default async function DashboardPage() {
         !word.nextReviewAt
       )
         return false;
-      const dueAt = Date.parse(word.nextReviewAt);
-      return Number.isFinite(dueAt) && dueAt <= endOfDay.getTime();
+      const due = new Date(word.nextReviewAt);
+      if (Number.isNaN(due.getTime())) return false;
+      return vnDateKey(due) === dayKey;
     }).length;
   });
   const dateLabel = new Intl.DateTimeFormat("vi-VN", {
