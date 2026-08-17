@@ -66,7 +66,7 @@ function isEditableTarget(target: EventTarget | null) {
 
 function ShortcutKey({ children }: { children: React.ReactNode }) {
   return (
-    <kbd className="rounded-md border border-current/25 bg-white/70 px-1.5 py-0.5 font-mono text-[0.7rem] font-extrabold leading-none shadow-sm">
+    <kbd className="rounded-md border border-current/25 bg-white/70 px-1.5 py-0.5 font-mono text-[0.7rem] font-extrabold leading-none">
       {children}
     </kbd>
   );
@@ -378,7 +378,7 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
     const available = mode === "learn" ? deck?.words.filter((word) => !word.learnedAt).length ?? 0 : null;
     return (
       <main className="grid min-h-svh place-items-center bg-[linear-gradient(180deg,#f8fff3_0%,#ffffff_55%)] px-5 py-10">
-        <Card className="w-full max-w-xl border-eel-light bg-white/95 shadow-[0_12px_40px_rgba(67,143,14,0.08)]">
+        <Card className="w-full max-w-xl border-eel-light bg-white/95">
           <CardContent className="p-6 text-center md:p-9">
             <span className="mx-auto grid size-16 place-items-center rounded-full bg-[#efffe5]">
               <Sprout className="size-9 text-ecto-green" />
@@ -409,7 +409,7 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
   if (session.status === "completed") {
     return (
       <main className="grid min-h-svh place-items-center bg-[linear-gradient(180deg,#f3ffe9,#fff)] px-5 text-center">
-        <Card className="max-w-xl border-eel-light shadow-[0_16px_50px_rgba(67,143,14,0.1)]">
+        <Card className="max-w-xl border-eel-light">
           <CardContent className="p-8 md:p-10">
             <span className="mx-auto grid size-20 place-items-center rounded-full bg-[#eaffdc]"><Check className="size-11 text-ecto-green" /></span>
             <h1 className="mt-5 font-display text-4xl font-extrabold text-eel-dark-blue">Hoàn thành phiên học</h1>
@@ -441,7 +441,7 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
 
       <main className="mx-auto flex min-h-[calc(100svh-80px)] max-w-[860px] flex-col justify-center px-5 py-8">
         {session.phase === "flashcard" && currentWord && (
-          <Card ref={promptRef} tabIndex={-1} className="mx-auto flex w-full max-w-[600px] flex-col overflow-hidden border-eel-light border-b-4 outline-none shadow-[0_12px_35px_rgba(30,70,20,0.07)] focus-visible:ring-4 focus-visible:ring-eel-light sm:min-h-[450px]">
+          <Card ref={promptRef} tabIndex={-1} className="mx-auto flex w-full max-w-[600px] flex-col overflow-hidden border-eel-light border-b-4 outline-none focus-visible:ring-4 focus-visible:ring-eel-light sm:min-h-[450px]">
             <CardHeader className="min-h-12 justify-center border-b-2 border-[#f0f0f0] bg-[#fbfff8] px-5 py-2.5">
               <div className="flex w-full items-center justify-between gap-3">
                 {currentWord.partOfSpeech.length > 0 && <Badge variant="blue" className="min-w-0 whitespace-normal text-left">{currentWord.partOfSpeech.join(", ")}</Badge>}
@@ -484,7 +484,7 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
         )}
 
         {session.phase === "typing" && currentWord && (
-          <Card ref={promptRef} tabIndex={-1} className={cn("mx-auto w-full max-w-2xl border-b-4 outline-none shadow-[0_12px_35px_rgba(30,70,20,0.07)] focus-visible:ring-4 focus-visible:ring-eel-light", feedback?.result.isCorrect === true && "border-ecto-green", feedback?.result.isCorrect === false && "border-[#ff6b6b]")}>
+          <Card ref={promptRef} tabIndex={-1} className={cn("mx-auto w-full max-w-2xl border-b-4 outline-none focus-visible:ring-4 focus-visible:ring-eel-light", feedback?.result.isCorrect === true && "border-ecto-green", feedback?.result.isCorrect === false && "border-[#ff6b6b]")}>
             <CardContent className="p-6 text-center md:p-10">
               <Badge variant="blue">Nhập từ tiếng Anh</Badge>
               <p className="mt-6 text-sm font-extrabold uppercase tracking-[0.12em] text-ash">Nghĩa tiếng Việt</p>

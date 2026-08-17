@@ -34,9 +34,9 @@ export default async function DeckPage({ params }: DeckPageProps) {
         <ArrowLeft className="size-5" /> Tất cả bộ từ
       </Link>
 
-      <section className="mt-5 overflow-hidden rounded-xl border-2 border-eel-light bg-[#fbfff8] p-6 md:p-8">
+      <section className="mt-5 overflow-hidden rounded-xl border-2 border-b-4 border-eel-light border-b-[#c4f0a0] bg-[#fbfff8] p-6 md:p-8">
         <div className="grid gap-6 md:grid-cols-[auto_1fr_auto] md:items-center">
-          <span className="grid size-20 place-items-center rounded-xl border-2 border-lingot-lime bg-white text-4xl md:size-24">
+          <span className="grid size-20 place-items-center rounded-xl border-2 border-b-4 border-lingot-lime border-b-[#8ed459] bg-white text-4xl md:size-24">
             {deck.emoji}
           </span>
           <div>

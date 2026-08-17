@@ -32,10 +32,10 @@ export function IpaSoundCard({
         }
       }}
       className={cn(
-        "group relative flex w-full cursor-pointer items-center justify-between rounded-xl border-2 p-3.5 text-left transition-all duration-150 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-lingot-lime/40 active:translate-y-0.5",
+        "group relative flex w-full cursor-pointer items-center justify-between rounded-xl border-2 border-b-4 p-3.5 text-left transition-all duration-150 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-lingot-lime/40 active:translate-y-0.5",
         isSelected
-          ? "border-[#438f0e] bg-[#f7fff1] shadow-sm"
-          : "border-[#e5e5e5] bg-white hover:border-[#d0d0d0] hover:bg-[#fafafa]",
+          ? "border-ecto-green border-b-[#46a302] bg-[#f7fff1]"
+          : "border-[#e5e5e5] border-b-[#dedede] bg-white hover:border-lingot-lime hover:bg-[#fafafa]",
       )}
     >
       <div className="flex items-center gap-3.5">

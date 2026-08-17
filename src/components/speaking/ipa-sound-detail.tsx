@@ -22,11 +22,11 @@ export function IpaSoundDetail({ sound }: IpaSoundDetailProps) {
   };
 
   return (
-    <div className="flex flex-col gap-6 rounded-2xl border-2 border-[#e5e5e5] bg-white p-6 shadow-sm md:p-8">
+    <div className="flex flex-col gap-6 rounded-xl border-2 border-b-4 border-[#e5e5e5] border-b-[#dedede] bg-white p-6 md:p-8">
       {/* HEADER CARD */}
       <div className="flex flex-wrap items-start justify-between gap-4 border-b-2 border-[#f0f0f0] pb-6">
         <div className="flex items-center gap-4">
-          <div className="grid size-16 place-items-center rounded-2xl bg-[#f7fff1] border-2 border-eel-light font-display text-3xl font-black text-[#438f0e]">
+          <div className="grid size-16 place-items-center rounded-xl bg-[#f7fff1] border-2 border-eel-light font-display text-3xl font-black text-[#438f0e]">
             {sound.symbol}
           </div>
           <div>

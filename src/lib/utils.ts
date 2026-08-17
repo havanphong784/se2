@@ -93,3 +93,36 @@ export function vnCalendarWeek(base = new Date()): Date[] {
     return date;
   });
 }
+
+/**
+ * Trả danh sách các ngày trong tháng theo lịch VN và offset thứ trong tuần (T2=0, CN=6).
+ */
+export function vnCalendarMonth(base = new Date()): {
+  days: Date[];
+  startOffset: number;
+  monthLabel: string;
+  year: number;
+  month: number;
+} {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: VN_TZ,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(base);
+  const get = (type: string) => Number(parts.find((p) => p.type === type)?.value);
+  const year = get("year");
+  const month = get("month");
+
+  const firstDay = new Date(Date.UTC(year, month - 1, 1));
+  const totalDays = new Date(Date.UTC(year, month, 0)).getUTCDate();
+  const startOffset = (firstDay.getUTCDay() + 6) % 7;
+
+  const days = Array.from({ length: totalDays }, (_, index) => {
+    return new Date(Date.UTC(year, month - 1, index + 1));
+  });
+
+  const monthLabel = `Tháng ${String(month).padStart(2, "0")}/${year}`;
+
+  return { days, startOffset, monthLabel, year, month };
+}

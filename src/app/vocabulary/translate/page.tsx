@@ -39,7 +39,7 @@ export default async function TranslatePage() {
               Tra cứu từ vựng 2 chiều Anh ↔ Việt với phát âm chuẩn IPA, loại từ, câu ví dụ và thêm trực tiếp vào gói từ cá nhân của bạn.
             </p>
           </div>
-          <div className="flex items-center gap-2 rounded-2xl border-2 border-[#e5e5e5] bg-[#fbfff8] px-4 py-3 shrink-0">
+          <div className="flex items-center gap-2 rounded-xl border-2 border-b-4 border-[#e5e5e5] border-b-[#dedede] bg-[#fbfff8] px-4 py-3 shrink-0">
             <Sparkles className="size-5 text-ecto-green" />
             <div className="text-xs font-bold text-eel-dark-blue">
               <span className="block font-black text-[#438f0e]">Google Translate API</span>
