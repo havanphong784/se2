@@ -6,6 +6,8 @@ import { StudySession } from "@/components/study-session";
 import { getDeckResult, getLearningData } from "@/lib/data";
 import { isLearnedToday, type StudyMode } from "@/lib/study";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = { title: "Phiên học từ vựng" };
 
 export default async function PracticePage({

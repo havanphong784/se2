@@ -12,6 +12,8 @@ import { getDeckResult } from "@/lib/data";
 import { deckProgress } from "@/lib/demo-data";
 import { cn } from "@/lib/utils";
 
+export const dynamic = "force-dynamic";
+
 type DeckPageProps = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: DeckPageProps): Promise<Metadata> {
