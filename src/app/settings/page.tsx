@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { LogIn, Settings, UserCheck } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 import { getDb } from "@/db";
 import { getCurrentAuthUser } from "@/lib/auth";
 import { Badge } from "@/components/ui/badge";

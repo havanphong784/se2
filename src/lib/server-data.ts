@@ -25,13 +25,17 @@ export async function getDemoUser(db: NonNullable<ReturnType<typeof getDb>>) {
     // Fallback when outside request scope
   }
 
-  const [user] = await db
-    .select({ id: users.id, displayName: users.displayName })
-    .from(users)
-    .where(eq(users.email, demoEmail))
-    .limit(1);
+  try {
+    const [user] = await db
+      .select({ id: users.id, displayName: users.displayName })
+      .from(users)
+      .where(eq(users.email, demoEmail))
+      .limit(1);
 
-  return user ?? null;
+    return user ?? null;
+  } catch {
+    return null;
+  }
 }
 
 export function isUuid(value: string) {

@@ -6,6 +6,8 @@ import { VocabularyImportForm } from "@/components/vocabulary-import-form";
 import { Badge } from "@/components/ui/badge";
 import { getPersonalImportDecks } from "@/lib/vocabulary-import-server";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = { title: "Nhập từ vựng" };
 
 export default async function VocabularyImportPage() {

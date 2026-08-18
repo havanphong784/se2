@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { getPersonalImportDecks } from "@/lib/vocabulary-import-server";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = { title: "Dịch từ vựng" };
 
 export default async function TranslatePage() {

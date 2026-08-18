@@ -16,17 +16,21 @@ export type AuthUser = {
 };
 
 export async function getDemoUser(db: NonNullable<ReturnType<typeof getDb>>) {
-  const [user] = await db
-    .select({
-      id: users.id,
-      displayName: users.displayName,
-      email: users.email,
-    })
-    .from(users)
-    .where(eq(users.email, demoEmail))
-    .limit(1);
+  try {
+    const [user] = await db
+      .select({
+        id: users.id,
+        displayName: users.displayName,
+        email: users.email,
+      })
+      .from(users)
+      .where(eq(users.email, demoEmail))
+      .limit(1);
 
-  return user ?? null;
+    return user ?? null;
+  } catch {
+    return null;
+  }
 }
 
 export async function getCurrentAuthUser(
@@ -58,11 +62,15 @@ export async function getCurrentAuthUser(
     // Fallback when outside request scope
   }
 
-  const demoUser = await getDemoUser(db);
-  if (!demoUser) return null;
+  try {
+    const demoUser = await getDemoUser(db);
+    if (!demoUser) return null;
 
-  return {
-    ...demoUser,
-    isDemo: true,
-  };
+    return {
+      ...demoUser,
+      isDemo: true,
+    };
+  } catch {
+    return null;
+  }
 }

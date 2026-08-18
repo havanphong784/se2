@@ -21,6 +21,8 @@ import { getLearningData } from "@/lib/data";
 import { getTodayStudyMinutes, isDueForReview, isLearnedToday } from "@/lib/study";
 import { cn } from "@/lib/utils";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = { title: "Học từ vựng" };
 
 export default async function VocabularyPage() {
