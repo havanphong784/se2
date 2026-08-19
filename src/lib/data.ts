@@ -264,6 +264,82 @@ async function loadActivityData(
   return { activity, streak };
 }
 
+async function loadSingleDeck(
+  db: NonNullable<ReturnType<typeof getDb>>,
+  slug: string,
+  userId: string,
+): Promise<VocabularyDeck | null> {
+  const [deckRow] = await db
+    .select({
+      id: decks.id,
+      ownerId: decks.ownerId,
+      slug: decks.slug,
+      title: decks.title,
+      description: decks.description,
+      level: decks.level,
+    })
+    .from(decks)
+    .where(and(eq(decks.slug, slug), or(isNull(decks.ownerId), eq(decks.ownerId, userId))))
+    .limit(1);
+
+  if (!deckRow) return null;
+
+  const rows = await db
+    .select({
+      wordId: words.id,
+      term: words.term,
+      translation: words.translation,
+      phonetic: words.phonetic,
+      partOfSpeech: words.partOfSpeech,
+      exampleSentence: words.exampleSentence,
+      exampleTranslation: words.exampleTranslation,
+      status: wordProgress.status,
+      mastery: wordProgress.mastery,
+      intervalDays: wordProgress.intervalDays,
+      learnedAt: wordProgress.learnedAt,
+      reviewStage: wordProgress.reviewStage,
+      lastReviewedAt: wordProgress.lastReviewedAt,
+      nextReviewAt: wordProgress.nextReviewAt,
+      reviewCompletedAt: wordProgress.reviewCompletedAt,
+    })
+    .from(words)
+    .leftJoin(
+      wordProgress,
+      and(eq(wordProgress.wordId, words.id), eq(wordProgress.userId, userId)),
+    )
+    .where(eq(words.deckId, deckRow.id))
+    .orderBy(asc(words.sortOrder), asc(words.term));
+
+  const fallbackEmoji = new Map(DEMO_DECKS.map((d) => [d.slug, d.emoji]));
+
+  return {
+    id: deckRow.id,
+    slug: deckRow.slug,
+    title: deckRow.title,
+    description: deckRow.description,
+    level: deckRow.level,
+    emoji: fallbackEmoji.get(deckRow.slug) ?? "🌱",
+    ownership: deckRow.ownerId ? "personal" : "system",
+    words: rows.map((row) => ({
+      id: row.wordId,
+      term: row.term,
+      translation: row.translation,
+      phonetic: row.phonetic,
+      partOfSpeech: row.partOfSpeech,
+      exampleSentence: row.exampleSentence,
+      exampleTranslation: row.exampleTranslation,
+      status: (row.status as VocabularyWord["status"] | null) ?? "new",
+      mastery: row.mastery ?? 0,
+      intervalDays: row.intervalDays ?? 0,
+      learnedAt: row.learnedAt?.toISOString() ?? null,
+      reviewStage: (row.reviewStage as VocabularyWord["reviewStage"] | null) ?? 0,
+      lastReviewedAt: row.lastReviewedAt?.toISOString() ?? null,
+      nextReviewAt: row.nextReviewAt?.toISOString() ?? null,
+      reviewCompletedAt: row.reviewCompletedAt?.toISOString() ?? null,
+    })),
+  };
+}
+
 export async function getLearningData(userId?: string): Promise<DataResult<LearningData>> {
   const db = getDb();
   if (!db) return fallbackLearningData("demo-unconfigured");
@@ -294,8 +370,30 @@ export async function getDeckResult(
   slug: string,
   userId?: string,
 ): Promise<DataResult<VocabularyDeck | null>> {
-  const decksResult = await getDecksResult(userId);
-  return result(decksResult.data.find((deck) => deck.slug === slug) ?? null, decksResult.source);
+  const db = getDb();
+  if (!db) {
+    const demo = DEMO_DECKS.find((d) => d.slug === slug) ?? null;
+    return result(demo, "demo-unconfigured");
+  }
+  if (isDatabaseCoolingDown()) {
+    const demo = DEMO_DECKS.find((d) => d.slug === slug) ?? null;
+    return result(demo, "demo-unavailable");
+  }
+
+  try {
+    const currentUser = userId ? null : await getCurrentAuthUser(db);
+    const effectiveUserId = userId ?? currentUser?.id;
+    if (!effectiveUserId) {
+      const demo = DEMO_DECKS.find((d) => d.slug === slug) ?? null;
+      return result(demo, "demo-unavailable");
+    }
+    const deck = await loadSingleDeck(db, slug, effectiveUserId);
+    markDatabaseAvailable();
+    return result(deck, "database");
+  } catch (error) {
+    markDatabaseFailure(error);
+    throw error;
+  }
 }
 
 export async function getActivityResult(userId?: string): Promise<DataResult<ActivityItem[]>> {

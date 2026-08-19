@@ -24,6 +24,23 @@ export function useLearningData() {
   });
 }
 
+export function useDeck(slug: string) {
+  const { user, authFetch } = useAuth();
+  return useQuery({
+    queryKey: ["deck", slug, user?.id],
+    enabled: Boolean(user && slug),
+    queryFn: async () => {
+      const res = await authFetch(`/api/decks/${slug}`);
+      if (!res.ok) throw new Error("Failed to fetch deck");
+      const data = await res.json();
+      return {
+        deck: data.deck as VocabularyDeck | null,
+        source: (data.meta?.source ?? "database") as DataSource,
+      };
+    },
+  });
+}
+
 export function useStreak() {
   const { user, authFetch } = useAuth();
   return useQuery({
@@ -59,6 +76,7 @@ export function useInvalidateAuthData() {
   return () => {
     if (!user) return;
     queryClient.invalidateQueries({ queryKey: ["learning-data", user.id] });
+    queryClient.invalidateQueries({ queryKey: ["deck"] });
     queryClient.invalidateQueries({ queryKey: ["streak", user.id] });
     queryClient.invalidateQueries({ queryKey: ["decks", user.id] });
   };

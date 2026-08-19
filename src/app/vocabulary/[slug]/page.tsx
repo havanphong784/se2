@@ -1,4 +1,6 @@
-import type { Metadata } from "next";
+"use client";
+
+import { use } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight, BookOpen, Brain, CheckCircle2, Leaf, Sparkles } from "lucide-react";
@@ -8,30 +10,39 @@ import { WordList } from "@/components/word-list";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { getDeckResult } from "@/lib/data";
+import { useDeck } from "@/lib/hooks/use-queries";
 import { deckProgress } from "@/lib/demo-data";
-import { cn } from "@/lib/utils";
-
-export const dynamic = "force-dynamic";
 
 type DeckPageProps = { params: Promise<{ slug: string }> };
 
-export async function generateMetadata({ params }: DeckPageProps): Promise<Metadata> {
-  const deckResult = await getDeckResult((await params).slug);
-  return { title: deckResult.data?.title ?? "Bộ từ" };
-}
+export default function DeckPage({ params }: DeckPageProps) {
+  const { slug } = use(params);
+  const { data: deckRes, isLoading } = useDeck(slug);
 
-export default async function DeckPage({ params }: DeckPageProps) {
-  const deckResult = await getDeckResult((await params).slug);
-  const deck = deckResult.data;
+  if (isLoading) {
+    return (
+      <div className="mx-auto w-full max-w-[1100px] px-5 py-8 md:px-8 lg:py-12 animate-pulse">
+        <div className="h-6 w-32 bg-gray-200 rounded-lg mb-6" />
+        <div className="h-48 bg-gray-100 rounded-xl mb-6" />
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <div className="h-20 bg-gray-100 rounded-xl" />
+          <div className="h-20 bg-gray-100 rounded-xl" />
+          <div className="h-20 bg-gray-100 rounded-xl" />
+        </div>
+      </div>
+    );
+  }
+
+  const deck = deckRes?.deck;
   if (!deck) notFound();
+
   const progress = deckProgress(deck);
   const isCompleted = progress.percent >= 100;
   const isStarted = progress.percent > 0;
 
   return (
     <div className="mx-auto w-full max-w-[1100px] px-5 py-8 md:px-8 lg:py-12">
-      <DataSourceNotice source={deckResult.source} />
+      <DataSourceNotice source={deckRes.source} />
 
       {/* Back button */}
       <div className="mb-6">
@@ -152,4 +163,3 @@ export default async function DeckPage({ params }: DeckPageProps) {
     </div>
   );
 }
-
