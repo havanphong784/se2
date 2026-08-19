@@ -3,12 +3,13 @@ import { NextResponse } from "next/server";
 
 import { getDb, isDatabaseCoolingDown, markDatabaseAvailable, markDatabaseFailure } from "@/db";
 import { wordProgress, words } from "@/db/schema";
-import { getDemoUser, isUuid } from "@/lib/server-data";
+import { requireAuth } from "@/lib/auth";
+import { isUuid } from "@/lib/server-data";
 
 export const runtime = "nodejs";
 
 export async function POST(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ wordId: string }> },
 ) {
   const { wordId } = await params;
@@ -21,12 +22,10 @@ export async function POST(
     return NextResponse.json({ message: "Cơ sở dữ liệu chưa sẵn sàng." }, { status: 503 });
   }
 
-  try {
-    const user = await getDemoUser(db);
-    if (!user) {
-      return NextResponse.json({ message: "Không tìm thấy người dùng." }, { status: 401 });
-    }
+  const user = await requireAuth(request, db);
+  if (!user) return NextResponse.json({ message: "Chưa xác thực." }, { status: 401 });
 
+  try {
     // Verify word exists
     const [word] = await db
       .select({ id: words.id })

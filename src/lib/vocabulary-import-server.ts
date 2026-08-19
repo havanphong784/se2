@@ -2,7 +2,6 @@ import { and, desc, eq, max, sql } from "drizzle-orm";
 
 import { getDb } from "@/db";
 import { decks, words } from "@/db/schema";
-import { getDemoUser } from "@/lib/server-data";
 import type { ImportedWord } from "@/lib/vocabulary-import";
 
 type Destination =
@@ -31,20 +30,22 @@ function slugify(title: string) {
   );
 }
 
-export async function importVocabulary(destination: Destination, importedWords: ImportedWord[]) {
+export async function importVocabulary(
+  destination: Destination,
+  importedWords: ImportedWord[],
+  userId: string,
+) {
   const db = getDb();
   if (!db) throw new ImportError("DATABASE_NOT_CONFIGURED", "Database chưa được cấu hình.", 503);
 
   return db.transaction(async (tx) => {
-    const user = await getDemoUser(tx as NonNullable<ReturnType<typeof getDb>>);
-    if (!user) throw new ImportError("USER_NOT_FOUND", "Không tìm thấy user hiện tại.", 503);
 
     let deck: { id: string; slug: string; title: string };
     if (destination.type === "existing") {
       const [ownedDeck] = await tx
         .select({ id: decks.id, slug: decks.slug, title: decks.title })
         .from(decks)
-        .where(and(eq(decks.id, destination.deckId), eq(decks.ownerId, user.id)))
+        .where(and(eq(decks.id, destination.deckId), eq(decks.ownerId, userId)))
         .limit(1);
       if (!ownedDeck) throw new ImportError("DECK_NOT_FOUND", "Không tìm thấy bộ từ cá nhân.", 404);
       deck = ownedDeck;
@@ -57,18 +58,18 @@ export async function importVocabulary(destination: Destination, importedWords: 
       const existing = await tx
         .select({ slug: decks.slug })
         .from(decks)
-        .where(eq(decks.ownerId, user.id));
+        .where(eq(decks.ownerId, userId));
       const used = new Set(existing.map((item) => item.slug));
       let slug = base;
       for (let suffix = 2; used.has(slug); suffix += 1) slug = `${base}-${suffix}`;
       const [{ nextOrder }] = await tx
         .select({ nextOrder: sql<number>`coalesce(max(${decks.sortOrder}), -1)::int + 1` })
         .from(decks)
-        .where(eq(decks.ownerId, user.id));
+        .where(eq(decks.ownerId, userId));
       const [created] = await tx
         .insert(decks)
         .values({
-          ownerId: user.id,
+          ownerId: userId,
           slug,
           title,
           description: destination.description.normalize("NFC").trim().slice(0, 500),
@@ -104,15 +105,13 @@ export async function importVocabulary(destination: Destination, importedWords: 
   });
 }
 
-export async function getPersonalImportDecks() {
+export async function getPersonalImportDecks(userId: string) {
   const db = getDb();
   if (!db) return { available: false as const, decks: [] };
-  const user = await getDemoUser(db);
-  if (!user) return { available: false as const, decks: [] };
   const ownedDecks = await db
     .select({ id: decks.id, title: decks.title, slug: decks.slug })
     .from(decks)
-    .where(eq(decks.ownerId, user.id))
+    .where(eq(decks.ownerId, userId))
     .orderBy(desc(decks.updatedAt));
   return { available: true as const, decks: ownedDecks };
 }

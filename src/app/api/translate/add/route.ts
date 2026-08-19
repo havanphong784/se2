@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 
+import { getDb } from "@/db";
+import { requireAuth } from "@/lib/auth";
 import { isUuid } from "@/lib/server-data";
 import { importVocabulary, ImportError } from "@/lib/vocabulary-import-server";
 import type { ImportedWord } from "@/lib/vocabulary-import";
@@ -21,6 +23,11 @@ type AddWordRequest = {
 };
 
 export async function POST(request: Request) {
+  const db = getDb();
+  if (!db) return NextResponse.json({ error: { message: "Cơ sở dữ liệu chưa sẵn sàng." } }, { status: 503 });
+  const user = await requireAuth(request, db);
+  if (!user) return NextResponse.json({ error: { message: "Chưa xác thực." } }, { status: 401 });
+
   try {
     const body = (await request.json().catch(() => null)) as AddWordRequest | null;
     if (!body || !body.destination || !body.word) {
@@ -112,7 +119,7 @@ export async function POST(request: Request) {
                 : "Tự chọn",
           };
 
-    const saved = await importVocabulary(targetDestination, [importedWord]);
+    const saved = await importVocabulary(targetDestination, [importedWord], user.id);
 
     return NextResponse.json(
       {

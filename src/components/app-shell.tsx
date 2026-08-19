@@ -10,7 +10,6 @@ import {
   Flame,
   Headphones,
   Home,
-  LogIn,
   Mic2,
   Puzzle,
   Settings,
@@ -19,6 +18,7 @@ import {
 import { BrandName } from "@/components/brand-mark";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/components/auth-provider";
 
 const navigation = [
   { href: "/", label: "Tổng quan", icon: Home },
@@ -44,20 +44,11 @@ export function AppShell({
 }) {
   const pathname = usePathname();
   const inPractice = pathname.startsWith("/vocabulary/practice");
-  const [user, setUser] = useState<{ displayName: string; isDemo: boolean } | null>(null);
+  const { user, authFetch } = useAuth();
   const [streakDays, setStreakDays] = useState<number>(initialStreakDays ?? 0);
 
   useEffect(() => {
-    fetch("/api/auth/me")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.user) {
-          setUser({ displayName: data.user.displayName, isDemo: data.user.isDemo });
-        }
-      })
-      .catch(() => {});
-
-    fetch("/api/streak")
+    authFetch("/api/streak")
       .then((res) => res.json())
       .then((data) => {
         if (data.streak && typeof data.streak.current === "number") {
@@ -65,7 +56,7 @@ export function AppShell({
         }
       })
       .catch(() => {});
-  }, [pathname]);
+  }, [authFetch, pathname]);
 
   return (
     <div className="min-h-svh bg-white">
@@ -116,10 +107,10 @@ export function AppShell({
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-extrabold text-charcoal">
-                    {user?.displayName ?? "Minh Anh"}
+                    {user?.displayName ?? "Tài khoản"}
                   </p>
                   <p className="text-xs font-bold text-ash">
-                    {user?.isDemo ? "Demo User" : "Tài khoản cá nhân"}
+                    Tài khoản cá nhân
                   </p>
                 </div>
               </div>
@@ -131,14 +122,6 @@ export function AppShell({
                 <Settings className="size-5" />
               </Link>
             </div>
-            {user?.isDemo && (
-              <Link
-                href="/login"
-                className="flex items-center justify-center gap-1.5 rounded-xl border-2 border-ecto-green bg-ecto-green px-3 py-1.5 text-xs font-extrabold text-white transition-transform active:translate-y-0.5"
-              >
-                <LogIn className="size-4" /> Đăng nhập
-              </Link>
-            )}
             <Badge variant="warning" className="w-full justify-center py-2">
               <Flame className="size-4 fill-current" /> {streakDays} ngày liên tiếp
             </Badge>
@@ -155,26 +138,17 @@ export function AppShell({
             <Badge variant="warning" className="h-9 px-2.5 text-xs font-extrabold">
               <Flame className="size-4 fill-current" /> {streakDays}
             </Badge>
-            {user?.isDemo ? (
-              <Link
-                href="/login"
-                className="flex h-9 items-center gap-1.5 rounded-xl border-2 border-b-4 border-ecto-green border-b-[#46a302] bg-ecto-green px-3 text-xs font-extrabold text-white transition-transform active:translate-y-0.5"
-              >
-                <LogIn className="size-3.5" /> Đăng nhập
-              </Link>
-            ) : (
-              <Link
-                href="/settings"
-                aria-label="Cài đặt tài khoản"
-                className="flex h-9 items-center gap-1.5 rounded-xl border-2 border-b-4 border-eel-light border-b-[#c4f0a0] bg-[#f7fff1] px-2.5 text-xs font-extrabold text-charcoal transition-transform active:translate-y-0.5"
-              >
-                <span>🌱</span>
-                <span className="max-w-[90px] truncate text-eel-dark-blue sm:max-w-[140px]">
-                  {user?.displayName ?? "Tài khoản"}
-                </span>
-                <Settings className="size-3.5 text-ash" />
-              </Link>
-            )}
+            <Link
+              href="/settings"
+              aria-label="Cài đặt tài khoản"
+              className="flex h-9 items-center gap-1.5 rounded-xl border-2 border-b-4 border-eel-light border-b-[#c4f0a0] bg-[#f7fff1] px-2.5 text-xs font-extrabold text-charcoal transition-transform active:translate-y-0.5"
+            >
+              <span>🌱</span>
+              <span className="max-w-[90px] truncate text-eel-dark-blue sm:max-w-[140px]">
+                {user?.displayName ?? "Tài khoản"}
+              </span>
+              <Settings className="size-3.5 text-ash" />
+            </Link>
           </div>
         </header>
       )}

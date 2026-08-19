@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { Mic, Square, Volume2, RotateCcw, CheckCircle2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { PronunciationAssessmentResponse } from "@/app/api/speaking/assess/route";
+import { useAuth } from "@/components/auth-provider";
 
 interface IpaRecorderProps {
   soundSymbol: string;
@@ -12,6 +13,7 @@ interface IpaRecorderProps {
 }
 
 export function IpaRecorder({ soundSymbol, soundName, expectedPhoneme }: IpaRecorderProps) {
+  const { authFetch } = useAuth();
   const [isRecording, setIsRecording] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
@@ -80,7 +82,7 @@ export function IpaRecorder({ soundSymbol, soundName, expectedPhoneme }: IpaReco
       formData.append("expectedText", soundSymbol);
       formData.append("phoneme", expectedPhoneme);
 
-      const res = await fetch("/api/speaking/assess", {
+      const res = await authFetch("/api/speaking/assess", {
         method: "POST",
         body: formData,
       });

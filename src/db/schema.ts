@@ -18,6 +18,7 @@ export const users = pgTable(
     id: uuid("id").defaultRandom().primaryKey(),
     email: text("email").notNull(),
     passwordHash: text("password_hash"),
+    emailVerifiedAt: timestamp("email_verified_at", { withTimezone: true }),
     displayName: text("display_name").notNull(),
     nativeLanguage: text("native_language").default("vi").notNull(),
     targetLanguage: text("target_language").default("en").notNull(),
@@ -29,6 +30,46 @@ export const users = pgTable(
       .notNull(),
   },
   (table) => [unique("users_email_unique").on(table.email)],
+).enableRLS();
+
+export const emailVerificationTokens = pgTable(
+  "email_verification_tokens",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    tokenHash: text("token_hash").notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    consumedAt: timestamp("consumed_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    unique("email_verification_tokens_token_hash_unique").on(table.tokenHash),
+    index("email_verification_tokens_user_id_idx").on(table.userId),
+    index("email_verification_tokens_expires_at_idx").on(table.expiresAt),
+  ],
+).enableRLS();
+
+export const refreshTokens = pgTable(
+  "refresh_tokens",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    tokenHash: text("token_hash").notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    revokedAt: timestamp("revoked_at", { withTimezone: true }),
+    replacedById: uuid("replaced_by_id"),
+    lastUsedAt: timestamp("last_used_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    unique("refresh_tokens_token_hash_unique").on(table.tokenHash),
+    index("refresh_tokens_user_id_idx").on(table.userId),
+    index("refresh_tokens_expires_at_idx").on(table.expiresAt),
+  ],
 ).enableRLS();
 
 export const decks = pgTable(

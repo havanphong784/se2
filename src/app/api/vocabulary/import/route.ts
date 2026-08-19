@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 
+import { getDb } from "@/db";
+import { requireAuth } from "@/lib/auth";
 import { importVocabulary, ImportError } from "@/lib/vocabulary-import-server";
 import {
   MAX_IMPORT_BYTES,
@@ -11,6 +13,11 @@ import { isUuid } from "@/lib/server-data";
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
+  const db = getDb();
+  if (!db) return NextResponse.json({ error: { code: "DATABASE_UNAVAILABLE", message: "Cơ sở dữ liệu chưa sẵn sàng." } }, { status: 503 });
+  const user = await requireAuth(request, db);
+  if (!user) return NextResponse.json({ error: { code: "UNAUTHENTICATED", message: "Chưa xác thực." } }, { status: 401 });
+
   try {
     const form = await request.formData();
     const file = form.get("file");
@@ -60,7 +67,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const saved = await importVocabulary(target, parsed.words);
+    const saved = await importVocabulary(target, parsed.words, user.id);
     return NextResponse.json(
       {
         deck: saved.deck,

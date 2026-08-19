@@ -1,75 +1,53 @@
+import { and, eq, gt, isNotNull, isNull } from "drizzle-orm";
 import { cookies } from "next/headers";
-import { eq } from "drizzle-orm";
 
 import { getDb } from "@/db";
-import { users } from "@/db/schema";
-import { isUuid } from "@/lib/server-data";
-
-export const AUTH_COOKIE_NAME = "vocabloom_session";
-export const demoEmail = process.env.DEMO_USER_EMAIL ?? "demo@vocabloom.vn";
+import { refreshTokens, users } from "@/db/schema";
+import { hashRefreshToken, REFRESH_COOKIE_NAME, verifyAccessToken } from "@/lib/auth-tokens";
 
 export type AuthUser = {
   id: string;
   displayName: string;
   email: string;
-  isDemo: boolean;
+  emailVerifiedAt: Date | null;
 };
 
-export async function getDemoUser(db: NonNullable<ReturnType<typeof getDb>>) {
-  try {
-    const [user] = await db
-      .select({
-        id: users.id,
-        displayName: users.displayName,
-        email: users.email,
-      })
-      .from(users)
-      .where(eq(users.email, demoEmail))
-      .limit(1);
+type Db = NonNullable<ReturnType<typeof getDb>>;
 
-    return user ?? null;
-  } catch {
-    return null;
-  }
+export async function getAuthUser(db: Db, userId: string): Promise<AuthUser | null> {
+  const [user] = await db
+    .select({ id: users.id, displayName: users.displayName, email: users.email, emailVerifiedAt: users.emailVerifiedAt })
+    .from(users)
+    .where(and(eq(users.id, userId), isNotNull(users.emailVerifiedAt)))
+    .limit(1);
+  return user ?? null;
 }
 
-export async function getCurrentAuthUser(
-  db: NonNullable<ReturnType<typeof getDb>>,
-): Promise<AuthUser | null> {
+export async function requireAuth(request: Request, db: Db): Promise<AuthUser | null> {
+  const authorization = request.headers.get("authorization");
+  if (!authorization?.startsWith("Bearer ")) return null;
+
+  const claims = await verifyAccessToken(authorization.slice("Bearer ".length));
+  if (!claims) return null;
+  return getAuthUser(db, claims.sub);
+}
+
+export async function getCurrentAuthUser(db: Db): Promise<AuthUser | null> {
   try {
-    const cookieStore = await cookies();
-    const userId = cookieStore.get(AUTH_COOKIE_NAME)?.value;
-
-    if (userId && isUuid(userId)) {
-      const [user] = await db
-        .select({
-          id: users.id,
-          displayName: users.displayName,
-          email: users.email,
-        })
-        .from(users)
-        .where(eq(users.id, userId))
-        .limit(1);
-
-      if (user) {
-        return {
-          ...user,
-          isDemo: user.email === demoEmail,
-        };
-      }
-    }
-  } catch {
-    // Fallback when outside request scope
-  }
-
-  try {
-    const demoUser = await getDemoUser(db);
-    if (!demoUser) return null;
-
-    return {
-      ...demoUser,
-      isDemo: true,
-    };
+    const token = (await cookies()).get(REFRESH_COOKIE_NAME)?.value;
+    if (!token) return null;
+    const [session] = await db
+      .select({ userId: refreshTokens.userId })
+      .from(refreshTokens)
+      .where(
+        and(
+          eq(refreshTokens.tokenHash, await hashRefreshToken(token)),
+          isNull(refreshTokens.revokedAt),
+          gt(refreshTokens.expiresAt, new Date()),
+        ),
+      )
+      .limit(1);
+    return session ? getAuthUser(db, session.userId) : null;
   } catch {
     return null;
   }
