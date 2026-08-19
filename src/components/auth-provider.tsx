@@ -51,8 +51,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, 9 * 60 * 1000);
   }, [clearSession]);
 
+  const isPublicPage = pathname === "/login" || pathname === "/register" || pathname === "/verify-email";
+
   useEffect(() => {
-    if (pathname === "/login" || pathname === "/register") {
+    if (isPublicPage) {
       setReady(true);
       return;
     }
@@ -61,7 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       else router.replace(`/login?next=${encodeURIComponent(pathname)}`);
       setReady(true);
     });
-  }, [pathname, router, setSession]);
+  }, [isPublicPage, pathname, router, setSession]);
 
   useEffect(() => () => { if (refreshTimer.current) clearTimeout(refreshTimer.current); }, []);
 
@@ -76,13 +78,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const session = await refreshSession();
     if (!session) {
       clearSession();
-      router.replace(`/login?next=${encodeURIComponent(pathname)}`);
+      if (!isPublicPage) router.replace(`/login?next=${encodeURIComponent(pathname)}`);
       return response;
     }
     setSession(session);
     response = await send();
     return response;
-  }, [clearSession, pathname, router, setSession]);
+  }, [clearSession, isPublicPage, pathname, router, setSession]);
 
   const value = useMemo(() => ({ user, ready, setSession, clearSession, authFetch }), [authFetch, clearSession, ready, setSession, user]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -48,6 +48,7 @@ export function AppShell({
   const [streakDays, setStreakDays] = useState<number>(initialStreakDays ?? 0);
 
   useEffect(() => {
+    if (!user) return;
     authFetch("/api/streak")
       .then((res) => res.json())
       .then((data) => {
@@ -56,7 +57,7 @@ export function AppShell({
         }
       })
       .catch(() => {});
-  }, [authFetch, pathname]);
+  }, [authFetch, pathname, user]);
 
   return (
     <div className="min-h-svh bg-white">
