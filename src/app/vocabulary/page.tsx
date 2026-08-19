@@ -1,4 +1,5 @@
-import type { Metadata } from "next";
+"use client";
+
 import Link from "next/link";
 import {
   ArrowRight,
@@ -17,17 +18,29 @@ import { DataSourceNotice } from "@/components/data-source-notice";
 import { VocabularyLibrary } from "@/components/vocabulary-library";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
-import { getLearningData } from "@/lib/data";
+import { useLearningData } from "@/lib/hooks/use-queries";
 import { getTodayStudyMinutes, isDueForReview, isLearnedToday } from "@/lib/study";
 import { cn } from "@/lib/utils";
 
-export const dynamic = "force-dynamic";
+export default function VocabularyPage() {
+  const { data: learningRes, isLoading } = useLearningData();
 
-export const metadata: Metadata = { title: "Học từ vựng" };
+  if (isLoading || !learningRes) {
+    return (
+      <div className="mx-auto w-full max-w-[1200px] px-5 py-8 md:px-8 lg:py-12 animate-pulse">
+        <div className="h-64 bg-gray-100 rounded-xl mb-10" />
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-14">
+          <div className="h-44 bg-gray-100 rounded-xl" />
+          <div className="h-44 bg-gray-100 rounded-xl" />
+          <div className="h-44 bg-gray-100 rounded-xl" />
+          <div className="h-44 bg-gray-100 rounded-xl" />
+        </div>
+      </div>
+    );
+  }
 
-export default async function VocabularyPage() {
-  const learningResult = await getLearningData();
-  const { decks, activity } = learningResult.data;
+  const { data: learning, source } = learningRes;
+  const { decks, activity } = learning;
   const words = decks.flatMap((deck) => deck.words);
   const now = new Date();
   const totalDue = words.filter((word) => isDueForReview(word, now)).length;
@@ -42,7 +55,7 @@ export default async function VocabularyPage() {
 
   return (
     <div className="mx-auto w-full max-w-[1200px] px-5 py-8 md:px-8 lg:py-12">
-      <DataSourceNotice source={learningResult.source} />
+      <DataSourceNotice source={source} />
 
       {/* Hero Banner: Colorful & Inviting */}
       <section
@@ -313,5 +326,3 @@ export default async function VocabularyPage() {
     </div>
   );
 }
-
-

@@ -41,6 +41,7 @@ import type {
 } from "@/lib/study-service";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/auth-provider";
+import { useInvalidateAuthData } from "@/lib/hooks/use-queries";
 
 const AUTO_SPEAK_KEY = "vocabloom:auto-speak";
 
@@ -90,6 +91,7 @@ async function readEventJson(response: Response) {
 
 export function StudySession({ mode, deck }: { mode: StudyMode; deck?: VocabularyDeck }) {
   const { authFetch } = useAuth();
+  const invalidateAuthData = useInvalidateAuthData();
   const [requestedSize, setRequestedSize] = useState<SessionSize>(10);
   const [session, setSession] = useState<StudySessionDto | null>(null);
   const [queue, setQueue] = useState<string[]>([]);
@@ -356,6 +358,7 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
     setAnswer("");
 
     if (nextSession.status === "completed") {
+      invalidateAuthData();
       setQueue([]);
       return;
     }

@@ -58,12 +58,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setReady(true);
       return;
     }
+    // Chỉ refresh lần đầu khi mount app
     void refreshSession().then((session) => {
       if (session) setSession(session);
       else router.replace(`/login?next=${encodeURIComponent(pathname)}`);
       setReady(true);
     });
-  }, [isPublicPage, pathname, router, setSession]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => () => { if (refreshTimer.current) clearTimeout(refreshTimer.current); }, []);
 

@@ -19,6 +19,7 @@ import { BrandName } from "@/components/brand-mark";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/auth-provider";
+import { useStreak } from "@/lib/hooks/use-queries";
 
 const navigation = [
   { href: "/", label: "Tổng quan", icon: Home },
@@ -44,20 +45,9 @@ export function AppShell({
 }) {
   const pathname = usePathname();
   const inPractice = pathname.startsWith("/vocabulary/practice");
-  const { user, authFetch } = useAuth();
-  const [streakDays, setStreakDays] = useState<number>(initialStreakDays ?? 0);
-
-  useEffect(() => {
-    if (!user) return;
-    authFetch("/api/streak")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.streak && typeof data.streak.current === "number") {
-          setStreakDays(data.streak.current);
-        }
-      })
-      .catch(() => {});
-  }, [authFetch, pathname, user]);
+  const { user } = useAuth();
+  const { data: streak } = useStreak();
+  const streakDays = streak?.current ?? initialStreakDays ?? 0;
 
   return (
     <div className="min-h-svh bg-white">

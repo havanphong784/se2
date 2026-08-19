@@ -3,6 +3,7 @@ import { Baloo_2, Nunito } from "next/font/google";
 
 import { AppShell } from "@/components/app-shell";
 import { AuthProvider } from "@/components/auth-provider";
+import { QueryProvider } from "@/components/query-provider";
 
 import "./globals.css";
 
@@ -31,7 +32,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="vi" suppressHydrationWarning>
       <body className={`${nunito.variable} ${baloo.variable}`} suppressHydrationWarning>
-        <AuthProvider><AppShell>{children}</AppShell></AuthProvider>
+        <QueryProvider>
+          <AuthProvider>
+            <AppShell>{children}</AppShell>
+          </AuthProvider>
+        </QueryProvider>
       </body>
     </html>
   );

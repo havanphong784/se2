@@ -27,6 +27,7 @@ import { Input } from "@/components/ui/input";
 import { speakEnglish } from "@/lib/speech";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/auth-provider";
+import { useInvalidateAuthData } from "@/lib/hooks/use-queries";
 
 type PersonalDeck = { id: string; title: string; slug: string };
 
@@ -67,6 +68,7 @@ export function TranslationTool({
   decks: PersonalDeck[];
 }) {
   const { authFetch } = useAuth();
+  const invalidateAuthData = useInvalidateAuthData();
   const [direction, setDirection] = useState<"en-vi" | "vi-en">("en-vi");
   const [inputText, setInputText] = useState("");
   const [loading, setLoading] = useState(false);
@@ -268,6 +270,7 @@ export function TranslationTool({
         setNewTitle("");
         setNewDescription("");
       }
+      invalidateAuthData();
       setTimeout(() => {
         setShowDeckModal(false);
         setAddMessage(null);
