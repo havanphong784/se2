@@ -26,6 +26,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { speakEnglish } from "@/lib/speech";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/components/auth-provider";
+import { useInvalidateAuthData } from "@/lib/hooks/use-queries";
 
 type PersonalDeck = { id: string; title: string; slug: string };
 
@@ -65,6 +67,8 @@ export function TranslationTool({
   available: boolean;
   decks: PersonalDeck[];
 }) {
+  const { authFetch } = useAuth();
+  const invalidateAuthData = useInvalidateAuthData();
   const [direction, setDirection] = useState<"en-vi" | "vi-en">("en-vi");
   const [inputText, setInputText] = useState("");
   const [loading, setLoading] = useState(false);
@@ -142,7 +146,7 @@ export function TranslationTool({
     setError(null);
     setResult(null);
     try {
-      const response = await fetch("/api/translate", {
+      const response = await authFetch("/api/translate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: textToTranslate.trim(), direction: dir }),
@@ -247,7 +251,7 @@ export function TranslationTool({
     };
 
     try {
-      const response = await fetch("/api/translate/add", {
+      const response = await authFetch("/api/translate/add", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -266,6 +270,7 @@ export function TranslationTool({
         setNewTitle("");
         setNewDescription("");
       }
+      invalidateAuthData();
       setTimeout(() => {
         setShowDeckModal(false);
         setAddMessage(null);

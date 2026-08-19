@@ -14,6 +14,8 @@ import {
   type ImportFormat,
   type ImportParseResult,
 } from "@/lib/vocabulary-import";
+import { useAuth } from "@/components/auth-provider";
+import { useInvalidateAuthData } from "@/lib/hooks/use-queries";
 
 type PersonalDeck = { id: string; title: string; slug: string };
 
@@ -29,6 +31,8 @@ export function VocabularyImportForm({
   available: boolean;
   decks: PersonalDeck[];
 }) {
+  const { authFetch } = useAuth();
+  const invalidateAuthData = useInvalidateAuthData();
   const [file, setFile] = useState<File | null>(null);
   const [format, setFormat] = useState<ImportFormat>("csv");
   const [preview, setPreview] = useState<ImportParseResult | null>(null);
@@ -74,7 +78,7 @@ export function VocabularyImportForm({
       body.set("level", level);
     }
     try {
-      const response = await fetch("/api/vocabulary/import", { method: "POST", body });
+      const response = await authFetch("/api/vocabulary/import", { method: "POST", body });
       const result = (await response.json()) as Success & { error?: { message?: string } };
       if (!response.ok) throw new Error(result.error?.message ?? "Không thể nhập từ vựng.");
       setSuccess(result);
@@ -85,6 +89,7 @@ export function VocabularyImportForm({
       setDescription("");
       setLevel("Tự chọn");
       if (fileInputRef.current) fileInputRef.current.value = "";
+      invalidateAuthData();
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Không thể nhập từ vựng.");
     } finally {

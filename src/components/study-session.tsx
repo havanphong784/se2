@@ -40,6 +40,8 @@ import type {
   SubmitStudyEventResult,
 } from "@/lib/study-service";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/components/auth-provider";
+import { useInvalidateAuthData } from "@/lib/hooks/use-queries";
 
 const AUTO_SPEAK_KEY = "vocabloom:auto-speak";
 
@@ -88,6 +90,8 @@ async function readEventJson(response: Response) {
 }
 
 export function StudySession({ mode, deck }: { mode: StudyMode; deck?: VocabularyDeck }) {
+  const { authFetch } = useAuth();
+  const invalidateAuthData = useInvalidateAuthData();
   const [requestedSize, setRequestedSize] = useState<SessionSize>(10);
   const [session, setSession] = useState<StudySessionDto | null>(null);
   const [queue, setQueue] = useState<string[]>([]);
@@ -250,7 +254,7 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
     setSaving(true);
     setError(null);
     try {
-      const response = await fetch("/api/study-sessions", {
+      const response = await authFetch("/api/study-sessions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ mode, deckId: deck?.id, requestedSize }),
@@ -268,7 +272,7 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
 
   async function sendEvent(payload: EventPayload) {
     if (!session) throw new Error("Phiên học chưa bắt đầu.");
-    const response = await fetch(`/api/study-sessions/${session.id}/events`, {
+    const response = await authFetch(`/api/study-sessions/${session.id}/events`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -354,6 +358,7 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
     setAnswer("");
 
     if (nextSession.status === "completed") {
+      invalidateAuthData();
       setQueue([]);
       return;
     }
@@ -369,7 +374,7 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
   function closeSession() {
     if (!session || session.status !== "active") return;
     cancelEnglishSpeech();
-    void fetch(`/api/study-sessions/${session.id}/abandon`, {
+    void authFetch(`/api/study-sessions/${session.id}/abandon`, {
       method: "POST",
       keepalive: true,
     }).catch(() => undefined);

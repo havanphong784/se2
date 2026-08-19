@@ -10,7 +10,6 @@ import {
   wordProgress,
   words,
 } from "@/db/schema";
-import { getDemoUser } from "@/lib/server-data";
 import { vnDateKeyOffset } from "@/lib/utils";
 import {
   evaluateStudyAnswer,
@@ -80,21 +79,18 @@ function dateKey(value: Date) {
   return value.toISOString().slice(0, 10);
 }
 
-async function requireUser(db: Db | Transaction) {
-  const user = await getDemoUser(db as Db);
-  if (!user) throw new StudyServiceError("Hãy chạy pnpm db:seed trước khi học.", 503);
-  return user;
-}
-
-export async function getStudySession(db: Db | Transaction, sessionId: string) {
-  const user = await requireUser(db);
+export async function getStudySession(
+  db: Db | Transaction,
+  sessionId: string,
+  userId: string,
+) {
   const [session] = await db
     .select()
     .from(studySessions)
     .where(
       and(
         eq(studySessions.id, sessionId),
-        eq(studySessions.userId, user.id),
+        eq(studySessions.userId, userId),
       ),
     )
     .limit(1);
@@ -154,9 +150,9 @@ export async function getStudySession(db: Db | Transaction, sessionId: string) {
 export async function createStudySession(
   db: Db,
   input: { mode: StudyMode; deckId?: string; requestedSize: SessionSize },
+  userId: string,
 ) {
   return db.transaction(async (tx) => {
-    const user = await requireUser(tx);
     const now = new Date();
 
     const candidates =
@@ -167,7 +163,7 @@ export async function createStudySession(
             .innerJoin(decks, eq(decks.id, words.deckId))
             .leftJoin(
               wordProgress,
-              and(eq(wordProgress.wordId, words.id), eq(wordProgress.userId, user.id)),
+              and(eq(wordProgress.wordId, words.id), eq(wordProgress.userId, userId)),
             )
             .where(
               and(
@@ -183,7 +179,7 @@ export async function createStudySession(
             .innerJoin(words, eq(words.id, wordProgress.wordId))
             .where(
               and(
-                eq(wordProgress.userId, user.id),
+                eq(wordProgress.userId, userId),
                 sql`${wordProgress.learnedAt} is not null`,
                 isNull(wordProgress.reviewCompletedAt),
                 sql`${wordProgress.nextReviewAt} < ${vnDateKeyOffset(1, now)}`,
@@ -206,7 +202,7 @@ export async function createStudySession(
     const [session] = await tx
       .insert(studySessions)
       .values({
-        userId: user.id,
+        userId: userId,
         deckId: input.mode === "learn" ? input.deckId : null,
         mode: input.mode,
         status: "active",
@@ -226,7 +222,7 @@ export async function createStudySession(
       })),
     );
 
-    return getStudySession(tx, session.id);
+    return getStudySession(tx, session.id, userId);
   });
 }
 
@@ -268,12 +264,12 @@ export async function submitStudyEvent(
     selectedWordId?: string;
     answer?: string;
   },
+  userId: string,
 ) {
   return db.transaction(async (tx) => {
     await tx.execute(
       sql`select pg_advisory_xact_lock(hashtextextended(${input.sessionId}, 0))`,
     );
-    const user = await requireUser(tx);
     const [duplicate] = await tx
       .select({
         sessionId: studySessionWords.sessionId,
@@ -295,7 +291,7 @@ export async function submitStudyEvent(
     if (duplicate) {
       const payloadMatches =
         duplicate.sessionId === input.sessionId &&
-        duplicate.userId === user.id &&
+        duplicate.userId === userId &&
         duplicate.wordId === input.wordId &&
         duplicate.phase === input.phase &&
         (input.phase !== "multiple_choice" ||
@@ -309,7 +305,7 @@ export async function submitStudyEvent(
         );
       }
       return {
-        session: await getStudySession(tx, input.sessionId),
+        session: await getStudySession(tx, input.sessionId, userId),
         result: {
           eventId: input.eventId,
           wordId: input.wordId,
@@ -327,7 +323,7 @@ export async function submitStudyEvent(
       .where(
         and(
           eq(studySessions.id, input.sessionId),
-          eq(studySessions.userId, user.id),
+          eq(studySessions.userId, userId),
         ),
       )
       .limit(1);
@@ -455,7 +451,7 @@ export async function submitStudyEvent(
       const [progress] = await tx
         .select()
         .from(wordProgress)
-        .where(and(eq(wordProgress.userId, user.id), eq(wordProgress.wordId, input.wordId)))
+        .where(and(eq(wordProgress.userId, userId), eq(wordProgress.wordId, input.wordId)))
         .limit(1);
 
       if (!correct && session.mode === "review" && progress) {
@@ -481,7 +477,7 @@ export async function submitStudyEvent(
           await tx
             .insert(wordProgress)
             .values({
-              userId: user.id,
+              userId: userId,
               wordId: input.wordId,
               status: schedule.status,
               mastery: 25,
@@ -515,7 +511,7 @@ export async function submitStudyEvent(
               xpEarned: sql`${studySessions.xpEarned} + 15`,
             })
             .where(eq(studySessions.id, session.id));
-          await updateDailyActivity(tx, user.id, now, {
+          await updateDailyActivity(tx, userId, now, {
             learned: 1,
             reviewed: 0,
             correct: 1,
@@ -548,7 +544,7 @@ export async function submitStudyEvent(
               xpEarned: sql`${studySessions.xpEarned} + 10`,
             })
             .where(eq(studySessions.id, session.id));
-          await updateDailyActivity(tx, user.id, now, {
+          await updateDailyActivity(tx, userId, now, {
             learned: 0,
             reviewed: 1,
             correct: 1,
@@ -592,7 +588,7 @@ export async function submitStudyEvent(
     }
 
     return {
-      session: await getStudySession(tx, session.id),
+      session: await getStudySession(tx, session.id, userId),
       result: {
         eventId: input.eventId,
         wordId: input.wordId,
@@ -604,8 +600,7 @@ export async function submitStudyEvent(
   });
 }
 
-export async function abandonStudySession(db: Db, sessionId: string) {
-  const user = await requireUser(db);
+export async function abandonStudySession(db: Db, sessionId: string, userId: string) {
   const now = new Date();
   await db
     .update(studySessions)
@@ -619,9 +614,9 @@ export async function abandonStudySession(db: Db, sessionId: string) {
     .where(
       and(
         eq(studySessions.id, sessionId),
-        eq(studySessions.userId, user.id),
+        eq(studySessions.userId, userId),
         eq(studySessions.status, "active"),
       ),
     );
-  return getStudySession(db, sessionId);
+  return getStudySession(db, sessionId, userId);
 }

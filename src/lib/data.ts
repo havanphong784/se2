@@ -7,6 +7,7 @@ import {
   markDatabaseFailure,
 } from "@/db";
 import { dailyActivity, decks, wordProgress, words } from "@/db/schema";
+import { getCurrentAuthUser } from "@/lib/auth";
 import {
   DEMO_ACTIVITY,
   DEMO_DECKS,
@@ -17,7 +18,6 @@ import {
   type VocabularyDeck,
   type VocabularyWord,
 } from "@/lib/demo-data";
-import { getDemoUser } from "@/lib/server-data";
 import {
   vnDateKey,
   vnDateKeyOffset,
@@ -150,7 +150,7 @@ export function computeStreak(rows: ActivityRow[]): Streak {
 
 async function loadDecks(
   db: NonNullable<ReturnType<typeof getDb>>,
-  user: Awaited<ReturnType<typeof getDemoUser>>,
+  userId: string,
 ): Promise<VocabularyDeck[]> {
   const rows = await db
     .select({
@@ -180,11 +180,9 @@ async function loadDecks(
     .innerJoin(words, eq(words.deckId, decks.id))
     .leftJoin(
       wordProgress,
-      user
-        ? and(eq(wordProgress.wordId, words.id), eq(wordProgress.userId, user.id))
-        : eq(wordProgress.id, "00000000-0000-0000-0000-000000000000"),
+      and(eq(wordProgress.wordId, words.id), eq(wordProgress.userId, userId)),
     )
-    .where(user ? or(isNull(decks.ownerId), eq(decks.ownerId, user.id)) : isNull(decks.ownerId))
+    .where(or(isNull(decks.ownerId), eq(decks.ownerId, userId)))
     .orderBy(asc(decks.sortOrder), asc(decks.slug), asc(words.sortOrder), asc(words.term));
 
   const fallbackEmoji = new Map(DEMO_DECKS.map((deck) => [deck.slug, deck.emoji]));
@@ -229,9 +227,8 @@ async function loadDecks(
 
 async function loadActivityData(
   db: NonNullable<ReturnType<typeof getDb>>,
-  user: Awaited<ReturnType<typeof getDemoUser>>,
+  userId: string,
 ): Promise<{ activity: ActivityItem[]; streak: Streak }> {
-  if (!user) return { activity: emptyRecentActivity(), streak: computeStreak([]) };
 
   // Lấy 30 ngày gần nhất để tính streak best + current chính xác hơn,
   // nhưng UI weekly chỉ hiển thị 7 ngày cuối.
@@ -244,7 +241,7 @@ async function loadActivityData(
       xpEarned: dailyActivity.xpEarned,
     })
     .from(dailyActivity)
-    .where(and(eq(dailyActivity.userId, user.id), gte(dailyActivity.activityDate, streakStartKey)))
+    .where(and(eq(dailyActivity.userId, userId), gte(dailyActivity.activityDate, streakStartKey)))
     .orderBy(asc(dailyActivity.activityDate));
 
   const streak = computeStreak(rows);
@@ -267,48 +264,151 @@ async function loadActivityData(
   return { activity, streak };
 }
 
-export async function getLearningData(): Promise<DataResult<LearningData>> {
+async function loadSingleDeck(
+  db: NonNullable<ReturnType<typeof getDb>>,
+  slug: string,
+  userId: string,
+): Promise<VocabularyDeck | null> {
+  const [deckRow] = await db
+    .select({
+      id: decks.id,
+      ownerId: decks.ownerId,
+      slug: decks.slug,
+      title: decks.title,
+      description: decks.description,
+      level: decks.level,
+    })
+    .from(decks)
+    .where(and(eq(decks.slug, slug), or(isNull(decks.ownerId), eq(decks.ownerId, userId))))
+    .limit(1);
+
+  if (!deckRow) return null;
+
+  const rows = await db
+    .select({
+      wordId: words.id,
+      term: words.term,
+      translation: words.translation,
+      phonetic: words.phonetic,
+      partOfSpeech: words.partOfSpeech,
+      exampleSentence: words.exampleSentence,
+      exampleTranslation: words.exampleTranslation,
+      status: wordProgress.status,
+      mastery: wordProgress.mastery,
+      intervalDays: wordProgress.intervalDays,
+      learnedAt: wordProgress.learnedAt,
+      reviewStage: wordProgress.reviewStage,
+      lastReviewedAt: wordProgress.lastReviewedAt,
+      nextReviewAt: wordProgress.nextReviewAt,
+      reviewCompletedAt: wordProgress.reviewCompletedAt,
+    })
+    .from(words)
+    .leftJoin(
+      wordProgress,
+      and(eq(wordProgress.wordId, words.id), eq(wordProgress.userId, userId)),
+    )
+    .where(eq(words.deckId, deckRow.id))
+    .orderBy(asc(words.sortOrder), asc(words.term));
+
+  const fallbackEmoji = new Map(DEMO_DECKS.map((d) => [d.slug, d.emoji]));
+
+  return {
+    id: deckRow.id,
+    slug: deckRow.slug,
+    title: deckRow.title,
+    description: deckRow.description,
+    level: deckRow.level,
+    emoji: fallbackEmoji.get(deckRow.slug) ?? "🌱",
+    ownership: deckRow.ownerId ? "personal" : "system",
+    words: rows.map((row) => ({
+      id: row.wordId,
+      term: row.term,
+      translation: row.translation,
+      phonetic: row.phonetic,
+      partOfSpeech: row.partOfSpeech,
+      exampleSentence: row.exampleSentence,
+      exampleTranslation: row.exampleTranslation,
+      status: (row.status as VocabularyWord["status"] | null) ?? "new",
+      mastery: row.mastery ?? 0,
+      intervalDays: row.intervalDays ?? 0,
+      learnedAt: row.learnedAt?.toISOString() ?? null,
+      reviewStage: (row.reviewStage as VocabularyWord["reviewStage"] | null) ?? 0,
+      lastReviewedAt: row.lastReviewedAt?.toISOString() ?? null,
+      nextReviewAt: row.nextReviewAt?.toISOString() ?? null,
+      reviewCompletedAt: row.reviewCompletedAt?.toISOString() ?? null,
+    })),
+  };
+}
+
+export async function getLearningData(userId?: string): Promise<DataResult<LearningData>> {
   const db = getDb();
   if (!db) return fallbackLearningData("demo-unconfigured");
   if (isDatabaseCoolingDown()) return fallbackLearningData("demo-unavailable");
 
   try {
-    const user = await getDemoUser(db);
+    const currentUser = userId ? null : await getCurrentAuthUser(db);
+    const effectiveUserId = userId ?? currentUser?.id;
+    if (!effectiveUserId) return fallbackLearningData("demo-unavailable");
     const [loadedDecks, { activity, streak }] = await Promise.all([
-      loadDecks(db, user),
-      loadActivityData(db, user),
+      loadDecks(db, effectiveUserId),
+      loadActivityData(db, effectiveUserId),
     ]);
     markDatabaseAvailable();
     return result({ decks: loadedDecks, activity, streak }, "database");
   } catch (error) {
     markDatabaseFailure(error);
-    return fallbackLearningData("demo-unavailable");
+    throw error;
   }
 }
 
-export async function getDecksResult(): Promise<DataResult<VocabularyDeck[]>> {
-  const learning = await getLearningData();
+export async function getDecksResult(userId?: string): Promise<DataResult<VocabularyDeck[]>> {
+  const learning = await getLearningData(userId);
   return result(learning.data.decks, learning.source);
 }
 
-export async function getDeckResult(slug: string): Promise<DataResult<VocabularyDeck | null>> {
-  const decksResult = await getDecksResult();
-  return result(decksResult.data.find((deck) => deck.slug === slug) ?? null, decksResult.source);
+export async function getDeckResult(
+  slug: string,
+  userId?: string,
+): Promise<DataResult<VocabularyDeck | null>> {
+  const db = getDb();
+  if (!db) {
+    const demo = DEMO_DECKS.find((d) => d.slug === slug) ?? null;
+    return result(demo, "demo-unconfigured");
+  }
+  if (isDatabaseCoolingDown()) {
+    const demo = DEMO_DECKS.find((d) => d.slug === slug) ?? null;
+    return result(demo, "demo-unavailable");
+  }
+
+  try {
+    const currentUser = userId ? null : await getCurrentAuthUser(db);
+    const effectiveUserId = userId ?? currentUser?.id;
+    if (!effectiveUserId) {
+      const demo = DEMO_DECKS.find((d) => d.slug === slug) ?? null;
+      return result(demo, "demo-unavailable");
+    }
+    const deck = await loadSingleDeck(db, slug, effectiveUserId);
+    markDatabaseAvailable();
+    return result(deck, "database");
+  } catch (error) {
+    markDatabaseFailure(error);
+    throw error;
+  }
 }
 
-export async function getActivityResult(): Promise<DataResult<ActivityItem[]>> {
-  const learning = await getLearningData();
+export async function getActivityResult(userId?: string): Promise<DataResult<ActivityItem[]>> {
+  const learning = await getLearningData(userId);
   return result(learning.data.activity, learning.source);
 }
 
-export async function getDecks() {
-  return (await getDecksResult()).data;
+export async function getDecks(userId: string) {
+  return (await getDecksResult(userId)).data;
 }
 
-export async function getDeck(slug: string) {
-  return (await getDeckResult(slug)).data;
+export async function getDeck(slug: string, userId: string) {
+  return (await getDeckResult(slug, userId)).data;
 }
 
-export async function getActivity() {
-  return (await getActivityResult()).data;
+export async function getActivity(userId: string) {
+  return (await getActivityResult(userId)).data;
 }

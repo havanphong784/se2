@@ -1,7 +1,6 @@
+"use client";
+
 import Link from "next/link";
-
-export const dynamic = "force-dynamic";
-
 import {
   ArrowRight,
   BookCheck,
@@ -22,9 +21,7 @@ import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { getLearningData } from "@/lib/data";
-import { getCurrentAuthUser } from "@/lib/auth";
-import { getDb } from "@/db";
+import { useLearningData } from "@/lib/hooks/use-queries";
 import { isDueForReview } from "@/lib/study";
 import {
   cn,
@@ -35,13 +32,26 @@ import {
   vnWeekdayLabel,
 } from "@/lib/utils";
 
-export default async function DashboardPage() {
-  const db = getDb();
-  const authUser = db ? await getCurrentAuthUser(db) : null;
-  const displayName = authUser?.displayName ?? "Minh Anh";
+export default function DashboardPage() {
+  const { data: learningRes, isLoading } = useLearningData();
 
-  const learning = await getLearningData();
-  const { decks, activity, streak } = learning.data;
+  if (isLoading || !learningRes) {
+    return (
+      <div className="mx-auto w-full max-w-[1200px] px-5 py-8 md:px-8 lg:py-10 animate-pulse">
+        <div className="h-8 w-48 bg-gray-200 rounded-lg mb-4" />
+        <div className="h-12 w-96 bg-gray-200 rounded-lg mb-8" />
+        <div className="grid gap-5 lg:grid-cols-[1.55fr_0.8fr]">
+          <div className="h-64 bg-gray-100 rounded-xl" />
+          <div className="h-64 bg-gray-100 rounded-xl" />
+        </div>
+      </div>
+    );
+  }
+
+  const { data: learning, source, user } = learningRes;
+  const { decks, activity, streak } = learning;
+  const displayName = user?.displayName ?? "Bạn";
+
   const allWords = decks.flatMap((deck) => deck.words);
   const mastered = allWords.filter((word) => word.reviewCompletedAt).length;
   const learningCount = allWords.filter(
@@ -55,9 +65,6 @@ export default async function DashboardPage() {
   const dueWords = allWords.filter((word) => isDueForReview(word, now));
   const activeDays = activity.filter((item) => item.reviewed > 0 || item.learned > 0).length;
 
-  // Panel "ôn tuần này" (T2–CN): ô quá khứ hiển thị số đã ôn (reviewed),
-  // ô hôm nay/tương lai hiển thị số từ đến hạn ĐÚNG ngày đó (nextReviewAt
-  // rơi vào ngày D theo múi giờ VN, không cộng dồn).
   const weekDates = vnCalendarWeek(now);
   const weekDays = weekDates.map((date) => vnWeekdayLabel(date));
   const weekFullDates = weekDates.map((date) => vnDayLabel(date));
@@ -85,7 +92,6 @@ export default async function DashboardPage() {
     }).length;
   });
 
-  // Data cho Lịch ôn Tháng (F3)
   const monthInfo = vnCalendarMonth(now);
   const monthDaysData = monthInfo.days.map((date) => {
     const dayKey = vnDateKey(date);
@@ -133,7 +139,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="mx-auto w-full max-w-[1200px] px-5 py-8 md:px-8 lg:py-10">
-      <DataSourceNotice source={learning.source} />
+      <DataSourceNotice source={source} />
       <header className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <Badge variant="blue" className="mb-3">

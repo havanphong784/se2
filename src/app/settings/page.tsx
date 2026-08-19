@@ -1,5 +1,4 @@
-import Link from "next/link";
-import { LogIn, Settings, UserCheck } from "lucide-react";
+import { Settings, UserCheck } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -36,36 +35,17 @@ export default async function SettingsPage() {
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-xl font-extrabold text-eel-dark-blue">
-                  {user?.displayName ?? "Minh Anh"}
+                  {user?.displayName ?? "Tài khoản"}
                 </h2>
-                <Badge variant={user?.isDemo ? "neutral" : "default"}>
-                  {user?.isDemo ? "Demo User" : "Tài khoản cá nhân"}
+                <Badge variant="default">
+                  Tài khoản cá nhân
                 </Badge>
               </div>
-              <p className="mt-1 text-sm font-bold text-ash">
-                {user?.email ?? "demo@vocabloom.vn"}
-              </p>
+              <p className="mt-1 text-sm font-bold text-ash">{user?.email}</p>
             </div>
           </div>
 
-          {user?.isDemo ? (
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <Link
-                href="/login"
-                className={buttonVariants({ size: "sm", className: "justify-center gap-1.5" })}
-              >
-                <LogIn className="size-4" /> Đăng nhập
-              </Link>
-              <Link
-                href="/register"
-                className={buttonVariants({ variant: "outline", size: "sm", className: "justify-center" })}
-              >
-                Đăng ký
-              </Link>
-            </div>
-          ) : (
-            <LogoutButton />
-          )}
+          <LogoutButton />
         </div>
       </div>
 

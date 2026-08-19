@@ -4,17 +4,13 @@ import { ArrowLeft, FileUp } from "lucide-react";
 
 import { VocabularyImportForm } from "@/components/vocabulary-import-form";
 import { Badge } from "@/components/ui/badge";
-import { getPersonalImportDecks } from "@/lib/vocabulary-import-server";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = { title: "Nhập từ vựng" };
 
-export default async function VocabularyImportPage() {
-  const targets = await getPersonalImportDecks().catch(() => ({
-    available: false as const,
-    decks: [],
-  }));
+export default function VocabularyImportPage() {
+  const targets = { available: true as const, decks: [] };
 
   return (
     <div className="mx-auto w-full max-w-[1200px] px-5 py-8 md:px-8 lg:py-10">

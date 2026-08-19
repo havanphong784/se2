@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 
+import { getDb } from "@/db";
+import { requireAuth } from "@/lib/auth";
+
 export const runtime = "nodejs";
 
 type TranslateRequest = {
@@ -106,6 +109,12 @@ async function fetchEnglishDictionaryDetails(word: string) {
 }
 
 export async function POST(request: Request) {
+  const db = getDb();
+  if (!db) return NextResponse.json({ error: "Cơ sở dữ liệu chưa sẵn sàng." }, { status: 503 });
+  if (!(await requireAuth(request, db))) {
+    return NextResponse.json({ error: "Chưa xác thực." }, { status: 401 });
+  }
+
   const body = (await request.json().catch(() => null)) as TranslateRequest | null;
   if (
     !body ||

@@ -1,11 +1,16 @@
 import { eq } from "drizzle-orm";
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 import { getDb } from "@/db";
 import { users } from "@/db/schema";
-import { AUTH_COOKIE_NAME } from "@/lib/auth";
+import { createRefreshSession } from "@/lib/auth-sessions";
 import { verifyPassword } from "@/lib/auth-crypto";
+import {
+  createAccessToken,
+  noStoreHeaders,
+  REFRESH_COOKIE_NAME,
+  refreshCookieOptions,
+} from "@/lib/auth-tokens";
 
 export async function POST(request: Request) {
   try {
@@ -15,7 +20,7 @@ export async function POST(request: Request) {
     if (!email || typeof email !== "string" || !password || typeof password !== "string") {
       return NextResponse.json(
         { error: "Vui lòng nhập đầy đủ email và mật khẩu." },
-        { status: 400 },
+        { status: 400, headers: noStoreHeaders },
       );
     }
 
@@ -23,7 +28,7 @@ export async function POST(request: Request) {
     if (!db) {
       return NextResponse.json(
         { error: "Cơ sở dữ liệu tạm thời không khả dụng." },
-        { status: 503 },
+        { status: 503, headers: noStoreHeaders },
       );
     }
 
@@ -36,32 +41,32 @@ export async function POST(request: Request) {
     if (!user || !verifyPassword(password, user.passwordHash)) {
       return NextResponse.json(
         { error: "Email hoặc mật khẩu không chính xác." },
-        { status: 401 },
+        { status: 401, headers: noStoreHeaders },
       );
     }
 
-    const cookieStore = await cookies();
-    cookieStore.set(AUTH_COOKIE_NAME, user.id, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 30, // 30 days
-      path: "/",
-    });
+    if (!user.emailVerifiedAt) {
+      return NextResponse.json(
+        { error: "Tài khoản chưa được kích hoạt. Vui lòng kiểm tra email.", unverified: true },
+        { status: 403, headers: noStoreHeaders },
+      );
+    }
 
-    return NextResponse.json({
-      success: true,
-      user: {
-        id: user.id,
-        email: user.email,
-        displayName: user.displayName,
+    const session = await createRefreshSession(db, user.id);
+    const response = NextResponse.json(
+      {
+        accessToken: await createAccessToken(user.id),
+        user: { id: user.id, email: user.email, displayName: user.displayName },
       },
-    });
+      { headers: noStoreHeaders },
+    );
+    response.cookies.set(REFRESH_COOKIE_NAME, session.token, refreshCookieOptions());
+    return response;
   } catch (error) {
     console.error("Login error:", error);
     return NextResponse.json(
       { error: "Đã có lỗi xảy ra khi đăng nhập." },
-      { status: 500 },
+      { status: 500, headers: noStoreHeaders },
     );
   }
 }

@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 
+import { getDb } from "@/db";
+import { requireAuth } from "@/lib/auth";
+
 export type PronunciationAssessmentResponse = {
   accuracyScore: number;
   fluencyScore: number;
@@ -13,6 +16,12 @@ export type PronunciationAssessmentResponse = {
 };
 
 export async function POST(request: Request) {
+  const db = getDb();
+  if (!db) return NextResponse.json({ error: "Cơ sở dữ liệu chưa sẵn sàng." }, { status: 503 });
+  if (!(await requireAuth(request, db))) {
+    return NextResponse.json({ error: "Chưa xác thực." }, { status: 401 });
+  }
+
   try {
     const formData = await request.formData();
     const audioFile = formData.get("audio") as Blob | null;

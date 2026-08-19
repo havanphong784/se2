@@ -3,22 +3,28 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Lock, Mail, Sparkles, Sprout } from "lucide-react";
+import { ArrowRight, Lock, Mail, Sprout } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/components/auth-provider";
 import { Input } from "@/components/ui/input";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { setSession } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [unverified, setUnverified] = useState(false);
+  const [resendMessage, setResendMessage] = useState<string | null>(null);
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     setError(null);
+    setUnverified(false);
+    setResendMessage(null);
     setLoading(true);
 
     try {
@@ -31,9 +37,11 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (!response.ok) {
+        setUnverified(data.unverified === true);
         throw new Error(data.error || "Đăng nhập không thành công.");
       }
 
+      setSession(data);
       router.push("/");
       router.refresh();
     } catch (err) {
@@ -41,6 +49,16 @@ export default function LoginPage() {
     } finally {
       setLoading(false);
     }
+  }
+
+  async function resendVerification() {
+    const response = await fetch("/api/auth/verify-email/resend", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    const data = await response.json();
+    setResendMessage(data.message ?? "Đã xử lý yêu cầu gửi lại email.");
   }
 
   return (
@@ -58,9 +76,12 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {error && (
-          <div className="mt-5 rounded-xl border-2 border-[#ffcdd2] bg-[#ffebee] p-3.5 text-center text-sm font-bold text-[#c62828]">
-            {error}
+        {error && <div className="mt-5 rounded-xl border-2 border-[#ffcdd2] bg-[#ffebee] p-3.5 text-center text-sm font-bold text-[#c62828]">{error}</div>}
+        {unverified && (
+          <div className="mt-4 rounded-xl border-2 border-eel-light bg-[#fbfff8] p-4 text-center text-sm font-bold text-charcoal">
+            <p>Chưa nhận được email kích hoạt?</p>
+            <Button type="button" variant="outline" size="sm" className="mt-3" onClick={() => void resendVerification()}>Gửi lại email xác thực</Button>
+            {resendMessage && <p className="mt-3 text-xs text-ash">{resendMessage}</p>}
           </div>
         )}
 
@@ -113,20 +134,6 @@ export default function LoginPage() {
               Đăng ký ngay
             </Link>
           </p>
-          <div className="mt-4 rounded-xl border-2 border-eel-light bg-[#fbfff8] p-3 text-xs text-charcoal">
-            <span className="flex items-center justify-center gap-1 font-extrabold text-ecto-green">
-              <Sparkles className="size-4" /> Hoặc dùng tài khoản Demo
-            </span>
-            <p className="mt-1 text-ash">
-              Bạn vẫn có thể trải nghiệm toàn bộ ứng dụng mà không cần đăng nhập.
-            </p>
-            <Link
-              href="/"
-              className={buttonVariants({ variant: "outline", size: "sm", className: "mt-2.5 w-full justify-center" })}
-            >
-              Vào học với Demo User
-            </Link>
-          </div>
         </div>
       </div>
     </div>

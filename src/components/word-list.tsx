@@ -10,6 +10,8 @@ import { Progress } from "@/components/ui/progress";
 import type { VocabularyWord, WordStatus } from "@/lib/demo-data";
 import { speakEnglish } from "@/lib/speech";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/components/auth-provider";
+import { useInvalidateAuthData } from "@/lib/hooks/use-queries";
 
 const filters: Array<{ value: "all" | WordStatus; label: string }> = [
   { value: "all", label: "Tất cả" },
@@ -28,6 +30,8 @@ const statusConfig: Record<
 };
 
 export function WordList({ words: initialWords }: { words: VocabularyWord[] }) {
+  const { authFetch } = useAuth();
+  const invalidateAuthData = useInvalidateAuthData();
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<"all" | WordStatus>("all");
   const [words, setWords] = useState(initialWords);
@@ -78,8 +82,10 @@ export function WordList({ words: initialWords }: { words: VocabularyWord[] }) {
       );
 
       try {
-        const response = await fetch(`/api/words/${wordId}/mark-known`, { method: "POST" });
-        if (!response.ok) {
+        const response = await authFetch(`/api/words/${wordId}/mark-known`, { method: "POST" });
+        if (response.ok) {
+          invalidateAuthData();
+        } else {
           // Hoàn tác nếu server lỗi
           setWords((prev) =>
             prev.map((w) => {

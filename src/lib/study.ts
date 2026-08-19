@@ -313,7 +313,7 @@ export function scheduleCorrectReview(
   hadIncorrectAttempt: boolean,
   now: Date,
 ): ReviewSchedule {
-  if (hadIncorrectAttempt) return scheduleLearnedWord(now);
+  if (hadIncorrectAttempt) return scheduleIncorrectReview(now);
   if (currentStage === 0) {
     return {
       reviewStage: 1,

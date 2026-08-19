@@ -232,7 +232,7 @@ test("review schedule advances through 3, 7, and 30 day cycle", () => {
   });
 });
 
-test("incorrect review is due tomorrow and relearning restarts at three days", () => {
+test("incorrect review and successful retry remain due tomorrow", () => {
   assert.deepEqual(scheduleIncorrectReview(now), {
     reviewStage: 0,
     intervalDays: 1,
@@ -240,7 +240,7 @@ test("incorrect review is due tomorrow and relearning restarts at three days", (
     reviewCompletedAt: null,
     status: "learning",
   });
-  assert.deepEqual(scheduleCorrectReview(2, true, now), scheduleLearnedWord(now));
+  assert.deepEqual(scheduleCorrectReview(2, true, now), scheduleIncorrectReview(now));
 });
 
 test("session summary counts unique words separately from attempts", () => {
