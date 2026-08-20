@@ -10,7 +10,6 @@ export type ReviewStage = 0 | 1 | 2 | 3;
 export type StudySpeechSpeed = "slow" | "normal";
 
 export type StudyEventResult = {
-  eventId: string;
   wordId: string;
   phase: StudyPhase;
   isCorrect: boolean;
@@ -40,7 +39,6 @@ export type StudySessionDto = {
     flashcardCompleted: boolean;
     multipleChoiceCompleted: boolean;
     typingCompleted: boolean;
-    hadIncorrectAttempt: boolean;
     incorrectAttemptCount: number;
   }>;
 };
@@ -290,8 +288,6 @@ export function applyStudyResult(session: StudySessionDto, result: StudyEventRes
       ? {
           ...word,
           [completionKey]: result.isCorrect || word[completionKey],
-          hadIncorrectAttempt:
-            word.hadIncorrectAttempt || (countsAsAttempt && !result.isCorrect),
           incorrectAttemptCount:
             word.incorrectAttemptCount + Number(countsAsAttempt && !result.isCorrect),
         }
@@ -346,11 +342,10 @@ export function createMultipleChoiceOptions<T extends Pick<StudyWord, "id" | "tr
   target: T,
   sessionWords: T[],
   seed: string,
-  distractorPool: T[] = [],
 ) {
   const seen = new Set([normalizeAnswer(target.translation)]);
   const distractors = seededShuffle(
-    [...sessionWords, ...distractorPool].filter((word) => word.id !== target.id),
+    sessionWords.filter((word) => word.id !== target.id),
     `${seed}:distractors`,
   ).filter((word) => {
     const normalized = normalizeAnswer(word.translation);

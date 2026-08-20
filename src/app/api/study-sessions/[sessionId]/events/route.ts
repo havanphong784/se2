@@ -41,7 +41,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ ses
   if (!user) return NextResponse.json({ message: "Chưa xác thực." }, { status: 401 });
 
   try {
-    const submitted = await submitStudyEvent(
+    await submitStudyEvent(
       db,
       {
         sessionId,
@@ -52,7 +52,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ ses
       },
       user.id,
     );
-    return NextResponse.json(submitted);
+    return new NextResponse(null, { status: 204 });
   } catch (error) {
     if (error instanceof StudyServiceError) {
       return NextResponse.json({ message: error.message }, { status: error.status });

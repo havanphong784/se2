@@ -12,13 +12,12 @@ import {
 } from "@/db/schema";
 import { vnDateKey, vnDateKeyOffset } from "@/lib/utils";
 import {
-  evaluateStudyAnswer,
+  isTypingAnswerCorrect,
   normalizeAnswer,
   scheduleCorrectReview,
   scheduleLearnedWord,
   type ReviewStage,
   type SessionSize,
-  type StudyEventResult,
   type StudyMode,
   type StudyPhase,
   type StudySessionDto,
@@ -36,12 +35,7 @@ export class StudyServiceError extends Error {
 type Db = NonNullable<ReturnType<typeof getDb>>;
 type Transaction = Parameters<Parameters<Db["transaction"]>[0]>[0];
 
-export type SubmitStudyEventResult = {
-  result: StudyEventResult;
-  sessionCompleted: boolean;
-};
-
-export type { StudyEventResult, StudySessionDto } from "@/lib/study";
+export type { StudySessionDto } from "@/lib/study";
 
 export async function getStudySession(
   db: Db | Transaction,
@@ -64,7 +58,6 @@ export async function getStudySession(
 
   const sessionWordRows = await db
     .select({
-      sessionWordId: studySessionWords.id,
       wordId: words.id,
       position: studySessionWords.position,
       term: words.term,
@@ -76,7 +69,6 @@ export async function getStudySession(
       flashcardCompletedAt: studySessionWords.flashcardCompletedAt,
       multipleChoiceCompletedAt: studySessionWords.multipleChoiceCompletedAt,
       typingCompletedAt: studySessionWords.typingCompletedAt,
-      hadIncorrectAttempt: studySessionWords.hadIncorrectAttempt,
       incorrectAttemptCount: studySessionWords.incorrectAttemptCount,
     })
     .from(studySessionWords)
@@ -107,7 +99,6 @@ export async function getStudySession(
       flashcardCompleted: Boolean(item.flashcardCompletedAt),
       multipleChoiceCompleted: Boolean(item.multipleChoiceCompletedAt),
       typingCompleted: Boolean(item.typingCompletedAt),
-      hadIncorrectAttempt: item.hadIncorrectAttempt === 1,
       incorrectAttemptCount: item.incorrectAttemptCount,
     })),
   } satisfies StudySessionDto;
@@ -241,10 +232,7 @@ export async function submitStudyEvent(
         userId: studySessions.userId,
         wordId: studySessionWords.wordId,
         answerNormalized: studyAttempts.answerNormalized,
-        isCorrect: studyAttempts.isCorrect,
         incorrectAttemptCount: studySessionWords.incorrectAttemptCount,
-        term: words.term,
-        sessionStatus: studySessions.status,
       })
       .from(studyAttempts)
       .innerJoin(studySessionWords, eq(studySessionWords.id, studyAttempts.sessionWordId))
@@ -265,16 +253,7 @@ export async function submitStudyEvent(
           409,
         );
       }
-      return {
-        result: {
-          eventId: input.eventId,
-          wordId: input.wordId,
-          phase: "typing",
-          isCorrect: duplicate.isCorrect === 1,
-          expectedAnswer: duplicate.term,
-        },
-        sessionCompleted: duplicate.sessionStatus === "completed",
-      } satisfies SubmitStudyEventResult;
+      return;
     }
 
     const [session] = await tx
@@ -295,7 +274,6 @@ export async function submitStudyEvent(
       .select({
         id: studySessionWords.id,
         term: words.term,
-        translation: words.translation,
         typingCompletedAt: studySessionWords.typingCompletedAt,
       })
       .from(studySessionWords)
@@ -312,14 +290,7 @@ export async function submitStudyEvent(
       throw new StudyServiceError("Từ đã hoàn thành bước học này.", 409);
     }
 
-    const grading = evaluateStudyAnswer({
-      phase: "typing",
-      wordId: input.wordId,
-      term: sessionWord.term,
-      translation: sessionWord.translation,
-      answer: input.answer,
-    });
-    if (!grading.isCorrect) {
+    if (!isTypingAnswerCorrect(sessionWord.term, input.answer)) {
       throw new StudyServiceError("Đáp án nhập từ chưa chính xác.", 409);
     }
 
@@ -454,8 +425,7 @@ export async function submitStudyEvent(
       })
       .from(studySessionWords)
       .where(eq(studySessionWords.sessionId, session.id));
-    const sessionCompleted = remaining === 0;
-    if (sessionCompleted) {
+    if (remaining === 0) {
       await tx
         .update(studySessions)
         .set({
@@ -468,17 +438,6 @@ export async function submitStudyEvent(
         })
         .where(eq(studySessions.id, session.id));
     }
-
-    return {
-      result: {
-        eventId: input.eventId,
-        wordId: input.wordId,
-        phase: "typing",
-        isCorrect: true,
-        expectedAnswer: grading.expectedAnswer,
-      },
-      sessionCompleted,
-    } satisfies SubmitStudyEventResult;
   });
 }
 

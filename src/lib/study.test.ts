@@ -228,13 +228,11 @@ test("local study results complete all phases and preserve incorrect attempts", 
         flashcardCompleted: false,
         multipleChoiceCompleted: false,
         typingCompleted: false,
-        hadIncorrectAttempt: false,
         incorrectAttemptCount: 0,
       },
     ],
   };
   const event = (phase: "flashcard" | "multiple_choice" | "typing", isCorrect: boolean) => ({
-    eventId: `${phase}-${isCorrect}`,
     wordId: "word-1",
     phase,
     isCorrect,

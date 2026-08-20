@@ -44,7 +44,6 @@ import { useInvalidateAuthData } from "@/lib/hooks/use-queries";
 const AUTO_SPEAK_KEY = "vocabloom:auto-speak";
 
 type EventPayload = {
-  eventId: string;
   wordId: string;
   phase: StudyPhase;
   selectedWordId?: string;
@@ -89,10 +88,9 @@ async function readSessionJson(response: Response) {
 }
 
 async function ensureEventSaved(response: Response) {
-  const result = (await response.json()) as { result?: StudyEventResult; message?: string };
-  if (!response.ok || !result.result) {
-    throw new Error(result.message ?? "Không thể lưu câu trả lời.");
-  }
+  if (response.ok) return;
+  const result = (await response.json()) as { message?: string };
+  throw new Error(result.message ?? "Không thể lưu câu trả lời.");
 }
 
 export function StudySession({ mode, deck }: { mode: StudyMode; deck?: VocabularyDeck }) {
@@ -162,10 +160,6 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
   }, [feedback]);
 
   useEffect(() => {
-    if (!saving) actionLockRef.current = false;
-  }, [saving]);
-
-  useEffect(() => {
     if (pendingWrites.length === 0) return;
     const preventUnload = (event: BeforeUnloadEvent) => event.preventDefault();
     window.addEventListener("beforeunload", preventUnload);
@@ -189,7 +183,6 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
       !session.phase ||
       session.status !== "active" ||
       !currentWord ||
-      saving ||
       actionLockRef.current ||
       event.defaultPrevented ||
       event.repeat ||
@@ -332,7 +325,6 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
   function nextFlashcard() {
     if (!session || !currentWord || feedback) return;
     const result: StudyEventResult = {
-      eventId: crypto.randomUUID(),
       wordId: currentWord.id,
       phase: "flashcard",
       isCorrect: true,
@@ -369,7 +361,7 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
     }
     if (payload.phase === "typing" && result.isCorrect) {
       saveCompletion({
-        eventId: payload.eventId,
+        eventId: crypto.randomUUID(),
         wordId: payload.wordId,
         answer: payload.answer ?? "",
         incorrectAttemptCount:
@@ -379,9 +371,8 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
   }
 
   function chooseOption(selectedWordId: string) {
-    if (!currentWord || saving || feedback) return;
+    if (!currentWord || feedback) return;
     submitAnswer({
-      eventId: crypto.randomUUID(),
       wordId: currentWord.id,
       phase: "multiple_choice",
       selectedWordId,
@@ -390,9 +381,8 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
 
   function submitTyping(event: FormEvent) {
     event.preventDefault();
-    if (!currentWord || !answer.trim() || saving || feedback) return;
+    if (!currentWord || !answer.trim() || feedback) return;
     submitAnswer({
-      eventId: crypto.randomUUID(),
       wordId: currentWord.id,
       phase: "typing",
       answer,
@@ -400,7 +390,7 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
   }
 
   function continueAfterFeedback() {
-    if (!feedback || saving) return;
+    if (!feedback) return;
     const { nextSession, result } = feedback;
     setSession(nextSession);
     setFeedback(null);
@@ -658,7 +648,7 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
                   variant="secondary"
                   size="default"
                   className="w-full"
-                  disabled={saving || flashcardIndex === 0}
+                  disabled={flashcardIndex === 0}
                   onClick={() => setFlashcardIndex((index) => index - 1)}
                   aria-keyshortcuts="ArrowLeft"
                 >
@@ -667,7 +657,6 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
                 <Button
                   size="default"
                   className="w-full"
-                  disabled={saving}
                   onClick={nextFlashcard}
                   aria-keyshortcuts="ArrowRight"
                 >
@@ -736,7 +725,7 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
                     <motion.button
                       key={option.id}
                       type="button"
-                      disabled={saving || Boolean(feedback)}
+                      disabled={Boolean(feedback)}
                       onClick={() => chooseOption(option.id)}
                       aria-keyshortcuts={`${index + 1} ${letter}`}
                       animate={
@@ -831,7 +820,7 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
                         feedback?.result.isCorrect === true && "border-ecto-green bg-[#f7fff1] text-[#438f0e]",
                         feedback?.result.isCorrect === false && "border-[#ff6b6b] bg-[#fff7f7] text-[#b93636]",
                       )}
-                      disabled={saving || Boolean(feedback)}
+                      disabled={Boolean(feedback)}
                       maxLength={256}
                     />
                   </label>
@@ -841,9 +830,9 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
                       type="submit"
                       size="lg"
                       className="mt-4 w-full"
-                      disabled={saving || !answer.trim()}
+                      disabled={!answer.trim()}
                     >
-                      <span>{saving ? "Đang kiểm tra…" : "Kiểm tra"}</span> <ArrowRight className="size-4" />
+                      <span>Kiểm tra</span> <ArrowRight className="size-4" />
                     </Button>
                   )}
                 </form>
