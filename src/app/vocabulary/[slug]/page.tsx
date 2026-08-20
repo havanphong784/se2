@@ -5,6 +5,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight, BookOpen, Brain, CheckCircle2, Leaf, Sparkles } from "lucide-react";
 
+import { CustomPracticeDialog } from "@/components/custom-practice-dialog";
 import { DataSourceNotice } from "@/components/data-source-notice";
 import { WordList } from "@/components/word-list";
 import { Badge } from "@/components/ui/badge";
@@ -37,6 +38,7 @@ export default function DeckPage({ params }: DeckPageProps) {
   if (!deck) notFound();
 
   const progress = deckProgress(deck);
+  const learnedWords = deck.words.filter((word) => Boolean(word.learnedAt));
   const isCompleted = progress.percent >= 100;
   const isStarted = progress.percent > 0;
 
@@ -86,7 +88,7 @@ export default function DeckPage({ params }: DeckPageProps) {
             </div>
           </div>
 
-          <div className="shrink-0">
+          <div className="flex shrink-0 flex-col gap-3">
             <Link
               href={`/vocabulary/practice?mode=learn&deck=${deck.slug}`}
               className={buttonVariants({
@@ -96,6 +98,7 @@ export default function DeckPage({ params }: DeckPageProps) {
             >
               <span>{isStarted ? "Tiếp tục học" : "Bắt đầu học"}</span> <ArrowRight />
             </Link>
+            <CustomPracticeDialog deck={deck} practiceWords={learnedWords} />
           </div>
         </div>
       </section>

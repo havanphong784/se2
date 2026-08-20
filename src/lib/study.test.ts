@@ -20,6 +20,7 @@ import {
   scheduleIncorrectReview,
   scheduleLearnedWord,
   selectDueWords,
+  selectRandomWords,
   selectNewWords,
   summarizeSession,
   type StudySessionDto,
@@ -37,6 +38,17 @@ const word = (overrides: Partial<StudyWord> = {}): StudyWord => ({
   nextReviewAt: null,
   reviewCompletedAt: null,
   ...overrides,
+});
+
+test("random practice selection supports preset counts and all", () => {
+  const words = Array.from({ length: 25 }, (_, index) => ({ id: String(index) }));
+  for (const count of [5, 10, 15, 20] as const) {
+    const selected = selectRandomWords(words, count);
+    assert.equal(selected.length, count);
+    assert.equal(new Set(selected.map((item) => item.id)).size, count);
+  }
+  assert.equal(selectRandomWords(words, "all").length, 25);
+  assert.equal(selectRandomWords(words.slice(0, 3), 5).length, 3);
 });
 
 test("selectNewWords limits new words to requested session size", () => {

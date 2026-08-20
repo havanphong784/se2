@@ -222,7 +222,7 @@ export default function VocabularyPage() {
 
             <div className="mt-5 border-t-2 border-current/10 pt-3.5">
               {learnedTodayCount > 0 ? (
-                <CustomPracticeDialog wordsLearnedToday={wordsLearnedToday} />
+                <CustomPracticeDialog practiceWords={wordsLearnedToday} />
               ) : (
                 <span
                   className={buttonVariants({
