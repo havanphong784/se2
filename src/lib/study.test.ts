@@ -266,6 +266,50 @@ test("local study results complete all phases and preserve incorrect attempts", 
   assert.equal(completed.words[0].incorrectAttemptCount, 2);
 });
 
+test("review counts only a correct first attempt", () => {
+  const session: StudySessionDto = {
+    id: "session-1",
+    mode: "review",
+    status: "active",
+    phase: "typing",
+    requestedSize: 10,
+    selectedSize: 1,
+    learnedCount: 0,
+    reviewedCount: 0,
+    attemptCount: 0,
+    incorrectCount: 0,
+    words: [
+      {
+        id: "word-1",
+        position: 0,
+        term: "hello",
+        translation: "xin chào",
+        phonetic: "",
+        partOfSpeech: [],
+        exampleSentence: "",
+        exampleTranslation: "",
+        flashcardCompleted: false,
+        multipleChoiceCompleted: false,
+        typingCompleted: false,
+        incorrectAttemptCount: 0,
+      },
+    ],
+  };
+  const result = (isCorrect: boolean) => ({
+    wordId: "word-1",
+    phase: "typing" as const,
+    isCorrect,
+    expectedAnswer: "hello",
+  });
+
+  const afterIncorrect = applyStudyResult(session, result(false));
+  const afterRetryCorrect = applyStudyResult(afterIncorrect, result(true));
+  const afterFirstCorrect = applyStudyResult(session, result(true));
+  assert.equal(afterIncorrect.reviewedCount, 0);
+  assert.equal(afterRetryCorrect.reviewedCount, 0);
+  assert.equal(afterFirstCorrect.reviewedCount, 1);
+});
+
 test("review schedule advances through 3, 7, and 30 day cycle", () => {
   assert.deepEqual(scheduleLearnedWord(now), {
     reviewStage: 0,

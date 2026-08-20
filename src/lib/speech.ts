@@ -54,6 +54,7 @@ const IPA_PHONETIC_TTS_MAP: Record<string, string> = {
 };
 
 let currentAudio: HTMLAudioElement | null = null;
+let currentUtterance: SpeechSynthesisUtterance | null = null;
 
 export function canSpeakEnglish() {
   return typeof window !== "undefined" && "speechSynthesis" in window;
@@ -65,15 +66,27 @@ export function cancelEnglishSpeech() {
     currentAudio = null;
   }
   if (canSpeakEnglish()) window.speechSynthesis.cancel();
+  currentUtterance = null;
 }
 
 export function speakEnglish(term: string, speed: SpeechSpeed = "normal") {
   if (!canSpeakEnglish()) return;
   cancelEnglishSpeech();
+  const synthesis = window.speechSynthesis;
   const utterance = new SpeechSynthesisUtterance(term);
-  utterance.lang = "en-GB";
+  const voices = synthesis.getVoices();
+  const voice =
+    voices.find((item) => item.lang.toLowerCase() === "en-gb") ??
+    voices.find((item) => item.lang.toLowerCase().startsWith("en"));
+  currentUtterance = utterance;
+  utterance.voice = voice ?? null;
+  utterance.lang = voice?.lang ?? "en-US";
   utterance.rate = SPEECH_RATES[speed];
-  window.speechSynthesis.speak(utterance);
+  utterance.onend = utterance.onerror = () => {
+    if (currentUtterance === utterance) currentUtterance = null;
+  };
+  synthesis.resume();
+  synthesis.speak(utterance);
 }
 
 export function speakIpaSound(soundId: string, symbol: string, audioUrl?: string) {

@@ -219,6 +219,7 @@ export async function submitStudyEvent(
     wordId: string;
     answer: string;
     incorrectAttemptCount: number;
+    isCorrect: boolean;
   },
   userId: string,
 ) {
@@ -232,7 +233,7 @@ export async function submitStudyEvent(
         userId: studySessions.userId,
         wordId: studySessionWords.wordId,
         answerNormalized: studyAttempts.answerNormalized,
-        incorrectAttemptCount: studySessionWords.incorrectAttemptCount,
+        isCorrect: studyAttempts.isCorrect,
       })
       .from(studyAttempts)
       .innerJoin(studySessionWords, eq(studySessionWords.id, studyAttempts.sessionWordId))
@@ -246,7 +247,7 @@ export async function submitStudyEvent(
         duplicate.userId === userId &&
         duplicate.wordId === input.wordId &&
         duplicate.answerNormalized === normalizeAnswer(input.answer) &&
-        duplicate.incorrectAttemptCount === input.incorrectAttemptCount;
+        duplicate.isCorrect === Number(input.isCorrect);
       if (!payloadMatches) {
         throw new StudyServiceError(
           "Mã lượt học đã được dùng cho một câu trả lời khác.",
@@ -290,33 +291,38 @@ export async function submitStudyEvent(
       throw new StudyServiceError("Từ đã hoàn thành bước học này.", 409);
     }
 
-    if (!isTypingAnswerCorrect(sessionWord.term, input.answer)) {
-      throw new StudyServiceError("Đáp án nhập từ chưa chính xác.", 409);
+    const correct = isTypingAnswerCorrect(sessionWord.term, input.answer);
+    if (
+      correct !== input.isCorrect ||
+      (!correct && (session.mode !== "review" || input.incorrectAttemptCount !== 1))
+    ) {
+      throw new StudyServiceError("Kết quả nhập từ không hợp lệ.", 409);
     }
 
     const now = new Date();
-    const correctAttemptCount = session.mode === "learn" ? 2 : 1;
-    const attemptCount = correctAttemptCount + input.incorrectAttemptCount;
+    const correctAttemptCount = correct ? (session.mode === "learn" ? 2 : 1) : 0;
 
     await tx.insert(studyAttempts).values({
       id: input.eventId,
       sessionWordId: sessionWord.id,
       phase: "typing",
       answerNormalized: normalizeAnswer(input.answer),
-      isCorrect: 1,
+      isCorrect: correct ? 1 : 0,
       attemptedAt: now,
     });
     await tx
       .update(studySessionWords)
       .set({
-        flashcardCompletedAt: now,
-        multipleChoiceCompletedAt: session.mode === "learn" ? now : undefined,
+        flashcardCompletedAt: correct ? now : undefined,
+        multipleChoiceCompletedAt: correct && session.mode === "learn" ? now : undefined,
         typingCompletedAt: now,
         completedAt: now,
         correctAttemptCount: sql`${studySessionWords.correctAttemptCount} + ${correctAttemptCount}`,
-        incorrectAttemptCount: sql`${studySessionWords.incorrectAttemptCount} + ${input.incorrectAttemptCount}`,
-        hadIncorrectAttempt: input.incorrectAttemptCount > 0 ? 1 : 0,
-        lastIncorrectAt: input.incorrectAttemptCount > 0 ? now : undefined,
+        incorrectAttemptCount: correct
+          ? studySessionWords.incorrectAttemptCount
+          : sql`${studySessionWords.incorrectAttemptCount} + 1`,
+        hadIncorrectAttempt: correct ? studySessionWords.hadIncorrectAttempt : 1,
+        lastIncorrectAt: correct ? undefined : now,
         updatedAt: now,
       })
       .where(eq(studySessionWords.id, sessionWord.id));
@@ -324,9 +330,11 @@ export async function submitStudyEvent(
       .update(studySessions)
       .set({
         phase: "typing",
-        attemptCount: sql`${studySessions.attemptCount} + ${attemptCount}`,
+        attemptCount: sql`${studySessions.attemptCount} + 1`,
         correctCount: sql`${studySessions.correctCount} + ${correctAttemptCount}`,
-        incorrectCount: sql`${studySessions.incorrectCount} + ${input.incorrectAttemptCount}`,
+        incorrectCount: correct
+          ? studySessions.incorrectCount
+          : sql`${studySessions.incorrectCount} + 1`,
         lastActivityAt: now,
         updatedAt: now,
       })
@@ -337,6 +345,29 @@ export async function submitStudyEvent(
       .from(wordProgress)
       .where(and(eq(wordProgress.userId, userId), eq(wordProgress.wordId, input.wordId)))
       .limit(1);
+
+    if (!correct && progress) {
+      const schedule = scheduleCorrectReview(
+        progress.reviewStage as ReviewStage,
+        true,
+        now,
+      );
+      await tx
+        .update(wordProgress)
+        .set({
+          status: schedule.status,
+          mastery: 25,
+          reviewStage: schedule.reviewStage,
+          intervalDays: schedule.intervalDays,
+          incorrectCount: sql`${wordProgress.incorrectCount} + 1`,
+          lastReviewedAt: now,
+          nextReviewAt: schedule.nextReviewAt,
+          reviewCompletedAt: null,
+          updatedAt: now,
+        })
+        .where(eq(wordProgress.id, progress.id));
+      return;
+    }
 
     if (session.mode === "learn") {
       const schedule = scheduleLearnedWord(now);

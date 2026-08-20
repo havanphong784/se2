@@ -55,6 +55,7 @@ type CompletionPayload = {
   wordId: string;
   answer: string;
   incorrectAttemptCount: number;
+  isCorrect: boolean;
 };
 
 type PendingWrite = CompletionPayload & { failed: boolean };
@@ -359,13 +360,21 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
     if (payload.phase === "typing" && autoSpeakEnabled) {
       speakEnglish(result.expectedAnswer, "normal");
     }
-    if (payload.phase === "typing" && result.isCorrect) {
+    const firstReviewAttempt =
+      session.mode === "review" &&
+      payload.phase === "typing" &&
+      currentWord.incorrectAttemptCount === 0;
+    if (
+      payload.phase === "typing" &&
+      (session.mode === "review" ? firstReviewAttempt : result.isCorrect)
+    ) {
       saveCompletion({
         eventId: crypto.randomUUID(),
         wordId: payload.wordId,
         answer: payload.answer ?? "",
         incorrectAttemptCount:
           nextSession.words.find((word) => word.id === payload.wordId)?.incorrectAttemptCount ?? 0,
+        isCorrect: result.isCorrect,
       });
     }
   }
