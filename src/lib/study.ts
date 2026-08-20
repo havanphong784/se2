@@ -9,6 +9,40 @@ export type SessionSize = 10 | 20;
 export type ReviewStage = 0 | 1 | 2 | 3;
 export type StudySpeechSpeed = "slow" | "normal";
 
+export type StudyEventResult = {
+  wordId: string;
+  phase: StudyPhase;
+  isCorrect: boolean;
+  expectedAnswer: string;
+};
+
+export type StudySessionDto = {
+  id: string;
+  mode: StudyMode;
+  status: "active" | "completed" | "abandoned";
+  phase: StudyPhase | null;
+  requestedSize: SessionSize;
+  selectedSize: number;
+  learnedCount: number;
+  reviewedCount: number;
+  attemptCount: number;
+  incorrectCount: number;
+  words: Array<{
+    id: string;
+    position: number;
+    term: string;
+    translation: string;
+    phonetic: string;
+    partOfSpeech: string[];
+    exampleSentence: string;
+    exampleTranslation: string;
+    flashcardCompleted: boolean;
+    multipleChoiceCompleted: boolean;
+    typingCompleted: boolean;
+    incorrectAttemptCount: number;
+  }>;
+};
+
 export type HighlightedTextPart = {
   text: string;
   highlighted: boolean;
@@ -239,6 +273,49 @@ export function evaluateStudyAnswer({
           : isTypingAnswerCorrect(term, answer ?? ""),
     expectedAnswer: phase === "typing" ? term : translation,
   };
+}
+
+export function applyStudyResult(session: StudySessionDto, result: StudyEventResult) {
+  const completionKey =
+    result.phase === "flashcard"
+      ? "flashcardCompleted"
+      : result.phase === "multiple_choice"
+        ? "multipleChoiceCompleted"
+        : "typingCompleted";
+  const countsAsAttempt = result.phase !== "flashcard";
+  const words = session.words.map((word) =>
+    word.id === result.wordId
+      ? {
+          ...word,
+          [completionKey]: result.isCorrect || word[completionKey],
+          incorrectAttemptCount:
+            word.incorrectAttemptCount + Number(countsAsAttempt && !result.isCorrect),
+        }
+      : word,
+  );
+  const phaseCompleted = result.isCorrect && words.every((word) => word[completionKey]);
+  const nextPhase = phaseCompleted
+    ? result.phase === "flashcard"
+      ? "multiple_choice"
+      : result.phase === "multiple_choice"
+        ? "typing"
+        : null
+    : session.phase;
+  const completed = phaseCompleted && result.phase === "typing";
+
+  return {
+    ...session,
+    status: completed ? "completed" : session.status,
+    phase: nextPhase,
+    learnedCount:
+      session.learnedCount + Number(result.phase === "typing" && result.isCorrect && session.mode === "learn"),
+    reviewedCount:
+      session.reviewedCount + Number(result.phase === "typing" && result.isCorrect && session.mode === "review"),
+    attemptCount: session.attemptCount + Number(countsAsAttempt),
+    incorrectCount:
+      session.incorrectCount + Number(countsAsAttempt && !result.isCorrect),
+    words,
+  } satisfies StudySessionDto;
 }
 
 function hashSeed(value: string) {
