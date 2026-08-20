@@ -1,4 +1,4 @@
-import { and, asc, eq, isNull, lte, or, sql } from "drizzle-orm";
+import { and, asc, eq, isNull, or, sql } from "drizzle-orm";
 
 import type { getDb } from "@/db";
 import {
@@ -10,17 +10,18 @@ import {
   wordProgress,
   words,
 } from "@/db/schema";
-import { vnDateKeyOffset } from "@/lib/utils";
+import { vnDateKey, vnDateKeyOffset } from "@/lib/utils";
 import {
   evaluateStudyAnswer,
   normalizeAnswer,
   scheduleCorrectReview,
-  scheduleIncorrectReview,
   scheduleLearnedWord,
   type ReviewStage,
   type SessionSize,
+  type StudyEventResult,
   type StudyMode,
   type StudyPhase,
+  type StudySessionDto,
 } from "@/lib/study";
 
 export class StudyServiceError extends Error {
@@ -35,49 +36,12 @@ export class StudyServiceError extends Error {
 type Db = NonNullable<ReturnType<typeof getDb>>;
 type Transaction = Parameters<Parameters<Db["transaction"]>[0]>[0];
 
-export type StudyEventResult = {
-  eventId: string;
-  wordId: string;
-  phase: StudyPhase;
-  isCorrect: boolean;
-  expectedAnswer: string;
-};
-
 export type SubmitStudyEventResult = {
-  session: StudySessionDto;
   result: StudyEventResult;
+  sessionCompleted: boolean;
 };
 
-export type StudySessionDto = {
-  id: string;
-  mode: StudyMode;
-  status: "active" | "completed" | "abandoned";
-  phase: StudyPhase | null;
-  requestedSize: SessionSize;
-  selectedSize: number;
-  learnedCount: number;
-  reviewedCount: number;
-  attemptCount: number;
-  incorrectCount: number;
-  words: Array<{
-    id: string;
-    position: number;
-    term: string;
-    translation: string;
-    phonetic: string;
-    partOfSpeech: string[];
-    exampleSentence: string;
-    exampleTranslation: string;
-    flashcardCompleted: boolean;
-    multipleChoiceCompleted: boolean;
-    typingCompleted: boolean;
-    hadIncorrectAttempt: boolean;
-  }>;
-};
-
-function dateKey(value: Date) {
-  return value.toISOString().slice(0, 10);
-}
+export type { StudyEventResult, StudySessionDto } from "@/lib/study";
 
 export async function getStudySession(
   db: Db | Transaction,
@@ -113,6 +77,7 @@ export async function getStudySession(
       multipleChoiceCompletedAt: studySessionWords.multipleChoiceCompletedAt,
       typingCompletedAt: studySessionWords.typingCompletedAt,
       hadIncorrectAttempt: studySessionWords.hadIncorrectAttempt,
+      incorrectAttemptCount: studySessionWords.incorrectAttemptCount,
     })
     .from(studySessionWords)
     .innerJoin(words, eq(words.id, studySessionWords.wordId))
@@ -143,6 +108,7 @@ export async function getStudySession(
       multipleChoiceCompleted: Boolean(item.multipleChoiceCompletedAt),
       typingCompleted: Boolean(item.typingCompletedAt),
       hadIncorrectAttempt: item.hadIncorrectAttempt === 1,
+      incorrectAttemptCount: item.incorrectAttemptCount,
     })),
   } satisfies StudySessionDto;
 }
@@ -236,7 +202,7 @@ async function updateDailyActivity(
     .insert(dailyActivity)
     .values({
       userId,
-      activityDate: dateKey(now),
+      activityDate: vnDateKey(now),
       learnedCount: values.learned,
       reviewedCount: values.reviewed,
       correctCount: values.correct,
@@ -260,9 +226,8 @@ export async function submitStudyEvent(
     sessionId: string;
     eventId: string;
     wordId: string;
-    phase: StudyPhase;
-    selectedWordId?: string;
-    answer?: string;
+    answer: string;
+    incorrectAttemptCount: number;
   },
   userId: string,
 ) {
@@ -275,12 +240,11 @@ export async function submitStudyEvent(
         sessionId: studySessionWords.sessionId,
         userId: studySessions.userId,
         wordId: studySessionWords.wordId,
-        phase: studyAttempts.phase,
         answerNormalized: studyAttempts.answerNormalized,
-        selectedWordId: studyAttempts.selectedWordId,
         isCorrect: studyAttempts.isCorrect,
+        incorrectAttemptCount: studySessionWords.incorrectAttemptCount,
         term: words.term,
-        translation: words.translation,
+        sessionStatus: studySessions.status,
       })
       .from(studyAttempts)
       .innerJoin(studySessionWords, eq(studySessionWords.id, studyAttempts.sessionWordId))
@@ -293,11 +257,8 @@ export async function submitStudyEvent(
         duplicate.sessionId === input.sessionId &&
         duplicate.userId === userId &&
         duplicate.wordId === input.wordId &&
-        duplicate.phase === input.phase &&
-        (input.phase !== "multiple_choice" ||
-          duplicate.selectedWordId === input.selectedWordId) &&
-        (input.phase !== "typing" ||
-          duplicate.answerNormalized === normalizeAnswer(input.answer ?? ""));
+        duplicate.answerNormalized === normalizeAnswer(input.answer) &&
+        duplicate.incorrectAttemptCount === input.incorrectAttemptCount;
       if (!payloadMatches) {
         throw new StudyServiceError(
           "Mã lượt học đã được dùng cho một câu trả lời khác.",
@@ -305,15 +266,14 @@ export async function submitStudyEvent(
         );
       }
       return {
-        session: await getStudySession(tx, input.sessionId, userId),
         result: {
           eventId: input.eventId,
           wordId: input.wordId,
-          phase: input.phase,
+          phase: "typing",
           isCorrect: duplicate.isCorrect === 1,
-          expectedAnswer:
-            input.phase === "typing" ? duplicate.term : duplicate.translation,
+          expectedAnswer: duplicate.term,
         },
+        sessionCompleted: duplicate.sessionStatus === "completed",
       } satisfies SubmitStudyEventResult;
     }
 
@@ -330,18 +290,12 @@ export async function submitStudyEvent(
     if (!session || session.status !== "active") {
       throw new StudyServiceError("Phiên học không còn hoạt động.", 409);
     }
-    if (session.phase !== input.phase) {
-      throw new StudyServiceError("Bước học không khớp với phiên hiện tại.", 409);
-    }
 
     const [sessionWord] = await tx
       .select({
         id: studySessionWords.id,
         term: words.term,
         translation: words.translation,
-        hadIncorrectAttempt: studySessionWords.hadIncorrectAttempt,
-        flashcardCompletedAt: studySessionWords.flashcardCompletedAt,
-        multipleChoiceCompletedAt: studySessionWords.multipleChoiceCompletedAt,
         typingCompletedAt: studySessionWords.typingCompletedAt,
       })
       .from(studySessionWords)
@@ -354,233 +308,161 @@ export async function submitStudyEvent(
       )
       .limit(1);
     if (!sessionWord) throw new StudyServiceError("Từ không thuộc phiên học.", 404);
-
-    if (input.phase === "multiple_choice" && !sessionWord.flashcardCompletedAt) {
-      throw new StudyServiceError("Từ chưa hoàn thành flashcard.", 409);
-    }
-    if (input.phase === "typing" && session.mode === "learn" && !sessionWord.multipleChoiceCompletedAt) {
-      throw new StudyServiceError("Từ chưa hoàn thành trắc nghiệm.", 409);
-    }
-    if (
-      (input.phase === "flashcard" && sessionWord.flashcardCompletedAt) ||
-      (input.phase === "multiple_choice" && sessionWord.multipleChoiceCompletedAt) ||
-      (input.phase === "typing" && sessionWord.typingCompletedAt)
-    ) {
+    if (sessionWord.typingCompletedAt) {
       throw new StudyServiceError("Từ đã hoàn thành bước học này.", 409);
     }
-    if (input.phase === "multiple_choice") {
-      const [selectedWord] = await tx
-        .select({ id: studySessionWords.id })
-        .from(studySessionWords)
-        .where(
-          and(
-            eq(studySessionWords.sessionId, input.sessionId),
-            eq(studySessionWords.wordId, input.selectedWordId!),
-          ),
-        )
-        .limit(1);
-      if (!selectedWord) {
-        throw new StudyServiceError("Đáp án không thuộc phiên học.", 400);
-      }
-    }
 
-    const now = new Date();
     const grading = evaluateStudyAnswer({
-      phase: input.phase,
+      phase: "typing",
       wordId: input.wordId,
       term: sessionWord.term,
       translation: sessionWord.translation,
-      selectedWordId: input.selectedWordId,
       answer: input.answer,
     });
-    const correct = grading.isCorrect;
+    if (!grading.isCorrect) {
+      throw new StudyServiceError("Đáp án nhập từ chưa chính xác.", 409);
+    }
+
+    const now = new Date();
+    const correctAttemptCount = session.mode === "learn" ? 2 : 1;
+    const attemptCount = correctAttemptCount + input.incorrectAttemptCount;
 
     await tx.insert(studyAttempts).values({
       id: input.eventId,
       sessionWordId: sessionWord.id,
-      phase: input.phase,
-      answerNormalized:
-        input.phase === "typing" ? normalizeAnswer(input.answer ?? "") : null,
-      selectedWordId: input.phase === "multiple_choice" ? input.selectedWordId : null,
-      isCorrect: correct ? 1 : 0,
+      phase: "typing",
+      answerNormalized: normalizeAnswer(input.answer),
+      isCorrect: 1,
       attemptedAt: now,
     });
+    await tx
+      .update(studySessionWords)
+      .set({
+        flashcardCompletedAt: now,
+        multipleChoiceCompletedAt: session.mode === "learn" ? now : undefined,
+        typingCompletedAt: now,
+        completedAt: now,
+        correctAttemptCount: sql`${studySessionWords.correctAttemptCount} + ${correctAttemptCount}`,
+        incorrectAttemptCount: sql`${studySessionWords.incorrectAttemptCount} + ${input.incorrectAttemptCount}`,
+        hadIncorrectAttempt: input.incorrectAttemptCount > 0 ? 1 : 0,
+        lastIncorrectAt: input.incorrectAttemptCount > 0 ? now : undefined,
+        updatedAt: now,
+      })
+      .where(eq(studySessionWords.id, sessionWord.id));
+    await tx
+      .update(studySessions)
+      .set({
+        phase: "typing",
+        attemptCount: sql`${studySessions.attemptCount} + ${attemptCount}`,
+        correctCount: sql`${studySessions.correctCount} + ${correctAttemptCount}`,
+        incorrectCount: sql`${studySessions.incorrectCount} + ${input.incorrectAttemptCount}`,
+        lastActivityAt: now,
+        updatedAt: now,
+      })
+      .where(eq(studySessions.id, session.id));
 
-    if (input.phase === "flashcard") {
+    const [progress] = await tx
+      .select()
+      .from(wordProgress)
+      .where(and(eq(wordProgress.userId, userId), eq(wordProgress.wordId, input.wordId)))
+      .limit(1);
+
+    if (session.mode === "learn") {
+      const schedule = scheduleLearnedWord(now);
       await tx
-        .update(studySessionWords)
-        .set({ flashcardCompletedAt: now, updatedAt: now })
-        .where(eq(studySessionWords.id, sessionWord.id));
-    } else {
-      await tx
-        .update(studySessionWords)
-        .set({
-          correctAttemptCount: correct
-            ? sql`${studySessionWords.correctAttemptCount} + 1`
-            : studySessionWords.correctAttemptCount,
-          incorrectAttemptCount: correct
-            ? studySessionWords.incorrectAttemptCount
-            : sql`${studySessionWords.incorrectAttemptCount} + 1`,
-          hadIncorrectAttempt: correct ? studySessionWords.hadIncorrectAttempt : 1,
-          lastIncorrectAt: correct ? undefined : now,
-          multipleChoiceCompletedAt:
-            input.phase === "multiple_choice" && correct ? now : undefined,
-          typingCompletedAt: input.phase === "typing" && correct ? now : undefined,
-          completedAt: input.phase === "typing" && correct ? now : undefined,
-          updatedAt: now,
+        .insert(wordProgress)
+        .values({
+          userId,
+          wordId: input.wordId,
+          status: schedule.status,
+          mastery: 25,
+          learnedAt: now,
+          reviewStage: schedule.reviewStage,
+          intervalDays: schedule.intervalDays,
+          correctCount: 1,
+          lastReviewedAt: now,
+          nextReviewAt: schedule.nextReviewAt,
         })
-        .where(eq(studySessionWords.id, sessionWord.id));
-
-      await tx
-        .update(studySessions)
-        .set({
-          attemptCount: sql`${studySessions.attemptCount} + 1`,
-          correctCount: correct
-            ? sql`${studySessions.correctCount} + 1`
-            : studySessions.correctCount,
-          incorrectCount: correct
-            ? studySessions.incorrectCount
-            : sql`${studySessions.incorrectCount} + 1`,
-          lastActivityAt: now,
-          updatedAt: now,
-        })
-        .where(eq(studySessions.id, session.id));
-    }
-
-    if (input.phase === "typing") {
-      const [progress] = await tx
-        .select()
-        .from(wordProgress)
-        .where(and(eq(wordProgress.userId, userId), eq(wordProgress.wordId, input.wordId)))
-        .limit(1);
-
-      if (!correct && session.mode === "review" && progress) {
-        const schedule = scheduleIncorrectReview(now);
-        await tx
-          .update(wordProgress)
-          .set({
+        .onConflictDoUpdate({
+          target: [wordProgress.userId, wordProgress.wordId],
+          set: {
             status: schedule.status,
+            mastery: 25,
+            learnedAt: now,
             reviewStage: schedule.reviewStage,
             intervalDays: schedule.intervalDays,
+            correctCount: sql`${wordProgress.correctCount} + 1`,
+            lastReviewedAt: now,
             nextReviewAt: schedule.nextReviewAt,
             reviewCompletedAt: null,
-            incorrectCount: sql`${wordProgress.incorrectCount} + 1`,
-            lastReviewedAt: now,
             updatedAt: now,
-          })
-          .where(eq(wordProgress.id, progress.id));
-      }
-
-      if (correct) {
-        if (session.mode === "learn") {
-          const schedule = scheduleLearnedWord(now);
-          await tx
-            .insert(wordProgress)
-            .values({
-              userId: userId,
-              wordId: input.wordId,
-              status: schedule.status,
-              mastery: 25,
-              learnedAt: now,
-              reviewStage: schedule.reviewStage,
-              intervalDays: schedule.intervalDays,
-              correctCount: 1,
-              lastReviewedAt: now,
-              nextReviewAt: schedule.nextReviewAt,
-            })
-            .onConflictDoUpdate({
-              target: [wordProgress.userId, wordProgress.wordId],
-              set: {
-                status: schedule.status,
-                mastery: 25,
-                learnedAt: now,
-                reviewStage: schedule.reviewStage,
-                intervalDays: schedule.intervalDays,
-                correctCount: sql`${wordProgress.correctCount} + 1`,
-                lastReviewedAt: now,
-                nextReviewAt: schedule.nextReviewAt,
-                reviewCompletedAt: null,
-                updatedAt: now,
-              },
-            });
-          await tx
-            .update(studySessions)
-            .set({
-              learnedCount: sql`${studySessions.learnedCount} + 1`,
-              reviewedCount: sql`${studySessions.reviewedCount} + 1`,
-              xpEarned: sql`${studySessions.xpEarned} + 15`,
-            })
-            .where(eq(studySessions.id, session.id));
-          await updateDailyActivity(tx, userId, now, {
-            learned: 1,
-            reviewed: 0,
-            correct: 1,
-            xp: 15,
-          });
-        } else if (progress) {
-          const schedule = scheduleCorrectReview(
-            progress.reviewStage as ReviewStage,
-            sessionWord.hadIncorrectAttempt === 1,
-            now,
-          );
-          await tx
-            .update(wordProgress)
-            .set({
-              status: schedule.status,
-              mastery: schedule.reviewStage === 3 ? 100 : 25 + schedule.reviewStage * 25,
-              reviewStage: schedule.reviewStage,
-              intervalDays: schedule.intervalDays,
-              correctCount: sql`${wordProgress.correctCount} + 1`,
-              lastReviewedAt: now,
-              nextReviewAt: schedule.nextReviewAt,
-              reviewCompletedAt: schedule.reviewCompletedAt,
-              updatedAt: now,
-            })
-            .where(eq(wordProgress.id, progress.id));
-          await tx
-            .update(studySessions)
-            .set({
-              reviewedCount: sql`${studySessions.reviewedCount} + 1`,
-              xpEarned: sql`${studySessions.xpEarned} + 10`,
-            })
-            .where(eq(studySessions.id, session.id));
-          await updateDailyActivity(tx, userId, now, {
-            learned: 0,
-            reviewed: 1,
-            correct: 1,
-            xp: 10,
-          });
-        }
-      }
-    }
-
-    const completionColumn =
-      input.phase === "flashcard"
-        ? studySessionWords.flashcardCompletedAt
-        : input.phase === "multiple_choice"
-          ? studySessionWords.multipleChoiceCompletedAt
-          : studySessionWords.typingCompletedAt;
-    const [{ remaining }] = await tx
-      .select({ remaining: sql<number>`count(*) filter (where ${completionColumn} is null)::int` })
-      .from(studySessionWords)
-      .where(eq(studySessionWords.sessionId, session.id));
-
-    if (remaining === 0) {
-      const nextPhase =
-        session.mode === "learn" && input.phase === "flashcard"
-          ? "multiple_choice"
-          : session.mode === "learn" && input.phase === "multiple_choice"
-            ? "typing"
-            : null;
+          },
+        });
       await tx
         .update(studySessions)
         .set({
-          phase: nextPhase,
-          status: nextPhase ? "active" : "completed",
-          completedAt: nextPhase ? null : now,
-          durationSeconds: nextPhase
-            ? studySessions.durationSeconds
-            : sql`greatest(1, extract(epoch from (${now.toISOString()}::timestamptz - ${studySessions.startedAt}))::integer)`,
+          learnedCount: sql`${studySessions.learnedCount} + 1`,
+          reviewedCount: sql`${studySessions.reviewedCount} + 1`,
+          xpEarned: sql`${studySessions.xpEarned} + 15`,
+        })
+        .where(eq(studySessions.id, session.id));
+      await updateDailyActivity(tx, userId, now, {
+        learned: 1,
+        reviewed: 0,
+        correct: 1,
+        xp: 15,
+      });
+    } else if (progress) {
+      const schedule = scheduleCorrectReview(
+        progress.reviewStage as ReviewStage,
+        input.incorrectAttemptCount > 0,
+        now,
+      );
+      await tx
+        .update(wordProgress)
+        .set({
+          status: schedule.status,
+          mastery: schedule.reviewStage === 3 ? 100 : 25 + schedule.reviewStage * 25,
+          reviewStage: schedule.reviewStage,
+          intervalDays: schedule.intervalDays,
+          correctCount: sql`${wordProgress.correctCount} + 1`,
+          incorrectCount: sql`${wordProgress.incorrectCount} + ${input.incorrectAttemptCount}`,
+          lastReviewedAt: now,
+          nextReviewAt: schedule.nextReviewAt,
+          reviewCompletedAt: schedule.reviewCompletedAt,
+          updatedAt: now,
+        })
+        .where(eq(wordProgress.id, progress.id));
+      await tx
+        .update(studySessions)
+        .set({
+          reviewedCount: sql`${studySessions.reviewedCount} + 1`,
+          xpEarned: sql`${studySessions.xpEarned} + 10`,
+        })
+        .where(eq(studySessions.id, session.id));
+      await updateDailyActivity(tx, userId, now, {
+        learned: 0,
+        reviewed: 1,
+        correct: 1,
+        xp: 10,
+      });
+    }
+
+    const [{ remaining }] = await tx
+      .select({
+        remaining: sql<number>`count(*) filter (where ${studySessionWords.typingCompletedAt} is null)::int`,
+      })
+      .from(studySessionWords)
+      .where(eq(studySessionWords.sessionId, session.id));
+    const sessionCompleted = remaining === 0;
+    if (sessionCompleted) {
+      await tx
+        .update(studySessions)
+        .set({
+          phase: null,
+          status: "completed",
+          completedAt: now,
+          durationSeconds: sql`greatest(1, extract(epoch from (${now.toISOString()}::timestamptz - ${studySessions.startedAt}))::integer)`,
           lastActivityAt: now,
           updatedAt: now,
         })
@@ -588,14 +470,14 @@ export async function submitStudyEvent(
     }
 
     return {
-      session: await getStudySession(tx, session.id, userId),
       result: {
         eventId: input.eventId,
         wordId: input.wordId,
-        phase: input.phase,
-        isCorrect: grading.isCorrect,
+        phase: "typing",
+        isCorrect: true,
         expectedAnswer: grading.expectedAnswer,
       },
+      sessionCompleted,
     } satisfies SubmitStudyEventResult;
   });
 }

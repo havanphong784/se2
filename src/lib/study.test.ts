@@ -3,6 +3,7 @@ import test from "node:test";
 
 import {
   addDays,
+  applyStudyResult,
   compareReviewPriority,
   createMultipleChoiceOptions,
   evaluateStudyAnswer,
@@ -20,6 +21,7 @@ import {
   selectDueWords,
   selectNewWords,
   summarizeSession,
+  type StudySessionDto,
   type StudyWord,
 } from "./study";
 
@@ -199,6 +201,71 @@ test("multiple choice options are stable, distinct, and session-scoped", () => {
   assert.equal(first.length, 4);
   assert.equal(first.filter((item) => item.id === target.id).length, 1);
   assert.equal(new Set(first.map((item) => normalizeAnswer(item.translation))).size, 4);
+});
+
+test("local study results complete all phases and preserve incorrect attempts", () => {
+  const session: StudySessionDto = {
+    id: "session-1",
+    mode: "learn",
+    status: "active",
+    phase: "flashcard",
+    requestedSize: 10,
+    selectedSize: 1,
+    learnedCount: 0,
+    reviewedCount: 0,
+    attemptCount: 0,
+    incorrectCount: 0,
+    words: [
+      {
+        id: "word-1",
+        position: 0,
+        term: "hello",
+        translation: "xin chào",
+        phonetic: "",
+        partOfSpeech: [],
+        exampleSentence: "",
+        exampleTranslation: "",
+        flashcardCompleted: false,
+        multipleChoiceCompleted: false,
+        typingCompleted: false,
+        hadIncorrectAttempt: false,
+        incorrectAttemptCount: 0,
+      },
+    ],
+  };
+  const event = (phase: "flashcard" | "multiple_choice" | "typing", isCorrect: boolean) => ({
+    eventId: `${phase}-${isCorrect}`,
+    wordId: "word-1",
+    phase,
+    isCorrect,
+    expectedAnswer: "hello",
+  });
+
+  const afterFlashcard = applyStudyResult(session, event("flashcard", true));
+  assert.equal(afterFlashcard.phase, "multiple_choice");
+  assert.equal(afterFlashcard.attemptCount, 0);
+
+  const afterWrongChoice = applyStudyResult(
+    afterFlashcard,
+    event("multiple_choice", false),
+  );
+  assert.equal(afterWrongChoice.phase, "multiple_choice");
+  assert.equal(afterWrongChoice.words[0].incorrectAttemptCount, 1);
+
+  const afterChoice = applyStudyResult(
+    afterWrongChoice,
+    event("multiple_choice", true),
+  );
+  assert.equal(afterChoice.phase, "typing");
+
+  const afterWrongTyping = applyStudyResult(afterChoice, event("typing", false));
+  const completed = applyStudyResult(afterWrongTyping, event("typing", true));
+  assert.equal(completed.status, "completed");
+  assert.equal(completed.phase, null);
+  assert.equal(completed.learnedCount, 1);
+  assert.equal(completed.attemptCount, 4);
+  assert.equal(completed.incorrectCount, 2);
+  assert.equal(completed.words[0].incorrectAttemptCount, 2);
 });
 
 test("review schedule advances through 3, 7, and 30 day cycle", () => {

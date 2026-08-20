@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
+import { FormEvent, MouseEvent, useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -9,7 +9,6 @@ import {
   Check,
   CheckCircle2,
   Headphones,
-  Lightbulb,
   Sprout,
   Volume2,
   VolumeX,
@@ -19,26 +18,25 @@ import {
 
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import type { VocabularyDeck } from "@/lib/demo-data";
 import {
+  applyStudyResult,
   createMultipleChoiceOptions,
+  evaluateStudyAnswer,
   getStudyShortcutAction,
   getStudySpeechSpeed,
   highlightTermInExample,
   moveFirstToEnd,
   type SessionSize,
+  type StudyEventResult,
   type StudyMode,
   type StudyPhase,
+  type StudySessionDto,
 } from "@/lib/study";
 import { cancelEnglishSpeech, canSpeakEnglish, speakEnglish } from "@/lib/speech";
-import type {
-  StudyEventResult,
-  StudySessionDto,
-  SubmitStudyEventResult,
-} from "@/lib/study-service";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/auth-provider";
 import { useInvalidateAuthData } from "@/lib/hooks/use-queries";
@@ -52,6 +50,15 @@ type EventPayload = {
   selectedWordId?: string;
   answer?: string;
 };
+
+type CompletionPayload = {
+  eventId: string;
+  wordId: string;
+  answer: string;
+  incorrectAttemptCount: number;
+};
+
+type PendingWrite = CompletionPayload & { failed: boolean };
 
 type Feedback = {
   result: StudyEventResult;
@@ -81,12 +88,11 @@ async function readSessionJson(response: Response) {
   return result.session;
 }
 
-async function readEventJson(response: Response) {
-  const result = (await response.json()) as Partial<SubmitStudyEventResult> & { message?: string };
-  if (!response.ok || !result.session || !result.result) {
+async function ensureEventSaved(response: Response) {
+  const result = (await response.json()) as { result?: StudyEventResult; message?: string };
+  if (!response.ok || !result.result) {
     throw new Error(result.message ?? "Không thể lưu câu trả lời.");
   }
-  return result as SubmitStudyEventResult;
 }
 
 export function StudySession({ mode, deck }: { mode: StudyMode; deck?: VocabularyDeck }) {
@@ -98,7 +104,7 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
   const [flashcardIndex, setFlashcardIndex] = useState(0);
   const [answer, setAnswer] = useState("");
   const [feedback, setFeedback] = useState<Feedback | null>(null);
-  const [pendingEvent, setPendingEvent] = useState<EventPayload | null>(null);
+  const [pendingWrites, setPendingWrites] = useState<PendingWrite[]>([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [autoSpeakEnabled, setAutoSpeakEnabled] = useState(
@@ -130,6 +136,7 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
     [currentWord, session],
   );
   const actionLockRef = useRef(false);
+  const completionInvalidatedRef = useRef(false);
 
   useEffect(
     () => () => {
@@ -158,6 +165,24 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
     if (!saving) actionLockRef.current = false;
   }, [saving]);
 
+  useEffect(() => {
+    if (pendingWrites.length === 0) return;
+    const preventUnload = (event: BeforeUnloadEvent) => event.preventDefault();
+    window.addEventListener("beforeunload", preventUnload);
+    return () => window.removeEventListener("beforeunload", preventUnload);
+  }, [pendingWrites.length]);
+
+  useEffect(() => {
+    if (
+      session?.status === "completed" &&
+      pendingWrites.length === 0 &&
+      !completionInvalidatedRef.current
+    ) {
+      completionInvalidatedRef.current = true;
+      invalidateAuthData();
+    }
+  }, [invalidateAuthData, pendingWrites.length, session?.status]);
+
   const handleShortcut = useEffectEvent((event: KeyboardEvent) => {
     if (
       !session ||
@@ -165,8 +190,6 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
       session.status !== "active" ||
       !currentWord ||
       saving ||
-      error ||
-      pendingEvent ||
       actionLockRef.current ||
       event.defaultPrevented ||
       event.repeat ||
@@ -197,12 +220,18 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
       setFlashcardIndex((index) => Math.max(0, index - 1));
     } else if (action.type === "next-flashcard") {
       actionLockRef.current = true;
-      void nextFlashcard();
+      nextFlashcard();
+      requestAnimationFrame(() => {
+        actionLockRef.current = false;
+      });
     } else if (action.type === "choose-option") {
       const option = options[action.optionIndex];
       if (!option) return;
       actionLockRef.current = true;
       chooseOption(option.id);
+      requestAnimationFrame(() => {
+        actionLockRef.current = false;
+      });
     } else if (action.type === "continue-feedback") {
       actionLockRef.current = true;
       continueAfterFeedback();
@@ -270,67 +299,88 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
     }
   }
 
-  async function sendEvent(payload: EventPayload) {
+  async function sendCompletion(payload: CompletionPayload) {
     if (!session) throw new Error("Phiên học chưa bắt đầu.");
     const response = await authFetch(`/api/study-sessions/${session.id}/events`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
+      keepalive: true,
     });
-    return readEventJson(response);
+    await ensureEventSaved(response);
   }
 
-  async function nextFlashcard() {
-    if (!session || !currentWord || saving || feedback) return;
-    if (currentWord.flashcardCompleted) {
-      setError(null);
-      setFlashcardIndex((index) => Math.min(index + 1, session.words.length - 1));
-      return;
-    }
-    setSaving(true);
-    setError(null);
-    try {
-      const submitted = await sendEvent({
-        eventId: crypto.randomUUID(),
-        wordId: currentWord.id,
-        phase: "flashcard",
+  function saveCompletion(payload: CompletionPayload) {
+    setPendingWrites((items) => [
+      ...items.filter((item) => item.eventId !== payload.eventId),
+      { ...payload, failed: false },
+    ]);
+    void sendCompletion(payload)
+      .then(() => {
+        setPendingWrites((items) => items.filter((item) => item.eventId !== payload.eventId));
+      })
+      .catch((caught) => {
+        setPendingWrites((items) =>
+          items.map((item) =>
+            item.eventId === payload.eventId ? { ...item, failed: true } : item,
+          ),
+        );
+        setError(caught instanceof Error ? caught.message : "Không thể lưu câu trả lời.");
       });
-      setSession(submitted.session);
-      if (submitted.session.phase === "multiple_choice") resetQueue(submitted.session);
-      else setFlashcardIndex((index) => Math.min(index + 1, session.words.length - 1));
-    } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Không thể lưu bước học.");
-    } finally {
-      setSaving(false);
-    }
   }
 
-  async function submitAnswer(payload: EventPayload) {
-    setSaving(true);
+  function nextFlashcard() {
+    if (!session || !currentWord || feedback) return;
+    const result: StudyEventResult = {
+      eventId: crypto.randomUUID(),
+      wordId: currentWord.id,
+      phase: "flashcard",
+      isCorrect: true,
+      expectedAnswer: currentWord.translation,
+    };
+    const nextSession = applyStudyResult(session, result);
+    setSession(nextSession);
     setError(null);
-    setPendingEvent(payload);
-    try {
-      const submitted = await sendEvent(payload);
-      setFeedback({
-        result: submitted.result,
-        nextSession: submitted.session,
-        selectedWordId: payload.selectedWordId,
-        submittedAnswer: payload.answer,
+    if (nextSession.phase === "multiple_choice") resetQueue(nextSession);
+    else setFlashcardIndex((index) => Math.min(index + 1, session.words.length - 1));
+  }
+
+  function submitAnswer(payload: EventPayload) {
+    if (!session || !currentWord) return;
+    const grading = evaluateStudyAnswer({
+      phase: payload.phase,
+      wordId: currentWord.id,
+      term: currentWord.term,
+      translation: currentWord.translation,
+      selectedWordId: payload.selectedWordId,
+      answer: payload.answer,
+    });
+    const result: StudyEventResult = { ...payload, ...grading };
+    const nextSession = applyStudyResult(session, result);
+    setFeedback({
+      result,
+      nextSession,
+      selectedWordId: payload.selectedWordId,
+      submittedAnswer: payload.answer,
+    });
+    setError(null);
+    if (payload.phase === "typing" && autoSpeakEnabled) {
+      speakEnglish(result.expectedAnswer, "normal");
+    }
+    if (payload.phase === "typing" && result.isCorrect) {
+      saveCompletion({
+        eventId: payload.eventId,
+        wordId: payload.wordId,
+        answer: payload.answer ?? "",
+        incorrectAttemptCount:
+          nextSession.words.find((word) => word.id === payload.wordId)?.incorrectAttemptCount ?? 0,
       });
-      setPendingEvent(null);
-      if (payload.phase === "typing" && autoSpeakEnabled) {
-        speakEnglish(submitted.result.expectedAnswer, "normal");
-      }
-    } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Không thể lưu câu trả lời.");
-    } finally {
-      setSaving(false);
     }
   }
 
   function chooseOption(selectedWordId: string) {
-    if (!currentWord || saving || error || feedback) return;
-    void submitAnswer({
+    if (!currentWord || saving || feedback) return;
+    submitAnswer({
       eventId: crypto.randomUUID(),
       wordId: currentWord.id,
       phase: "multiple_choice",
@@ -341,7 +391,7 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
   function submitTyping(event: FormEvent) {
     event.preventDefault();
     if (!currentWord || !answer.trim() || saving || feedback) return;
-    void submitAnswer({
+    submitAnswer({
       eventId: crypto.randomUUID(),
       wordId: currentWord.id,
       phase: "typing",
@@ -350,7 +400,7 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
   }
 
   function continueAfterFeedback() {
-    if (!feedback || saving || error) return;
+    if (!feedback || saving) return;
     const { nextSession, result } = feedback;
     setSession(nextSession);
     setFeedback(null);
@@ -358,7 +408,6 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
     setAnswer("");
 
     if (nextSession.status === "completed") {
-      invalidateAuthData();
       setQueue([]);
       return;
     }
@@ -371,8 +420,13 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
     });
   }
 
-  function closeSession() {
+  function closeSession(event: MouseEvent<HTMLAnchorElement>) {
     if (!session || session.status !== "active") return;
+    if (pendingWrites.length > 0) {
+      event.preventDefault();
+      setError("Đang lưu kết quả. Hãy thử lại sau giây lát.");
+      return;
+    }
     cancelEnglishSpeech();
     void authFetch(`/api/study-sessions/${session.id}/abandon`, {
       method: "POST",
@@ -406,6 +460,38 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
             <Button size="lg" className="mt-7 w-full" onClick={() => void start()} disabled={saving}>Bắt đầu <ArrowRight /></Button>
             {error && <p className="mt-3 text-sm font-bold text-[#c43e3e]">{error}</p>}
             <Link href={deck ? `/vocabulary/${deck.slug}` : "/vocabulary"} className={buttonVariants({ variant: "ghost", className: "mt-3" })}><ArrowLeft /> Quay lại</Link>
+          </CardContent>
+        </Card>
+      </main>
+    );
+  }
+
+  if (session.status === "completed" && pendingWrites.length > 0) {
+    const failedWrites = pendingWrites.filter((item) => item.failed);
+    return (
+      <main className="grid min-h-svh place-items-center bg-[linear-gradient(180deg,#f8fff3_0%,#ffffff_55%)] px-5 text-center">
+        <Card className="w-full max-w-xl border-eel-light">
+          <CardContent className="p-8 md:p-10">
+            <h1 className="font-display text-3xl font-extrabold text-eel-dark-blue">
+              {failedWrites.length ? "Chưa lưu được kết quả" : "Đang lưu kết quả…"}
+            </h1>
+            <p className="mt-3 font-bold text-ash">
+              {failedWrites.length
+                ? "Giữ trang này mở và thử lại để không mất tiến độ."
+                : `Còn ${pendingWrites.length} từ đang được lưu.`}
+            </p>
+            {failedWrites.length > 0 && (
+              <Button
+                size="lg"
+                className="mt-6"
+                onClick={() => {
+                  setError(null);
+                  failedWrites.forEach(saveCompletion);
+                }}
+              >
+                Thử lại
+              </Button>
+            )}
           </CardContent>
         </Card>
       </main>
@@ -582,7 +668,7 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
                   size="default"
                   className="w-full"
                   disabled={saving}
-                  onClick={() => void nextFlashcard()}
+                  onClick={nextFlashcard}
                   aria-keyshortcuts="ArrowRight"
                 >
                   <span>{flashcardIndex === session.words.length - 1 ? "Trắc nghiệm" : "Tiếp theo"}</span>
@@ -855,11 +941,6 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
       {error && (
         <div className="mx-auto mt-5 w-full max-w-xl rounded-xl border-2 border-[#ffb4b4] bg-[#fff7f7] p-4 text-center font-bold text-[#c43e3e]" role="alert">
           <p>{error}</p>
-          {pendingEvent && (
-            <Button type="button" variant="danger" size="sm" className="mt-3" disabled={saving} onClick={() => void submitAnswer(pendingEvent)}>
-              Thử lại
-            </Button>
-          )}
         </div>
       )}
 
