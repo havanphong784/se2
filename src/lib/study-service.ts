@@ -12,6 +12,7 @@ import {
 } from "@/db/schema";
 import { vnDateKey, vnDateKeyOffset } from "@/lib/utils";
 import {
+  getPersistedAttemptCounts,
   isTypingAnswerCorrect,
   normalizeAnswer,
   scheduleCorrectReview,
@@ -300,7 +301,7 @@ export async function submitStudyEvent(
     }
 
     const now = new Date();
-    const correctAttemptCount = correct ? (session.mode === "learn" ? 2 : 1) : 0;
+    const counts = getPersistedAttemptCounts(session.mode as StudyMode, correct);
 
     await tx.insert(studyAttempts).values({
       id: input.eventId,
@@ -317,7 +318,7 @@ export async function submitStudyEvent(
         multipleChoiceCompletedAt: correct && session.mode === "learn" ? now : undefined,
         typingCompletedAt: now,
         completedAt: now,
-        correctAttemptCount: sql`${studySessionWords.correctAttemptCount} + ${correctAttemptCount}`,
+        correctAttemptCount: sql`${studySessionWords.correctAttemptCount} + ${counts.correct}`,
         incorrectAttemptCount: correct
           ? studySessionWords.incorrectAttemptCount
           : sql`${studySessionWords.incorrectAttemptCount} + 1`,
@@ -330,8 +331,8 @@ export async function submitStudyEvent(
       .update(studySessions)
       .set({
         phase: "typing",
-        attemptCount: sql`${studySessions.attemptCount} + 1`,
-        correctCount: sql`${studySessions.correctCount} + ${correctAttemptCount}`,
+        attemptCount: sql`${studySessions.attemptCount} + ${counts.attempts}`,
+        correctCount: sql`${studySessions.correctCount} + ${counts.correct}`,
         incorrectCount: correct
           ? studySessions.incorrectCount
           : sql`${studySessions.incorrectCount} + 1`,

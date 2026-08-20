@@ -135,6 +135,7 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
     [currentWord, session],
   );
   const actionLockRef = useRef(false);
+  const writeChainRef = useRef<Promise<void>>(Promise.resolve());
   const completionInvalidatedRef = useRef(false);
 
   useEffect(
@@ -309,7 +310,9 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
       ...items.filter((item) => item.eventId !== payload.eventId),
       { ...payload, failed: false },
     ]);
-    void sendCompletion(payload)
+    const request = writeChainRef.current.then(() => sendCompletion(payload));
+    writeChainRef.current = request;
+    void request
       .then(() => {
         setPendingWrites((items) => items.filter((item) => item.eventId !== payload.eventId));
       })
@@ -321,6 +324,31 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
         );
         setError(caught instanceof Error ? caught.message : "Không thể lưu câu trả lời.");
       });
+  }
+
+  async function retryFailedWrites(items: PendingWrite[]) {
+    setError(null);
+    for (const item of items) {
+      setPendingWrites((pending) =>
+        pending.map((entry) =>
+          entry.eventId === item.eventId ? { ...entry, failed: false } : entry,
+        ),
+      );
+      try {
+        await sendCompletion(item);
+        setPendingWrites((pending) =>
+          pending.filter((entry) => entry.eventId !== item.eventId),
+        );
+      } catch (caught) {
+        setPendingWrites((pending) =>
+          pending.map((entry) =>
+            entry.eventId === item.eventId ? { ...entry, failed: true } : entry,
+          ),
+        );
+        setError(caught instanceof Error ? caught.message : "Không thể lưu câu trả lời.");
+        break;
+      }
+    }
   }
 
   function nextFlashcard() {
@@ -483,10 +511,7 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
               <Button
                 size="lg"
                 className="mt-6"
-                onClick={() => {
-                  setError(null);
-                  failedWrites.forEach(saveCompletion);
-                }}
+                onClick={() => void retryFailedWrites(failedWrites)}
               >
                 Thử lại
               </Button>

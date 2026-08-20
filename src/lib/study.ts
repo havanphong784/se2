@@ -426,6 +426,11 @@ export function scheduleCorrectReview(
   };
 }
 
+export function getPersistedAttemptCounts(mode: StudyMode, isCorrect: boolean) {
+  const correct = isCorrect ? (mode === "learn" ? 2 : 1) : 0;
+  return { correct, attempts: correct + Number(!isCorrect) };
+}
+
 export function summarizeSession({
   selectedCount,
   completedCount,
