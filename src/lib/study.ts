@@ -276,6 +276,8 @@ export function evaluateStudyAnswer({
 }
 
 export function applyStudyResult(session: StudySessionDto, result: StudyEventResult) {
+  const firstAttempt =
+    session.words.find((word) => word.id === result.wordId)?.incorrectAttemptCount === 0;
   const completionKey =
     result.phase === "flashcard"
       ? "flashcardCompleted"
@@ -310,7 +312,13 @@ export function applyStudyResult(session: StudySessionDto, result: StudyEventRes
     learnedCount:
       session.learnedCount + Number(result.phase === "typing" && result.isCorrect && session.mode === "learn"),
     reviewedCount:
-      session.reviewedCount + Number(result.phase === "typing" && result.isCorrect && session.mode === "review"),
+      session.reviewedCount +
+      Number(
+        result.phase === "typing" &&
+          result.isCorrect &&
+          session.mode === "review" &&
+          firstAttempt,
+      ),
     attemptCount: session.attemptCount + Number(countsAsAttempt),
     incorrectCount:
       session.incorrectCount + Number(countsAsAttempt && !result.isCorrect),
