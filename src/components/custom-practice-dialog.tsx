@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { createPortal } from "react-dom";
 import {
   ArrowRight,
   Brain,
@@ -103,7 +104,7 @@ export function CustomPracticeDialog({
         <RotateCcw className="size-5" /> Ôn từ mới học hôm nay ({totalToday})
       </Button>
 
-      {open && (
+      {open && createPortal(
         <div
           role="dialog"
           aria-modal="true"
@@ -259,7 +260,8 @@ export function CustomPracticeDialog({
               </Link>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </>
   );
