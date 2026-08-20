@@ -7,6 +7,7 @@ import {
   compareReviewPriority,
   createMultipleChoiceOptions,
   evaluateStudyAnswer,
+  getPersistedAttemptCounts,
   getStudyShortcutAction,
   getStudySpeechSpeed,
   getTodayStudyMinutes,
@@ -350,6 +351,12 @@ test("incorrect review and successful retry remain due tomorrow", () => {
     status: "learning",
   });
   assert.deepEqual(scheduleCorrectReview(2, true, now), scheduleIncorrectReview(now));
+});
+
+test("persisted attempt counts satisfy session count constraints", () => {
+  assert.deepEqual(getPersistedAttemptCounts("learn", true), { correct: 2, attempts: 2 });
+  assert.deepEqual(getPersistedAttemptCounts("review", true), { correct: 1, attempts: 1 });
+  assert.deepEqual(getPersistedAttemptCounts("review", false), { correct: 0, attempts: 1 });
 });
 
 test("session summary counts unique words separately from attempts", () => {
