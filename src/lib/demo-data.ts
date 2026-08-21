@@ -178,7 +178,7 @@ export const DEMO_STREAK: Streak = {
 
 export function deckProgress(deck: VocabularyDeck) {
   if (!deck.words || deck.words.length === 0) {
-    return { mastered: 0, learning: 0, fresh: 0, percent: 100 };
+    return { mastered: 0, learning: 0, learned: 0, fresh: 0, percent: 100, learnedPercent: 100 };
   }
   const mastered = deck.words.filter(
     (item) => item.status === "mastered" || Boolean(item.reviewCompletedAt),
@@ -186,12 +186,15 @@ export function deckProgress(deck: VocabularyDeck) {
   const learning = deck.words.filter(
     (item) => item.status !== "mastered" && !item.reviewCompletedAt && Boolean(item.learnedAt),
   ).length;
+  const learned = mastered + learning;
   const completed = mastered + learning * 0.5;
 
   return {
     mastered,
     learning,
-    fresh: deck.words.length - mastered - learning,
-    percent: deck.words.length === 0 ? 0 : Math.round((completed / deck.words.length) * 100),
+    learned,
+    fresh: deck.words.length - learned,
+    percent: Math.round((completed / deck.words.length) * 100),
+    learnedPercent: Math.round((learned / deck.words.length) * 100),
   };
 }

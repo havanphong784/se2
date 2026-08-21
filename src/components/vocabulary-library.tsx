@@ -110,7 +110,7 @@ export function VocabularyLibrary({ decks }: { decks: VocabularyDeck[] }) {
                         ? "border-lingot-lime border-b-[#8ed459] bg-white hover:border-ecto-green"
                         : "border-[#e5e5e5] border-b-[#dedede] bg-white hover:border-lingot-lime hover:border-b-[#8ed459]",
                   )}
-                  aria-label={`Bộ từ ${deck.title}, ${deck.words.length} từ, hoàn thành ${progress.percent}%`}
+                  aria-label={`Bộ từ ${deck.title}, ${deck.words.length} từ, đã học ${progress.learnedPercent}%, đã master ${progress.percent}%`}
                 >
                   <div>
                     {/* Header: Emoji Icon + Badges */}
@@ -150,16 +150,60 @@ export function VocabularyLibrary({ decks }: { decks: VocabularyDeck[] }) {
                   {/* Bottom: Progress or CTA */}
                   <div className="mt-5 border-t-2 border-[#f0f0f0] pt-3.5">
                     {isStarted ? (
-                      <div className="space-y-1.5">
-                        <div className="flex justify-between text-[11px] font-black">
-                          <span className="text-ash">
-                            Đã thuộc {progress.mastered}/{deck.words.length} từ
-                          </span>
-                          <span className="text-ecto-green tabular-nums font-black">
+                      <div className="flex items-end gap-3">
+                        <div className="min-w-0 flex-1 space-y-1.5">
+                          <div className="flex justify-between text-[11px] font-black">
+                            <span className="text-ash">
+                              Đã học {progress.learned}/{deck.words.length} từ
+                            </span>
+                            <span className="text-ecto-green tabular-nums">
+                              {progress.learnedPercent}%
+                            </span>
+                          </div>
+                          <Progress
+                            value={progress.learnedPercent}
+                            className="h-2"
+                            aria-label={`Đã học ${progress.learnedPercent}%`}
+                          />
+                        </div>
+                        <div
+                          className="relative size-9 shrink-0"
+                          role="progressbar"
+                          aria-label={`Đã master ${progress.mastered}/${deck.words.length} từ, ${progress.percent}%`}
+                          aria-valuemin={0}
+                          aria-valuemax={100}
+                          aria-valuenow={progress.percent}
+                          title={`Đã master ${progress.mastered}/${deck.words.length} từ`}
+                        >
+                          <svg
+                            className="size-full -rotate-90 text-macaw-blue"
+                            viewBox="0 0 36 36"
+                            aria-hidden="true"
+                          >
+                            <circle
+                              cx="18"
+                              cy="18"
+                              r="15"
+                              fill="none"
+                              stroke="var(--border)"
+                              strokeWidth="4"
+                            />
+                            <circle
+                              cx="18"
+                              cy="18"
+                              r="15"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                              strokeLinecap="round"
+                              pathLength="100"
+                              strokeDasharray={`${progress.percent} 100`}
+                            />
+                          </svg>
+                          <span className="absolute inset-0 grid place-items-center text-[9px] font-black text-macaw-blue tabular-nums">
                             {progress.percent}%
                           </span>
                         </div>
-                        <Progress value={progress.percent} className="h-2" />
                       </div>
                     ) : (
                       <div className="flex items-center justify-between text-xs font-black text-ecto-green">

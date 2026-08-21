@@ -1,8 +1,30 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { DEMO_DECKS } from "./demo-data";
+import { deckProgress, DEMO_DECKS, type VocabularyWord } from "./demo-data";
 import { getLearningData } from "./data";
+
+test("deck progress separates learned words from weighted mastery", () => {
+  const words: VocabularyWord[] = Array.from({ length: 4 }, (_, index) => ({
+    ...DEMO_DECKS[0].words[index % DEMO_DECKS[0].words.length],
+    id: `progress-${index}`,
+    status: "new",
+    learnedAt: null,
+    reviewCompletedAt: null,
+  }));
+
+  words[0] = { ...words[0], status: "mastered", reviewCompletedAt: "2026-08-21T00:00:00Z" };
+  words[1] = { ...words[1], status: "learning", learnedAt: "2026-08-21T00:00:00Z" };
+
+  assert.deepEqual(deckProgress({ ...DEMO_DECKS[0], words }), {
+    mastered: 1,
+    learning: 1,
+    learned: 2,
+    fresh: 2,
+    percent: 38,
+    learnedPercent: 50,
+  });
+});
 
 test("missing database configuration returns isolated demo data with metadata", async () => {
   const previousUrl = process.env.DATABASE_URL;
