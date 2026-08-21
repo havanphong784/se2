@@ -18,7 +18,7 @@ import {
 
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import type { VocabularyDeck, VocabularyWord } from "@/lib/demo-data";
@@ -36,14 +36,14 @@ import { cn } from "@/lib/utils";
 
 type CustomStudySessionProps = {
   deck?: VocabularyDeck;
-  wordsLearnedToday: VocabularyWord[];
+  practiceWords: VocabularyWord[];
   countParam?: string;
   typeParam?: string;
 };
 
 export function CustomStudySession({
   deck,
-  wordsLearnedToday,
+  practiceWords,
   countParam,
   typeParam,
 }: CustomStudySessionProps) {
@@ -55,7 +55,7 @@ export function CustomStudySession({
   const requestedCount = countParam === "all" ? "all" : parseInt(countParam ?? "10", 10) || 10;
 
   const [sessionWords] = useState<VocabularyWord[]>(() =>
-    selectRandomWords(wordsLearnedToday, requestedCount),
+    selectRandomWords(practiceWords, requestedCount),
   );
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -100,11 +100,11 @@ export function CustomStudySession({
         <Card className="w-full max-w-xl border-eel-light text-center p-8">
           <CardContent className="space-y-4">
             <h1 className="font-display text-2xl font-extrabold text-eel-dark-blue">
-              Chưa có từ mới học hôm nay
+              {deck ? "Chưa có từ đã học trong bộ này" : "Chưa có từ mới học hôm nay"}
             </h1>
             <p className="text-ash font-bold">
               {deck
-                ? `Bạn chưa học từ mới nào trong bộ “${deck.title}” hôm nay. Hãy học từ mới trước khi ôn tập!`
+                ? `Bạn chưa học từ nào trong bộ “${deck.title}”. Hãy học từ mới trước khi ôn tập!`
                 : "Bạn chưa học từ mới nào trong ngày hôm nay. Hãy học từ mới trước khi ôn tập!"}
             </p>
             <Link href={homeHref} className={buttonVariants({ size: "lg" })}>
@@ -133,7 +133,7 @@ export function CustomStudySession({
               Tự chọn • Không tính điểm
             </Badge>
             <h1 className="mt-4 font-display text-3xl font-extrabold text-eel-dark-blue">
-              Hoàn thành ôn tập từ mới học!
+              {deck ? "Hoàn thành ôn tập trong gói!" : "Hoàn thành ôn tập từ mới học!"}
             </h1>
             <p className="mt-3 font-bold leading-7 text-ash">
               Bạn đã ôn lại xong {sessionWords.length} từ{" "}

@@ -28,7 +28,7 @@ export default async function PracticePage({
     const wordsLearnedToday = allWords.filter((word) => isLearnedToday(word.learnedAt));
     return (
       <CustomStudySession
-        wordsLearnedToday={wordsLearnedToday}
+        practiceWords={wordsLearnedToday}
         countParam={params.count}
         typeParam={params.type}
       />
@@ -41,11 +41,11 @@ export default async function PracticePage({
   if (!deckResult.data) notFound();
 
   if (mode === "custom") {
-    const wordsLearnedToday = deckResult.data.words.filter((word) => isLearnedToday(word.learnedAt));
+    const learnedWords = deckResult.data.words.filter((word) => Boolean(word.learnedAt));
     return (
       <CustomStudySession
         deck={deckResult.data}
-        wordsLearnedToday={wordsLearnedToday}
+        practiceWords={learnedWords}
         countParam={params.count}
         typeParam={params.type}
       />

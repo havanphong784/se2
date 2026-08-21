@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { createPortal } from "react-dom";
 import {
   ArrowRight,
   Brain,
@@ -22,19 +23,18 @@ import { cn } from "@/lib/utils";
 
 type CustomPracticeDialogProps = {
   deck?: VocabularyDeck;
-  wordsLearnedToday: VocabularyWord[];
+  practiceWords: VocabularyWord[];
 };
 
 export function CustomPracticeDialog({
   deck,
-  wordsLearnedToday,
+  practiceWords,
 }: CustomPracticeDialogProps) {
   const [open, setOpen] = useState(false);
-  const totalToday = wordsLearnedToday.length;
-  // Cross-deck (deck === undefined): ôn TẤT CẢ từ học hôm nay ở mọi bộ, không gắn deck cụ thể.
+  const totalWords = practiceWords.length;
   const scopeLabel = deck ? deck.title : "Tất cả bộ từ vựng";
 
-  const countOptions = [5, 10, 15, 20].filter((c) => c < totalToday);
+  const countOptions = [5, 10, 15, 20].filter((c) => c < totalWords);
   const [selectedCount, setSelectedCount] = useState<number | "all">(
     countOptions[0] ?? "all",
   );
@@ -52,7 +52,7 @@ export function CustomPracticeDialog({
     }
   }, [open]);
 
-  if (totalToday === 0) {
+  if (totalWords === 0) {
     return (
       <Button
         variant="secondary"
@@ -60,7 +60,7 @@ export function CustomPracticeDialog({
         disabled
         className="w-full opacity-60 md:w-auto"
       >
-        <RotateCcw className="size-5" /> Ôn từ mới học (0)
+        <RotateCcw className="size-5" /> {deck ? "Ôn từ đã học (0)" : "Ôn từ mới học (0)"}
       </Button>
     );
   }
@@ -100,10 +100,10 @@ export function CustomPracticeDialog({
         onClick={() => setOpen(true)}
         className="w-full border-macaw-blue text-[#087db4] hover:bg-[#f5fbff] md:w-auto"
       >
-        <RotateCcw className="size-5" /> Ôn từ mới học hôm nay ({totalToday})
+        <RotateCcw className="size-5" /> {deck ? "Ôn từ đã học" : "Ôn từ mới học hôm nay"} ({totalWords})
       </Button>
 
-      {open && (
+      {open && createPortal(
         <div
           role="dialog"
           aria-modal="true"
@@ -132,18 +132,17 @@ export function CustomPracticeDialog({
                   Tự chọn • Không tính điểm
                 </Badge>
                 <h2 id="custom-practice-title" className="font-display text-2xl font-extrabold text-eel-dark-blue">
-                  Ôn lại từ mới học hôm nay
+                  {deck ? "Ôn tập từ đã học trong gói" : "Ôn lại từ mới học hôm nay"}
                 </h2>
               </div>
             </div>
 
             <p className="mt-3 text-sm font-bold text-ash">
               {deck ? (
-                <>Bộ từ: <strong className="text-charcoal">{scopeLabel}</strong> • </>
+                <>Bộ từ: <strong className="text-charcoal">{scopeLabel}</strong> • Có {totalWords} từ đã học.</>
               ) : (
-                <>Phạm vi: <strong className="text-charcoal">{scopeLabel}</strong> • </>
+                <>Phạm vi: <strong className="text-charcoal">{scopeLabel}</strong> • Có {totalWords} từ vừa học hôm nay.</>
               )}
-              Có {totalToday} từ vừa học hôm nay.
             </p>
 
             <div className="mt-6 space-y-5">
@@ -180,7 +179,7 @@ export function CustomPracticeDialog({
                         : "border-[#dedede] bg-white text-ash hover:border-macaw-blue",
                     )}
                   >
-                    Tất cả ({totalToday})
+                    Tất cả ({totalWords})
                   </button>
                 </div>
               </div>
@@ -238,7 +237,7 @@ export function CustomPracticeDialog({
               <div className="flex items-start gap-2.5 rounded-xl border-2 border-[#e5f3ff] bg-[#f5fbff] p-3 text-xs font-bold text-macaw-blue">
                 <Info className="mt-0.5 size-4 shrink-0" />
                 <span>
-                  Phiên ôn tập này chọn ngẫu nhiên các từ mới học hôm nay và{" "}
+                  Phiên ôn tập này chọn ngẫu nhiên {deck ? "các từ đã học trong gói" : "các từ mới học hôm nay"} và{" "}
                   <strong>không lưu dữ liệu hay tính điểm XP</strong>.
                 </span>
               </div>
@@ -259,7 +258,8 @@ export function CustomPracticeDialog({
               </Link>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </>
   );
