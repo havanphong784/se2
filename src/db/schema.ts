@@ -19,6 +19,7 @@ export const users = pgTable(
     email: text("email").notNull(),
     passwordHash: text("password_hash"),
     emailVerifiedAt: timestamp("email_verified_at", { withTimezone: true }),
+    authVersion: integer("auth_version").default(1).notNull(),
     displayName: text("display_name").notNull(),
     nativeLanguage: text("native_language").default("vi").notNull(),
     targetLanguage: text("target_language").default("en").notNull(),
@@ -48,6 +49,20 @@ export const emailVerificationTokens = pgTable(
     unique("email_verification_tokens_token_hash_unique").on(table.tokenHash),
     index("email_verification_tokens_user_id_idx").on(table.userId),
     index("email_verification_tokens_expires_at_idx").on(table.expiresAt),
+  ],
+).enableRLS();
+
+export const authRateLimits = pgTable(
+  "auth_rate_limits",
+  {
+    keyHash: text("key_hash").notNull(),
+    windowStartedAt: timestamp("window_started_at", { withTimezone: true }).notNull(),
+    attempts: integer("attempts").default(1).notNull(),
+  },
+  (table) => [
+    unique("auth_rate_limits_key_window_unique").on(table.keyHash, table.windowStartedAt),
+    index("auth_rate_limits_window_started_at_idx").on(table.windowStartedAt),
+    check("auth_rate_limits_attempts_check", sql`${table.attempts} > 0`),
   ],
 ).enableRLS();
 

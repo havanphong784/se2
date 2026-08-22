@@ -10,13 +10,20 @@ export type AuthUser = {
   displayName: string;
   email: string;
   emailVerifiedAt: Date | null;
+  authVersion: number;
 };
 
 type Db = NonNullable<ReturnType<typeof getDb>>;
 
 export async function getAuthUser(db: Db, userId: string): Promise<AuthUser | null> {
   const [user] = await db
-    .select({ id: users.id, displayName: users.displayName, email: users.email, emailVerifiedAt: users.emailVerifiedAt })
+    .select({
+      id: users.id,
+      displayName: users.displayName,
+      email: users.email,
+      emailVerifiedAt: users.emailVerifiedAt,
+      authVersion: users.authVersion,
+    })
     .from(users)
     .where(and(eq(users.id, userId), isNotNull(users.emailVerifiedAt)))
     .limit(1);
@@ -29,7 +36,8 @@ export async function requireAuth(request: Request, db: Db): Promise<AuthUser | 
 
   const claims = await verifyAccessToken(authorization.slice("Bearer ".length));
   if (!claims) return null;
-  return getAuthUser(db, claims.sub);
+  const user = await getAuthUser(db, claims.sub);
+  return user?.authVersion === claims.authVersion ? user : null;
 }
 
 export async function getCurrentAuthUser(db: Db): Promise<AuthUser | null> {

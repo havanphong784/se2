@@ -6,9 +6,11 @@ export const REFRESH_COOKIE_NAME = "vocabloom_refresh";
 
 const encoder = new TextEncoder();
 
-function secret(name: "JWT_ACCESS_SECRET" | "JWT_REFRESH_SECRET") {
-  const value = process.env[name];
-  if (!value) throw new Error(`${name} must be configured.`);
+function secret() {
+  const value = process.env.JWT_ACCESS_SECRET;
+  if (!value || encoder.encode(value).byteLength < 32 || value.startsWith("replace-with-")) {
+    throw new Error("JWT_ACCESS_SECRET must contain at least 32 non-placeholder bytes.");
+  }
   return encoder.encode(value);
 }
 
@@ -16,27 +18,34 @@ export type AccessTokenClaims = {
   sub: string;
   jti: string;
   type: "access";
+  authVersion: number;
 };
 
-export async function createAccessToken(userId: string) {
-  return new SignJWT({ type: "access" })
+export async function createAccessToken(userId: string, authVersion: number) {
+  return new SignJWT({ type: "access", authVersion })
     .setProtectedHeader({ alg: "HS256" })
     .setSubject(userId)
     .setJti(crypto.randomUUID())
     .setIssuedAt()
     .setExpirationTime(`${ACCESS_TOKEN_TTL_SECONDS}s`)
-    .sign(secret("JWT_ACCESS_SECRET"));
+    .sign(secret());
 }
 
 export async function verifyAccessToken(token: string): Promise<AccessTokenClaims | null> {
   try {
-    const { payload } = await jwtVerify(token, secret("JWT_ACCESS_SECRET"), {
+    const { payload } = await jwtVerify(token, secret(), {
       algorithms: ["HS256"],
     });
-    if (payload.type !== "access" || typeof payload.sub !== "string" || typeof payload.jti !== "string") {
+    if (
+      payload.type !== "access"
+      || typeof payload.sub !== "string"
+      || typeof payload.jti !== "string"
+      || typeof payload.authVersion !== "number"
+      || !Number.isSafeInteger(payload.authVersion)
+    ) {
       return null;
     }
-    return { sub: payload.sub, jti: payload.jti, type: "access" };
+    return { sub: payload.sub, jti: payload.jti, type: "access", authVersion: payload.authVersion };
   } catch {
     return null;
   }

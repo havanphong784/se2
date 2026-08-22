@@ -71,7 +71,7 @@ async function seed() {
   const topics = loadVocabularyFiles();
 
   await db.transaction(async (tx) => {
-    const defaultPasswordHash = hashPassword("12345678");
+    const defaultPasswordHash = await hashPassword("12345678");
 
     // 1. Upsert users
     const [demoUser] = await tx
