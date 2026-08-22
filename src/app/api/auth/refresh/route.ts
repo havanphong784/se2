@@ -41,6 +41,12 @@ export async function POST(request: Request) {
     response.cookies.set(REFRESH_COOKIE_NAME, "", refreshCookieOptions(0));
     return response;
   }
+  if (session.status === "conflict") {
+    return NextResponse.json(
+      { error: "Phiên đăng nhập vừa được làm mới." },
+      { status: 409, headers: noStoreHeaders },
+    );
+  }
 
   const user = await getAuthUser(db, session.userId);
   if (!user) {
@@ -50,7 +56,7 @@ export async function POST(request: Request) {
   }
 
   const response = NextResponse.json(
-    { accessToken: await createAccessToken(user.id), user },
+    { accessToken: await createAccessToken(user.id, user.authVersion), user },
     { headers: noStoreHeaders },
   );
   response.cookies.set(REFRESH_COOKIE_NAME, session.token, refreshCookieOptions());

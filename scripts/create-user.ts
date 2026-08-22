@@ -12,7 +12,7 @@ async function run() {
   const email = "tu123@gmail.com";
   const password = "123456";
   const displayName = "tu123";
-  const passwordHash = hashPassword(password);
+  const passwordHash = await hashPassword(password);
 
   const [user] = await db
     .insert(users)

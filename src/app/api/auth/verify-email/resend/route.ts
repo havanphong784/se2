@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { users } from "@/db/schema";
 import { noStoreHeaders } from "@/lib/auth-tokens";
+import { clientIp, isRateLimited } from "@/lib/auth-rate-limit";
 import { createVerificationToken } from "@/lib/email-verification";
 import { sendVerificationEmail } from "@/lib/mailer";
 
@@ -18,6 +19,10 @@ export async function POST(request: Request) {
   if (!email) return response();
   const db = getDb();
   if (!db) return response();
+  if (await isRateLimited(db, [
+    { scope: "resend-ip", key: clientIp(request) ?? email, maxAttempts: 10, windowSeconds: 60 * 60 },
+    { scope: "resend-email", key: email, maxAttempts: 1, windowSeconds: 60 },
+  ])) return response();
 
   const [user] = await db
     .select({ id: users.id, email: users.email })

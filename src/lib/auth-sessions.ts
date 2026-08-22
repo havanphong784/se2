@@ -35,11 +35,15 @@ export async function rotateRefreshSession(db: Db, token: string) {
       .select()
       .from(refreshTokens)
       .where(eq(refreshTokens.tokenHash, tokenHash))
-      .limit(1);
+      .limit(1)
+      .for("update");
 
     if (!current || current.expiresAt <= now) return null;
 
     if (current.revokedAt) {
+      if (current.replacedById && now.getTime() - current.revokedAt.getTime() < 5_000) {
+        return { status: "conflict" as const };
+      }
       await tx
         .update(refreshTokens)
         .set({ revokedAt: now })
@@ -78,7 +82,7 @@ export async function rotateRefreshSession(db: Db, token: string) {
       return null;
     }
 
-    return { userId: current.userId, token: nextToken, expiresAt };
+    return { status: "rotated" as const, userId: current.userId, token: nextToken, expiresAt };
   });
 }
 

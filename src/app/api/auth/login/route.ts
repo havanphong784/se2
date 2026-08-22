@@ -4,7 +4,8 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { users } from "@/db/schema";
 import { createRefreshSession } from "@/lib/auth-sessions";
-import { verifyPassword } from "@/lib/auth-crypto";
+import { hashPassword, needsPasswordRehash, verifyPassword } from "@/lib/auth-crypto";
+import { clientIp, isRateLimited } from "@/lib/auth-rate-limit";
 import {
   createAccessToken,
   noStoreHeaders,
@@ -32,13 +33,24 @@ export async function POST(request: Request) {
       );
     }
 
+    const cleanEmail = email.trim().toLowerCase();
+    if (await isRateLimited(db, [
+      { scope: "login-ip", key: clientIp(request) ?? cleanEmail, maxAttempts: 20, windowSeconds: 15 * 60 },
+      { scope: "login-email", key: cleanEmail, maxAttempts: 10, windowSeconds: 15 * 60 },
+    ])) {
+      return NextResponse.json(
+        { error: "Quá nhiều lần đăng nhập. Vui lòng thử lại sau." },
+        { status: 429, headers: noStoreHeaders },
+      );
+    }
+
     const [user] = await db
       .select()
       .from(users)
-      .where(eq(users.email, email.trim().toLowerCase()))
+      .where(eq(users.email, cleanEmail))
       .limit(1);
 
-    if (!user || !verifyPassword(password, user.passwordHash)) {
+    if (!user || !(await verifyPassword(password, user.passwordHash))) {
       return NextResponse.json(
         { error: "Email hoặc mật khẩu không chính xác." },
         { status: 401, headers: noStoreHeaders },
@@ -52,10 +64,17 @@ export async function POST(request: Request) {
       );
     }
 
+    if (needsPasswordRehash(user.passwordHash)) {
+      await db
+        .update(users)
+        .set({ passwordHash: await hashPassword(password), updatedAt: new Date() })
+        .where(eq(users.id, user.id));
+    }
+
     const session = await createRefreshSession(db, user.id);
     const response = NextResponse.json(
       {
-        accessToken: await createAccessToken(user.id),
+        accessToken: await createAccessToken(user.id, user.authVersion),
         user: { id: user.id, email: user.email, displayName: user.displayName },
       },
       { headers: noStoreHeaders },

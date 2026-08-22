@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { users } from "@/db/schema";
 import { hashPassword } from "@/lib/auth-crypto";
+import { clientIp, isRateLimited } from "@/lib/auth-rate-limit";
 import { noStoreHeaders } from "@/lib/auth-tokens";
 import { createVerificationToken } from "@/lib/email-verification";
 import { sendVerificationEmail } from "@/lib/mailer";
@@ -24,13 +25,19 @@ export async function POST(request: Request) {
 
     const db = getDb();
     if (!db) return NextResponse.json({ error: "Cơ sở dữ liệu tạm thời không khả dụng." }, { status: 503, headers: noStoreHeaders });
+    if (await isRateLimited(db, [
+      { scope: "register-ip", key: clientIp(request) ?? cleanEmail, maxAttempts: 5, windowSeconds: 60 * 60 },
+      { scope: "register-email", key: cleanEmail, maxAttempts: 3, windowSeconds: 60 * 60 },
+    ])) {
+      return NextResponse.json({ error: "Quá nhiều yêu cầu đăng ký. Vui lòng thử lại sau." }, { status: 429, headers: noStoreHeaders });
+    }
     const [existing] = await db.select({ id: users.id }).from(users).where(eq(users.email, cleanEmail)).limit(1);
     if (existing) return NextResponse.json({ error: "Email này đã được sử dụng." }, { status: 400, headers: noStoreHeaders });
 
     const [user] = await db.insert(users).values({
       email: cleanEmail,
       displayName: cleanName,
-      passwordHash: hashPassword(password),
+      passwordHash: await hashPassword(password),
     }).returning({ id: users.id });
     const token = await createVerificationToken(db, user.id);
 
