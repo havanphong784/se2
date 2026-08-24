@@ -334,7 +334,7 @@ export async function submitStudyEvent(
         attemptCount: sql`${studySessions.attemptCount} + ${counts.attempts}`,
         correctCount: sql`${studySessions.correctCount} + ${counts.correct}`,
         incorrectCount: correct
-          ? studySessions.incorrectCount
+          ? sql`${studySessions.incorrectCount} + 0`
           : sql`${studySessions.incorrectCount} + 1`,
         lastActivityAt: now,
         updatedAt: now,
