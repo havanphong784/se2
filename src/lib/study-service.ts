@@ -10,7 +10,7 @@ import {
   wordProgress,
   words,
 } from "@/db/schema";
-import { vnDateKey, vnDateKeyOffset } from "@/lib/utils";
+import { vnDateBoundary, vnDateKey } from "@/lib/utils";
 import {
   getPersistedAttemptCounts,
   isTypingAnswerCorrect,
@@ -113,17 +113,19 @@ export async function createStudySession(
   return db.transaction(async (tx) => {
     const now = new Date();
 
+    const visibleDeck = or(isNull(decks.ownerId), eq(decks.ownerId, userId));
     const [deck] = input.deckId
       ? await tx
           .select({ id: decks.id })
           .from(decks)
-          .where(eq(decks.id, input.deckId))
+          .where(and(eq(decks.id, input.deckId), visibleDeck))
           .limit(1)
       : input.deckSlug
         ? await tx
             .select({ id: decks.id })
             .from(decks)
-            .where(eq(decks.slug, input.deckSlug))
+            .where(and(eq(decks.slug, input.deckSlug), visibleDeck))
+            .orderBy(sql`${decks.ownerId} is null`)
             .limit(1)
         : [];
     if (input.mode === "learn" && !deck) {
@@ -156,7 +158,7 @@ export async function createStudySession(
                 eq(wordProgress.userId, userId),
                 sql`${wordProgress.learnedAt} is not null`,
                 isNull(wordProgress.reviewCompletedAt),
-                sql`${wordProgress.nextReviewAt} < ${vnDateKeyOffset(1, now)}`,
+                sql`${wordProgress.nextReviewAt} < ${vnDateBoundary(1, now)}`,
               ),
             )
             .orderBy(
@@ -235,7 +237,6 @@ export async function submitStudyEvent(
     eventId: string;
     wordId: string;
     answer: string;
-    incorrectAttemptCount: number;
     isCorrect: boolean;
   },
   userId: string,
@@ -294,6 +295,7 @@ export async function submitStudyEvent(
         id: studySessionWords.id,
         term: words.term,
         typingCompletedAt: studySessionWords.typingCompletedAt,
+        hadIncorrectAttempt: studySessionWords.hadIncorrectAttempt,
       })
       .from(studySessionWords)
       .innerJoin(words, eq(words.id, studySessionWords.wordId))
@@ -310,10 +312,7 @@ export async function submitStudyEvent(
     }
 
     const correct = isTypingAnswerCorrect(sessionWord.term, input.answer);
-    if (
-      correct !== input.isCorrect ||
-      (!correct && (session.mode !== "review" || input.incorrectAttemptCount !== 1))
-    ) {
+    if (correct !== input.isCorrect || (!correct && session.mode !== "review")) {
       throw new StudyServiceError("Kết quả nhập từ không hợp lệ.", 409);
     }
 
@@ -333,8 +332,8 @@ export async function submitStudyEvent(
       .set({
         flashcardCompletedAt: correct ? now : undefined,
         multipleChoiceCompletedAt: correct && session.mode === "learn" ? now : undefined,
-        typingCompletedAt: now,
-        completedAt: now,
+        typingCompletedAt: correct ? now : undefined,
+        completedAt: correct ? now : undefined,
         correctAttemptCount: sql`${studySessionWords.correctAttemptCount} + ${counts.correct}`,
         incorrectAttemptCount: correct
           ? studySessionWords.incorrectAttemptCount
@@ -435,7 +434,7 @@ export async function submitStudyEvent(
     } else if (progress) {
       const schedule = scheduleCorrectReview(
         progress.reviewStage as ReviewStage,
-        input.incorrectAttemptCount > 0,
+        Boolean(sessionWord.hadIncorrectAttempt),
         now,
       );
       await tx
@@ -446,7 +445,6 @@ export async function submitStudyEvent(
           reviewStage: schedule.reviewStage,
           intervalDays: schedule.intervalDays,
           correctCount: sql`${wordProgress.correctCount} + 1`,
-          incorrectCount: sql`${wordProgress.incorrectCount} + ${input.incorrectAttemptCount}`,
           lastReviewedAt: now,
           nextReviewAt: schedule.nextReviewAt,
           reviewCompletedAt: schedule.reviewCompletedAt,
@@ -491,22 +489,27 @@ export async function submitStudyEvent(
 }
 
 export async function abandonStudySession(db: Db, sessionId: string, userId: string) {
-  const now = new Date();
-  await db
-    .update(studySessions)
-    .set({
-      status: "abandoned",
-      abandonedAt: now,
-      durationSeconds: sql`greatest(1, extract(epoch from (${now.toISOString()}::timestamptz - ${studySessions.startedAt}))::integer)`,
-      lastActivityAt: now,
-      updatedAt: now,
-    })
-    .where(
-      and(
-        eq(studySessions.id, sessionId),
-        eq(studySessions.userId, userId),
-        eq(studySessions.status, "active"),
-      ),
+  return db.transaction(async (tx) => {
+    await tx.execute(
+      sql`select pg_advisory_xact_lock(hashtextextended(${sessionId}, 0))`,
     );
-  return getStudySession(db, sessionId, userId);
+    const now = new Date();
+    await tx
+      .update(studySessions)
+      .set({
+        status: "abandoned",
+        abandonedAt: now,
+        durationSeconds: sql`greatest(1, extract(epoch from (${now.toISOString()}::timestamptz - ${studySessions.startedAt}))::integer)`,
+        lastActivityAt: now,
+        updatedAt: now,
+      })
+      .where(
+        and(
+          eq(studySessions.id, sessionId),
+          eq(studySessions.userId, userId),
+          eq(studySessions.status, "active"),
+        ),
+      );
+    return getStudySession(tx, sessionId, userId);
+  });
 }

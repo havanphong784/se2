@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
+import { vnDateBoundary } from "./utils";
 import {
   addDays,
   applyStudyResult,
@@ -58,6 +59,17 @@ test("selectNewWords limits new words to requested session size", () => {
   assert.equal(selectNewWords(words, 10).length, 10);
   assert.equal(selectNewWords(words, 20).length, 20);
   assert.equal(selectNewWords(words.slice(0, 6), 10).length, 5);
+});
+
+test("VN day boundary is independent from database timezone", () => {
+  assert.equal(
+    vnDateBoundary(1, new Date("2026-08-25T16:59:59.000Z")).toISOString(),
+    "2026-08-25T17:00:00.000Z",
+  );
+  assert.equal(
+    vnDateBoundary(1, new Date("2026-08-25T17:00:00.000Z")).toISOString(),
+    "2026-08-26T17:00:00.000Z",
+  );
 });
 
 test("due selection prioritizes oldest due then never reviewed", () => {

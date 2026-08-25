@@ -54,7 +54,6 @@ type CompletionPayload = {
   eventId: string;
   wordId: string;
   answer: string;
-  incorrectAttemptCount: number;
   isCorrect: boolean;
 };
 
@@ -396,14 +395,12 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
       currentWord.incorrectAttemptCount === 0;
     if (
       payload.phase === "typing" &&
-      (session.mode === "review" ? firstReviewAttempt : result.isCorrect)
+      (session.mode === "review" ? firstReviewAttempt || result.isCorrect : result.isCorrect)
     ) {
       saveCompletion({
         eventId: crypto.randomUUID(),
         wordId: payload.wordId,
         answer: payload.answer ?? "",
-        incorrectAttemptCount:
-          nextSession.words.find((word) => word.id === payload.wordId)?.incorrectAttemptCount ?? 0,
         isCorrect: result.isCorrect,
       });
     }

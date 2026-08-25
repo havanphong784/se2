@@ -1,4 +1,4 @@
-import { and, asc, eq, gte, isNull, or } from "drizzle-orm";
+import { and, asc, eq, isNull, or, sql } from "drizzle-orm";
 
 import {
   getDb,
@@ -230,9 +230,6 @@ async function loadActivityData(
   userId: string,
 ): Promise<{ activity: ActivityItem[]; streak: Streak }> {
 
-  // Lấy 30 ngày gần nhất để tính streak best + current chính xác hơn,
-  // nhưng UI weekly chỉ hiển thị 7 ngày cuối.
-  const streakStartKey = vnDateKeyOffset(-29);
   const rows = await db
     .select({
       activityDate: dailyActivity.activityDate,
@@ -241,7 +238,7 @@ async function loadActivityData(
       xpEarned: dailyActivity.xpEarned,
     })
     .from(dailyActivity)
-    .where(and(eq(dailyActivity.userId, userId), gte(dailyActivity.activityDate, streakStartKey)))
+    .where(eq(dailyActivity.userId, userId))
     .orderBy(asc(dailyActivity.activityDate));
 
   const streak = computeStreak(rows);
@@ -280,6 +277,7 @@ async function loadSingleDeck(
     })
     .from(decks)
     .where(and(eq(decks.slug, slug), or(isNull(decks.ownerId), eq(decks.ownerId, userId))))
+    .orderBy(sql`${decks.ownerId} is null`)
     .limit(1);
 
   if (!deckRow) return null;

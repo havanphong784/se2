@@ -13,7 +13,6 @@ export async function POST(request: Request, { params }: { params: Promise<{ ses
     eventId?: unknown;
     wordId?: unknown;
     answer?: unknown;
-    incorrectAttemptCount?: unknown;
     isCorrect?: unknown;
   } | null;
 
@@ -26,10 +25,6 @@ export async function POST(request: Request, { params }: { params: Promise<{ ses
     !isUuid(body.wordId) ||
     typeof body.answer !== "string" ||
     body.answer.length > 256 ||
-    typeof body.incorrectAttemptCount !== "number" ||
-    !Number.isSafeInteger(body.incorrectAttemptCount) ||
-    body.incorrectAttemptCount < 0 ||
-    body.incorrectAttemptCount > 1_000 ||
     typeof body.isCorrect !== "boolean"
   ) {
     return NextResponse.json({ message: "Dữ liệu lượt học không hợp lệ." }, { status: 400 });
@@ -50,7 +45,6 @@ export async function POST(request: Request, { params }: { params: Promise<{ ses
         eventId: body.eventId,
         wordId: body.wordId,
         answer: body.answer,
-        incorrectAttemptCount: body.incorrectAttemptCount,
         isCorrect: body.isCorrect,
       },
       user.id,

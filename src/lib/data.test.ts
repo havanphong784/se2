@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { deckProgress, DEMO_DECKS, type VocabularyWord } from "./demo-data";
-import { getLearningData } from "./data";
+import { computeStreak, getLearningData } from "./data";
+import { vnDateKeyOffset } from "./utils";
 
 test("deck progress separates learned words from weighted mastery", () => {
   const words: VocabularyWord[] = Array.from({ length: 4 }, (_, index) => ({
@@ -23,6 +24,29 @@ test("deck progress separates learned words from weighted mastery", () => {
     fresh: 2,
     percent: 38,
     learnedPercent: 50,
+  });
+});
+
+test("streak best uses activity older than 30 days", () => {
+  const rows = Array.from({ length: 45 }, (_, index) => ({
+    activityDate: vnDateKeyOffset(index - 74),
+    reviewedCount: 1,
+    learnedCount: 0,
+    xpEarned: 5,
+  }));
+  rows.push(
+    ...Array.from({ length: 5 }, (_, index) => ({
+      activityDate: vnDateKeyOffset(index - 4),
+      reviewedCount: 1,
+      learnedCount: 0,
+      xpEarned: 5,
+    })),
+  );
+
+  assert.deepEqual(computeStreak(rows), {
+    current: 5,
+    best: 45,
+    status: "active",
   });
 });
 
