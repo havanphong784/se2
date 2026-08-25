@@ -282,7 +282,7 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
       const response = await authFetch("/api/study-sessions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mode, deckId: deck?.id, requestedSize }),
+        body: JSON.stringify({ mode, deckId: deck?.id, deckSlug: deck?.slug, requestedSize }),
       });
       const nextSession = await readSessionJson(response);
       setSession(nextSession);
