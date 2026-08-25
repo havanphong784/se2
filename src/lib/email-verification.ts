@@ -18,13 +18,10 @@ export function createEmailVerificationToken() {
 
 export async function createVerificationToken(db: Db, userId: string) {
   const { token, tokenHash } = createEmailVerificationToken();
-  await db.transaction(async (tx) => {
-    await tx.delete(emailVerificationTokens).where(eq(emailVerificationTokens.userId, userId));
-    await tx.insert(emailVerificationTokens).values({
-      userId,
-      tokenHash,
-      expiresAt: new Date(Date.now() + EMAIL_VERIFICATION_TTL_MS),
-    });
+  await db.insert(emailVerificationTokens).values({
+    userId,
+    tokenHash,
+    expiresAt: new Date(Date.now() + EMAIL_VERIFICATION_TTL_MS),
   });
   return token;
 }

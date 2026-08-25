@@ -53,7 +53,9 @@ type EventPayload = {
 type CompletionPayload = {
   eventId: string;
   wordId: string;
+  phase: StudyPhase;
   answer: string;
+  selectedWordId?: string;
   isCorrect: boolean;
 };
 
@@ -362,6 +364,15 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
     const nextSession = applyStudyResult(session, result);
     setSession(nextSession);
     setError(null);
+    if (!currentWord.flashcardCompleted) {
+      saveCompletion({
+        eventId: crypto.randomUUID(),
+        wordId: currentWord.id,
+        phase: "flashcard",
+        answer: "",
+        isCorrect: true,
+      });
+    }
     if (nextSession.phase === "multiple_choice") resetQueue(nextSession);
     else setFlashcardIndex((index) => Math.min(index + 1, session.words.length - 1));
   }
@@ -389,18 +400,13 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
     if (payload.phase === "typing" && autoSpeakEnabled) {
       speakEnglish(result.expectedAnswer, "normal");
     }
-    const firstReviewAttempt =
-      session.mode === "review" &&
-      payload.phase === "typing" &&
-      currentWord.incorrectAttemptCount === 0;
-    if (
-      payload.phase === "typing" &&
-      (session.mode === "review" ? firstReviewAttempt || result.isCorrect : result.isCorrect)
-    ) {
+    if (payload.phase === "multiple_choice" || payload.phase === "typing") {
       saveCompletion({
         eventId: crypto.randomUUID(),
         wordId: payload.wordId,
+        phase: payload.phase,
         answer: payload.answer ?? "",
+        selectedWordId: payload.selectedWordId,
         isCorrect: result.isCorrect,
       });
     }

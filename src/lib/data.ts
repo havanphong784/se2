@@ -79,6 +79,7 @@ type ActivityRow = {
   reviewedCount: number;
   learnedCount: number;
   xpEarned: number;
+  studySeconds?: number;
 };
 
 function isDayActive(row: ActivityRow | undefined): row is ActivityRow {
@@ -236,6 +237,7 @@ async function loadActivityData(
       reviewedCount: dailyActivity.reviewedCount,
       learnedCount: dailyActivity.learnedCount,
       xpEarned: dailyActivity.xpEarned,
+      studySeconds: dailyActivity.studySeconds,
     })
     .from(dailyActivity)
     .where(eq(dailyActivity.userId, userId))
@@ -254,7 +256,7 @@ async function loadActivityData(
       reviewed: row?.reviewedCount ?? 0,
       learned: row?.learnedCount ?? 0,
       xp: row?.xpEarned ?? 0,
-      studySeconds: 0,
+      studySeconds: row?.studySeconds ?? 0,
     };
   });
 

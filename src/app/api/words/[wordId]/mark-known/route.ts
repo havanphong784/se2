@@ -1,8 +1,8 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNull, or } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 import { getDb, isDatabaseCoolingDown, markDatabaseAvailable, markDatabaseFailure } from "@/db";
-import { wordProgress, words } from "@/db/schema";
+import { decks, wordProgress, words } from "@/db/schema";
 import { requireAuth } from "@/lib/auth";
 import { isUuid } from "@/lib/server-data";
 
@@ -26,11 +26,16 @@ export async function POST(
   if (!user) return NextResponse.json({ message: "Chưa xác thực." }, { status: 401 });
 
   try {
-    // Verify word exists
     const [word] = await db
       .select({ id: words.id })
       .from(words)
-      .where(eq(words.id, wordId))
+      .innerJoin(decks, eq(decks.id, words.deckId))
+      .where(
+        and(
+          eq(words.id, wordId),
+          or(isNull(decks.ownerId), eq(decks.ownerId, user.id)),
+        ),
+      )
       .limit(1);
 
     if (!word) {

@@ -39,6 +39,9 @@ export async function importVocabulary(
   if (!db) throw new ImportError("DATABASE_NOT_CONFIGURED", "Database chưa được cấu hình.", 503);
 
   return db.transaction(async (tx) => {
+    await tx.execute(
+      sql`select pg_advisory_xact_lock(hashtextextended(${userId}, 1))`,
+    );
 
     let deck: { id: string; slug: string; title: string };
     if (destination.type === "existing") {
