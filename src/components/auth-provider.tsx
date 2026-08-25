@@ -63,7 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (accessToken) return;
     void refreshSession().then((session) => {
       if (session) setSession(session);
-      else router.replace(`/login?next=${encodeURIComponent(pathname)}`);
+      else router.replace(`/login?next=${encodeURIComponent(pathname + window.location.search)}`);
       setReady(true);
     });
   }, [isPublicPage, pathname, router, setSession]);
@@ -81,7 +81,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const session = await refreshSession();
     if (!session) {
       clearSession();
-      if (!isPublicPage) router.replace(`/login?next=${encodeURIComponent(pathname)}`);
+      if (!isPublicPage) router.replace(`/login?next=${encodeURIComponent(pathname + window.location.search)}`);
       return response;
     }
     setSession(session);
