@@ -268,9 +268,10 @@ export async function submitStudyEvent(
         ),
       )
       .limit(1);
-    if (!session || session.status !== "active") {
+    if (!session || session.status === "abandoned") {
       throw new StudyServiceError("Phiên học không còn hoạt động.", 409);
     }
+    if (session.status === "completed") return;
 
     const [sessionWord] = await tx
       .select({

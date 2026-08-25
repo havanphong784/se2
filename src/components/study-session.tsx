@@ -135,6 +135,7 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
     [currentWord, session],
   );
   const actionLockRef = useRef(false);
+  const answerLockRef = useRef(false);
   const writeChainRef = useRef<Promise<void>>(Promise.resolve());
   const completionInvalidatedRef = useRef(false);
 
@@ -367,7 +368,8 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
   }
 
   function submitAnswer(payload: EventPayload) {
-    if (!session || !currentWord) return;
+    if (!session || !currentWord || answerLockRef.current) return;
+    answerLockRef.current = true;
     const grading = evaluateStudyAnswer({
       phase: payload.phase,
       wordId: currentWord.id,
@@ -428,6 +430,7 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
 
   function continueAfterFeedback() {
     if (!feedback) return;
+    answerLockRef.current = false;
     const { nextSession, result } = feedback;
     setSession(nextSession);
     setFeedback(null);
