@@ -50,6 +50,9 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true, message: "Đăng ký thành công. Vui lòng kiểm tra email để kích hoạt tài khoản." }, { status: 201, headers: noStoreHeaders });
   } catch (error) {
+    if (error && typeof error === "object" && "code" in error && error.code === "23505") {
+      return NextResponse.json({ error: "Email này đã được sử dụng." }, { status: 400, headers: noStoreHeaders });
+    }
     console.error("Registration error:", error);
     return NextResponse.json({ error: "Không thể gửi email xác thực. Vui lòng thử lại." }, { status: 500, headers: noStoreHeaders });
   }

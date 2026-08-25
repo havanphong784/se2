@@ -12,8 +12,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ ses
   const body = (await request.json().catch(() => null)) as {
     eventId?: unknown;
     wordId?: unknown;
+    phase?: unknown;
     answer?: unknown;
-    incorrectAttemptCount?: unknown;
+    selectedWordId?: unknown;
     isCorrect?: unknown;
   } | null;
 
@@ -24,12 +25,13 @@ export async function POST(request: Request, { params }: { params: Promise<{ ses
     !isUuid(body.eventId) ||
     typeof body.wordId !== "string" ||
     !isUuid(body.wordId) ||
+    (body.phase !== "flashcard" &&
+      body.phase !== "multiple_choice" &&
+      body.phase !== "typing") ||
     typeof body.answer !== "string" ||
     body.answer.length > 256 ||
-    typeof body.incorrectAttemptCount !== "number" ||
-    !Number.isSafeInteger(body.incorrectAttemptCount) ||
-    body.incorrectAttemptCount < 0 ||
-    body.incorrectAttemptCount > 1_000 ||
+    (body.selectedWordId !== undefined &&
+      (typeof body.selectedWordId !== "string" || !isUuid(body.selectedWordId))) ||
     typeof body.isCorrect !== "boolean"
   ) {
     return NextResponse.json({ message: "Dữ liệu lượt học không hợp lệ." }, { status: 400 });
@@ -49,8 +51,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ ses
         sessionId,
         eventId: body.eventId,
         wordId: body.wordId,
+        phase: body.phase,
         answer: body.answer,
-        incorrectAttemptCount: body.incorrectAttemptCount,
+        selectedWordId: body.selectedWordId,
         isCorrect: body.isCorrect,
       },
       user.id,

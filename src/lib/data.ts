@@ -1,4 +1,4 @@
-import { and, asc, eq, gte, isNull, or } from "drizzle-orm";
+import { and, asc, eq, isNull, or, sql } from "drizzle-orm";
 
 import {
   getDb,
@@ -79,6 +79,7 @@ type ActivityRow = {
   reviewedCount: number;
   learnedCount: number;
   xpEarned: number;
+  studySeconds?: number;
 };
 
 function isDayActive(row: ActivityRow | undefined): row is ActivityRow {
@@ -230,18 +231,16 @@ async function loadActivityData(
   userId: string,
 ): Promise<{ activity: ActivityItem[]; streak: Streak }> {
 
-  // Lấy 30 ngày gần nhất để tính streak best + current chính xác hơn,
-  // nhưng UI weekly chỉ hiển thị 7 ngày cuối.
-  const streakStartKey = vnDateKeyOffset(-29);
   const rows = await db
     .select({
       activityDate: dailyActivity.activityDate,
       reviewedCount: dailyActivity.reviewedCount,
       learnedCount: dailyActivity.learnedCount,
       xpEarned: dailyActivity.xpEarned,
+      studySeconds: dailyActivity.studySeconds,
     })
     .from(dailyActivity)
-    .where(and(eq(dailyActivity.userId, userId), gte(dailyActivity.activityDate, streakStartKey)))
+    .where(eq(dailyActivity.userId, userId))
     .orderBy(asc(dailyActivity.activityDate));
 
   const streak = computeStreak(rows);
@@ -257,7 +256,7 @@ async function loadActivityData(
       reviewed: row?.reviewedCount ?? 0,
       learned: row?.learnedCount ?? 0,
       xp: row?.xpEarned ?? 0,
-      studySeconds: 0,
+      studySeconds: row?.studySeconds ?? 0,
     };
   });
 
@@ -280,6 +279,7 @@ async function loadSingleDeck(
     })
     .from(decks)
     .where(and(eq(decks.slug, slug), or(isNull(decks.ownerId), eq(decks.ownerId, userId))))
+    .orderBy(sql`${decks.ownerId} is null`)
     .limit(1);
 
   if (!deckRow) return null;

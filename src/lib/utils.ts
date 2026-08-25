@@ -58,6 +58,10 @@ export function vnDateKeyOffset(offset: number, base = new Date()): string {
   return anchor.toISOString().slice(0, 10);
 }
 
+export function vnDateBoundary(offset: number, base = new Date()): Date {
+  return new Date(`${vnDateKeyOffset(offset, base)}T00:00:00+07:00`);
+}
+
 /** Trả `dd/MM` cho một `Date` (lấy phần UTC). */
 export function vnDayLabel(date: Date): string {
   if (Number.isNaN(date.getTime())) return "";
