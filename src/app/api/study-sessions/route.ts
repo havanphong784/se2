@@ -12,13 +12,16 @@ export async function POST(request: Request) {
   const body = (await request.json().catch(() => null)) as {
     mode?: unknown;
     deckId?: unknown;
+    deckSlug?: unknown;
     requestedSize?: unknown;
   } | null;
   const mode = body?.mode;
   const requestedSize = body?.requestedSize;
   if (!body || (mode !== "learn" && mode !== "review") || typeof requestedSize !== "number" ||
     !SESSION_SIZES.includes(requestedSize as SessionSize) ||
-    (mode === "learn" && (typeof body.deckId !== "string" || !isUuid(body.deckId)))) {
+    (mode === "learn" &&
+      ((typeof body.deckId !== "string" || !isUuid(body.deckId)) &&
+        (typeof body.deckSlug !== "string" || !body.deckSlug || body.deckSlug.length > 160)))) {
     return NextResponse.json({ message: "Cấu hình phiên học không hợp lệ." }, { status: 400 });
   }
 
@@ -32,7 +35,9 @@ export async function POST(request: Request) {
   try {
     const session = await createStudySession(db, {
       mode: mode as StudyMode,
-      deckId: typeof body.deckId === "string" ? body.deckId : undefined,
+      deckId:
+        typeof body.deckId === "string" && isUuid(body.deckId) ? body.deckId : undefined,
+      deckSlug: typeof body.deckSlug === "string" ? body.deckSlug : undefined,
       requestedSize: requestedSize as SessionSize,
     }, user.id);
     return NextResponse.json({ session }, { status: 201 });

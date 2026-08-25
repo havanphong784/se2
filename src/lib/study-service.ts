@@ -107,12 +107,28 @@ export async function getStudySession(
 
 export async function createStudySession(
   db: Db,
-  input: { mode: StudyMode; deckId?: string; requestedSize: SessionSize },
+  input: { mode: StudyMode; deckId?: string; deckSlug?: string; requestedSize: SessionSize },
   userId: string,
 ) {
   return db.transaction(async (tx) => {
     const now = new Date();
 
+    const [deck] = input.deckId
+      ? await tx
+          .select({ id: decks.id })
+          .from(decks)
+          .where(eq(decks.id, input.deckId))
+          .limit(1)
+      : input.deckSlug
+        ? await tx
+            .select({ id: decks.id })
+            .from(decks)
+            .where(eq(decks.slug, input.deckSlug))
+            .limit(1)
+        : [];
+    if (input.mode === "learn" && !deck) {
+      throw new StudyServiceError("Không tìm thấy bộ từ.", 404);
+    }
     const candidates =
       input.mode === "learn"
         ? await tx
@@ -125,7 +141,7 @@ export async function createStudySession(
             )
             .where(
               and(
-                eq(words.deckId, input.deckId!),
+                eq(words.deckId, deck!.id),
                 or(isNull(wordProgress.id), isNull(wordProgress.learnedAt)),
               ),
             )
@@ -161,7 +177,7 @@ export async function createStudySession(
       .insert(studySessions)
       .values({
         userId: userId,
-        deckId: input.mode === "learn" ? input.deckId : null,
+        deckId: input.mode === "learn" ? deck?.id : null,
         mode: input.mode,
         status: "active",
         phase: input.mode === "learn" ? "flashcard" : "typing",
@@ -268,9 +284,10 @@ export async function submitStudyEvent(
         ),
       )
       .limit(1);
-    if (!session || session.status !== "active") {
+    if (!session || session.status === "abandoned") {
       throw new StudyServiceError("Phiên học không còn hoạt động.", 409);
     }
+    if (session.status === "completed") return;
 
     const [sessionWord] = await tx
       .select({
