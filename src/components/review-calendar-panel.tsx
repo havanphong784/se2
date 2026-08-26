@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { type KeyboardEvent, useRef, useState } from "react";
 import { Calendar, CalendarRange } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -29,7 +29,30 @@ export function ReviewCalendarPanel({
   monthly,
 }: ReviewCalendarPanelProps) {
   const [mode, setMode] = useState<"week" | "month">("week");
-  const totalDueWeek = weekly.due.reduce((sum, n) => sum + n, 0);
+  const weekTabRef = useRef<HTMLButtonElement>(null);
+  const monthTabRef = useRef<HTMLButtonElement>(null);
+  const totalDueWeek = weekly.due.reduce((sum, due) => sum + due, 0);
+
+  function selectTab(nextMode: "week" | "month") {
+    setMode(nextMode);
+    requestAnimationFrame(() => {
+      (nextMode === "week" ? weekTabRef : monthTabRef).current?.focus();
+    });
+  }
+
+  function handleTabKeyDown(event: KeyboardEvent<HTMLButtonElement>) {
+    let nextMode: "week" | "month" | null = null;
+    if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+      nextMode = mode === "week" ? "month" : "week";
+    } else if (event.key === "Home") {
+      nextMode = "week";
+    } else if (event.key === "End") {
+      nextMode = "month";
+    }
+    if (!nextMode) return;
+    event.preventDefault();
+    selectTab(nextMode);
+  }
 
   return (
     <div className="space-y-4">
@@ -38,9 +61,14 @@ export function ReviewCalendarPanel({
         {/* Toggle buttons */}
         <div className="flex gap-1.5" role="tablist" aria-label="Chọn chế độ xem lịch ôn">
           <button
+            ref={weekTabRef}
+            id="review-calendar-week-tab"
             type="button"
             role="tab"
             aria-selected={mode === "week"}
+            aria-controls="review-calendar-week-panel"
+            tabIndex={mode === "week" ? 0 : -1}
+            onKeyDown={handleTabKeyDown}
             onClick={() => setMode("week")}
             className={cn(
               "flex min-h-9 items-center gap-1.5 rounded-xl border-2 px-3 text-xs font-extrabold transition",
@@ -52,9 +80,14 @@ export function ReviewCalendarPanel({
             <Calendar className="size-3.5" /> Tuần này
           </button>
           <button
+            ref={monthTabRef}
+            id="review-calendar-month-tab"
             type="button"
             role="tab"
             aria-selected={mode === "month"}
+            aria-controls="review-calendar-month-panel"
+            tabIndex={mode === "month" ? 0 : -1}
+            onKeyDown={handleTabKeyDown}
             onClick={() => setMode("month")}
             className={cn(
               "flex min-h-9 items-center gap-1.5 rounded-xl border-2 px-3 text-xs font-extrabold transition",
@@ -86,17 +119,27 @@ export function ReviewCalendarPanel({
       </div>
 
       {/* Calendar Views */}
-      <div role="tabpanel">
-        {mode === "week" ? (
+      {mode === "week" ? (
+        <div
+          id="review-calendar-week-panel"
+          role="tabpanel"
+          aria-labelledby="review-calendar-week-tab"
+        >
           <WeeklyReviewCalendar {...weekly} />
-        ) : (
+        </div>
+      ) : (
+        <div
+          id="review-calendar-month-panel"
+          role="tabpanel"
+          aria-labelledby="review-calendar-month-tab"
+        >
           <MonthlyReviewCalendar
             monthLabel={monthly.monthLabel}
             startOffset={monthly.startOffset}
             days={monthly.days}
           />
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

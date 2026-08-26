@@ -470,7 +470,7 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
   if (!session) {
     const available = mode === "learn" ? deck?.words.filter((word) => !word.learnedAt).length ?? 0 : null;
     return (
-      <main className="grid min-h-svh place-items-center bg-[linear-gradient(180deg,#f8fff3_0%,#ffffff_55%)] px-5 py-10">
+      <main className="grid min-h-svh place-items-center bg-[#f8fff3] px-5 py-10">
         <Card className="w-full max-w-xl border-eel-light bg-white/95">
           <CardContent className="p-6 text-center md:p-9">
             <span className="mx-auto grid size-16 place-items-center rounded-full bg-[#efffe5]">
@@ -502,7 +502,7 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
   if (session.status === "completed" && pendingWrites.length > 0) {
     const failedWrites = pendingWrites.filter((item) => item.failed);
     return (
-      <main className="grid min-h-svh place-items-center bg-[linear-gradient(180deg,#f8fff3_0%,#ffffff_55%)] px-5 text-center">
+      <main className="grid min-h-svh place-items-center bg-[#f8fff3] px-5 text-center">
         <Card className="w-full max-w-xl border-eel-light">
           <CardContent className="p-8 md:p-10">
             <h1 className="font-display text-3xl font-extrabold text-eel-dark-blue">
@@ -530,7 +530,7 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
 
   if (session.status === "completed") {
     return (
-      <main className="grid min-h-svh place-items-center bg-[linear-gradient(180deg,#f3ffe9,#fff)] px-5 text-center">
+      <main className="grid min-h-svh place-items-center bg-[#f3ffe9] px-5 text-center">
         <Card className="max-w-xl border-eel-light">
           <CardContent className="p-8 md:p-10">
             <span className="mx-auto grid size-20 place-items-center rounded-full bg-[#eaffdc]"><Check className="size-11 text-ecto-green" /></span>
@@ -552,7 +552,7 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
   return (
     <div className="flex min-h-svh flex-col bg-[#fcfdfa]">
       {/* Top Navigation Bar */}
-      <header className="sticky top-0 z-30 border-b-2 border-[#eeeeee] bg-white/95 backdrop-blur">
+      <header className="sticky top-0 z-30 border-b-2 border-[#eeeeee] bg-white">
         <div className="mx-auto flex h-18 max-w-4xl items-center gap-4 px-4 sm:h-20 sm:px-6">
           <Link
             href={deck ? `/vocabulary/${deck.slug}` : "/vocabulary"}
@@ -897,7 +897,7 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
             aria-live="polite"
             aria-atomic="true"
             className={cn(
-              "fixed inset-x-0 bottom-0 z-40 border-t-2 p-4 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] outline-none sm:p-5",
+              "fixed inset-x-0 bottom-0 z-40 border-t-2 p-4 outline-none sm:p-5",
               feedback.result.isCorrect
                 ? "border-ecto-green bg-[#f2ffe9]"
                 : "border-[#ff6b6b] bg-[#fff3f3]",

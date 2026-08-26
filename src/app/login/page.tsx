@@ -42,7 +42,8 @@ export default function LoginPage() {
       }
 
       setSession(data);
-      router.push("/");
+      const next = new URLSearchParams(window.location.search).get("next");
+      router.push(next?.startsWith("/") && !next.startsWith("//") ? next : "/");
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Đã có lỗi xảy ra.");

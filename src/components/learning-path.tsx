@@ -25,14 +25,14 @@ export function LearningPath({ decks }: { decks: VocabularyDeck[] }) {
           <li key={deck.id} className="relative flex gap-4">
             <span
               className={`relative z-10 grid size-14 shrink-0 place-items-center rounded-xl border-2 text-xl ${
-                progress.percent >= 85
+                progress.percent >= 100
                   ? "border-ecto-green bg-ecto-green text-white"
                   : available
                     ? "border-lingot-lime bg-white text-[#438f0e]"
                     : "border-[#dedede] bg-white text-[#aaaaaa]"
               }`}
             >
-              {progress.percent >= 85 ? (
+              {progress.percent >= 100 ? (
                 <Check className="size-6" strokeWidth={3} />
               ) : available ? (
                 <Sprout className="size-6" strokeWidth={2.5} />

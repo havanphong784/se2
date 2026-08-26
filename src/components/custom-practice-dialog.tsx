@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { createPortal } from "react-dom";
 import {
@@ -39,17 +39,44 @@ export function CustomPracticeDialog({
     countOptions[0] ?? "all",
   );
   const [selectedPhase, setSelectedPhase] = useState<StudyPhase>("flashcard");
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
+    if (!open) return;
+    const trigger = triggerRef.current;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    closeRef.current?.focus();
+
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setOpen(false);
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const focusable = dialogRef.current?.querySelectorAll<HTMLElement>(
+        "button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex='-1'])",
+      );
+      if (!focusable?.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
       }
     };
-    if (open) {
-      window.addEventListener("keydown", handleKeyDown);
-      return () => window.removeEventListener("keydown", handleKeyDown);
-    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = previousOverflow;
+      trigger?.focus();
+    };
   }, [open]);
 
   if (totalWords === 0) {
@@ -94,6 +121,7 @@ export function CustomPracticeDialog({
   return (
     <>
       <Button
+        ref={triggerRef}
         type="button"
         variant="outline"
         size="lg"
@@ -108,13 +136,15 @@ export function CustomPracticeDialog({
           role="dialog"
           aria-modal="true"
           aria-labelledby="custom-practice-title"
+          aria-describedby="custom-practice-description"
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
           onClick={(e) => {
             if (e.target === e.currentTarget) setOpen(false);
           }}
         >
-          <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-xl border-2 border-b-4 border-eel-light bg-white p-6 md:p-8">
+          <div ref={dialogRef} className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-xl border-2 border-b-4 border-eel-light bg-white p-6 md:p-8">
             <button
+              ref={closeRef}
               type="button"
               onClick={() => setOpen(false)}
               className="absolute right-4 top-4 grid size-9 place-items-center rounded-xl text-ash hover:bg-[#f0f0f0]"
@@ -137,7 +167,7 @@ export function CustomPracticeDialog({
               </div>
             </div>
 
-            <p className="mt-3 text-sm font-bold text-ash">
+            <p id="custom-practice-description" className="mt-3 text-sm font-bold text-ash">
               {deck ? (
                 <>Bộ từ: <strong className="text-charcoal">{scopeLabel}</strong> • Có {totalWords} từ đã học.</>
               ) : (
