@@ -25,7 +25,8 @@ test("database connectivity failures open and reset the cooldown", () => {
 });
 
 test("query errors do not open the connectivity cooldown", () => {
-  const error = Object.assign(new Error("column does not exist"), { code: "42703" });
+  const cause = Object.assign(new Error("column does not exist"), { code: "42703" });
+  const error = new Error("Failed query: select ...", { cause });
 
   assert.equal(markDatabaseFailure(error, 1_000), false);
   assert.equal(isDatabaseCoolingDown(1_001), false);

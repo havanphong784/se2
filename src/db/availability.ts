@@ -12,9 +12,18 @@ let unavailableUntil = 0;
 let outageLogged = false;
 
 function errorDetails(error: unknown) {
-  if (!(error instanceof Error)) return { code: "UNKNOWN", message: "Unknown database error" };
-  const code = "code" in error && typeof error.code === "string" ? error.code : "UNKNOWN";
-  return { code, message: error.message.slice(0, 180) };
+  const cause =
+    error && typeof error === "object" && "cause" in error && error.cause
+      ? error.cause
+      : error;
+  if (!cause || typeof cause !== "object") {
+    return { code: "UNKNOWN", message: String(cause ?? "Unknown database error") };
+  }
+  const code = "code" in cause && typeof cause.code === "string" ? cause.code : "UNKNOWN";
+  const message = "message" in cause && typeof cause.message === "string"
+    ? cause.message
+    : String(cause);
+  return { code, message: message.slice(0, 180) };
 }
 
 export function isDatabaseCoolingDown(now = Date.now()) {
@@ -40,7 +49,7 @@ export function markDatabaseFailure(error: unknown, now = Date.now()) {
       outageLogged = true;
     }
   } else {
-    console.error("Database query failed.", { code, message });
+    console.error(`Database query failed. ${code}: ${message}`);
   }
 
   return connectivityFailure;

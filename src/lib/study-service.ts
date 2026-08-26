@@ -1,4 +1,4 @@
-import { and, asc, eq, isNull, or, sql } from "drizzle-orm";
+import { and, asc, eq, isNull, lt, or, sql } from "drizzle-orm";
 
 import type { getDb } from "@/db";
 import {
@@ -150,21 +150,20 @@ export async function createStudySession(
             .orderBy(asc(words.sortOrder), asc(words.id))
             .limit(input.requestedSize)
         : await tx
-            .select({ id: words.id })
+            .select({ id: wordProgress.wordId })
             .from(wordProgress)
-            .innerJoin(words, eq(words.id, wordProgress.wordId))
             .where(
               and(
                 eq(wordProgress.userId, userId),
                 sql`${wordProgress.learnedAt} is not null`,
                 isNull(wordProgress.reviewCompletedAt),
-                sql`${wordProgress.nextReviewAt} < ${vnDateBoundary(1, now)}`,
+                lt(wordProgress.nextReviewAt, vnDateBoundary(1, now)),
               ),
             )
             .orderBy(
               asc(wordProgress.nextReviewAt),
               sql`${wordProgress.lastReviewedAt} asc nulls first`,
-              asc(words.id),
+              asc(wordProgress.wordId),
             )
             .limit(input.requestedSize);
 
