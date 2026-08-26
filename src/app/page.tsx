@@ -33,16 +33,36 @@ import {
 } from "@/lib/utils";
 
 export default function DashboardPage() {
-  const { data: learningRes, isLoading } = useLearningData();
+  const { data: learningRes, isLoading, isError, refetch } = useLearningData();
 
-  if (isLoading || !learningRes) {
+  if (isLoading) {
     return (
-      <div className="mx-auto w-full max-w-[1200px] px-5 py-8 md:px-8 lg:py-10 animate-pulse">
-        <div className="h-8 w-48 bg-gray-200 rounded-lg mb-4" />
-        <div className="h-12 w-96 bg-gray-200 rounded-lg mb-8" />
+      <div className="mx-auto w-full max-w-[1200px] animate-pulse px-5 py-8 md:px-8 lg:py-10">
+        <div className="mb-4 h-8 w-48 rounded-xl bg-gray-200" />
+        <div className="mb-8 h-12 w-96 max-w-full rounded-xl bg-gray-200" />
         <div className="grid gap-5 lg:grid-cols-[1.55fr_0.8fr]">
-          <div className="h-64 bg-gray-100 rounded-xl" />
-          <div className="h-64 bg-gray-100 rounded-xl" />
+          <div className="h-64 rounded-xl bg-gray-100" />
+          <div className="h-64 rounded-xl bg-gray-100" />
+        </div>
+      </div>
+    );
+  }
+
+  if (isError || !learningRes) {
+    return (
+      <div className="mx-auto grid min-h-[60svh] w-full max-w-xl place-items-center px-5 py-8">
+        <div role="alert" className="w-full rounded-xl border-2 border-b-4 border-[#ffb4b4] border-b-[#d94e4e] bg-white p-6 text-center">
+          <h1 className="font-display text-2xl font-extrabold text-eel-dark-blue">
+            Chưa tải được dữ liệu học tập
+          </h1>
+          <p className="mt-2 font-bold text-ash">Kiểm tra kết nối rồi thử lại.</p>
+          <button
+            type="button"
+            onClick={() => void refetch()}
+            className={cn(buttonVariants(), "mt-5")}
+          >
+            Thử lại
+          </button>
         </div>
       </div>
     );
@@ -128,7 +148,7 @@ export default function DashboardPage() {
     };
   });
 
-  const totalDueMonth = monthDaysData.reduce((sum, d) => sum + d.due, 0);
+  const totalDueMonth = monthDaysData.reduce((sum, day) => sum + day.due, 0);
 
   const dateLabel = new Intl.DateTimeFormat("vi-VN", {
     weekday: "long",

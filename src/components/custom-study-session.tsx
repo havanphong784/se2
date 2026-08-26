@@ -96,7 +96,7 @@ export function CustomStudySession({
 
   if (sessionWords.length === 0) {
     return (
-      <main className="grid min-h-svh place-items-center bg-[linear-gradient(180deg,#f8fff3_0%,#ffffff_55%)] px-5 py-10">
+      <main className="grid min-h-svh place-items-center bg-[#f8fff3] px-5 py-10">
         <Card className="w-full max-w-xl border-eel-light text-center p-8">
           <CardContent className="space-y-4">
             <h1 className="font-display text-2xl font-extrabold text-eel-dark-blue">
@@ -123,7 +123,7 @@ export function CustomStudySession({
 
   if (isCompleted) {
     return (
-      <main className="grid min-h-svh place-items-center bg-[linear-gradient(180deg,#f3ffe9,#fff)] px-5 text-center">
+      <main className="grid min-h-svh place-items-center bg-[#f3ffe9] px-5 text-center">
         <Card className="max-w-xl border-2 border-b-4 border-eel-light">
           <CardContent className="p-8 md:p-10">
             <span className="mx-auto grid size-20 place-items-center rounded-full bg-[#eaffdc]">
@@ -208,7 +208,7 @@ export function CustomStudySession({
   return (
     <div className="flex min-h-svh flex-col bg-[#fcfdfa]">
       {/* Top Header */}
-      <header className="sticky top-0 z-30 border-b-2 border-[#eeeeee] bg-white/95 backdrop-blur">
+      <header className="sticky top-0 z-30 border-b-2 border-[#eeeeee] bg-white">
         <div className="mx-auto flex h-18 max-w-4xl items-center gap-4 px-4 sm:h-20 sm:px-6">
           <Link
             href={homeHref}
@@ -544,7 +544,7 @@ export function CustomStudySession({
             exit={{ y: "100%", opacity: 0 }}
             transition={{ type: "spring", stiffness: 450, damping: 32 }}
             className={cn(
-              "fixed inset-x-0 bottom-0 z-40 border-t-2 p-4 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] outline-none sm:p-5",
+              "fixed inset-x-0 bottom-0 z-40 border-t-2 p-4 outline-none sm:p-5",
               feedback.isCorrect
                 ? "border-ecto-green bg-[#f2ffe9]"
                 : "border-[#ff6b6b] bg-[#fff3f3]",

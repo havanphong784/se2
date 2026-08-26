@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
   ArrowLeftRight,
@@ -9,7 +9,6 @@ import {
   Clock,
   Copy,
   FolderPlus,
-  HelpCircle,
   History,
   Languages,
   Lightbulb,
@@ -18,6 +17,7 @@ import {
   Sparkles,
   Trash2,
   Volume2,
+  X,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -61,7 +61,6 @@ const SUGGESTED_TOPICS = [
 ];
 
 export function TranslationTool({
-  available,
   decks: initialDecks,
 }: {
   available: boolean;
@@ -75,6 +74,12 @@ export function TranslationTool({
   const [result, setResult] = useState<TranslationResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const translateControllerRef = useRef<AbortController | null>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
+  const modalCloseRef = useRef<HTMLButtonElement>(null);
+  const modalTriggerRef = useRef<HTMLButtonElement>(null);
+  const addingWordRef = useRef(false);
+  const closeModalTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const STORAGE_KEY = "vocabloom_translation_history";
 
@@ -82,24 +87,23 @@ export function TranslationTool({
   const [history, setHistory] = useState<TranslationHistoryItem[]>([]);
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        setHistory(JSON.parse(saved));
+    let active = true;
+    queueMicrotask(() => {
+      if (!active) return;
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        const parsed: unknown = saved ? JSON.parse(saved) : [];
+        if (Array.isArray(parsed)) setHistory(parsed);
+      } catch {
+        // Ignore localStorage errors
       }
-    } catch {
-      // Ignore localStorage errors
-    }
+    });
+    return () => {
+      active = false;
+      translateControllerRef.current?.abort();
+      if (closeModalTimerRef.current) clearTimeout(closeModalTimerRef.current);
+    };
   }, []);
-
-  function saveHistory(items: TranslationHistoryItem[]) {
-    setHistory(items);
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-    } catch {
-      // Ignore localStorage errors
-    }
-  }
 
   function handleClearHistory() {
     setHistory([]);
@@ -119,7 +123,7 @@ export function TranslationTool({
   const [selectedDeckId, setSelectedDeckId] = useState(decks[0]?.id ?? "");
   const [newTitle, setNewTitle] = useState("");
   const [newDescription, setNewDescription] = useState("");
-  const [newLevel, setNewLevel] = useState("Tự chọn");
+  const newLevel = "Tự chọn";
 
   // Editable fields for saving
   const [customPhonetic, setCustomPhonetic] = useState("");
@@ -132,7 +136,44 @@ export function TranslationTool({
     text: string;
   } | null>(null);
 
+  useEffect(() => {
+    if (!showDeckModal) return;
+    const trigger = modalTriggerRef.current;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    modalCloseRef.current?.focus();
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape" && !addingWordRef.current) {
+        setShowDeckModal(false);
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const focusable = modalRef.current?.querySelectorAll<HTMLElement>(
+        "button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex='-1'])",
+      );
+      if (!focusable?.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = previousOverflow;
+      trigger?.focus();
+    };
+  }, [showDeckModal]);
+
   function handleSwapDirection() {
+    translateControllerRef.current?.abort();
     setDirection((prev) => (prev === "en-vi" ? "vi-en" : "en-vi"));
     if (result) {
       setInputText(result.translated);
@@ -142,6 +183,9 @@ export function TranslationTool({
 
   async function performTranslate(textToTranslate: string, dir: "en-vi" | "vi-en" = direction) {
     if (!textToTranslate.trim()) return;
+    translateControllerRef.current?.abort();
+    const controller = new AbortController();
+    translateControllerRef.current = controller;
     setLoading(true);
     setError(null);
     setResult(null);
@@ -150,11 +194,13 @@ export function TranslationTool({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: textToTranslate.trim(), direction: dir }),
+        signal: controller.signal,
       });
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.error || "Lỗi dịch từ.");
       }
+      if (translateControllerRef.current !== controller) return;
       setResult(data);
 
       // Pre-fill modal states with dict details if returned
@@ -164,14 +210,14 @@ export function TranslationTool({
       setCustomExampleTranslation(data.exampleTranslation || "");
 
       // Add to history
-      const newItem: TranslationHistoryItem = {
-        id: Date.now().toString(),
-        original: data.original,
-        translated: data.translated,
-        direction: data.direction,
-        timestamp: new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
-      };
       setHistory((prev) => {
+        const newItem: TranslationHistoryItem = {
+          id: crypto.randomUUID(),
+          original: data.original,
+          translated: data.translated,
+          direction: data.direction,
+          timestamp: new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
+        };
         const next = [newItem, ...prev.filter((h) => h.original !== data.original).slice(0, 9)];
         try {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
@@ -181,9 +227,15 @@ export function TranslationTool({
         return next;
       });
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Không thể kết nối dịch vụ dịch.");
+      if (err instanceof DOMException && err.name === "AbortError") return;
+      if (translateControllerRef.current === controller) {
+        setError(err instanceof Error ? err.message : "Không thể kết nối dịch vụ dịch.");
+      }
     } finally {
-      setLoading(false);
+      if (translateControllerRef.current === controller) {
+        translateControllerRef.current = null;
+        setLoading(false);
+      }
     }
   }
 
@@ -217,6 +269,10 @@ export function TranslationTool({
 
   function handleOpenAddModal() {
     if (!result) return;
+    if (closeModalTimerRef.current) {
+      clearTimeout(closeModalTimerRef.current);
+      closeModalTimerRef.current = null;
+    }
     setAddMessage(null);
     setShowDeckModal(true);
   }
@@ -224,6 +280,7 @@ export function TranslationTool({
   async function handleAddWordToDeck(e: React.FormEvent) {
     e.preventDefault();
     if (!result) return;
+    addingWordRef.current = true;
     setAddingWord(true);
     setAddMessage(null);
 
@@ -271,7 +328,8 @@ export function TranslationTool({
         setNewDescription("");
       }
       invalidateAuthData();
-      setTimeout(() => {
+      closeModalTimerRef.current = setTimeout(() => {
+        closeModalTimerRef.current = null;
         setShowDeckModal(false);
         setAddMessage(null);
       }, 1500);
@@ -281,6 +339,7 @@ export function TranslationTool({
         text: err instanceof Error ? err.message : "Lỗi thêm từ vào gói.",
       });
     } finally {
+      addingWordRef.current = false;
       setAddingWord(false);
     }
   }
@@ -358,6 +417,7 @@ export function TranslationTool({
                       : "Nhập từ hoặc câu tiếng Việt cần dịch (Ví dụ: xin chào, môi trường, ...)"
                   }
                   rows={6}
+                  maxLength={2000}
                   className="w-full resize-none rounded-xl border-2 border-[#e5e5e5] p-4 text-base font-bold text-eel-dark-blue focus:border-ecto-green focus:outline-none transition-colors"
                 />
                 <div className="flex justify-between items-center">
@@ -467,6 +527,7 @@ export function TranslationTool({
                     )}
 
                     <Button
+                      ref={modalTriggerRef}
                       type="button"
                       variant="blue"
                       size="sm"
@@ -638,13 +699,34 @@ export function TranslationTool({
 
       {/* Modal dialog for adding word to deck */}
       {showDeckModal && result && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
-          <Card className="w-full max-w-lg border-eel-light border-b-4 max-h-[90vh] overflow-y-auto">
-            <CardHeader className="bg-[#fbfff8] border-b border-[#f0f0f0]">
-              <CardTitle className="flex items-center gap-2 text-xl font-black text-eel-dark-blue">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="add-word-dialog-title"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget && !addingWord) setShowDeckModal(false);
+          }}
+        >
+          <Card
+            ref={modalRef}
+            className="max-h-[90vh] w-full max-w-lg overflow-y-auto border-eel-light border-b-4"
+          >
+            <CardHeader className="relative border-b border-[#f0f0f0] bg-[#fbfff8] pr-14">
+              <CardTitle id="add-word-dialog-title" className="flex items-center gap-2 text-xl font-black text-eel-dark-blue">
                 <FolderPlus className="size-5 text-macaw-blue" />
                 Thêm từ vào gói vựng
               </CardTitle>
+              <button
+                ref={modalCloseRef}
+                type="button"
+                aria-label="Đóng hộp thoại"
+                disabled={addingWord}
+                onClick={() => setShowDeckModal(false)}
+                className="absolute right-4 top-4 grid size-9 place-items-center rounded-xl text-ash hover:bg-[#eeeeee] focus-visible:ring-4 focus-visible:ring-lingot-lime/40"
+              >
+                <X className="size-5" />
+              </button>
             </CardHeader>
             <CardContent className="pt-6 space-y-4">
               {/* Target info preview */}
