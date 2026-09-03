@@ -2,9 +2,14 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 
 export type AuthUser = { id: string; email: string; displayName: string };
 type AuthResponse = { accessToken: string; user: AuthUser };
+type RefreshOutcome =
+  | { kind: "success"; session: AuthResponse }
+  | { kind: "unauthorized"; status: 401 }
+  | { kind: "transient"; status: number | null };
 type AuthContextValue = {
   user: AuthUser | null;
   ready: boolean;
@@ -13,20 +18,65 @@ type AuthContextValue = {
   authFetch: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
 };
 
-const AuthContext = createContext<AuthContextValue | null>(null);
-let accessToken: string | null = null;
-let refreshPromise: Promise<AuthResponse | null> | null = null;
+type LockManagerLike = {
+  request<T>(name: string, callback: () => Promise<T>): Promise<T>;
+};
+type NavigatorWithLocks = Navigator & { locks?: LockManagerLike };
 
-async function refreshSession() {
+const AuthContext = createContext<AuthContextValue | null>(null);
+let refreshPromise: Promise<RefreshOutcome> | null = null;
+
+const ACCESS_REFRESH_INTERVAL = 9 * 60 * 1000;
+const REFRESH_RETRY_DELAY = 30 * 1000;
+const FOREGROUND_REFRESH_AFTER = 8 * 60 * 1000;
+const REFRESH_RETRY_DELAYS = [100, 250, 500, 1_000, 1_500];
+
+function isAuthResponse(value: unknown): value is AuthResponse {
+  if (!value || typeof value !== "object") return false;
+  const response = value as Record<string, unknown>;
+  const user = response.user;
+  if (!response.accessToken || typeof response.accessToken !== "string" || !user || typeof user !== "object") return false;
+  const candidate = user as Record<string, unknown>;
+  return typeof candidate.id === "string"
+    && typeof candidate.email === "string"
+    && typeof candidate.displayName === "string";
+}
+
+async function requestRefresh(): Promise<RefreshOutcome> {
+  try {
+    let response = await fetch("/api/auth/refresh", { method: "POST", credentials: "same-origin" });
+    for (const delay of REFRESH_RETRY_DELAYS) {
+      if (response.status !== 409) break;
+      await new Promise((resolve) => setTimeout(resolve, delay));
+      response = await fetch("/api/auth/refresh", { method: "POST", credentials: "same-origin" });
+    }
+
+    if (response.status === 401) return { kind: "unauthorized", status: 401 };
+    if (!response.ok) return { kind: "transient", status: response.status };
+
+    const value: unknown = await response.json().catch(() => null);
+    return isAuthResponse(value)
+      ? { kind: "success", session: value }
+      : { kind: "transient", status: response.status };
+  } catch {
+    return { kind: "transient", status: null };
+  }
+}
+
+async function refreshSession(): Promise<RefreshOutcome> {
   if (!refreshPromise) {
     refreshPromise = (async () => {
-      let response = await fetch("/api/auth/refresh", { method: "POST", credentials: "same-origin" });
-      if (response.status === 409) {
-        await new Promise((resolve) => setTimeout(resolve, 100));
-        response = await fetch("/api/auth/refresh", { method: "POST", credentials: "same-origin" });
+      try {
+        const locks = typeof navigator !== "undefined" ? (navigator as NavigatorWithLocks).locks : undefined;
+        return locks
+          ? await locks.request("vocabloom-auth-refresh", requestRefresh)
+          : await requestRefresh();
+      } catch {
+        return { kind: "transient", status: null };
       }
-      return response.ok ? (response.json() as Promise<AuthResponse>) : null;
-    })().catch(() => null).finally(() => { refreshPromise = null; });
+    })().finally(() => {
+      refreshPromise = null;
+    });
   }
   return refreshPromise;
 }
@@ -34,62 +84,139 @@ async function refreshSession() {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
+  const queryClient = useQueryClient();
   const isPublicPage = pathname === "/login" || pathname === "/register" || pathname === "/verify-email";
   const [user, setUser] = useState<AuthUser | null>(null);
   const [ready, setReady] = useState(isPublicPage);
+  const accessTokenRef = useRef<string | null>(null);
   const refreshTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const generationRef = useRef(0);
+  const lastRefreshAtRef = useRef(0);
 
   const clearSession = useCallback(() => {
-    accessToken = null;
+    generationRef.current += 1;
+    accessTokenRef.current = null;
+    lastRefreshAtRef.current = 0;
     setUser(null);
+    if (refreshTimer.current) {
+      clearTimeout(refreshTimer.current);
+      refreshTimer.current = null;
+    }
+    queryClient.clear();
+  }, [queryClient]);
+
+  function redirectToLogin() {
+    if (!isPublicPage) {
+      router.replace(`/login?next=${encodeURIComponent(pathname + window.location.search)}`);
+    }
+  }
+
+  function expireSession(generation: number) {
+    if (generation !== generationRef.current) return;
+    clearSession();
+    redirectToLogin();
+  }
+
+  function scheduleRefresh(generation: number, delay = ACCESS_REFRESH_INTERVAL) {
     if (refreshTimer.current) clearTimeout(refreshTimer.current);
-  }, []);
+    refreshTimer.current = setTimeout(async () => {
+      if (generation !== generationRef.current) return;
+      const outcome = await refreshSession();
+      if (generation !== generationRef.current) return;
+      if (outcome.kind === "success") {
+        applySession(outcome.session, generation);
+      } else if (outcome.kind === "unauthorized") {
+        expireSession(generation);
+      } else {
+        scheduleRefresh(generation, REFRESH_RETRY_DELAY);
+      }
+    }, delay);
+  }
+
+  function applySession(session: AuthResponse, generation: number) {
+    if (generation !== generationRef.current) return false;
+    accessTokenRef.current = session.accessToken;
+    lastRefreshAtRef.current = Date.now();
+    setUser(session.user);
+    scheduleRefresh(generation);
+    return true;
+  }
 
   const setSession = useCallback((session: AuthResponse) => {
-    accessToken = session.accessToken;
-    setUser(session.user);
-    if (refreshTimer.current) clearTimeout(refreshTimer.current);
-    refreshTimer.current = setTimeout(async function refresh() {
-      const next = await refreshSession();
-      if (!next) return clearSession();
-      accessToken = next.accessToken;
-      setUser(next.user);
-      refreshTimer.current = setTimeout(refresh, 9 * 60 * 1000);
-    }, 9 * 60 * 1000);
-  }, [clearSession]);
+    const generation = generationRef.current + 1;
+    generationRef.current = generation;
+    applySession(session, generation);
+  }, []);
 
   useEffect(() => {
     if (isPublicPage) return;
-    if (accessToken) return;
-    void refreshSession().then((session) => {
-      if (session) setSession(session);
-      else router.replace(`/login?next=${encodeURIComponent(pathname + window.location.search)}`);
+    const generation = generationRef.current;
+    if (accessTokenRef.current) return;
+    void refreshSession().then((outcome) => {
+      if (generation !== generationRef.current) return;
+      if (outcome.kind === "success") applySession(outcome.session, generation);
+      else if (outcome.kind === "unauthorized") redirectToLogin();
+      else scheduleRefresh(generation, REFRESH_RETRY_DELAY);
       setReady(true);
     });
-  }, [isPublicPage, pathname, router, setSession]);
+  }, [isPublicPage, pathname, router]);
 
-  useEffect(() => () => { if (refreshTimer.current) clearTimeout(refreshTimer.current); }, []);
+  useEffect(() => {
+    function refreshOnForeground() {
+      if (document.visibilityState !== "visible" || !user) return;
+      if (Date.now() - lastRefreshAtRef.current < FOREGROUND_REFRESH_AFTER) return;
+      const generation = generationRef.current;
+      void refreshSession().then((outcome) => {
+        if (generation !== generationRef.current) return;
+        if (outcome.kind === "success") applySession(outcome.session, generation);
+        else if (outcome.kind === "unauthorized") expireSession(generation);
+        else scheduleRefresh(generation, REFRESH_RETRY_DELAY);
+      });
+    }
+
+    document.addEventListener("visibilitychange", refreshOnForeground);
+    return () => document.removeEventListener("visibilitychange", refreshOnForeground);
+  }, [user]);
+
+  useEffect(() => () => {
+    if (refreshTimer.current) clearTimeout(refreshTimer.current);
+  }, []);
 
   const authFetch = useCallback(async (input: RequestInfo | URL, init: RequestInit = {}) => {
+    const requestGeneration = generationRef.current;
+    const request = input instanceof Request ? input : null;
     const send = () => {
-      const headers = new Headers(init.headers);
-      if (accessToken) headers.set("Authorization", `Bearer ${accessToken}`);
-      return fetch(input, { ...init, headers, credentials: "same-origin" });
+      const headers = new Headers(request?.headers);
+      new Headers(init.headers).forEach((value, key) => headers.set(key, value));
+      if (accessTokenRef.current) headers.set("Authorization", `Bearer ${accessTokenRef.current}`);
+      return fetch(request ? request.clone() : input, { ...init, headers, credentials: "same-origin" });
     };
+
     let response = await send();
     if (response.status !== 401) return response;
-    const session = await refreshSession();
-    if (!session) {
-      clearSession();
-      if (!isPublicPage) router.replace(`/login?next=${encodeURIComponent(pathname + window.location.search)}`);
+
+    const outcome = await refreshSession();
+    if (outcome.kind !== "success") {
+      if (outcome.kind === "unauthorized" && requestGeneration === generationRef.current) {
+        expireSession(requestGeneration);
+      }
       return response;
     }
-    setSession(session);
-    response = await send();
-    return response;
-  }, [clearSession, isPublicPage, pathname, router, setSession]);
+    if (requestGeneration !== generationRef.current) return response;
 
-  const value = useMemo(() => ({ user, ready, setSession, clearSession, authFetch }), [authFetch, clearSession, ready, setSession, user]);
+    applySession(outcome.session, requestGeneration);
+    try {
+      response = await send();
+    } catch {
+      return response;
+    }
+    return response;
+  }, [isPublicPage, pathname, router]);
+
+  const value = useMemo(
+    () => ({ user, ready, setSession, clearSession, authFetch }),
+    [authFetch, clearSession, ready, setSession, user],
+  );
   const showChildren = isPublicPage || (ready && user);
   return <AuthContext.Provider value={value}>{showChildren ? children : null}</AuthContext.Provider>;
 }

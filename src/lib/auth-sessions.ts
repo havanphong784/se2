@@ -1,7 +1,7 @@
-import { and, eq, gt, isNull } from "drizzle-orm";
+import { and, eq, gt, isNull, sql } from "drizzle-orm";
 
 import type { getDb } from "@/db";
-import { refreshTokens } from "@/db/schema";
+import { refreshTokens, users } from "@/db/schema";
 import {
   createRefreshToken,
   hashRefreshToken,
@@ -48,6 +48,10 @@ export async function rotateRefreshSession(db: Db, token: string) {
         .update(refreshTokens)
         .set({ revokedAt: now })
         .where(and(eq(refreshTokens.userId, current.userId), isNull(refreshTokens.revokedAt)));
+      await tx
+        .update(users)
+        .set({ authVersion: sql`${users.authVersion} + 1`, updatedAt: now })
+        .where(eq(users.id, current.userId));
       return null;
     }
 
@@ -79,6 +83,10 @@ export async function rotateRefreshSession(db: Db, token: string) {
         .update(refreshTokens)
         .set({ revokedAt: now })
         .where(and(eq(refreshTokens.userId, current.userId), isNull(refreshTokens.revokedAt)));
+      await tx
+        .update(users)
+        .set({ authVersion: sql`${users.authVersion} + 1`, updatedAt: now })
+        .where(eq(users.id, current.userId));
       return null;
     }
 

@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 import { getDb } from "@/db";
@@ -9,12 +10,7 @@ import {
   refreshCookieOptions,
 } from "@/lib/auth-tokens";
 import { getAuthUser } from "@/lib/auth";
-
-function isSameOrigin(request: Request) {
-  const origin = request.headers.get("origin");
-  if (!origin) return true;
-  return origin === new URL(request.url).origin;
-}
+import { isSameOrigin } from "@/lib/auth-origin";
 
 export async function POST(request: Request) {
   if (!isSameOrigin(request)) {
@@ -22,11 +18,7 @@ export async function POST(request: Request) {
   }
 
   const db = getDb();
-  const token = request.headers.get("cookie")
-    ?.split(";")
-    .map((value) => value.trim())
-    .find((value) => value.startsWith(`${REFRESH_COOKIE_NAME}=`))
-    ?.slice(REFRESH_COOKIE_NAME.length + 1);
+  const token = (await cookies()).get(REFRESH_COOKIE_NAME)?.value;
 
   if (!db || !token) {
     return NextResponse.json({ error: "Phiên đăng nhập đã hết hạn." }, { status: 401, headers: noStoreHeaders });
