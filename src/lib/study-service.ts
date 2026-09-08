@@ -38,6 +38,12 @@ type Transaction = Parameters<Parameters<Db["transaction"]>[0]>[0];
 
 export type { StudySessionDto } from "@/lib/study";
 
+const PHASE_ORDER: Record<StudyPhase, number> = {
+  flashcard: 1,
+  multiple_choice: 2,
+  typing: 3,
+};
+
 export async function getStudySession(
   db: Db | Transaction,
   sessionId: string,
@@ -301,8 +307,11 @@ export async function submitStudyEvent(
     if (!session || session.status === "abandoned") {
       throw new StudyServiceError("Phiên học không còn hoạt động.", 409);
     }
-    if (session.status === "completed") return;
+    if (session.status === "completed" || !session.phase) return;
     if (session.phase !== input.phase) {
+      if (PHASE_ORDER[input.phase] < PHASE_ORDER[session.phase]) {
+        return;
+      }
       throw new StudyServiceError("Bước học không còn hoạt động.", 409);
     }
 
@@ -333,7 +342,7 @@ export async function submitStudyEvent(
         : input.phase === "multiple_choice"
           ? sessionWord.multipleChoiceCompletedAt
           : sessionWord.typingCompletedAt;
-    if (completion) throw new StudyServiceError("Từ đã hoàn thành bước học này.", 409);
+    if (completion) return;
 
     const grading = evaluateStudyAnswer({
       phase: input.phase,

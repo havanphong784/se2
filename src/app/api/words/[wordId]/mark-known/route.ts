@@ -44,27 +44,10 @@ export async function POST(
 
     const now = new Date();
 
-    // Upsert word_progress to mastered
-    const [existing] = await db
-      .select({ id: wordProgress.id })
-      .from(wordProgress)
-      .where(and(eq(wordProgress.userId, user.id), eq(wordProgress.wordId, wordId)))
-      .limit(1);
-
-    if (existing) {
-      await db
-        .update(wordProgress)
-        .set({
-          status: "mastered",
-          mastery: 100,
-          reviewStage: 3,
-          reviewCompletedAt: now,
-          learnedAt: now,
-          updatedAt: now,
-        })
-        .where(eq(wordProgress.id, existing.id));
-    } else {
-      await db.insert(wordProgress).values({
+    // Atomic Upsert word_progress to mastered
+    await db
+      .insert(wordProgress)
+      .values({
         userId: user.id,
         wordId,
         status: "mastered",
@@ -76,8 +59,18 @@ export async function POST(
         reviewCompletedAt: now,
         learnedAt: now,
         updatedAt: now,
+      })
+      .onConflictDoUpdate({
+        target: [wordProgress.userId, wordProgress.wordId],
+        set: {
+          status: "mastered",
+          mastery: 100,
+          reviewStage: 3,
+          reviewCompletedAt: now,
+          learnedAt: now,
+          updatedAt: now,
+        },
       });
-    }
 
     markDatabaseAvailable();
     return NextResponse.json({ success: true, wordId, status: "mastered" });

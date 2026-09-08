@@ -312,11 +312,19 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
       ...items.filter((item) => item.eventId !== payload.eventId),
       { ...payload, failed: false },
     ]);
-    const request = writeChainRef.current.then(() => sendCompletion(payload));
+    const request = writeChainRef.current
+      .catch(() => {})
+      .then(() => sendCompletion(payload));
     writeChainRef.current = request;
     void request
       .then(() => {
-        setPendingWrites((items) => items.filter((item) => item.eventId !== payload.eventId));
+        setPendingWrites((items) => {
+          const next = items.filter((item) => item.eventId !== payload.eventId);
+          if (next.every((item) => !item.failed)) {
+            setError(null);
+          }
+          return next;
+        });
       })
       .catch((caught) => {
         setPendingWrites((items) =>
@@ -513,6 +521,11 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
                 ? "Giữ trang này mở và thử lại để không mất tiến độ."
                 : `Còn ${pendingWrites.length} từ đang được lưu.`}
             </p>
+            {failedWrites.length > 0 && error && (
+              <div className="mx-auto mt-4 rounded-xl border-2 border-[#ffb4b4] bg-[#fff7f7] p-3 text-center text-sm font-bold text-[#c43e3e]" role="alert">
+                <p>{error}</p>
+              </div>
+            )}
             {failedWrites.length > 0 && (
               <Button
                 size="lg"

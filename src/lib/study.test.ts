@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
+import { StudyServiceError } from "./study-service";
 import { vnDateBoundary } from "./utils";
 import {
   addDays,
@@ -406,3 +407,89 @@ test("getTodayStudyMinutes calculates study time accurately", () => {
   assert.equal(getTodayStudyMinutes({ reviewed: 5, learned: 5, studySeconds: 20 }), 1);
   assert.equal(getTodayStudyMinutes({ reviewed: 4, learned: 6, studySeconds: 0 }), 5);
 });
+
+test("applyStudyResult maintains completed word state when replayed", () => {
+  const session: StudySessionDto = {
+    id: "session-1",
+    mode: "review",
+    status: "active",
+    phase: "typing",
+    requestedSize: 10,
+    selectedSize: 1,
+    learnedCount: 0,
+    reviewedCount: 0,
+    attemptCount: 0,
+    incorrectCount: 0,
+    words: [
+      {
+        id: "word-1",
+        position: 0,
+        term: "hello",
+        translation: "xin chào",
+        phonetic: "",
+        partOfSpeech: [],
+        exampleSentence: "",
+        exampleTranslation: "",
+        flashcardCompleted: true,
+        multipleChoiceCompleted: true,
+        typingCompleted: false,
+        incorrectAttemptCount: 0,
+      },
+    ],
+  };
+
+  const completed = applyStudyResult(session, {
+    wordId: "word-1",
+    phase: "typing",
+    isCorrect: true,
+    expectedAnswer: "hello",
+  });
+  assert.equal(completed.status, "completed");
+  assert.equal(completed.words[0].typingCompleted, true);
+
+  const replayed = applyStudyResult(completed, {
+    wordId: "word-1",
+    phase: "typing",
+    isCorrect: true,
+    expectedAnswer: "hello",
+  });
+  assert.equal(replayed.words[0].typingCompleted, true);
+  assert.equal(replayed.status, "completed");
+});
+
+test("sequential write queue with catch recovery continues executing after failure", async () => {
+  let writeChain: Promise<void> = Promise.resolve();
+  const executed: string[] = [];
+
+  const enqueue = (id: string, shouldFail: boolean) => {
+    const request = writeChain
+      .catch(() => {})
+      .then(async () => {
+        if (shouldFail) throw new Error(`Write failed for ${id}`);
+        executed.push(id);
+      });
+    writeChain = request;
+    return request;
+  };
+
+  const first = enqueue("w1", true);
+  const second = enqueue("w2", false);
+  const third = enqueue("w3", false);
+
+  await assert.rejects(first, /Write failed for w1/);
+  await second;
+  await third;
+
+  assert.deepEqual(executed, ["w2", "w3"]);
+});
+
+test("StudyServiceError carries default and custom status code", () => {
+  const defaultErr = new StudyServiceError("Lỗi mặc định");
+  assert.equal(defaultErr.status, 400);
+  assert.equal(defaultErr.message, "Lỗi mặc định");
+
+  const conflictErr = new StudyServiceError("Lỗi xung đột", 409);
+  assert.equal(conflictErr.status, 409);
+  assert.equal(conflictErr.message, "Lỗi xung đột");
+});
+
