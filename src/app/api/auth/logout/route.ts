@@ -10,8 +10,13 @@ import {
   REFRESH_COOKIE_NAME,
   refreshCookieOptions,
 } from "@/lib/auth-tokens";
+import { isSameOrigin } from "@/lib/auth-origin";
 
-export async function POST() {
+export async function POST(request: Request) {
+  if (!isSameOrigin(request)) {
+    return NextResponse.json({ error: "Nguồn yêu cầu không hợp lệ." }, { status: 403, headers: noStoreHeaders });
+  }
+
   const cookieStore = await cookies();
   const token = cookieStore.get(REFRESH_COOKIE_NAME)?.value;
   const db = getDb();

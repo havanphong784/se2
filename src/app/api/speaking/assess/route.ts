@@ -98,8 +98,23 @@ export async function POST(request: Request) {
       }
     }
 
-    // Fallback khi không có Azure Key hoặc API lỗi: Tính điểm ngẫu nhiên thực tế (78 - 96%) dựa trên độ dài audio
+    // Fallback khi không có Azure Key hoặc API lỗi
     const audioSize = audioFile.size;
+
+    // Nếu kích thước âm thanh quá nhỏ (dưới 4KB ~ khoảng lặng hoặc lỗi mic), không cho điểm giả mạo
+    if (audioSize < 4000) {
+      return NextResponse.json({
+        accuracyScore: 0,
+        fluencyScore: 0,
+        completenessScore: 0,
+        pronScore: 0,
+        phonemeScores: expectedPhoneme
+          ? [{ phoneme: expectedPhoneme, accuracyScore: 0 }]
+          : [],
+        isFallback: true,
+      } satisfies PronunciationAssessmentResponse);
+    }
+
     const baseScore = Math.min(
       95,
       Math.max(75, 80 + (audioSize % 15) - 3),

@@ -65,20 +65,20 @@ async function requestRefresh(): Promise<RefreshOutcome> {
 
 async function refreshSession(): Promise<RefreshOutcome> {
   if (!refreshPromise) {
-    refreshPromise = (async () => {
+    refreshPromise = (async (): Promise<RefreshOutcome> => {
       try {
         const locks = typeof navigator !== "undefined" ? (navigator as NavigatorWithLocks).locks : undefined;
         return locks
           ? await locks.request("vocabloom-auth-refresh", requestRefresh)
           : await requestRefresh();
       } catch {
-        return { kind: "transient", status: null };
+        return { kind: "transient" as const, status: null };
       }
     })().finally(() => {
       refreshPromise = null;
     });
   }
-  return refreshPromise;
+  return refreshPromise!;
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -106,8 +106,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [queryClient]);
 
   function redirectToLogin() {
-    if (!isPublicPage) {
-      router.replace(`/login?next=${encodeURIComponent(pathname + window.location.search)}`);
+    if (!isPublicPage && typeof window !== "undefined") {
+      const currentTarget = `${window.location.pathname}${window.location.search}`;
+      router.replace(`/login?next=${encodeURIComponent(currentTarget)}`);
     }
   }
 

@@ -60,7 +60,7 @@ export default function VocabularyPage() {
       {/* Hero Banner: Colorful & Inviting */}
       <section
         aria-label="Giới thiệu khu vườn từ vựng"
-        className="relative mb-10 overflow-hidden rounded-xl border-2 border-b-4 border-eel-light border-b-[#c4f0a0] bg-[#fbfff8] p-6 md:p-8"
+        className="relative mb-10 overflow-hidden rounded-xl border-2 border-b-4 border-eel-light border-b-lingot-lime bg-eel-light/20 p-6 md:p-8"
       >
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div className="max-w-2xl">
@@ -82,17 +82,17 @@ export default function VocabularyPage() {
 
           {/* Quick Stats Banner: Colorful, clear metrics */}
           <div className="grid grid-cols-3 gap-3 sm:w-auto sm:shrink-0">
-            <div className="flex min-w-[100px] flex-col items-center justify-center rounded-xl border-2 border-b-4 border-lingot-lime border-b-[#8ed459] bg-[#f7fff1] p-3.5 text-center sm:min-w-[115px]">
+            <div className="flex min-w-[100px] flex-col items-center justify-center rounded-xl border-2 border-b-4 border-lingot-lime border-b-ecto-green bg-lingot-lime/15 p-3.5 text-center sm:min-w-[115px]">
               <div className="flex items-center gap-1 text-ecto-green">
                 <Brain className="size-4" />
-                <span className="text-[11px] font-black uppercase tracking-wider text-[#438f0e]">Đã thuộc</span>
+                <span className="text-[11px] font-black uppercase tracking-wider text-eel-dark-blue">Đã thuộc</span>
               </div>
-              <strong className="mt-1 text-2xl font-black text-[#438f0e] tabular-nums sm:text-3xl">
+              <strong className="mt-1 text-2xl font-black text-ecto-green tabular-nums sm:text-3xl">
                 {mastered}
               </strong>
             </div>
 
-            <div className="flex min-w-[100px] flex-col items-center justify-center rounded-xl border-2 border-b-4 border-macaw-blue border-b-[#168bc2] bg-[#f4fbff] p-3.5 text-center sm:min-w-[115px]">
+            <div className="flex min-w-[100px] flex-col items-center justify-center rounded-xl border-2 border-b-4 border-macaw-blue border-b-macaw-blue/80 bg-macaw-blue/10 p-3.5 text-center sm:min-w-[115px]">
               <div className="flex items-center gap-1 text-macaw-blue">
                 <Clock3 className="size-4" />
                 <span className="text-[11px] font-black uppercase tracking-wider text-macaw-blue">Hôm nay</span>

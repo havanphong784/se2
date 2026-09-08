@@ -21,6 +21,10 @@ test("rejects cross-origin requests", () => {
   assert.equal(isSameOrigin(fakeRequest("http://localhost:3000/api/auth/refresh", "https://evil.com")), false);
 });
 
+test("rejects opaque null origin requests", () => {
+  assert.equal(isSameOrigin(fakeRequest("http://localhost:3000/api/auth/refresh", "null")), false);
+});
+
 test("uses APP_URL when set for origin comparison", () => {
   const original = process.env.APP_URL;
   process.env.APP_URL = "https://vocabloom.example.com";
