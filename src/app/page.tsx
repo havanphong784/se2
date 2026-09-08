@@ -98,6 +98,9 @@ export default function DashboardPage() {
   });
   const weekDue = weekDates.map((date) => {
     const dayKey = vnDateKey(date);
+    if (dayKey === todayKey) {
+      return dueWords.length;
+    }
     return allWords.filter((word) => {
       if (
         !word.learnedAt ||
@@ -123,18 +126,20 @@ export default function DashboardPage() {
 
     const fullDateLabel = vnDayLabel(date);
     const reviewed = reviewedByDate.get(`${weekday}-${fullDateLabel}`) ?? 0;
-    const due = allWords.filter((word) => {
-      if (
-        !word.learnedAt ||
-        word.status === "mastered" ||
-        word.reviewCompletedAt ||
-        !word.nextReviewAt
-      )
-        return false;
-      const dueDate = new Date(word.nextReviewAt);
-      if (Number.isNaN(dueDate.getTime())) return false;
-      return vnDateKey(dueDate) === dayKey;
-    }).length;
+    const due = isToday
+      ? dueWords.length
+      : allWords.filter((word) => {
+          if (
+            !word.learnedAt ||
+            word.status === "mastered" ||
+            word.reviewCompletedAt ||
+            !word.nextReviewAt
+          )
+            return false;
+          const dueDate = new Date(word.nextReviewAt);
+          if (Number.isNaN(dueDate.getTime())) return false;
+          return vnDateKey(dueDate) === dayKey;
+        }).length;
 
     return {
       date: dayKey,

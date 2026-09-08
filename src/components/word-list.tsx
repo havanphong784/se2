@@ -20,15 +20,6 @@ const filters: Array<{ value: "all" | WordStatus; label: string }> = [
   { value: "mastered", label: "Đã thuộc" },
 ];
 
-const statusConfig: Record<
-  WordStatus,
-  { label: string; badgeVariant: "neutral" | "blue" | "default" }
-> = {
-  new: { label: "Mới", badgeVariant: "neutral" },
-  learning: { label: "Đang học", badgeVariant: "blue" },
-  mastered: { label: "Đã thuộc", badgeVariant: "default" },
-};
-
 export function WordList({ words: initialWords }: { words: VocabularyWord[] }) {
   const { authFetch } = useAuth();
   const invalidateAuthData = useInvalidateAuthData();
@@ -122,7 +113,7 @@ export function WordList({ words: initialWords }: { words: VocabularyWord[] }) {
         });
       }
     },
-    [initialWords],
+    [authFetch, initialWords, invalidateAuthData],
   );
 
   const handleConfirm = () => {
@@ -204,7 +195,6 @@ export function WordList({ words: initialWords }: { words: VocabularyWord[] }) {
         {/* Rows */}
         <div className="divide-y divide-[#f0f0f0]">
           {filteredWords.map((word) => {
-            const config = statusConfig[word.status];
             const isMastered = word.status === "mastered";
 
             return (
