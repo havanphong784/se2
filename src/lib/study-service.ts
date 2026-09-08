@@ -38,7 +38,7 @@ type Transaction = Parameters<Parameters<Db["transaction"]>[0]>[0];
 
 export type { StudySessionDto } from "@/lib/study";
 
-const PHASE_ORDER: Record<StudyPhase, number> = {
+const PHASE_ORDER: Record<string, number> = {
   flashcard: 1,
   multiple_choice: 2,
   typing: 3,
@@ -309,7 +309,9 @@ export async function submitStudyEvent(
     }
     if (session.status === "completed" || !session.phase) return;
     if (session.phase !== input.phase) {
-      if (PHASE_ORDER[input.phase] < PHASE_ORDER[session.phase]) {
+      const currentOrder = PHASE_ORDER[session.phase] ?? 0;
+      const inputOrder = PHASE_ORDER[input.phase] ?? 0;
+      if (inputOrder < currentOrder) {
         return;
       }
       throw new StudyServiceError("Bước học không còn hoạt động.", 409);
