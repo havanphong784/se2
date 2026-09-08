@@ -105,49 +105,68 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     queryClient.clear();
   }, [queryClient]);
 
-  function redirectToLogin() {
+  const redirectToLogin = useCallback(() => {
     if (!isPublicPage && typeof window !== "undefined") {
       const currentTarget = `${window.location.pathname}${window.location.search}`;
       router.replace(`/login?next=${encodeURIComponent(currentTarget)}`);
     }
-  }
+  }, [isPublicPage, router]);
 
-  function expireSession(generation: number) {
-    if (generation !== generationRef.current) return;
-    clearSession();
-    redirectToLogin();
-  }
-
-  function scheduleRefresh(generation: number, delay = ACCESS_REFRESH_INTERVAL) {
-    if (refreshTimer.current) clearTimeout(refreshTimer.current);
-    refreshTimer.current = setTimeout(async () => {
+  const expireSession = useCallback(
+    (generation: number) => {
       if (generation !== generationRef.current) return;
-      const outcome = await refreshSession();
-      if (generation !== generationRef.current) return;
-      if (outcome.kind === "success") {
-        applySession(outcome.session, generation);
-      } else if (outcome.kind === "unauthorized") {
-        expireSession(generation);
-      } else {
-        scheduleRefresh(generation, REFRESH_RETRY_DELAY);
-      }
-    }, delay);
-  }
+      clearSession();
+      redirectToLogin();
+    },
+    [clearSession, redirectToLogin],
+  );
 
-  function applySession(session: AuthResponse, generation: number) {
-    if (generation !== generationRef.current) return false;
-    accessTokenRef.current = session.accessToken;
-    lastRefreshAtRef.current = Date.now();
-    setUser(session.user);
-    scheduleRefresh(generation);
-    return true;
-  }
+  const applySessionRef = useRef<(session: AuthResponse, generation: number) => boolean>(() => false);
+  const scheduleRefreshRef = useRef<(generation: number, delay?: number) => void>(() => {});
 
-  const setSession = useCallback((session: AuthResponse) => {
-    const generation = generationRef.current + 1;
-    generationRef.current = generation;
-    applySession(session, generation);
+  const scheduleRefresh = useCallback((generation: number, delay = ACCESS_REFRESH_INTERVAL) => {
+    scheduleRefreshRef.current(generation, delay);
   }, []);
+
+  const applySession = useCallback((session: AuthResponse, generation: number) => {
+    return applySessionRef.current(session, generation);
+  }, []);
+
+  useEffect(() => {
+    scheduleRefreshRef.current = (generation: number, delay = ACCESS_REFRESH_INTERVAL) => {
+      if (refreshTimer.current) clearTimeout(refreshTimer.current);
+      refreshTimer.current = setTimeout(async () => {
+        if (generation !== generationRef.current) return;
+        const outcome = await refreshSession();
+        if (generation !== generationRef.current) return;
+        if (outcome.kind === "success") {
+          applySession(outcome.session, generation);
+        } else if (outcome.kind === "unauthorized") {
+          expireSession(generation);
+        } else {
+          scheduleRefresh(generation, REFRESH_RETRY_DELAY);
+        }
+      }, delay);
+    };
+
+    applySessionRef.current = (session: AuthResponse, generation: number) => {
+      if (generation !== generationRef.current) return false;
+      accessTokenRef.current = session.accessToken;
+      lastRefreshAtRef.current = Date.now();
+      setUser(session.user);
+      scheduleRefresh(generation);
+      return true;
+    };
+  });
+
+  const setSession = useCallback(
+    (session: AuthResponse) => {
+      const generation = generationRef.current + 1;
+      generationRef.current = generation;
+      applySession(session, generation);
+    },
+    [applySession],
+  );
 
   useEffect(() => {
     if (isPublicPage) return;
@@ -160,7 +179,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       else scheduleRefresh(generation, REFRESH_RETRY_DELAY);
       setReady(true);
     });
-  }, [isPublicPage, pathname, router]);
+  }, [applySession, isPublicPage, pathname, redirectToLogin, scheduleRefresh]);
 
   useEffect(() => {
     function refreshOnForeground() {
@@ -177,7 +196,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     document.addEventListener("visibilitychange", refreshOnForeground);
     return () => document.removeEventListener("visibilitychange", refreshOnForeground);
-  }, [user]);
+  }, [applySession, expireSession, scheduleRefresh, user]);
 
   useEffect(() => () => {
     if (refreshTimer.current) clearTimeout(refreshTimer.current);
@@ -212,7 +231,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return response;
     }
     return response;
-  }, [isPublicPage, pathname, router]);
+  }, [applySession, expireSession]);
 
   const value = useMemo(
     () => ({ user, ready, setSession, clearSession, authFetch }),

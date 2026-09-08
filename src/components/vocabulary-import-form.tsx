@@ -15,7 +15,7 @@ import {
   type ImportParseResult,
 } from "@/lib/vocabulary-import";
 import { useAuth } from "@/components/auth-provider";
-import { useInvalidateAuthData } from "@/lib/hooks/use-queries";
+import { useDecks, useInvalidateAuthData } from "@/lib/hooks/use-queries";
 
 type PersonalDeck = { id: string; title: string; slug: string };
 
@@ -26,18 +26,29 @@ type Success = {
 
 export function VocabularyImportForm({
   available,
-  decks,
+  decks: initialDecks,
 }: {
   available: boolean;
   decks: PersonalDeck[];
 }) {
   const { authFetch } = useAuth();
   const invalidateAuthData = useInvalidateAuthData();
+  const { data: remoteDecks } = useDecks();
+  const decks = (remoteDecks
+    ? remoteDecks
+        .filter((d) => d.ownership === "personal")
+        .map((d) => ({ id: d.id, title: d.title, slug: d.slug }))
+    : initialDecks);
+
   const [file, setFile] = useState<File | null>(null);
   const [format, setFormat] = useState<ImportFormat>("csv");
   const [preview, setPreview] = useState<ImportParseResult | null>(null);
   const [destination, setDestination] = useState<"new" | "existing">("new");
   const [deckId, setDeckId] = useState(decks[0]?.id ?? "");
+
+  if (decks.length > 0 && !deckId && destination === "existing") {
+    setDeckId(decks[0].id);
+  }
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [level, setLevel] = useState("Tự chọn");

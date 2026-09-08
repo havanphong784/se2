@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
   ArrowLeftRight,
@@ -27,7 +27,7 @@ import { Input } from "@/components/ui/input";
 import { speakEnglish } from "@/lib/speech";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/auth-provider";
-import { useInvalidateAuthData } from "@/lib/hooks/use-queries";
+import { useDecks, useInvalidateAuthData } from "@/lib/hooks/use-queries";
 
 type PersonalDeck = { id: string; title: string; slug: string };
 
@@ -115,12 +115,29 @@ export function TranslationTool({
   }
 
   // Deck modal state
-  const [decks, setDecks] = useState<PersonalDeck[]>(initialDecks);
+  const { data: remoteDecks } = useDecks();
+  const [createdDecks, setCreatedDecks] = useState<PersonalDeck[]>([]);
+  const decks = useMemo(() => {
+    const list = remoteDecks
+      ? remoteDecks
+          .filter((d) => d.ownership === "personal")
+          .map((d) => ({ id: d.id, title: d.title, slug: d.slug }))
+      : initialDecks;
+    const combined = [...createdDecks, ...list];
+    const seen = new Set<string>();
+    return combined.filter((d) => {
+      if (seen.has(d.id)) return false;
+      seen.add(d.id);
+      return true;
+    });
+  }, [remoteDecks, initialDecks, createdDecks]);
+
   const [showDeckModal, setShowDeckModal] = useState(false);
   const [destinationType, setDestinationType] = useState<"existing" | "new">(
-    decks.length > 0 ? "existing" : "new",
+    initialDecks.length > 0 ? "existing" : "new",
   );
-  const [selectedDeckId, setSelectedDeckId] = useState(decks[0]?.id ?? "");
+  const [selectedDeckId, setSelectedDeckId] = useState("");
+  const activeDeckId = selectedDeckId || decks[0]?.id || "";
   const [newTitle, setNewTitle] = useState("");
   const [newDescription, setNewDescription] = useState("");
   const newLevel = "Tự chọn";
@@ -295,7 +312,7 @@ export function TranslationTool({
     const payload = {
       destination:
         destinationType === "existing"
-          ? { type: "existing", deckId: selectedDeckId }
+          ? { type: "existing", deckId: activeDeckId }
           : { type: "new", title: newTitle, description: newDescription, level: newLevel },
       word: {
         term,
@@ -321,7 +338,7 @@ export function TranslationTool({
       setAddMessage({ type: "success", text: data.message });
 
       if (destinationType === "new" && data.deck) {
-        setDecks((prev) => [data.deck, ...prev]);
+        setCreatedDecks((prev) => [data.deck, ...prev]);
         setSelectedDeckId(data.deck.id);
         setDestinationType("existing");
         setNewTitle("");
@@ -786,7 +803,7 @@ export function TranslationTool({
                       Danh sách gói từ cá nhân
                     </label>
                     <select
-                      value={selectedDeckId}
+                      value={activeDeckId}
                       onChange={(e) => setSelectedDeckId(e.target.value)}
                       className="w-full rounded-xl border-2 border-[#e5e5e5] p-3 text-sm font-extrabold text-eel-dark-blue bg-white"
                     >

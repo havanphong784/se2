@@ -9,7 +9,6 @@ import {
 import { dailyActivity, decks, wordProgress, words } from "@/db/schema";
 import { getCurrentAuthUser } from "@/lib/auth";
 import {
-  DEMO_ACTIVITY,
   DEMO_DECKS,
   DEMO_STREAK,
   getDemoActivity,
@@ -61,17 +60,6 @@ function fallbackLearningData(source: Exclude<DataSource, "database">): DataResu
     { decks: fallbackDecks(), activity: fallbackActivity(), streak: fallbackStreak() },
     source,
   );
-}
-
-function emptyRecentActivity(): ActivityItem[] {
-  return vnWeekDates().map((date) => ({
-    day: vnWeekdayLabel(date),
-    fullDate: vnDayLabel(date),
-    reviewed: 0,
-    learned: 0,
-    xp: 0,
-    studySeconds: 0,
-  }));
 }
 
 type ActivityRow = {

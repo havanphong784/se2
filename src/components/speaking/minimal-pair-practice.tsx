@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Volume2, ArrowRightLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { MinimalPair } from "@/lib/ipa/types";
