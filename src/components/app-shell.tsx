@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   BookOpenText,
+  BookMarked,
   ClipboardCheck,
   Flame,
   Headphones,
@@ -23,6 +24,7 @@ import { useStreak } from "@/lib/hooks/use-queries";
 const navigation = [
   { href: "/", label: "Tổng quan", icon: Home },
   { href: "/vocabulary", label: "Học từ vựng", icon: BookOpenText },
+  { href: "/reading", label: "Đọc hiểu AI", icon: BookMarked },
   { href: "/grammar", label: "Ngữ pháp", icon: Puzzle },
   { href: "/listening", label: "Luyện nghe", icon: Headphones },
   { href: "/speaking", label: "Luyện nói", icon: Mic2 },

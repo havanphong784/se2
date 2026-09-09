@@ -367,3 +367,54 @@ export const dailyActivity = pgTable(
     ),
   ],
 ).enableRLS();
+
+export const readingDocuments = pgTable(
+  "reading_documents",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    sourceType: text("source_type").notNull(), // 'raw_text' | 'pdf' | 'image'
+    originalFileName: text("original_file_name"),
+    rawContent: text("raw_content").notNull(),
+    totalWords: integer("total_words").default(0).notNull(),
+    estimatedCefr: text("estimated_cefr"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index("reading_documents_user_id_idx").on(table.userId),
+  ],
+).enableRLS();
+
+export const readingAnnotations = pgTable(
+  "reading_annotations",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    documentId: uuid("document_id")
+      .notNull()
+      .references(() => readingDocuments.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    sentenceHash: text("sentence_hash").notNull(),
+    analysisJson: text("analysis_json").notNull(),
+    savedWordId: uuid("saved_word_id").references(() => words.id, {
+      onDelete: "set null",
+    }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index("reading_annotations_doc_user_idx").on(table.documentId, table.userId),
+    index("reading_annotations_hash_idx").on(table.sentenceHash),
+  ],
+).enableRLS();
+
