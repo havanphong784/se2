@@ -106,6 +106,26 @@ logy sector is growing fast.`;
       assert.equal(retrieved?.phonetic, "/rɪˈzɪliəns/");
       assert.equal(retrieved?.translationVi, "khả năng phục hồi");
     });
+
+    it("merge cẩn thận translationVi và không bị ghi đè thành rỗng", async () => {
+      const { setCachedWord, getCachedWord } = await import("./dictionary-cache");
+
+      setCachedWord("serendipity", {
+        translationVi: "sự tình cờ may mắn",
+      });
+
+      // Lần cập nhật sau chỉ có definition, không có translationVi
+      setCachedWord("serendipity", {
+        definition: "the occurrence and development of events by chance",
+        phonetic: "/ˌser.ənˈdɪp.ə.ti/",
+      });
+
+      const merged = getCachedWord("serendipity");
+      assert.ok(merged);
+      assert.equal(merged?.translationVi, "sự tình cờ may mắn", "translationVi phải được giữ nguyên khi merge");
+      assert.equal(merged?.phonetic, "/ˌser.ənˈdɪp.ə.ti/");
+      assert.ok(merged?.definition?.includes("occurrence"));
+    });
   });
 
   describe("Phrase Matcher", () => {
@@ -127,6 +147,31 @@ logy sector is growing fast.`;
       assert.equal(aiPhrase?.subWords.length, 2);
       assert.equal(aiPhrase?.subWords[0].cleanWord.toLowerCase(), "artificial");
       assert.equal(aiPhrase?.subWords[1].cleanWord.toLowerCase(), "intelligence");
+    });
+
+    it("tự động gán meaningVi từ cache L1/L2 cho cụm từ NLP", async () => {
+      const { setCachedWord } = await import("./dictionary-cache");
+      const { detectPhrasesInSentence } = await import("./phrase-matcher");
+
+      // Cụm từ được prefetch vào cache trước
+      setCachedWord("profound questions", {
+        translationVi: "những câu hỏi sâu sắc",
+      });
+
+      const sentence = "Artificial intelligence brings profound questions.";
+      const tokens = tagSentenceWords(sentence);
+
+      const result = detectPhrasesInSentence(sentence, tokens);
+      const profoundPhrase = result.phrases.find(
+        (p) => p.cleanPhrase === "profound questions"
+      );
+
+      assert.ok(profoundPhrase, "Phải nhận diện được cụm adjective+noun 'profound questions'");
+      assert.equal(
+        profoundPhrase?.meaningVi,
+        "những câu hỏi sâu sắc",
+        "meaningVi phải được lấy trực tiếp từ L1 cache 0ms"
+      );
     });
   });
 

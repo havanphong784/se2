@@ -20,56 +20,58 @@ async function batchGoogleTranslate(
   if (words.length === 0) return {};
 
   const cleanWords = words.map((w) => w.trim()).filter(Boolean);
-  if (cleanWords.length === 0) return {};
+  const CHUNK_SIZE = 20;
+  const chunks: string[][] = [];
+  for (let i = 0; i < cleanWords.length; i += CHUNK_SIZE) {
+    chunks.push(cleanWords.slice(i, i + CHUNK_SIZE));
+  }
 
   const result: Record<string, string> = {};
-  const CHUNK_SIZE = 20;
 
-  for (let i = 0; i < cleanWords.length; i += CHUNK_SIZE) {
-    const chunk = cleanWords.slice(i, i + CHUNK_SIZE);
-    const text = chunk.join("\n");
+  await Promise.allSettled(
+    chunks.map(async (chunk) => {
+      const text = chunk.join("\n");
+      try {
+        const url = new URL("https://translate.googleapis.com/translate_a/single");
+        url.searchParams.set("client", "gtx");
+        url.searchParams.set("sl", "en");
+        url.searchParams.set("tl", "vi");
+        url.searchParams.set("dt", "t");
+        url.searchParams.set("q", text);
 
-    try {
-      const url = new URL("https://translate.googleapis.com/translate_a/single");
-      url.searchParams.set("client", "gtx");
-      url.searchParams.set("sl", "en");
-      url.searchParams.set("tl", "vi");
-      url.searchParams.set("dt", "t");
-      url.searchParams.set("q", text);
+        const res = await fetch(url.toString(), {
+          headers: { "User-Agent": "Mozilla/5.0 Vocabloom/1.0" },
+          signal: AbortSignal.timeout(5000),
+        });
 
-      const res = await fetch(url.toString(), {
-        headers: { "User-Agent": "Mozilla/5.0 Vocabloom/1.0" },
-        signal: AbortSignal.timeout(5000),
-      });
+        if (!res.ok) return;
 
-      if (!res.ok) continue;
+        const data = (await res.json()) as Array<Array<Array<string>>>;
+        if (!Array.isArray(data) || !Array.isArray(data[0])) return;
 
-      const data = (await res.json()) as Array<Array<Array<string>>>;
-      if (!Array.isArray(data) || !Array.isArray(data[0])) continue;
+        const rawTranslated = data[0]
+          .filter((part) => Array.isArray(part) && typeof part[0] === "string")
+          .map((part) => part[0])
+          .join("");
 
-      const rawTranslated = data[0]
-        .filter((part) => Array.isArray(part) && typeof part[0] === "string")
-        .map((part) => part[0])
-        .join("");
+        const translatedLines = rawTranslated.split("\n").map((s) => s.trim());
 
-      const translatedLines = rawTranslated.split("\n").map((s) => s.trim());
-
-      chunk.forEach((w, idx) => {
-        const trans = translatedLines[idx] || "";
-        const lower = w.toLowerCase();
-        result[lower] = trans;
-        if (SERVER_BATCH_CACHE.size >= MAX_BATCH_CACHE) {
-          const firstKey = SERVER_BATCH_CACHE.keys().next().value;
-          if (firstKey) SERVER_BATCH_CACHE.delete(firstKey);
-        }
-        if (trans) {
-          SERVER_BATCH_CACHE.set(lower, trans);
-        }
-      });
-    } catch {
-      // Bỏ qua lỗi từng batch nhỏ
-    }
-  }
+        chunk.forEach((w, idx) => {
+          const trans = translatedLines[idx] || "";
+          result[w.toLowerCase()] = trans;
+          if (SERVER_BATCH_CACHE.size >= MAX_BATCH_CACHE) {
+            const firstKey = SERVER_BATCH_CACHE.keys().next().value;
+            if (firstKey) SERVER_BATCH_CACHE.delete(firstKey);
+          }
+          if (trans) {
+            SERVER_BATCH_CACHE.set(w.toLowerCase(), trans);
+          }
+        });
+      } catch {
+        // ignore
+      }
+    })
+  );
 
   return result;
 }

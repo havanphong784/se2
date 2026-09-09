@@ -104,8 +104,8 @@ export function detectPhrasesInSentence(
     // Bắt phrasal verbs: (động từ đi kèm tiểu từ/giới từ)
     const phrasalMatches = doc.match("(#Verb && #PhrasalVerb)+ (#Particle|#Preposition)+").json() as Array<{ text: string }>;
     for (let i = 0; i < phrasalMatches.length; i++) {
-      const matchText = phrasalMatches[i].text;
-      const pWords = matchText.trim().split(/\s+/);
+      const matchText = phrasalMatches[i].text.trim().replace(/^[^\w]+|[^\w]+$/g, "");
+      const pWords = matchText.split(/\s+/);
       if (pWords.length < 2) continue;
 
       const indices = findTokenSequence(tokens, pWords);
@@ -140,8 +140,8 @@ export function detectPhrasesInSentence(
     // Bắt Adjective + Noun collocations (chỉ lấy 2-3 từ)
     const adjNounMatches = doc.match("#Adjective+ #Noun+").json() as Array<{ text: string }>;
     for (let i = 0; i < adjNounMatches.length; i++) {
-      const matchText = adjNounMatches[i].text;
-      const pWords = matchText.trim().split(/\s+/);
+      const matchText = adjNounMatches[i].text.trim().replace(/^[^\w]+|[^\w]+$/g, "");
+      const pWords = matchText.split(/\s+/);
       if (pWords.length < 2 || pWords.length > 3) continue;
 
       const indices = findTokenSequence(tokens, pWords);

@@ -57,7 +57,7 @@ export function ChunkPaginationBar({
           value={activeChunkIndex}
           onChange={(e) => onSelectChunkIndex(Number(e.target.value))}
           aria-label="Chọn phần đọc"
-          className="h-8 rounded-lg border border-[#e5e5e5] bg-[#fafafa] px-2 text-xs font-black text-eel-dark-blue hover:bg-white focus:border-[#1cb0f6] focus:outline-none cursor-pointer max-w-[190px] sm:max-w-none"
+          className="h-8 rounded-lg border border-[#e5e5e5] bg-[#fafafa] px-2 text-xs font-black text-eel-dark-blue hover:bg-white focus:border-[#1cb0f6] focus:outline-none cursor-pointer max-w-[190px] sm:max-w-[210px] md:max-w-[230px]"
         >
           {Array.from({ length: totalChunks }, (_, i) => {
             const sP = i * (meta.pagesPerChunk || 10) + 1;

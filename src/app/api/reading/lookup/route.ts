@@ -40,9 +40,9 @@ async function googleTranslate(text: string, sourceLang: string, targetLang: str
 
     const response = await fetch(url.toString(), {
       headers: {
-        "User-Agent": "Mozilla/5.0 Vocabloom/1.0",
+        "User-Agent": "Mozilla/5.0",
       },
-      signal: AbortSignal.timeout(3500),
+      signal: AbortSignal.timeout(4000),
     });
 
     if (!response.ok) return null;
@@ -71,7 +71,7 @@ export async function GET(request: Request) {
   const word = rawWord.trim().toLowerCase();
   const isPhrase = word.includes(" ") || word.includes("-");
 
-  // 1. Kiểm tra Server In-Memory Cache - chỉ coi là cache hit hợp lệ khi có translationVi hoặc definition
+  // 1. Kiểm tra Server In-Memory Cache (chỉ chấp nhận nếu có bản dịch hoặc định nghĩa)
   if (serverDictCache.has(word)) {
     const cachedData = serverDictCache.get(word)!;
     if (cachedData.translationVi || cachedData.definition) {
@@ -85,51 +85,76 @@ export async function GET(request: Request) {
   let synonyms: string[] = [];
 
   try {
+    // 2. Nếu là cụm từ (phrase): dịch qua Google Translate
     if (isPhrase) {
-      // 2. Nếu là cụm từ (phrase): dịch qua Google Translate
       const trans = await googleTranslate(word, "en", "vi");
       if (trans) {
         translationVi = trans;
       }
     } else {
-      // 3. Nếu là từ đơn: gọi song song Google Translate và dictionaryapi.dev (tối đa 350ms)
-      const dictState: { settled: boolean; result: DictionaryEntry[] | null } = {
-        settled: false,
-        result: null,
-      };
-
-      const dictPromise = fetch(
+      // 3. Nếu là từ đơn: gọi song song Google Translate và dictionaryapi.dev (timeout tối đa 350ms)
+      const dictPromise: Promise<DictionaryEntry[] | null> = fetch(
         `https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`,
         {
           signal: AbortSignal.timeout(350),
           headers: { "User-Agent": "Mozilla/5.0 Vocabloom/1.0" },
         }
       )
-        .then(async (r) => {
+        .then(async (r): Promise<DictionaryEntry[] | null> => {
           if (r.ok) {
             return (await r.json()) as DictionaryEntry[];
           }
           return null;
         })
-        .catch(() => null)
+        .catch(() => null);
+
+      // Cập nhật ngầm vào server cache khi dictPromise hoàn tất
+      dictPromise
         .then((res) => {
-          dictState.settled = true;
-          dictState.result = res;
-          return res;
-        });
+          if (res && res.length > 0) {
+            const entry = res[0];
+            const p =
+              entry.phonetic ||
+              entry.phonetics?.find((item) => Boolean(item.text))?.text ||
+              "";
+            const firstMeaning = entry.meanings?.[0];
+            const d = firstMeaning?.definitions?.[0]?.definition || "";
+            const s = firstMeaning?.synonyms?.slice(0, 3) || [];
+
+            const existing = serverDictCache.get(word);
+            if (existing) {
+              if (!existing.phonetic && p) existing.phonetic = p;
+              if (!existing.definition && d) existing.definition = d;
+              if (
+                (!existing.synonyms || existing.synonyms.length === 0) &&
+                s.length > 0
+              ) {
+                existing.synonyms = s;
+              }
+            }
+          }
+        })
+        .catch(() => {});
 
       const transPromise = googleTranslate(word, "en", "vi");
 
-      // Chờ Google Translate hoàn thành
-      const trans = await transPromise;
-      if (trans) {
-        translationVi = trans;
+      // Chờ Google Translate trước (thường ~80-120ms)
+      const transRes = await transPromise;
+      if (transRes) {
+        translationVi = transRes;
       }
 
-      // Xử lý race / timeout:
-      // Nếu dictionaryapi đã xong trước hoặc cùng lúc với Google Translate -> lấy đầy đủ thông tin
-      if (dictState.settled && dictState.result && dictState.result.length > 0) {
-        const entry = dictState.result[0];
+      // Đua với dictPromise: nếu đã có translationVi, chỉ lấy dict nếu đã xong (không đợi thêm)
+      // Nếu chưa có translationVi, chờ dictPromise tối đa 350ms để lấy định nghĩa/phiên âm
+      const dictResult = await Promise.race([
+        dictPromise,
+        new Promise<null>((resolve) =>
+          setTimeout(() => resolve(null), translationVi ? 0 : 350)
+        ),
+      ]);
+
+      if (dictResult && dictResult.length > 0) {
+        const entry = dictResult[0];
         phonetic =
           entry.phonetic ||
           entry.phonetics?.find((p) => Boolean(p.text))?.text ||
@@ -137,46 +162,6 @@ export async function GET(request: Request) {
         const firstMeaning = entry.meanings?.[0];
         definition = firstMeaning?.definitions?.[0]?.definition || "";
         synonyms = firstMeaning?.synonyms?.slice(0, 3) || [];
-      } else if (!translationVi) {
-        // Nếu Google Translate không ra kết quả, đợi dictionaryapi tối đa đến hết 350ms
-        const res = await dictPromise;
-        if (res && res.length > 0) {
-          const entry = res[0];
-          phonetic =
-            entry.phonetic ||
-            entry.phonetics?.find((p) => Boolean(p.text))?.text ||
-            "";
-          const firstMeaning = entry.meanings?.[0];
-          definition = firstMeaning?.definitions?.[0]?.definition || "";
-          synonyms = firstMeaning?.synonyms?.slice(0, 3) || [];
-        }
-      } else {
-        // Đã có translationVi từ Google Translate:
-        // Trả ngay bản dịch tiếng Việt về client với headers Cache-Control chuẩn (không chờ dictionaryapi).
-        // Cập nhật bổ sung phonetic/definition vào server cache khi dictionaryapi hoàn thành ngầm.
-        dictPromise
-          .then((res) => {
-            if (res && Array.isArray(res) && res.length > 0) {
-              const entry = res[0];
-              const p =
-                entry.phonetic ||
-                entry.phonetics?.find((item) => Boolean(item.text))?.text ||
-                "";
-              const firstMeaning = entry.meanings?.[0];
-              const d = firstMeaning?.definitions?.[0]?.definition || "";
-              const s = firstMeaning?.synonyms?.slice(0, 3) || [];
-
-              const existing = serverDictCache.get(word);
-              if (existing) {
-                if (!existing.phonetic && p) existing.phonetic = p;
-                if (!existing.definition && d) existing.definition = d;
-                if ((!existing.synonyms || existing.synonyms.length === 0) && s.length > 0) {
-                  existing.synonyms = s;
-                }
-              }
-            }
-          })
-          .catch(() => {});
       }
     }
 
@@ -189,8 +174,8 @@ export async function GET(request: Request) {
       synonyms,
     };
 
-    // Chỉ cache nếu có ít nhất translationVi hoặc definition
-    if (translationVi || definition) {
+    // Chỉ lưu vào server cache nếu có ít nhất bản dịch hoặc định nghĩa hợp lệ
+    if (payload.translationVi || payload.definition) {
       if (serverDictCache.size >= SERVER_CACHE_MAX) {
         const firstKey = serverDictCache.keys().next().value;
         if (firstKey) serverDictCache.delete(firstKey);
@@ -202,11 +187,11 @@ export async function GET(request: Request) {
   } catch {
     const fallback: LookupPayload = {
       word,
-      phonetic,
-      definition,
-      translationVi,
+      phonetic: "",
+      definition: "",
+      translationVi: translationVi || "",
       isPhrase,
-      synonyms,
+      synonyms: [],
     };
     return NextResponse.json(fallback, { headers: CACHE_HEADERS });
   }

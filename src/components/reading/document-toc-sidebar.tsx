@@ -53,30 +53,40 @@ export function DocumentTocSidebar({
   );
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-50 flex w-80 max-w-[85vw] flex-col border-r-2 border-[#e5e5e5] bg-white shadow-2xl animate-in slide-in-from-left duration-200">
-      {/* Header bar */}
-      <div className="flex items-center justify-between border-b-2 border-[#eeeeee] p-4">
-        <div className="flex items-center gap-2">
-          <div className="flex size-8 items-center justify-center rounded-xl bg-[#e5f6fd] text-[#1cb0f6]">
-            <BookOpen className="size-4" />
+    <>
+      {/* Backdrop overlay làm mờ nền và chống các thành phần khác che khuất hoặc chạm nhầm */}
+      <div
+        className="fixed inset-0 z-50 bg-black/40 backdrop-blur-[2px] transition-opacity animate-in fade-in duration-200"
+        onClick={onClose}
+        aria-hidden="true"
+      />
+      <aside className="fixed inset-y-0 left-0 z-50 flex w-80 max-w-[85vw] flex-col border-r-2 border-[#e5e5e5] bg-white shadow-2xl animate-in slide-in-from-left duration-200">
+        {/* Header bar */}
+        <div className="flex items-center justify-between border-b-2 border-[#eeeeee] p-4">
+          <div className="flex items-center gap-2.5 min-w-0 flex-1 mr-2">
+            <div className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-[#e5f6fd] text-[#1cb0f6]">
+              <BookOpen className="size-4" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <h3 className="text-sm font-black text-eel-dark-blue truncate">
+                Cấu trúc &amp; Chỉ mục
+              </h3>
+              <p
+                className="text-[11px] font-bold text-ash truncate"
+                title={documentMeta?.title || "Tài liệu đang mở"}
+              >
+                {documentMeta?.title || "Tài liệu đang mở"}
+              </p>
+            </div>
           </div>
-          <div>
-            <h3 className="text-sm font-black text-eel-dark-blue">
-              Cấu trúc &amp; Chỉ mục
-            </h3>
-            <p className="text-[11px] font-bold text-ash truncate max-w-[170px]">
-              {documentMeta?.title || "Tài liệu đang mở"}
-            </p>
-          </div>
+          <button
+            onClick={onClose}
+            className="shrink-0 rounded-lg p-1.5 text-ash hover:bg-gray-100 hover:text-charcoal cursor-pointer"
+            title="Đóng sidebar"
+          >
+            <X className="size-4.5" />
+          </button>
         </div>
-        <button
-          onClick={onClose}
-          className="rounded-lg p-1.5 text-ash hover:bg-gray-100 hover:text-charcoal"
-          title="Đóng sidebar"
-        >
-          <X className="size-4.5" />
-        </button>
-      </div>
 
       {/* Tabs chuyển đổi: Mục lục bài hiện tại vs Lịch sử tài liệu */}
       <div className="flex border-b border-[#eeeeee] bg-[#fafafa] p-1.5 gap-1 text-xs font-bold">
@@ -158,13 +168,13 @@ export function DocumentTocSidebar({
                       : "hover:bg-gray-100"
                   }`}
                 >
-                  <div className="flex items-center gap-1.5 min-w-0 pr-2">
+                  <div className="flex items-center gap-1.5 min-w-0 flex-1 pr-2">
                     <ChevronRight
                       className={`size-3 shrink-0 transition-transform ${
                         isActive ? "rotate-90 text-[#1cb0f6]" : "text-gray-400 group-hover:translate-x-0.5"
                       }`}
                     />
-                    <span className="truncate">{item.title}</span>
+                    <span className="truncate min-w-0 flex-1">{item.title}</span>
                   </div>
                   <span
                     className={`shrink-0 rounded px-1.5 py-0.2 text-[10px] font-mono font-bold ${
@@ -274,5 +284,6 @@ export function DocumentTocSidebar({
         </div>
       )}
     </aside>
+  </>
   );
 }

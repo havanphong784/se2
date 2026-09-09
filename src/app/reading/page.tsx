@@ -392,7 +392,7 @@ export default function ReadingPage() {
       {/* Tối ưu Header: Hợp nhất Header và thanh ChunkPaginationBar thành 1 thanh header duy nhất (~52-56px) */}
       <header className="mb-2.5 flex h-14 shrink-0 items-center justify-between gap-2.5 rounded-2xl border-2 border-b-4 border-[#e5e5e5] bg-white px-3 md:px-4 shadow-xs">
         {/* Bên trái: Nút Back, Nút Mục lục TOC (kèm badge số chương), Tên tài liệu, Badge số trang/phần */}
-        <div className="flex items-center gap-2 md:gap-3 min-w-0">
+        <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1 overflow-hidden">
           <Link
             href="/"
             className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-[#e5e5e5] text-ash hover:bg-gray-100 hover:text-charcoal transition-colors"
@@ -405,7 +405,7 @@ export default function ReadingPage() {
           <button
             type="button"
             onClick={() => setIsTocOpen(true)}
-            className="flex h-8 shrink-0 items-center gap-1.5 rounded-lg border border-[#e5e5e5] px-2 text-xs font-bold text-eel-dark-blue hover:bg-[#e5f6fd] hover:text-[#1cb0f6] transition-colors"
+            className="flex h-8 shrink-0 items-center gap-1.5 rounded-lg border border-[#e5e5e5] px-2 text-xs font-bold text-eel-dark-blue hover:bg-[#e5f6fd] hover:text-[#1cb0f6] transition-colors cursor-pointer"
             title="Mục lục & Thư viện tài liệu"
           >
             <Menu className="size-4 text-[#1cb0f6]" />
@@ -417,9 +417,9 @@ export default function ReadingPage() {
             )}
           </button>
 
-          {/* Tên tài liệu */}
+          {/* Tên tài liệu: Sử dụng flex-1 min-w-0 và loại bỏ giới hạn cứng max-w để không bị các component khác che khuất */}
           <h1
-            className="text-xs sm:text-sm md:text-[15px] font-black text-eel-dark-blue truncate max-w-[130px] sm:max-w-[200px] md:max-w-xs"
+            className="text-xs sm:text-sm md:text-[15px] font-black text-eel-dark-blue truncate min-w-0 flex-1"
             title={documentMeta?.title || "Tài liệu"}
           >
             {documentMeta?.title || "Đang tải tài liệu..."}
@@ -429,7 +429,7 @@ export default function ReadingPage() {
           {documentMeta && (
             <Badge
               variant="blue"
-              className="hidden xl:inline-flex text-[10px] py-0 px-2 min-h-6 shrink-0"
+              className="hidden 2xl:inline-flex text-[10px] py-0 px-2 min-h-6 shrink-0"
             >
               {documentMeta.totalPages} trang · {documentMeta.totalChunks} phần
             </Badge>
