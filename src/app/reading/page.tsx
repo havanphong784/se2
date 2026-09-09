@@ -243,6 +243,7 @@ export default function ReadingPage() {
             onSelectSentence={handleAnalyzeSentence}
             onSaveWordToDeck={handleSaveWordToDeck}
             contextVocabMap={contextVocabMap}
+            aiPhrases={analysisData?.idiomsAndPhrases}
           />
         </section>
 

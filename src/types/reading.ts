@@ -51,6 +51,20 @@ export interface ContextualVocab {
   synonyms?: string[];
 }
 
+export interface DetectedPhrase {
+  id: string;
+  phraseText: string;
+  cleanPhrase: string;
+  tokenIndices: number[];
+  type: "collocation" | "phrasal_verb" | "idiom" | "selection";
+  meaningVi?: string;
+  subWords: Array<{
+    word: string;
+    cleanWord: string;
+    pos: POSTag;
+  }>;
+}
+
 export interface IdiomPhrase {
   phrase: string;
   meaningVi: string;

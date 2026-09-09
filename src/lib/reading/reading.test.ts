@@ -107,4 +107,26 @@ logy sector is growing fast.`;
       assert.equal(retrieved?.translationVi, "khả năng phục hồi");
     });
   });
+
+  describe("Phrase Matcher", () => {
+    it("nhận diện đúng collocations và gom subwords tương ứng", async () => {
+      const { detectPhrasesInSentence } = await import("./phrase-matcher");
+      const sentence = "Artificial intelligence brings profound questions.";
+      const tokens = tagSentenceWords(sentence);
+
+      const result = detectPhrasesInSentence(sentence, tokens, [
+        { phrase: "artificial intelligence", meaningVi: "trí tuệ nhân tạo" },
+      ]);
+
+      assert.ok(result.phrases.length >= 1, "Phải tìm thấy ít nhất 1 cụm từ");
+      const aiPhrase = result.phrases.find(
+        (p) => p.cleanPhrase === "artificial intelligence"
+      );
+      assert.ok(aiPhrase, "Phải match được artificial intelligence");
+      assert.equal(aiPhrase?.meaningVi, "trí tuệ nhân tạo");
+      assert.equal(aiPhrase?.subWords.length, 2);
+      assert.equal(aiPhrase?.subWords[0].cleanWord.toLowerCase(), "artificial");
+      assert.equal(aiPhrase?.subWords[1].cleanWord.toLowerCase(), "intelligence");
+    });
+  });
 });
