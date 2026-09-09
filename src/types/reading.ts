@@ -23,6 +23,17 @@ export interface SentenceItem {
   tokens: WordToken[];
 }
 
+export type BlockType = "heading" | "paragraph" | "list_item" | "quote";
+
+export interface ParagraphBlock {
+  id: string;
+  index: number;
+  type: BlockType;
+  headingLevel?: 1 | 2 | 3;
+  sentences: SentenceItem[];
+  rawText: string;
+}
+
 export interface ClauseBreakdown {
   clauseText: string;
   role: "Main Clause" | "Subordinate Clause" | "Relative Clause" | "Adverbial Clause" | string;

@@ -34,7 +34,7 @@ describe("Smart Reading Utilities", () => {
     });
   });
 
-  describe("Text Segmenter", () => {
+  describe("Text Segmenter & Semantic Blocks", () => {
     it("tách đúng đoạn văn và câu", () => {
       const text = `The first paragraph has two sentences. Here is the second sentence.
 
@@ -46,6 +46,32 @@ The second paragraph stands alone.`;
       assert.equal(result.paragraphs[0].sentences.length, 2, "Đoạn 1 phải có 2 câu");
       assert.equal(result.paragraphs[1].sentences.length, 1, "Đoạn 2 phải có 1 câu");
       assert.ok(result.totalWords > 10, "Tổng số từ phải lớn hơn 10");
+    });
+
+    it("nhận diện đúng heading, quote và list item", () => {
+      const documentText = `## 1. INTRODUCTION
+
+> Artificial intelligence is transforming the modern landscape.
+
+Here are key aspects:
+- Enhanced productivity
+- Continuous learning`;
+
+      const result = segmentText(documentText);
+      const types = result.paragraphs.map((p) => p.type);
+
+      assert.ok(types.includes("heading"), "Phải nhận diện được heading");
+      assert.ok(types.includes("quote"), "Phải nhận diện được quote");
+      assert.ok(types.includes("list_item"), "Phải nhận diện được list_item");
+    });
+
+    it("khử đứt đoạn từ (de-hyphenation) khi ngắt dòng giữa chừng", () => {
+      const brokenText = `The techno-
+logy sector is growing fast.`;
+
+      const result = segmentText(brokenText);
+      const fullText = result.paragraphs[0].rawText;
+      assert.ok(fullText.includes("technology"), "Phải ghép lại thành technology");
     });
   });
 
