@@ -62,10 +62,38 @@ async function googleTranslate(text: string, sourceLang: string, targetLang: str
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
+  const rawSentence = searchParams.get("sentence");
+
+  // Xử lý dịch câu nhanh (Instant sentence translation ~100ms)
+  if (rawSentence && rawSentence.trim()) {
+    const text = rawSentence.trim();
+    const cacheKey = `sent_${text}`;
+    if (serverDictCache.has(cacheKey)) {
+      return NextResponse.json(serverDictCache.get(cacheKey)!, { headers: CACHE_HEADERS });
+    }
+    const trans = await googleTranslate(text, "en", "vi");
+    const payload: LookupPayload = {
+      word: text,
+      phonetic: "",
+      definition: "",
+      translationVi: trans || "",
+      isPhrase: true,
+      synonyms: [],
+    };
+    if (trans) {
+      if (serverDictCache.size >= SERVER_CACHE_MAX) {
+        const firstKey = serverDictCache.keys().next().value;
+        if (firstKey) serverDictCache.delete(firstKey);
+      }
+      serverDictCache.set(cacheKey, payload);
+    }
+    return NextResponse.json(payload, { headers: CACHE_HEADERS });
+  }
+
   const rawWord = searchParams.get("word");
 
   if (!rawWord || !rawWord.trim()) {
-    return NextResponse.json({ error: "Thiếu tham số word." }, { status: 400 });
+    return NextResponse.json({ error: "Thiếu tham số word hoặc sentence." }, { status: 400 });
   }
 
   const word = rawWord.trim().toLowerCase();

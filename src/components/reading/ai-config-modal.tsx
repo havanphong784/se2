@@ -126,19 +126,47 @@ function AIConfigModalContent({ onClose, onConfigUpdated }: { onClose: () => voi
 
           {/* Model Name */}
           <div>
-            <label className="block text-xs font-black text-eel-dark-blue mb-1">
-              Tên Model (Ollama / Local Model)
-            </label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-xs font-black text-eel-dark-blue">
+                Tên Model (Ollama / Local / Cloud)
+              </label>
+              <span className="text-[11px] font-bold text-ash">
+                Khuyên dùng: <code className="text-[#087db4]">qwen2.5:3b</code> (nhanh gấp 3 lần)
+              </span>
+            </div>
             <input
               type="text"
               value={config.model}
               onChange={(e) => setConfig({ ...config, model: e.target.value })}
-              placeholder="qwen2.5:7b hoặc llama3.1:8b"
+              placeholder="qwen2.5:3b, llama3.2:3b hoặc qwen2.5:7b"
               className="w-full rounded-xl border-2 border-[#e5e5e5] px-3.5 py-2.5 text-sm font-semibold text-charcoal focus:border-macaw-blue focus:outline-none"
             />
+            {/* Quick model recommendations */}
+            <div className="mt-2 flex flex-wrap items-center gap-1.5">
+              <span className="text-[11px] font-bold text-ash mr-1">Gợi ý tốc độ:</span>
+              {[
+                { name: "qwen2.5:3b", label: "qwen2.5:3b (Siêu tốc ⚡)" },
+                { name: "llama3.2:3b", label: "llama3.2:3b (Cực nhẹ)" },
+                { name: "qwen2.5:7b", label: "qwen2.5:7b (Chuẩn)" },
+              ].map((rec) => (
+                <button
+                  key={rec.name}
+                  type="button"
+                  onClick={() => setConfig({ ...config, model: rec.name })}
+                  className={`rounded-lg border px-2 py-0.5 text-[11px] font-bold transition-colors cursor-pointer ${
+                    config.model === rec.name
+                      ? "border-[#1cb0f6] bg-[#e5f6fd] text-[#1cb0f6]"
+                      : "border-[#e5e5e5] bg-white text-ash hover:border-gray-400 hover:text-charcoal"
+                  }`}
+                >
+                  {rec.label}
+                </button>
+              ))}
+            </div>
+
             {testResult.models && testResult.models.length > 0 && (
               <div className="mt-2 flex flex-wrap gap-1.5">
-                <span className="text-[11px] font-bold text-ash mr-1 self-center">Models có sẵn:</span>
+                <span className="text-[11px] font-bold text-ash mr-1 self-center">Models trên máy:</span>
                 {testResult.models.map((m) => (
                   <button
                     key={m}

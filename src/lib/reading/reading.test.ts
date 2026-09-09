@@ -87,6 +87,38 @@ logy sector is growing fast.`;
       const h2 = getSentenceHash("This is sentence B.");
       assert.notEqual(h1, h2);
     });
+
+    it("tạo instant draft tức thì chứa đủ cấu trúc cơ bản không bị crash", async () => {
+      const { createInstantSentenceDraft } = await import("@/lib/ai/local-ai-client");
+      const draft = createInstantSentenceDraft("The technology sector is growing fast.", "Ngành công nghệ đang phát triển nhanh chóng.");
+
+      assert.equal(draft.sentence, "The technology sector is growing fast.");
+      assert.equal(draft.translationVi, "Ngành công nghệ đang phát triển nhanh chóng.");
+      assert.ok(draft.grammar);
+      assert.equal(draft.grammar.pattern, "Đang phân tích cấu trúc...");
+      assert.deepEqual(draft.vocabulary, []);
+    });
+
+    it("lưu và đọc phân tích câu từ L1 memory cache", async () => {
+      const { setCachedAnalysis, getCachedAnalysis } = await import("@/lib/ai/local-ai-client");
+      const sample = {
+        sentence: "Learning languages expands horizons.",
+        translationVi: "Học ngôn ngữ mở rộng tầm nhìn.",
+        simplifiedEnglish: "Learning new languages helps you learn more.",
+        grammar: { pattern: "Simple Sentence", explanation: "Câu đơn", clauses: [] },
+        vocabulary: [
+          { term: "horizons", ipa: "/həˈraɪ.zənz/", partOfSpeech: "noun", contextMeaningVi: "tầm nhìn, chân trời", cefr: "B2" as const }
+        ],
+        idiomsAndPhrases: [],
+      };
+
+      setCachedAnalysis("Learning languages expands horizons.", sample);
+      const cached = getCachedAnalysis("LEARNING LANGUAGES EXPANDS HORIZONS.");
+      assert.ok(cached);
+      assert.equal(cached?.translationVi, "Học ngôn ngữ mở rộng tầm nhìn.");
+      assert.equal(cached?.vocabulary.length, 1);
+      assert.equal(cached?.vocabulary[0].term, "horizons");
+    });
   });
 
   describe("Dictionary Cache", () => {
