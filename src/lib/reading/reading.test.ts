@@ -129,4 +129,27 @@ logy sector is growing fast.`;
       assert.equal(aiPhrase?.subWords[1].cleanWord.toLowerCase(), "intelligence");
     });
   });
+
+  describe("Structured Document & TOC Extraction", () => {
+    it("bóc tách mục lục (TOC) và chia chunk 10 trang cho tài liệu dài", async () => {
+      const { extractStructuredText } = await import("./extractors");
+      const sampleBook = `## Chapter 1: Introduction to Intelligence
+Artificial intelligence is rapidly transforming global industry.
+
+## Chapter 2: Deep Neural Networks
+Deep architectures allow representation learning from raw data.
+
+## Chapter 3: Future Outlook
+Organizations must adapt to cognitive automation.`;
+
+      const { meta, chunks } = extractStructuredText(sampleBook, "AI Textbook", 1);
+
+      assert.equal(meta.title, "AI Textbook");
+      assert.ok(meta.toc.length >= 3, "Phải nhận diện được ít nhất 3 chương trong TOC");
+      assert.equal(meta.toc[0].title, "Chapter 1: Introduction to Intelligence");
+      assert.equal(meta.toc[1].title, "Chapter 2: Deep Neural Networks");
+      assert.equal(meta.toc[2].title, "Chapter 3: Future Outlook");
+      assert.ok(chunks.length >= 1, "Phải chia thành các chunks");
+    });
+  });
 });

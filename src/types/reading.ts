@@ -96,7 +96,7 @@ export interface ReadingDocument {
   id: string;
   userId: string;
   title: string;
-  sourceType: "raw_text" | "pdf" | "image";
+  sourceType: "raw_text" | "pdf" | "docx" | "image";
   originalFileName?: string;
   rawContent: string;
   totalWords: number;
@@ -104,3 +104,38 @@ export interface ReadingDocument {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface TableOfContentItem {
+  id: string;
+  title: string;
+  level: 1 | 2 | 3;
+  pageNumber: number;
+  chunkIndex: number;
+}
+
+export interface DocumentChunk {
+  chunkIndex: number;
+  startPage: number;
+  endPage: number;
+  chapterTitle?: string;
+  rawText: string;
+  totalWords?: number;
+}
+
+export interface StructuredDocumentMeta {
+  id: string;
+  title: string;
+  sourceType: "raw_text" | "pdf" | "docx" | "image";
+  originalFileName?: string;
+  totalPages: number;
+  totalChunks: number;
+  pagesPerChunk: number;
+  totalWords: number;
+  totalSentences: number;
+  toc: TableOfContentItem[];
+  activeChunkIndex: number;
+  lastReadSentenceId?: string;
+  createdAt: number;
+  updatedAt: number;
+}
+

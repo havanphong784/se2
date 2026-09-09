@@ -41,6 +41,7 @@
     "framer-motion": "12.42.2",
     "jose": "^6.2.9",
     "lucide-react": "^1.24.0",
+    "mammoth": "^1.12.2",
     "next": "16.2.10",
     "nodemailer": "^9.0.5",
     "papaparse": "^5.5.4",
