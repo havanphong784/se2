@@ -340,7 +340,7 @@ export function InteractiveReader({
               title="Chỉ làm nổi bật câu đang chọn (chống rối mắt, dễ tập trung)"
             >
               <Sparkles className="size-3" />
-              <span>Focus</span>
+              <span>Câu chọn</span>
             </button>
 
             <button
