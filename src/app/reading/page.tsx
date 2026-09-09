@@ -595,22 +595,20 @@ export default function ReadingPage() {
               variant="secondary"
               size="sm"
               onClick={toggleNativeFullscreen}
-              className="h-8 px-2 text-xs font-bold border-[#e5e5e5] text-ash hover:text-charcoal cursor-pointer"
+              className="flex size-8 shrink-0 items-center justify-center p-0 rounded-lg border border-[#e5e5e5] text-ash hover:text-charcoal cursor-pointer"
               title={isFullscreen ? "Thu nhỏ cửa sổ trình duyệt" : "Toàn màn hình trình duyệt"}
             >
-              {isFullscreen ? <Shrink className="size-3.5" /> : <Expand className="size-3.5" />}
+              {isFullscreen ? <Shrink className="size-4" /> : <Expand className="size-4" />}
             </Button>
 
             <Button
               variant="default"
               size="sm"
               onClick={() => setIsFocusMode(false)}
-              className="h-8 px-2.5 text-xs font-black bg-macaw-blue text-white hover:bg-[#16a5e8] border-b-2 border-b-[#1282b8] active:translate-y-0.5 cursor-pointer gap-1.5"
+              className="flex size-8 shrink-0 items-center justify-center p-0 rounded-lg bg-macaw-blue text-white hover:bg-[#16a5e8] border-b-2 border-b-[#1282b8] active:translate-y-0.5 cursor-pointer"
               title="Thoát Focus Mode (Phím Esc)"
             >
-              <Minimize2 className="size-3.5" />
-              <span>Thoát Focus</span>
-              <kbd className="hidden sm:inline rounded bg-white/20 px-1 py-0.2 font-mono text-[9px] text-white">Esc</kbd>
+              <Minimize2 className="size-4" />
             </Button>
           </div>
         </header>
@@ -683,23 +681,20 @@ export default function ReadingPage() {
               size="sm"
               onClick={handleSaveSession}
               disabled={isSavingSession || !documentMeta}
-              className={`h-8 px-2.5 text-xs font-bold transition-all ${
+              className={`flex size-8 shrink-0 items-center justify-center p-0 rounded-lg transition-all ${
                 saveSuccessMessage
                   ? "border-[#46a302] bg-ecto-green text-white hover:bg-[#51bd02]"
                   : "border-[#e5e5e5] text-charcoal hover:bg-gray-100"
               }`}
-              title="Lưu phiên học và tiến độ vào IndexedDB (.vdoc)"
+              title={saveSuccessMessage ? "Đã lưu phiên học" : "Lưu phiên học và tiến độ vào IndexedDB (.vdoc)"}
             >
               {isSavingSession ? (
-                <Loader2 className="size-3.5 animate-spin text-[#1cb0f6]" />
+                <Loader2 className="size-4 animate-spin text-[#1cb0f6]" />
               ) : saveSuccessMessage ? (
-                <Check className="size-3.5 text-white" />
+                <Check className="size-4 text-white" />
               ) : (
-                <Save className="size-3.5 text-ecto-green" />
+                <Save className="size-4 text-ecto-green" />
               )}
-              <span className="hidden xl:inline">
-                {saveSuccessMessage ? "Đã lưu" : "Lưu phiên"}
-              </span>
             </Button>
 
             <Button
@@ -726,17 +721,15 @@ export default function ReadingPage() {
               </span>
             </Button>
 
-            {/* Nút bật Focus Mode toàn màn hình */}
+            {/* Nút bật Focus Mode toàn màn hình (chỉ hiển thị icon) */}
             <Button
               variant="secondary"
               size="sm"
               onClick={() => setIsFocusMode(true)}
-              className="h-8 px-2.5 text-xs font-bold border-[#e5e5e5] text-charcoal hover:bg-[#f0f9ff] hover:border-[#bfe9fd] hover:text-[#0284c7] transition-all gap-1.5 cursor-pointer"
+              className="flex size-8 shrink-0 items-center justify-center p-0 rounded-lg border border-[#e5e5e5] text-charcoal hover:bg-[#f0f9ff] hover:border-[#bfe9fd] hover:text-[#0284c7] transition-all cursor-pointer"
               title="Bật Focus Mode toàn màn hình không xao nhãng (Phím F)"
             >
-              <Maximize2 className="size-3.5 text-[#1cb0f6]" />
-              <span className="hidden sm:inline">Focus Mode</span>
-              <kbd className="hidden md:inline rounded bg-gray-100 px-1 py-0.2 font-mono text-[9px] text-ash">F</kbd>
+              <Maximize2 className="size-4 text-[#1cb0f6]" />
             </Button>
           </div>
         </header>
