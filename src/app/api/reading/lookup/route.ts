@@ -40,9 +40,9 @@ async function googleTranslate(text: string, sourceLang: string, targetLang: str
 
     const response = await fetch(url.toString(), {
       headers: {
-        "User-Agent": "Mozilla/5.0",
+        "User-Agent": "Mozilla/5.0 Vocabloom/1.0",
       },
-      signal: AbortSignal.timeout(4000),
+      signal: AbortSignal.timeout(3500),
     });
 
     if (!response.ok) return null;
@@ -71,10 +71,12 @@ export async function GET(request: Request) {
   const word = rawWord.trim().toLowerCase();
   const isPhrase = word.includes(" ") || word.includes("-");
 
-  // 1. Kiểm tra Server In-Memory Cache
+  // 1. Kiểm tra Server In-Memory Cache - chỉ coi là cache hit hợp lệ khi có translationVi hoặc definition
   if (serverDictCache.has(word)) {
     const cachedData = serverDictCache.get(word)!;
-    return NextResponse.json(cachedData, { headers: CACHE_HEADERS });
+    if (cachedData.translationVi || cachedData.definition) {
+      return NextResponse.json(cachedData, { headers: CACHE_HEADERS });
+    }
   }
 
   let phonetic = "";
@@ -83,34 +85,98 @@ export async function GET(request: Request) {
   let synonyms: string[] = [];
 
   try {
-    // 2. Nếu là cụm từ (phrase): dịch qua Google Translate
     if (isPhrase) {
+      // 2. Nếu là cụm từ (phrase): dịch qua Google Translate
       const trans = await googleTranslate(word, "en", "vi");
-      translationVi = trans || "";
+      if (trans) {
+        translationVi = trans;
+      }
     } else {
-      // 3. Nếu là từ đơn: gọi song song từ điển Anh-Anh và Google Translate
-      const [dictRes, transRes] = await Promise.allSettled([
-        fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`, {
-          signal: AbortSignal.timeout(1200),
-          headers: { "User-Agent": "Mozilla/5.0 Vocabloom/1.0" },
-        }).then((r) => (r.ok ? (r.json() as Promise<DictionaryEntry[]>) : null)),
-        googleTranslate(word, "en", "vi"),
-      ]);
+      // 3. Nếu là từ đơn: gọi song song Google Translate và dictionaryapi.dev (tối đa 350ms)
+      const dictState: { settled: boolean; result: DictionaryEntry[] | null } = {
+        settled: false,
+        result: null,
+      };
 
-      if (transRes.status === "fulfilled" && transRes.value) {
-        translationVi = transRes.value;
+      const dictPromise = fetch(
+        `https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`,
+        {
+          signal: AbortSignal.timeout(350),
+          headers: { "User-Agent": "Mozilla/5.0 Vocabloom/1.0" },
+        }
+      )
+        .then(async (r) => {
+          if (r.ok) {
+            return (await r.json()) as DictionaryEntry[];
+          }
+          return null;
+        })
+        .catch(() => null)
+        .then((res) => {
+          dictState.settled = true;
+          dictState.result = res;
+          return res;
+        });
+
+      const transPromise = googleTranslate(word, "en", "vi");
+
+      // Chờ Google Translate hoàn thành
+      const trans = await transPromise;
+      if (trans) {
+        translationVi = trans;
       }
 
-      if (dictRes.status === "fulfilled" && Array.isArray(dictRes.value) && dictRes.value.length > 0) {
-        const entry = dictRes.value[0];
+      // Xử lý race / timeout:
+      // Nếu dictionaryapi đã xong trước hoặc cùng lúc với Google Translate -> lấy đầy đủ thông tin
+      if (dictState.settled && dictState.result && dictState.result.length > 0) {
+        const entry = dictState.result[0];
         phonetic =
           entry.phonetic ||
           entry.phonetics?.find((p) => Boolean(p.text))?.text ||
           "";
-
         const firstMeaning = entry.meanings?.[0];
         definition = firstMeaning?.definitions?.[0]?.definition || "";
         synonyms = firstMeaning?.synonyms?.slice(0, 3) || [];
+      } else if (!translationVi) {
+        // Nếu Google Translate không ra kết quả, đợi dictionaryapi tối đa đến hết 350ms
+        const res = await dictPromise;
+        if (res && res.length > 0) {
+          const entry = res[0];
+          phonetic =
+            entry.phonetic ||
+            entry.phonetics?.find((p) => Boolean(p.text))?.text ||
+            "";
+          const firstMeaning = entry.meanings?.[0];
+          definition = firstMeaning?.definitions?.[0]?.definition || "";
+          synonyms = firstMeaning?.synonyms?.slice(0, 3) || [];
+        }
+      } else {
+        // Đã có translationVi từ Google Translate:
+        // Trả ngay bản dịch tiếng Việt về client với headers Cache-Control chuẩn (không chờ dictionaryapi).
+        // Cập nhật bổ sung phonetic/definition vào server cache khi dictionaryapi hoàn thành ngầm.
+        dictPromise
+          .then((res) => {
+            if (res && Array.isArray(res) && res.length > 0) {
+              const entry = res[0];
+              const p =
+                entry.phonetic ||
+                entry.phonetics?.find((item) => Boolean(item.text))?.text ||
+                "";
+              const firstMeaning = entry.meanings?.[0];
+              const d = firstMeaning?.definitions?.[0]?.definition || "";
+              const s = firstMeaning?.synonyms?.slice(0, 3) || [];
+
+              const existing = serverDictCache.get(word);
+              if (existing) {
+                if (!existing.phonetic && p) existing.phonetic = p;
+                if (!existing.definition && d) existing.definition = d;
+                if ((!existing.synonyms || existing.synonyms.length === 0) && s.length > 0) {
+                  existing.synonyms = s;
+                }
+              }
+            }
+          })
+          .catch(() => {});
       }
     }
 
@@ -123,22 +189,24 @@ export async function GET(request: Request) {
       synonyms,
     };
 
-    // Lưu cache
-    if (serverDictCache.size >= SERVER_CACHE_MAX) {
-      const firstKey = serverDictCache.keys().next().value;
-      if (firstKey) serverDictCache.delete(firstKey);
+    // Chỉ cache nếu có ít nhất translationVi hoặc definition
+    if (translationVi || definition) {
+      if (serverDictCache.size >= SERVER_CACHE_MAX) {
+        const firstKey = serverDictCache.keys().next().value;
+        if (firstKey) serverDictCache.delete(firstKey);
+      }
+      serverDictCache.set(word, payload);
     }
-    serverDictCache.set(word, payload);
 
     return NextResponse.json(payload, { headers: CACHE_HEADERS });
   } catch {
     const fallback: LookupPayload = {
       word,
-      phonetic: "",
-      definition: "",
-      translationVi: "",
+      phonetic,
+      definition,
+      translationVi,
       isPhrase,
-      synonyms: [],
+      synonyms,
     };
     return NextResponse.json(fallback, { headers: CACHE_HEADERS });
   }

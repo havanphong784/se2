@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Volume2, Plus, Check, Loader2, Link2 } from "lucide-react";
+import { Volume2, Plus, Check, Loader2, Link2, RotateCw } from "lucide-react";
 import { POS_STYLES } from "@/lib/reading/pos-tagger";
 import {
   getCachedWord,
@@ -30,53 +30,59 @@ interface WordPopoverProps {
   data: WordPopoverData | null;
   onClose?: () => void;
   onSaveToDeck?: (word: string, translation: string, phonetic: string) => Promise<void>;
+  onRetry?: (word: string) => void;
 }
 
 function WordPopoverContent({
   data,
   onSaveToDeck,
+  onRetry,
 }: {
   data: WordPopoverData;
   onSaveToDeck?: (word: string, translation: string, phonetic: string) => Promise<void>;
+  onRetry?: (word: string) => void;
 }) {
   const cached = getCachedWord(data.cleanWord);
+  const hasContextMeaning = Boolean(data.contextMeaning?.trim());
+  const hasCachedTranslation = Boolean(cached?.translationVi?.trim());
+  const hasReadyTranslation = hasContextMeaning || hasCachedTranslation;
 
   const [details, setDetails] = useState<DictResult | null>(() => {
-    if (data.contextMeaning) {
+    if (hasContextMeaning) {
       return {
-        phonetic: data.ipa || "",
-        translationVi: data.contextMeaning,
+        phonetic: data.ipa || cached?.phonetic || "",
+        definition: cached?.definition || "",
+        translationVi: data.contextMeaning!.trim(),
+        synonyms: cached?.synonyms || [],
       };
     }
     if (cached) {
-      return {
-        ...cached,
-        translationVi: data.contextMeaning || cached.translationVi,
-      };
+      return cached;
     }
     return null;
   });
 
-  const [loading, setLoading] = useState<boolean>(() => {
-    if (data.contextMeaning && (data.ipa || data.isPhrase)) return false;
-    if (cached && (cached.translationVi || cached.definition)) return false;
-    return true;
-  });
-
+  const [loading, setLoading] = useState<boolean>(!hasReadyTranslation);
   const [isSaved, setIsSaved] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    if (data.contextMeaning && (data.ipa || data.isPhrase)) return;
-    if (getCachedWord(data.cleanWord)) return;
+    const currentCached = getCachedWord(data.cleanWord);
+    const hasReady = Boolean(data.contextMeaning?.trim()) || Boolean(currentCached?.translationVi?.trim());
+
+    if (hasReady) {
+      return;
+    }
 
     let active = true;
+
     fetchWordDetails(data.cleanWord, data.contextMeaning, data.ipa)
       .then((res) => {
         if (active) {
           setDetails(res);
         }
       })
+      .catch(() => {})
       .finally(() => {
         if (active) setLoading(false);
       });
@@ -84,7 +90,24 @@ function WordPopoverContent({
     return () => {
       active = false;
     };
-  }, [data.cleanWord, data.contextMeaning, data.ipa, data.isPhrase]);
+  }, [data.cleanWord, data.contextMeaning, data.ipa]);
+
+  const handleRetry = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    onRetry?.(data.cleanWord);
+    setLoading(true);
+
+    fetchWordDetails(data.cleanWord, data.contextMeaning, data.ipa, true)
+      .then((res) => {
+        setDetails(res);
+      })
+      .catch(() => {
+        // Fallback
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
 
   const playAudio = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -149,7 +172,7 @@ function WordPopoverContent({
             </span>
             <button
               onClick={playAudio}
-              className="rounded-md p-1 text-ash hover:bg-[#e5f6fd] hover:text-[#1cb0f6] transition-colors"
+              className="rounded-md p-1 text-ash hover:bg-[#e5f6fd] hover:text-[#1cb0f6] transition-colors cursor-pointer"
               title="Phát âm"
             >
               <Volume2 className="size-4" />
@@ -181,7 +204,7 @@ function WordPopoverContent({
             className={`flex shrink-0 items-center gap-1 rounded-lg border-2 px-2.5 py-1 text-xs font-black transition-all ${
               isSaved
                 ? "border-[#a5ed6e] bg-[#f7fff1] text-[#438f0e]"
-                : "border-[#46a302] border-b-3 bg-ecto-green text-white hover:bg-[#51bd02] active:translate-y-0.5"
+                : "border-[#46a302] border-b-3 bg-ecto-green text-white hover:bg-[#51bd02] active:translate-y-0.5 cursor-pointer"
             }`}
           >
             {isSaving ? (
@@ -208,7 +231,7 @@ function WordPopoverContent({
           </div>
         ) : (
           <>
-            {details?.translationVi && (
+            {details?.translationVi ? (
               <div className="rounded-lg bg-[#f7fff1] border border-[#d7ffb8] p-2 text-xs font-bold text-eel-dark-blue">
                 <span className="text-[#438f0e] block text-[10px] font-black mb-0.5">
                   🇻🇳 NGHĨA NGỮ CẢNH:
@@ -216,6 +239,26 @@ function WordPopoverContent({
                 <span className="text-sm font-black text-eel-dark-blue">
                   {details.translationVi}
                 </span>
+              </div>
+            ) : (
+              <div className="rounded-lg bg-[#fff9e6] border border-[#ffe58f] p-2 text-xs text-[#8c5100]">
+                <span className="text-[#ad6800] block text-[10px] font-black mb-0.5">
+                  🇻🇳 BẢN DỊCH:
+                </span>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-semibold text-[11.5px] text-[#8c5100]">
+                    Chưa có bản dịch trực tiếp
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleRetry}
+                    className="inline-flex items-center gap-1 rounded bg-white px-2 py-0.5 text-[11px] font-bold text-[#d48806] border border-[#ffe58f] hover:bg-[#fffbe6] active:scale-95 transition-all shadow-xs shrink-0 cursor-pointer"
+                    title="Thử tra cứu lại"
+                  >
+                    <RotateCw className="size-3" />
+                    <span>Thử tra cứu lại</span>
+                  </button>
+                </div>
               </div>
             )}
 
@@ -263,7 +306,14 @@ function WordPopoverContent({
   );
 }
 
-export function WordPopover({ data, onSaveToDeck }: WordPopoverProps) {
+export function WordPopover({ data, onSaveToDeck, onRetry }: WordPopoverProps) {
   if (!data) return null;
-  return <WordPopoverContent key={data.cleanWord} data={data} onSaveToDeck={onSaveToDeck} />;
+  return (
+    <WordPopoverContent
+      key={data.cleanWord}
+      data={data}
+      onSaveToDeck={onSaveToDeck}
+      onRetry={onRetry}
+    />
+  );
 }

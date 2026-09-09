@@ -58,17 +58,18 @@ export function getCachedWord(word: string): DictResult | null {
 }
 
 /**
- * Lưu kết quả vào cả L1 và L2
+ * Lưu kết quả vào cả L1 và L2, đảm bảo merge cẩn thận với cache hiện tại
  */
 export function setCachedWord(word: string, result: DictResult): void {
   const clean = word.toLowerCase().trim();
   if (!clean) return;
 
-  const existing = l1Cache.get(clean);
+  // Đọc từ getCachedWord (kiểm tra cả L1 và L2) để không ghi đè mất dữ liệu đã có
+  const existing = getCachedWord(clean);
   const merged: DictResult = {
-    phonetic: result.phonetic || existing?.phonetic || "",
-    definition: result.definition || existing?.definition || "",
-    translationVi: result.translationVi || existing?.translationVi || "",
+    phonetic: (result.phonetic && result.phonetic.trim()) || existing?.phonetic || "",
+    definition: (result.definition && result.definition.trim()) || existing?.definition || "",
+    translationVi: (result.translationVi && result.translationVi.trim()) || existing?.translationVi || "",
     synonyms: result.synonyms?.length ? result.synonyms : existing?.synonyms || [],
   };
 
@@ -89,12 +90,14 @@ export function setCachedWord(word: string, result: DictResult): void {
 export async function fetchWordDetails(
   word: string,
   contextMeaning?: string,
-  ipa?: string
+  ipa?: string,
+  forceRefresh: boolean = false
 ): Promise<DictResult> {
   const clean = word.toLowerCase().trim();
+  if (!clean) return { translationVi: contextMeaning || "" };
 
-  // 1. Nếu có context meaning & ipa từ AI analysis, kết hợp lưu ngay
-  if (contextMeaning && ipa) {
+  // 1. Nếu có context meaning & ipa từ AI analysis và không phải forceRefresh, kết hợp lưu ngay
+  if (!forceRefresh && contextMeaning && ipa) {
     const aiResult: DictResult = {
       phonetic: ipa,
       translationVi: contextMeaning,
@@ -103,9 +106,9 @@ export async function fetchWordDetails(
     return aiResult;
   }
 
-  // 2. Kiểm tra Cache L1/L2
+  // 2. Kiểm tra Cache L1/L2: chỉ dùng cache hit khi THỰC SỰ có translationVi khác rỗng
   const cached = getCachedWord(clean);
-  if (cached && (cached.translationVi || cached.definition)) {
+  if (!forceRefresh && cached && Boolean(cached.translationVi?.trim())) {
     if (contextMeaning && !cached.translationVi) {
       cached.translationVi = contextMeaning;
       setCachedWord(clean, cached);
@@ -113,8 +116,8 @@ export async function fetchWordDetails(
     return cached;
   }
 
-  // 3. Request Deduplication: Nếu từ này đang có 1 request đang bay, dùng chung Promise
-  if (inFlightRequests.has(clean)) {
+  // 3. Request Deduplication: Nếu từ này đang có 1 request đang bay và không phải forceRefresh, dùng chung Promise
+  if (!forceRefresh && inFlightRequests.has(clean)) {
     return inFlightRequests.get(clean)!;
   }
 
@@ -122,24 +125,38 @@ export async function fetchWordDetails(
     try {
       const res = await fetch(`/api/reading/lookup?word=${encodeURIComponent(clean)}`);
       if (!res.ok) {
-        const fallback: DictResult = { translationVi: contextMeaning || "Từ vựng" };
-        setCachedWord(clean, fallback);
+        const fallback: DictResult = {
+          phonetic: ipa || cached?.phonetic || "",
+          definition: cached?.definition || "",
+          translationVi: contextMeaning || cached?.translationVi || undefined,
+          synonyms: cached?.synonyms || [],
+        };
+        if (fallback.translationVi) {
+          setCachedWord(clean, fallback);
+        }
         return fallback;
       }
 
       const json = await res.json();
       const result: DictResult = {
-        phonetic: json.phonetic || ipa || "",
-        definition: json.definition || "",
-        translationVi: json.translationVi || contextMeaning || undefined,
-        synonyms: json.synonyms || [],
+        phonetic: json.phonetic || ipa || cached?.phonetic || "",
+        definition: json.definition || cached?.definition || "",
+        translationVi: (json.translationVi && json.translationVi.trim()) || contextMeaning || cached?.translationVi || undefined,
+        synonyms: (json.synonyms && json.synonyms.length > 0) ? json.synonyms : cached?.synonyms || [],
       };
 
       setCachedWord(clean, result);
       return result;
     } catch {
-      const errFallback: DictResult = { translationVi: contextMeaning || "Từ vựng" };
-      setCachedWord(clean, errFallback);
+      const errFallback: DictResult = {
+        phonetic: ipa || cached?.phonetic || "",
+        definition: cached?.definition || "",
+        translationVi: contextMeaning || cached?.translationVi || undefined,
+        synonyms: cached?.synonyms || [],
+      };
+      if (errFallback.translationVi) {
+        setCachedWord(clean, errFallback);
+      }
       return errFallback;
     } finally {
       inFlightRequests.delete(clean);
@@ -152,11 +169,13 @@ export async function fetchWordDetails(
 
 // Global Prefetch Controller để có thể hủy khi đổi bài đọc
 let prefetchAbortController: AbortController | null = null;
+let lastPrefetchSignature = "";
 
 /**
  * Batch Prefetch Engine (Siêu tốc):
- * Gom toàn bộ từ vựng và cụm từ trong bài đọc gửi 1 request duy nhất tới /api/reading/batch-lookup
- * Toàn bộ kết quả dịch được nạp vào L1 RAM & LocalStorage trong ~250ms!
+ * Gom từ vựng và cụm từ trong chunk văn bản chia thành các batch nhỏ (tối đa 20 từ)
+ * gửi tới /api/reading/batch-lookup để nạp vào L1 RAM & LocalStorage.
+ * Đảm bảo không abort vô cớ khi người dùng hover/click trong cùng một chunk văn bản.
  */
 export async function prefetchDocumentWords(
   words: string[],
@@ -165,13 +184,27 @@ export async function prefetchDocumentWords(
 ): Promise<void> {
   if (typeof window === "undefined") return;
 
-  // Hủy tiến trình prefetch cũ nếu có
+  // Tạo signature định danh chunk văn bản hiện tại
+  const firstWord = words[0] || "";
+  const midWord = words[Math.floor(words.length / 2)] || "";
+  const lastWord = words[words.length - 1] || "";
+  const phraseCount = phrases?.length || 0;
+  const signature = `${words.length}:${phraseCount}:${firstWord}:${midWord}:${lastWord}`;
+
+  // Tránh abort request vô cớ khi người dùng chỉ hover hoặc click trong cùng một chunk văn bản
+  if (signature === lastPrefetchSignature) {
+    // Nếu đang prefetch hoặc đã prefetch xong chunk này, không hủy ngang và không fetch lặp lại
+    return;
+  }
+
+  // Hủy tiến trình prefetch của chunk CŨ nếu chuyển sang chunk MỚI
   if (prefetchAbortController) {
     prefetchAbortController.abort();
   }
 
   prefetchAbortController = new AbortController();
   const signal = prefetchAbortController.signal;
+  lastPrefetchSignature = signature;
 
   const candidateWords: string[] = [];
   const seen = new Set<string>();
@@ -182,7 +215,9 @@ export async function prefetchDocumentWords(
       const clean = p.toLowerCase().trim();
       if (clean.length >= 3 && !seen.has(clean)) {
         seen.add(clean);
-        if (!getCachedWord(clean)) {
+        const cached = getCachedWord(clean);
+        // Chỉ prefetch nếu chưa có trong cache hoặc chưa có translationVi
+        if (!cached || !cached.translationVi?.trim()) {
           candidateWords.push(clean);
         }
       }
@@ -200,39 +235,54 @@ export async function prefetchDocumentWords(
       !seen.has(clean)
     ) {
       seen.add(clean);
-      if (!getCachedWord(clean)) {
+      const cached = getCachedWord(clean);
+      // Chỉ prefetch nếu chưa có trong cache hoặc chưa có translationVi
+      if (!cached || !cached.translationVi?.trim()) {
         candidateWords.push(clean);
       }
     }
     if (candidateWords.length >= maxToPrefetch) break;
   }
 
-  if (candidateWords.length === 0) return;
+  if (candidateWords.length === 0) {
+    return;
+  }
+
+  // Chia nhỏ mảng candidate thành các batch tối đa 20 từ/cụm từ
+  // để Google Translate phân tách \n chính xác 100%, không bị nuốt dòng
+  const BATCH_SIZE = 20;
+  const batches: string[][] = [];
+  for (let i = 0; i < candidateWords.length; i += BATCH_SIZE) {
+    batches.push(candidateWords.slice(i, i + BATCH_SIZE));
+  }
 
   try {
-    // Gửi 1 REQUEST DUY NHẤT cho toàn bộ danh sách từ
-    const res = await fetch("/api/reading/batch-lookup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ words: candidateWords }),
-      signal,
-    });
+    await Promise.allSettled(
+      batches.map(async (batch) => {
+        const res = await fetch("/api/reading/batch-lookup", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ words: batch }),
+          signal,
+        });
 
-    if (!res.ok) return;
+        if (!res.ok) return;
 
-    const data = (await res.json()) as {
-      results?: Record<string, { word: string; translationVi: string }>;
-    };
+        const data = (await res.json()) as {
+          results?: Record<string, { word: string; translationVi: string }>;
+        };
 
-    if (data && data.results) {
-      for (const [w, item] of Object.entries(data.results)) {
-        if (item.translationVi) {
-          setCachedWord(w, {
-            translationVi: item.translationVi,
-          });
+        if (data && data.results) {
+          for (const [w, item] of Object.entries(data.results)) {
+            if (item.translationVi && item.translationVi.trim()) {
+              setCachedWord(w, {
+                translationVi: item.translationVi.trim(),
+              });
+            }
+          }
         }
-      }
-    }
+      })
+    );
   } catch {
     // Ignore abort or network error
   }

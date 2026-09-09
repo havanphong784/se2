@@ -1,5 +1,6 @@
 import nlp from "compromise";
 import type { WordToken, DetectedPhrase, IdiomPhrase } from "@/types/reading";
+import { getCachedWord } from "./dictionary-cache";
 
 /**
  * Tìm dãy token liên tiếp khớp với các từ trong một cụm từ
@@ -77,13 +78,16 @@ export function detectPhrasesInSentence(
             pos: t.pos,
           }));
 
+        const cleanPhrase = item.phrase.toLowerCase().trim();
+        const cached = getCachedWord(cleanPhrase);
+
         const phraseObj: DetectedPhrase = {
           id: `phrase-ai-${idx}-${indices[0]}`,
           phraseText: item.phrase,
-          cleanPhrase: item.phrase.toLowerCase().trim(),
+          cleanPhrase,
           tokenIndices: indices,
           type: "collocation",
-          meaningVi: item.meaningVi,
+          meaningVi: item.meaningVi || cached?.translationVi?.trim() || undefined,
           subWords,
         };
 
@@ -115,12 +119,16 @@ export function detectPhrasesInSentence(
             pos: t.pos,
           }));
 
+        const cleanPhrase = matchText.toLowerCase().trim();
+        const cached = getCachedWord(cleanPhrase);
+
         const phraseObj: DetectedPhrase = {
           id: `phrase-nlp-pv-${i}-${indices[0]}`,
           phraseText: matchText,
-          cleanPhrase: matchText.toLowerCase().trim(),
+          cleanPhrase,
           tokenIndices: indices,
           type: "phrasal_verb",
+          meaningVi: cached?.translationVi?.trim() || undefined,
           subWords,
         };
 
@@ -147,12 +155,16 @@ export function detectPhrasesInSentence(
             pos: t.pos,
           }));
 
+        const cleanPhrase = matchText.toLowerCase().trim();
+        const cached = getCachedWord(cleanPhrase);
+
         const phraseObj: DetectedPhrase = {
           id: `phrase-nlp-an-${i}-${indices[0]}`,
           phraseText: matchText,
-          cleanPhrase: matchText.toLowerCase().trim(),
+          cleanPhrase,
           tokenIndices: indices,
           type: "collocation",
+          meaningVi: cached?.translationVi?.trim() || undefined,
           subWords,
         };
 
