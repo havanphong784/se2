@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -14,6 +14,7 @@ import { SentenceBreakdownCard } from "@/components/reading/sentence-breakdown-c
 import { DocumentImporter } from "@/components/reading/document-importer";
 import { AIConfigModal } from "@/components/reading/ai-config-modal";
 import { segmentText } from "@/lib/reading/text-segmenter";
+import { prefetchDocumentWords } from "@/lib/reading/dictionary-cache";
 import {
   getSavedAIConfig,
   analyzeSentence,
@@ -65,6 +66,23 @@ export default function ReadingPage() {
   const [contextVocabMap, setContextVocabMap] = useState<
     Record<string, { meaning: string; ipa: string }>
   >({});
+
+  // Background Prefetch ngầm các từ vựng trong bài đọc khi CPU nhàn rỗi
+  useEffect(() => {
+    const allWords: string[] = [];
+    for (const block of parsedData.paragraphs) {
+      for (const sent of block.sentences) {
+        for (const token of sent.tokens) {
+          if (token.isWord && token.cleanText) {
+            allWords.push(token.cleanText);
+          }
+        }
+      }
+    }
+    if (allWords.length > 0) {
+      prefetchDocumentWords(allWords);
+    }
+  }, [parsedData]);
 
   // Phân tích câu đang chọn
   const handleAnalyzeSentence = useCallback(

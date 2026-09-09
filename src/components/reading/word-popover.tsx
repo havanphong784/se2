@@ -3,6 +3,11 @@
 import React, { useState, useEffect } from "react";
 import { Volume2, Plus, Check, Loader2 } from "lucide-react";
 import { POS_STYLES } from "@/lib/reading/pos-tagger";
+import {
+  getCachedWord,
+  fetchWordDetails,
+  type DictResult,
+} from "@/lib/reading/dictionary-cache";
 import type { POSTag } from "@/types/reading";
 
 export interface WordPopoverData {
@@ -20,15 +25,6 @@ interface WordPopoverProps {
   onSaveToDeck?: (word: string, translation: string, phonetic: string) => Promise<void>;
 }
 
-interface DictResult {
-  phonetic?: string;
-  definition?: string;
-  translationVi?: string;
-  synonyms?: string[];
-}
-
-const lookupCache = new Map<string, DictResult>();
-
 function WordPopoverContent({
   data,
   onSaveToDeck,
@@ -36,7 +32,7 @@ function WordPopoverContent({
   data: WordPopoverData;
   onSaveToDeck?: (word: string, translation: string, phonetic: string) => Promise<void>;
 }) {
-  const cached = lookupCache.get(data.cleanWord.toLowerCase());
+  const cached = getCachedWord(data.cleanWord);
 
   const [details, setDetails] = useState<DictResult | null>(() => {
     if (data.contextMeaning && data.ipa) {
@@ -63,27 +59,13 @@ function WordPopoverContent({
 
   useEffect(() => {
     if (data.contextMeaning && data.ipa) return;
-    if (lookupCache.has(data.cleanWord.toLowerCase())) return;
+    if (getCachedWord(data.cleanWord)) return;
 
     let active = true;
-    fetch(`/api/reading/lookup?word=${encodeURIComponent(data.cleanWord.toLowerCase())}`)
-      .then((res) => (res.ok ? res.json() : null))
-      .then((json) => {
-        if (!active || !json) return;
-        const result: DictResult = {
-          phonetic: json.phonetic || "",
-          definition: json.definition || "",
-          translationVi: data.contextMeaning || undefined,
-          synonyms: json.synonyms || [],
-        };
-        lookupCache.set(data.cleanWord.toLowerCase(), result);
-        setDetails(result);
-      })
-      .catch(() => {
+    fetchWordDetails(data.cleanWord, data.contextMeaning, data.ipa)
+      .then((res) => {
         if (active) {
-          setDetails({
-            translationVi: data.contextMeaning || "Từ vựng",
-          });
+          setDetails(res);
         }
       })
       .finally(() => {

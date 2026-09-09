@@ -88,4 +88,23 @@ logy sector is growing fast.`;
       assert.notEqual(h1, h2);
     });
   });
+
+  describe("Dictionary Cache", () => {
+    it("lưu và đọc từ điển từ L1 memory cache", async () => {
+      const { setCachedWord, getCachedWord } = await import("./dictionary-cache");
+
+      assert.equal(getCachedWord("nonexistentword12345"), null);
+
+      setCachedWord("resilience", {
+        phonetic: "/rɪˈzɪliəns/",
+        definition: "the capacity to recover quickly from difficulties",
+        translationVi: "khả năng phục hồi",
+      });
+
+      const retrieved = getCachedWord("RESILIENCE");
+      assert.ok(retrieved);
+      assert.equal(retrieved?.phonetic, "/rɪˈzɪliəns/");
+      assert.equal(retrieved?.translationVi, "khả năng phục hồi");
+    });
+  });
 });
