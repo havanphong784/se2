@@ -7,6 +7,9 @@ import {
   Settings2,
   FilePlus2,
   Menu,
+  Save,
+  Check,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -24,9 +27,12 @@ import {
   getAllDocumentsMeta,
   getDocumentChunk,
   getDocumentMeta,
+  getAllDocumentChunks,
   updateReadingProgress,
   deleteDocument,
   saveStructuredDocument,
+  saveVdocPackage,
+  buildVdocPackage,
 } from "@/lib/reading/indexed-storage";
 import {
   getSavedAIConfig,
@@ -71,6 +77,8 @@ export default function ReadingPage() {
   const [isConfigOpen, setIsConfigOpen] = useState(false);
   const [isTocOpen, setIsTocOpen] = useState(false);
   const [aiConfig, setAiConfig] = useState<ClientAIConfig>(() => getSavedAIConfig());
+  const [isSavingSession, setIsSavingSession] = useState(false);
+  const [saveSuccessMessage, setSaveSuccessMessage] = useState<string | null>(null);
 
   // Tải tài liệu đã lưu từ IndexedDB khi khởi động
   useEffect(() => {
@@ -299,6 +307,32 @@ export default function ReadingPage() {
     [documentMeta, handleSelectDocument]
   );
 
+  // Lưu phiên học hiện tại vào IndexedDB (.vdoc)
+  const handleSaveSession = useCallback(async () => {
+    if (!documentMeta) return;
+    setIsSavingSession(true);
+    try {
+      const allChunks = await getAllDocumentChunks(documentMeta.id);
+      const vdoc = buildVdocPackage({
+        meta: documentMeta,
+        chunks: allChunks.length > 0 ? allChunks : activeChunk ? [activeChunk] : [],
+        activeChunkIndex,
+        lastReadSentenceId: activeSentence?.id,
+      });
+      await saveVdocPackage(vdoc);
+      setSaveSuccessMessage("Đã lưu vào IndexedDB!");
+      setTimeout(() => setSaveSuccessMessage(null), 2500);
+
+      // Cập nhật danh sách tài liệu
+      const docs = await getAllDocumentsMeta();
+      setAllSavedDocs(docs);
+    } catch (err) {
+      console.warn("Could not save session into IndexedDB:", err);
+    } finally {
+      setIsSavingSession(false);
+    }
+  }, [documentMeta, activeChunk, activeChunkIndex, activeSentence]);
+
   // Lưu từ vựng vào Deck của Vocabloom qua API /api/translate/add
   const handleSaveWordToDeck = async (
     term: string,
@@ -392,6 +426,30 @@ export default function ReadingPage() {
         {/* Action Controls */}
         <div className="flex items-center gap-2 shrink-0">
           <Button
+            variant={saveSuccessMessage ? "default" : "secondary"}
+            size="sm"
+            onClick={handleSaveSession}
+            disabled={isSavingSession || !documentMeta}
+            className={`gap-1.5 font-bold transition-all ${
+              saveSuccessMessage
+                ? "border-[#46a302] bg-ecto-green text-white hover:bg-[#51bd02]"
+                : "border-[#e5e5e5] text-charcoal hover:bg-gray-100"
+            }`}
+            title="Lưu phiên học và tiến độ vào IndexedDB (.vdoc)"
+          >
+            {isSavingSession ? (
+              <Loader2 className="size-4 animate-spin text-[#1cb0f6]" />
+            ) : saveSuccessMessage ? (
+              <Check className="size-4 text-white" />
+            ) : (
+              <Save className="size-4 text-ecto-green" />
+            )}
+            <span className="hidden sm:inline">
+              {saveSuccessMessage ? "Đã lưu vào IndexedDB" : "Lưu phiên học"}
+            </span>
+          </Button>
+
+          <Button
             variant="secondary"
             size="sm"
             onClick={() => setIsImporting(true)}
@@ -467,6 +525,7 @@ export default function ReadingPage() {
         onSelectDocument={handleSelectDocument}
         onDeleteDocument={handleDeleteDocument}
         onNewDocument={() => setIsImporting(true)}
+        onSaveCurrentSession={handleSaveSession}
       />
 
       {/* Modal Cài đặt Local AI */}

@@ -1,10 +1,13 @@
 import type {
   StructuredDocumentMeta,
   DocumentChunk,
+  VdocPackage,
+  VdocSavedWord,
+  SentenceBreakdownResponse,
 } from "@/types/reading";
 
-const DB_NAME = "vocabloom_reading_v1";
-const DB_VERSION = 1;
+const DB_NAME = "vocabloom_reading_v2";
+const DB_VERSION = 2;
 
 interface StoredChunkRecord {
   docId: string;
@@ -23,6 +26,7 @@ interface ReadingProgressRecord {
 const memDocuments = new Map<string, StructuredDocumentMeta>();
 const memChunks = new Map<string, DocumentChunk>();
 const memProgress = new Map<string, ReadingProgressRecord>();
+const memVdocPackages = new Map<string, VdocPackage>();
 
 let dbPromise: Promise<IDBDatabase> | null = null;
 
@@ -59,6 +63,11 @@ function getDb(): Promise<IDBDatabase> {
         if (!db.objectStoreNames.contains("reading_progress")) {
           db.createObjectStore("reading_progress", { keyPath: "docId" });
         }
+
+        // 4. Store lưu toàn bộ phiên đóng gói .vdoc
+        if (!db.objectStoreNames.contains("vdoc_packages")) {
+          db.createObjectStore("vdoc_packages", { keyPath: "id" });
+        }
       };
 
       request.onsuccess = () => {
@@ -75,36 +84,43 @@ function getDb(): Promise<IDBDatabase> {
 }
 
 /**
- * Lưu toàn bộ tài liệu cấu trúc (Metadata và tất cả các Chunks) vào IndexedDB
+ * Đóng gói và lưu phiên học thành định dạng .vdoc trực tiếp vào IndexedDB
  */
-export async function saveStructuredDocument(
-  meta: StructuredDocumentMeta,
-  chunks: DocumentChunk[]
-): Promise<void> {
+export async function saveVdocPackage(vdoc: VdocPackage): Promise<void> {
   try {
     const db = await getDb();
-    const tx = db.transaction(["documents", "chunks", "reading_progress"], "readwrite");
+    const tx = db.transaction(
+      ["vdoc_packages", "documents", "chunks", "reading_progress"],
+      "readwrite"
+    );
 
+    const vdocStore = tx.objectStore("vdoc_packages");
     const docStore = tx.objectStore("documents");
     const chunkStore = tx.objectStore("chunks");
     const progressStore = tx.objectStore("reading_progress");
 
-    docStore.put(meta);
+    // 1. Lưu bản đóng gói vdoc hoàn chỉnh
+    vdocStore.put(vdoc);
 
-    for (const chunk of chunks) {
+    // 2. Đồng bộ hóa sang document metadata
+    docStore.put(vdoc.meta);
+
+    // 3. Đồng bộ hóa chunks
+    for (const chunk of vdoc.chunks) {
       const record: StoredChunkRecord = {
-        docId: meta.id,
+        docId: vdoc.id,
         chunkIndex: chunk.chunkIndex,
         chunk,
       };
       chunkStore.put(record);
     }
 
+    // 4. Đồng bộ tiến độ
     const progressRecord: ReadingProgressRecord = {
-      docId: meta.id,
-      activeChunkIndex: meta.activeChunkIndex || 0,
-      lastSentenceId: meta.lastReadSentenceId,
-      updatedAt: Date.now(),
+      docId: vdoc.id,
+      activeChunkIndex: vdoc.sessionState.activeChunkIndex,
+      lastSentenceId: vdoc.sessionState.lastReadSentenceId,
+      updatedAt: vdoc.sessionState.lastSavedAt,
     };
     progressStore.put(progressRecord);
 
@@ -113,18 +129,118 @@ export async function saveStructuredDocument(
       tx.onerror = () => reject(tx.error);
     });
   } catch (err) {
-    console.warn("IndexedDB save fallback to memory:", err);
-    memDocuments.set(meta.id, meta);
-    for (const chunk of chunks) {
-      memChunks.set(`${meta.id}_${chunk.chunkIndex}`, chunk);
+    console.warn("IndexedDB save vdoc fallback to memory:", err);
+    memVdocPackages.set(vdoc.id, vdoc);
+    memDocuments.set(vdoc.meta.id, vdoc.meta);
+    for (const chunk of vdoc.chunks) {
+      memChunks.set(`${vdoc.meta.id}_${chunk.chunkIndex}`, chunk);
     }
-    memProgress.set(meta.id, {
-      docId: meta.id,
-      activeChunkIndex: meta.activeChunkIndex || 0,
-      lastSentenceId: meta.lastReadSentenceId,
-      updatedAt: Date.now(),
-    });
   }
+}
+
+/**
+ * Lấy gói .vdoc đầy đủ từ IndexedDB theo ID
+ */
+export async function getVdocPackage(docId: string): Promise<VdocPackage | null> {
+  try {
+    const db = await getDb();
+    const tx = db.transaction("vdoc_packages", "readonly");
+    const store = tx.objectStore("vdoc_packages");
+    const request = store.get(docId);
+
+    return new Promise((resolve, reject) => {
+      request.onsuccess = () => resolve((request.result as VdocPackage) || null);
+      request.onerror = () => reject(request.error);
+    });
+  } catch {
+    return memVdocPackages.get(docId) || null;
+  }
+}
+
+/**
+ * Lấy danh sách tất cả các gói .vdoc trong IndexedDB
+ */
+export async function getAllVdocPackages(): Promise<VdocPackage[]> {
+  try {
+    const db = await getDb();
+    const tx = db.transaction("vdoc_packages", "readonly");
+    const store = tx.objectStore("vdoc_packages");
+    const request = store.getAll();
+
+    return new Promise((resolve, reject) => {
+      request.onsuccess = () => {
+        const list = (request.result as VdocPackage[]) || [];
+        list.sort((a, b) => b.sessionState.lastSavedAt - a.sessionState.lastSavedAt);
+        resolve(list);
+      };
+      request.onerror = () => reject(request.error);
+    });
+  } catch {
+    return Array.from(memVdocPackages.values()).sort(
+      (a, b) => b.sessionState.lastSavedAt - a.sessionState.lastSavedAt
+    );
+  }
+}
+
+/**
+ * Helper tạo gói VdocPackage hoàn chỉnh từ trạng thái hiện tại
+ */
+export function buildVdocPackage(params: {
+  meta: StructuredDocumentMeta;
+  chunks: DocumentChunk[];
+  activeChunkIndex: number;
+  lastReadSentenceId?: string;
+  aiAnalysesCache?: Record<string, SentenceBreakdownResponse>;
+  savedWords?: VdocSavedWord[];
+}): VdocPackage {
+  const {
+    meta,
+    chunks,
+    activeChunkIndex,
+    lastReadSentenceId,
+    aiAnalysesCache = {},
+    savedWords = [],
+  } = params;
+
+  return {
+    schema: "vocabloom.vdoc.v1",
+    version: "1.0",
+    id: meta.id,
+    meta: {
+      ...meta,
+      activeChunkIndex,
+      lastReadSentenceId,
+      updatedAt: Date.now(),
+    },
+    sessionState: {
+      activeChunkIndex,
+      lastReadSentenceId,
+      savedWordsCount: savedWords.length,
+      analyzedSentencesCount: Object.keys(aiAnalysesCache).length,
+      lastSavedAt: Date.now(),
+    },
+    chunks,
+    aiAnalysesCache,
+    savedWords,
+  };
+}
+
+/**
+ * Lưu toàn bộ tài liệu cấu trúc (Metadata và tất cả các Chunks) vào IndexedDB
+ */
+export async function saveStructuredDocument(
+  meta: StructuredDocumentMeta,
+  chunks: DocumentChunk[]
+): Promise<void> {
+  // Đồng thời tự động tạo bản đóng gói .vdoc để bảo toàn trọn vẹn phiên
+  const vdoc = buildVdocPackage({
+    meta,
+    chunks,
+    activeChunkIndex: meta.activeChunkIndex || 0,
+    lastReadSentenceId: meta.lastReadSentenceId,
+  });
+
+  return saveVdocPackage(vdoc);
 }
 
 /**
@@ -199,6 +315,39 @@ export async function getDocumentChunk(
 }
 
 /**
+ * Lấy toàn bộ chunks của một tài liệu từ IndexedDB
+ */
+export async function getAllDocumentChunks(
+  docId: string
+): Promise<DocumentChunk[]> {
+  try {
+    const db = await getDb();
+    const tx = db.transaction("chunks", "readonly");
+    const store = tx.objectStore("chunks");
+    const index = store.index("docId");
+    const request = index.getAll(docId);
+
+    return new Promise((resolve, reject) => {
+      request.onsuccess = () => {
+        const records = (request.result as StoredChunkRecord[]) || [];
+        records.sort((a, b) => a.chunkIndex - b.chunkIndex);
+        resolve(records.map((r) => r.chunk));
+      };
+      request.onerror = () => reject(request.error);
+    });
+  } catch {
+    const list: DocumentChunk[] = [];
+    for (const [k, v] of memChunks.entries()) {
+      if (k.startsWith(`${docId}_`)) {
+        list.push(v);
+      }
+    }
+    list.sort((a, b) => a.chunkIndex - b.chunkIndex);
+    return list;
+  }
+}
+
+/**
  * Cập nhật tiến độ đọc hiện tại của tài liệu
  */
 export async function updateReadingProgress(
@@ -208,9 +357,13 @@ export async function updateReadingProgress(
 ): Promise<void> {
   try {
     const db = await getDb();
-    const tx = db.transaction(["documents", "reading_progress"], "readwrite");
+    const tx = db.transaction(
+      ["documents", "reading_progress", "vdoc_packages"],
+      "readwrite"
+    );
     const docStore = tx.objectStore("documents");
     const progressStore = tx.objectStore("reading_progress");
+    const vdocStore = tx.objectStore("vdoc_packages");
 
     const getDocReq = docStore.get(docId);
     getDocReq.onsuccess = () => {
@@ -220,6 +373,19 @@ export async function updateReadingProgress(
         doc.lastReadSentenceId = lastSentenceId;
         doc.updatedAt = Date.now();
         docStore.put(doc);
+      }
+    };
+
+    const getVdocReq = vdocStore.get(docId);
+    getVdocReq.onsuccess = () => {
+      const vdoc = getVdocReq.result as VdocPackage | undefined;
+      if (vdoc) {
+        vdoc.sessionState.activeChunkIndex = chunkIndex;
+        vdoc.sessionState.lastReadSentenceId = lastSentenceId;
+        vdoc.sessionState.lastSavedAt = Date.now();
+        vdoc.meta.activeChunkIndex = chunkIndex;
+        vdoc.meta.lastReadSentenceId = lastSentenceId;
+        vdocStore.put(vdoc);
       }
     };
 
@@ -242,6 +408,12 @@ export async function updateReadingProgress(
       doc.lastReadSentenceId = lastSentenceId;
       doc.updatedAt = Date.now();
     }
+    const vdoc = memVdocPackages.get(docId);
+    if (vdoc) {
+      vdoc.sessionState.activeChunkIndex = chunkIndex;
+      vdoc.sessionState.lastReadSentenceId = lastSentenceId;
+      vdoc.sessionState.lastSavedAt = Date.now();
+    }
     memProgress.set(docId, {
       docId,
       activeChunkIndex: chunkIndex,
@@ -252,14 +424,18 @@ export async function updateReadingProgress(
 }
 
 /**
- * Xóa một tài liệu và toàn bộ chunks của nó
+ * Xóa một tài liệu và toàn bộ chunks, vdoc packages của nó khỏi IndexedDB
  */
 export async function deleteDocument(docId: string): Promise<void> {
   try {
     const db = await getDb();
-    const tx = db.transaction(["documents", "chunks", "reading_progress"], "readwrite");
+    const tx = db.transaction(
+      ["documents", "chunks", "reading_progress", "vdoc_packages"],
+      "readwrite"
+    );
     tx.objectStore("documents").delete(docId);
     tx.objectStore("reading_progress").delete(docId);
+    tx.objectStore("vdoc_packages").delete(docId);
 
     const chunkStore = tx.objectStore("chunks");
     const index = chunkStore.index("docId");
@@ -279,6 +455,7 @@ export async function deleteDocument(docId: string): Promise<void> {
   } catch {
     memDocuments.delete(docId);
     memProgress.delete(docId);
+    memVdocPackages.delete(docId);
     for (const key of memChunks.keys()) {
       if (key.startsWith(`${docId}_`)) {
         memChunks.delete(key);

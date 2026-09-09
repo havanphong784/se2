@@ -139,3 +139,30 @@ export interface StructuredDocumentMeta {
   updatedAt: number;
 }
 
+export interface VdocSessionState {
+  activeChunkIndex: number;
+  lastReadSentenceId?: string;
+  savedWordsCount: number;
+  analyzedSentencesCount: number;
+  lastSavedAt: number;
+}
+
+export interface VdocSavedWord {
+  term: string;
+  translation: string;
+  phonetic: string;
+  savedAt: number;
+}
+
+export interface VdocPackage {
+  schema: "vocabloom.vdoc.v1";
+  version: "1.0";
+  id: string;
+  meta: StructuredDocumentMeta;
+  sessionState: VdocSessionState;
+  chunks: DocumentChunk[];
+  aiAnalysesCache: Record<string, SentenceBreakdownResponse>;
+  savedWords: VdocSavedWord[];
+}
+
+

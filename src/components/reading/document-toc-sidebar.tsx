@@ -27,6 +27,7 @@ interface DocumentTocSidebarProps {
   onSelectDocument?: (docId: string) => void;
   onDeleteDocument?: (docId: string) => void;
   onNewDocument?: () => void;
+  onSaveCurrentSession?: () => void;
 }
 
 export function DocumentTocSidebar({
@@ -39,6 +40,7 @@ export function DocumentTocSidebar({
   onSelectDocument,
   onDeleteDocument,
   onNewDocument,
+  onSaveCurrentSession,
 }: DocumentTocSidebarProps) {
   const [tab, setTab] = useState<"toc" | "history">("toc");
 
@@ -183,6 +185,15 @@ export function DocumentTocSidebar({
       {/* Tab 2: Thư viện tài liệu đã lưu trong IndexedDB */}
       {tab === "history" && (
         <div className="flex-1 overflow-y-auto p-3 space-y-2">
+          {onSaveCurrentSession && (
+            <button
+              onClick={onSaveCurrentSession}
+              className="flex w-full items-center justify-center gap-1.5 rounded-xl border-2 border-ecto-green bg-[#f7fff1] py-2.5 text-xs font-black text-[#438f0e] hover:bg-[#ebfcdb] transition-colors"
+            >
+              <Bookmark className="size-4 text-ecto-green" /> Lưu phiên học hiện tại (.vdoc)
+            </button>
+          )}
+
           {onNewDocument && (
             <button
               onClick={() => {
@@ -220,7 +231,7 @@ export function DocumentTocSidebar({
                   }`}
                 >
                   <div className="min-w-0 flex-1 pr-2">
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1.5 flex-wrap">
                       <span className="font-extrabold text-eel-dark-blue truncate">
                         {doc.title}
                       </span>
@@ -229,8 +240,11 @@ export function DocumentTocSidebar({
                           Đang đọc
                         </span>
                       )}
+                      <span className="rounded bg-[#f0fdf4] border border-[#bbf7d0] px-1 py-0.2 text-[9px] font-mono font-bold text-[#16a34a]">
+                        .vdoc
+                      </span>
                     </div>
-                    <div className="mt-1 flex items-center gap-2 text-[10px] font-semibold text-ash">
+                    <div className="mt-1 flex items-center gap-2 text-[10px] font-semibold text-ash flex-wrap">
                       <span>{doc.totalPages} trang</span>
                       <span>•</span>
                       <span>{doc.totalWords} từ</span>
@@ -243,7 +257,7 @@ export function DocumentTocSidebar({
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        if (confirm(`Bạn có chắc muốn xóa tài liệu "${doc.title}"?`)) {
+                        if (confirm(`Bạn có chắc muốn xóa tài liệu "${doc.title}" khỏi IndexedDB?`)) {
                           onDeleteDocument(doc.id);
                         }
                       }}

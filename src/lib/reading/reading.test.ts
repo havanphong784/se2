@@ -152,4 +152,30 @@ Organizations must adapt to cognitive automation.`;
       assert.ok(chunks.length >= 1, "Phải chia thành các chunks");
     });
   });
+
+  describe("Vdoc Package & IndexedDB Persistence", () => {
+    it("đóng gói đúng cấu trúc .vdoc và khôi phục từ storage", async () => {
+      const { buildVdocPackage, saveVdocPackage, getVdocPackage } = await import("./indexed-storage");
+      const { extractStructuredText } = await import("./extractors");
+
+      const { meta, chunks } = extractStructuredText("Test content for vdoc package.", "Test Document", 10);
+      const vdoc = buildVdocPackage({
+        meta,
+        chunks,
+        activeChunkIndex: 0,
+        lastReadSentenceId: "s-0-0",
+      });
+
+      assert.equal(vdoc.schema, "vocabloom.vdoc.v1");
+      assert.equal(vdoc.version, "1.0");
+      assert.equal(vdoc.id, meta.id);
+      assert.equal(vdoc.sessionState.activeChunkIndex, 0);
+
+      await saveVdocPackage(vdoc);
+      const loaded = await getVdocPackage(vdoc.id);
+      assert.ok(loaded);
+      assert.equal(loaded?.meta.title, "Test Document");
+      assert.equal(loaded?.chunks.length, chunks.length);
+    });
+  });
 });
