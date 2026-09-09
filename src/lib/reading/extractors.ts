@@ -325,8 +325,12 @@ export function extractStructuredText(
   for (const p of paragraphs) {
     const pWords = p.split(/\s+/).filter(Boolean).length;
 
+    const lastP = currentChunkParagraphs[currentChunkParagraphs.length - 1];
+    const isLastPComplete = lastP ? /[.!?:]\s*$/.test(lastP.trim()) : true;
+
     if (
-      currentChunkWords + pWords > wordsPerChunk &&
+      ((currentChunkWords + pWords > wordsPerChunk && isLastPComplete) ||
+        currentChunkWords > wordsPerChunk * 1.3) &&
       currentChunkIndex < totalChunks - 1
     ) {
       const startPage = currentChunkIndex * pagesPerChunk + 1;

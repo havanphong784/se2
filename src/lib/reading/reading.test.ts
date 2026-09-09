@@ -73,6 +73,53 @@ logy sector is growing fast.`;
       const fullText = result.paragraphs[0].rawText;
       assert.ok(fullText.includes("technology"), "Phải ghép lại thành technology");
     });
+
+    it("hàn gắn câu bị xuống dòng mềm (soft wrap) không bị cắt làm 2 câu", () => {
+      const wrappedSentence = `To appreciate the role that an operating system plays in
+a modern computer, it is useful to consider the physical machine.
+The software runs on top of it.`;
+
+      const result = segmentText(wrappedSentence);
+      assert.equal(result.paragraphs[0].sentences.length, 2, "Chỉ được tách thành đúng 2 câu");
+      assert.equal(
+        result.paragraphs[0].sentences[0].text,
+        "To appreciate the role that an operating system plays in a modern computer, it is useful to consider the physical machine."
+      );
+      assert.equal(
+        result.paragraphs[0].sentences[1].text,
+        "The software runs on top of it."
+      );
+    });
+
+    it("bảo vệ từ viết tắt và số thập phân không bị ngắt thành câu cụt", () => {
+      const text = "Dr. Smith and Prof. John introduced Fig. 1.5 at approx. 3.00 PM. It was very impressive.";
+      const result = segmentText(text);
+
+      assert.equal(result.paragraphs[0].sentences.length, 2, "Chỉ được tách thành đúng 2 câu hoàn chỉnh");
+      assert.equal(
+        result.paragraphs[0].sentences[0].text,
+        "Dr. Smith and Prof. John introduced Fig. 1.5 at approx. 3.00 PM."
+      );
+      assert.equal(
+        result.paragraphs[0].sentences[1].text,
+        "It was very impressive."
+      );
+    });
+
+    it("bảo tồn gạch đầu dòng nhiều dòng (multi-line bullet points) thành một mục duy nhất", () => {
+      const bulletText = `Key components:
+- Electronic components (transistors,
+  memory chips, etc.)
+- Central processing unit (CPU)`;
+
+      const result = segmentText(bulletText);
+      const listItems = result.paragraphs.filter((p) => p.type === "list_item");
+      assert.equal(listItems.length, 2, "Phải nhận diện đúng 2 list items");
+      assert.ok(
+        listItems[0].rawText.includes("Electronic components (transistors, memory chips, etc.)"),
+        "Dòng thứ hai của bullet phải được gộp vào bullet item đầu tiên"
+      );
+    });
   });
 
   describe("Sentence Hashing & Caching", () => {
