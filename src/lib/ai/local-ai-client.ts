@@ -195,6 +195,7 @@ Return only raw JSON. No markdown backticks, no introduction, no conversational 
   const requestBody: Record<string, unknown> = {
     model: config.model,
     temperature: config.temperature ?? 0.1,
+    stream: false,
     messages: [
       { role: "system", content: systemPrompt },
       { role: "user", content: userContent },
@@ -216,17 +217,62 @@ Return only raw JSON. No markdown backticks, no introduction, no conversational 
     throw new Error(`AI Request Failed (${res.status}): ${errText.slice(0, 200)}`);
   }
 
-  const json = await res.json();
-  const rawText = json.choices?.[0]?.message?.content;
-  if (!rawText) {
+  const responseText = await res.text();
+  if (!responseText || !responseText.trim()) {
     throw new Error("Mô hình AI trả về kết quả rỗng.");
   }
 
+  let rawContent = "";
+  const trimmed = responseText.trim();
+
+  // Xử lý cả phản hồi Server-Sent Events (SSE: data: {...}) lẫn JSON chuẩn
+  if (trimmed.startsWith("data:") || trimmed.includes("\ndata:")) {
+    const lines = trimmed.split("\n");
+    for (const line of lines) {
+      const cleanLine = line.trim();
+      if (!cleanLine.startsWith("data:")) continue;
+      const jsonStr = cleanLine.slice(5).trim();
+      if (jsonStr === "[DONE]" || !jsonStr) continue;
+      try {
+        const chunk = JSON.parse(jsonStr);
+        const delta =
+          chunk.choices?.[0]?.delta?.content ??
+          chunk.choices?.[0]?.message?.content ??
+          "";
+        rawContent += delta;
+      } catch {
+        // ignore chunk
+      }
+    }
+  } else {
+    try {
+      const json = JSON.parse(trimmed);
+      rawContent =
+        json.choices?.[0]?.message?.content ??
+        json.choices?.[0]?.text ??
+        json.content ??
+        "";
+    } catch {
+      rawContent = trimmed;
+    }
+  }
+
+  if (!rawContent || !rawContent.trim()) {
+    throw new Error("Không nhận được nội dung phân tích từ AI.");
+  }
+
   // Làm sạch các markdown tag ```json nếu có
-  const cleanJson = rawText
+  let cleanJson = rawContent
     .replace(/^```(?:json)?\s*/i, "")
     .replace(/\s*```$/i, "")
     .trim();
+
+  // Trích xuất JSON object nằm giữa { và } để tránh chữ dẫn giải ngoài lề
+  const firstBrace = cleanJson.indexOf("{");
+  const lastBrace = cleanJson.lastIndexOf("}");
+  if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+    cleanJson = cleanJson.slice(firstBrace, lastBrace + 1);
+  }
 
   let parsed: SentenceBreakdownResponse;
   try {

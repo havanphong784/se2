@@ -27,6 +27,8 @@ interface DictResult {
   synonyms?: string[];
 }
 
+const lookupCache = new Map<string, DictResult>();
+
 function WordPopoverContent({
   data,
   onSaveToDeck,
@@ -34,6 +36,8 @@ function WordPopoverContent({
   data: WordPopoverData;
   onSaveToDeck?: (word: string, translation: string, phonetic: string) => Promise<void>;
 }) {
+  const cached = lookupCache.get(data.cleanWord.toLowerCase());
+
   const [details, setDetails] = useState<DictResult | null>(() => {
     if (data.contextMeaning && data.ipa) {
       return {
@@ -41,41 +45,39 @@ function WordPopoverContent({
         translationVi: data.contextMeaning,
       };
     }
+    if (cached) {
+      return {
+        ...cached,
+        translationVi: data.contextMeaning || cached.translationVi,
+      };
+    }
     return null;
   });
-  const [loading, setLoading] = useState<boolean>(() => !data.contextMeaning || !data.ipa);
+  const [loading, setLoading] = useState<boolean>(() => {
+    if (data.contextMeaning && data.ipa) return false;
+    if (cached) return false;
+    return true;
+  });
   const [isSaved, setIsSaved] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (data.contextMeaning && data.ipa) return;
+    if (lookupCache.has(data.cleanWord.toLowerCase())) return;
 
     let active = true;
-    fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(data.cleanWord)}`)
+    fetch(`/api/reading/lookup?word=${encodeURIComponent(data.cleanWord.toLowerCase())}`)
       .then((res) => (res.ok ? res.json() : null))
       .then((json) => {
-        if (!active) return;
-        if (Array.isArray(json) && json.length > 0) {
-          const entry = json[0];
-          const phonetic =
-            entry.phonetic ||
-            entry.phonetics?.find((p: { text?: string }) => p.text)?.text ||
-            "";
-          const firstMeaning = entry.meanings?.[0];
-          const firstDef = firstMeaning?.definitions?.[0]?.definition || "";
-          const synonyms = firstMeaning?.synonyms?.slice(0, 3) || [];
-
-          setDetails({
-            phonetic,
-            definition: firstDef,
-            translationVi: data.contextMeaning || undefined,
-            synonyms,
-          });
-        } else {
-          setDetails({
-            translationVi: data.contextMeaning || "Từ vựng tiếng Anh",
-          });
-        }
+        if (!active || !json) return;
+        const result: DictResult = {
+          phonetic: json.phonetic || "",
+          definition: json.definition || "",
+          translationVi: data.contextMeaning || undefined,
+          synonyms: json.synonyms || [],
+        };
+        lookupCache.set(data.cleanWord.toLowerCase(), result);
+        setDetails(result);
       })
       .catch(() => {
         if (active) {
