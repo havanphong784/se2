@@ -219,7 +219,6 @@ You MUST output strictly a JSON object with this exact structure:
 {
   "sentence": "the original sentence",
   "translationVi": "accurate natural Vietnamese translation in context",
-  "simplifiedEnglish": "a simplified rewritten version (A2-B1 level, 1 sentence)",
   "grammar": {
     "pattern": "name of key grammar pattern (e.g. Inversion, Relative Clause, Passive Voice, Conditional)",
     "explanation": "concise educational explanation (1-2 sentences in Vietnamese) of why this structure was used and how it functions",
