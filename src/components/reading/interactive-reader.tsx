@@ -131,7 +131,7 @@ export function InteractiveReader({
           phraseType: phrase.type,
           subWords: phrase.subWords,
         });
-      }, 180);
+      }, 70);
     } else {
       setHoveredPhraseId(null);
       if (!cleanWord) return;
@@ -149,7 +149,7 @@ export function InteractiveReader({
           ipa: mapped?.ipa,
           isPhrase: false,
         });
-      }, 180);
+      }, 70);
     }
   };
 
@@ -158,7 +158,7 @@ export function InteractiveReader({
     hoverTimeoutRef.current = setTimeout(() => {
       setHoveredPhraseId(null);
       setPopoverData(null);
-    }, 250);
+    }, 160);
   };
 
   // Tính năng Bôi đen tra nhanh (Select-to-Lookup)

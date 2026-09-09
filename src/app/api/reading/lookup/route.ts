@@ -91,7 +91,7 @@ export async function GET(request: Request) {
       // 3. Nếu là từ đơn: gọi song song từ điển Anh-Anh và Google Translate
       const [dictRes, transRes] = await Promise.allSettled([
         fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`, {
-          signal: AbortSignal.timeout(3000),
+          signal: AbortSignal.timeout(1200),
           headers: { "User-Agent": "Mozilla/5.0 Vocabloom/1.0" },
         }).then((r) => (r.ok ? (r.json() as Promise<DictionaryEntry[]>) : null)),
         googleTranslate(word, "en", "vi"),

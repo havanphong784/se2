@@ -15,6 +15,7 @@ import { DocumentImporter } from "@/components/reading/document-importer";
 import { AIConfigModal } from "@/components/reading/ai-config-modal";
 import { segmentText } from "@/lib/reading/text-segmenter";
 import { prefetchDocumentWords } from "@/lib/reading/dictionary-cache";
+import { detectPhrasesInSentence } from "@/lib/reading/phrase-matcher";
 import {
   getSavedAIConfig,
   analyzeSentence,
@@ -67,9 +68,11 @@ export default function ReadingPage() {
     Record<string, { meaning: string; ipa: string }>
   >({});
 
-  // Background Prefetch ngầm các từ vựng trong bài đọc khi CPU nhàn rỗi
+  // Background Prefetch ngầm các từ vựng và cụm từ trong bài đọc (1 batch request)
   useEffect(() => {
     const allWords: string[] = [];
+    const allPhrases: string[] = [];
+
     for (const block of parsedData.paragraphs) {
       for (const sent of block.sentences) {
         for (const token of sent.tokens) {
@@ -77,10 +80,15 @@ export default function ReadingPage() {
             allWords.push(token.cleanText);
           }
         }
+        const detected = detectPhrasesInSentence(sent.text, sent.tokens);
+        for (const p of detected.phrases) {
+          allPhrases.push(p.cleanPhrase);
+        }
       }
     }
-    if (allWords.length > 0) {
-      prefetchDocumentWords(allWords);
+
+    if (allWords.length > 0 || allPhrases.length > 0) {
+      prefetchDocumentWords(allWords, allPhrases);
     }
   }, [parsedData]);
 
