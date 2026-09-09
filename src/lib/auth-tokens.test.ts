@@ -8,6 +8,7 @@ import {
   hashRefreshToken,
   verifyAccessToken,
 } from "./auth-tokens";
+import { REFRESH_GRACE_PERIOD_MS } from "./auth-sessions";
 
 process.env.JWT_ACCESS_SECRET = "test-access-secret-at-least-32-characters-long";
 process.env.JWT_REFRESH_SECRET = "test-refresh-secret-at-least-32-characters-long";
@@ -43,4 +44,5 @@ test("refresh tokens are unique and stored only as stable hashes", async () => {
   assert.notEqual(first, second);
   assert.equal((await hashRefreshToken(first)).length, 64);
   assert.equal(await hashRefreshToken(first), await hashRefreshToken(first));
+  assert.equal(REFRESH_GRACE_PERIOD_MS, 30_000);
 });

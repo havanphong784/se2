@@ -15,6 +15,8 @@ export type RefreshSession = {
   expiresAt: Date;
 };
 
+export const REFRESH_GRACE_PERIOD_MS = 30_000;
+
 export async function createRefreshSession(db: Db, userId: string): Promise<RefreshSession> {
   const token = createRefreshToken();
   const expiresAt = new Date(Date.now() + REFRESH_TOKEN_TTL_SECONDS * 1000);
@@ -41,7 +43,7 @@ export async function rotateRefreshSession(db: Db, token: string) {
     if (!current || current.expiresAt <= now) return null;
 
     if (current.revokedAt) {
-      if (current.replacedById && now.getTime() - current.revokedAt.getTime() < 5_000) {
+      if (current.replacedById && now.getTime() - current.revokedAt.getTime() < REFRESH_GRACE_PERIOD_MS) {
         return { status: "conflict" as const };
       }
       await tx
