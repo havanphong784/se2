@@ -73,7 +73,9 @@ function detectBlockType(text: string): {
  * Chuẩn hóa các dòng bẻ gãy từ PDF/OCR: ghép các dòng mềm thành câu hoàn chỉnh
  */
 function normalizeRawParagraphs(rawContent: string): string[] {
-  const dehyphenated = dehyphenateText(rawContent.replace(/\r\n/g, "\n"));
+  // Loại bỏ các thẻ HTML comment (ví dụ: <!-- Page 11 -->) do bộ bóc tách PDF / chunking sinh ra
+  const cleanedComments = rawContent.replace(/<!--[\s\S]*?-->/g, "");
+  const dehyphenated = dehyphenateText(cleanedComments.replace(/\r\n/g, "\n"));
 
   // Tách theo các khối dòng trống kép
   const rawBlocks = dehyphenated

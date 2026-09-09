@@ -267,6 +267,18 @@ export default function ReadingPage() {
     [aiConfig, parsedData]
   );
 
+  // Tự động phân tích câu đầu tiên khi mở bài đọc hoặc đổi chunk nếu chưa có câu nào được chọn
+  useEffect(() => {
+    const allSentences = parsedData.paragraphs.flatMap((p) => p.sentences);
+    if (allSentences.length > 0 && !selectedSentenceId) {
+      const firstSentence = allSentences[0];
+      const timer = setTimeout(() => {
+        handleAnalyzeSentence(firstSentence);
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [parsedData, selectedSentenceId, handleAnalyzeSentence]);
+
   // Speculative Prefetching: Tự động phân tích đón đầu câu N+1 khi người dùng dừng đọc ở câu N
   useEffect(() => {
     if (!activeSentence?.id || !parsedData) return;

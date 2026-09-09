@@ -264,12 +264,24 @@ Be concise, accurate, and educational. Output valid raw JSON only. No markdown b
         response_format: { type: "json_object" },
       };
 
-      const res = await fetch(endpoint, {
+      let res = await fetch(endpoint, {
         method: "POST",
         headers,
         body: JSON.stringify(requestBody),
         signal: AbortSignal.timeout(30000), // Timeout 30s
       });
+
+      // Nếu proxy/endpoint trả về lỗi 400 (ví dụ 9Router hoặc Gemini không hỗ trợ response_format), thử lại không kèm response_format
+      if (!res.ok && res.status === 400 && requestBody.response_format) {
+        const retryBody = { ...requestBody };
+        delete retryBody.response_format;
+        res = await fetch(endpoint, {
+          method: "POST",
+          headers,
+          body: JSON.stringify(retryBody),
+          signal: AbortSignal.timeout(30000),
+        });
+      }
 
       if (!res.ok) {
         const errText = await res.text();

@@ -230,7 +230,52 @@ export function SentenceBreakdownCard({
     );
   }
 
-  if (!data) return null;
+  // 4. Nếu chưa có data nhưng đã có selectedSentenceText (ví dụ vừa đổi chunk, hoặc đang đợi phân tích)
+  if (!data) {
+    return (
+      <div className="relative flex h-full flex-col items-center justify-center rounded-2xl border-2 border-[#e5e5e5] bg-[#fafafa] p-6 text-center">
+        {onClosePanel && (
+          <button
+            type="button"
+            onClick={onClosePanel}
+            className="absolute top-3 right-3 flex size-7 items-center justify-center rounded-lg text-ash hover:bg-gray-100 hover:text-charcoal transition-colors cursor-pointer"
+            title="Thu gọn bảng phân tích"
+          >
+            <PanelRightClose className="size-4" />
+          </button>
+        )}
+        <div className="flex size-12 items-center justify-center rounded-2xl border-2 border-[#bfe9fd] bg-[#f0f9ff] text-[#1cb0f6]">
+          <Sparkles className="size-6 text-[#1cb0f6] animate-pulse" />
+        </div>
+        <h3 className="mt-3 text-sm font-black text-eel-dark-blue">
+          Sẵn sàng phân tích câu
+        </h3>
+        <p className="mt-1 max-w-sm text-xs font-semibold text-charcoal italic line-clamp-3 px-2">
+          &ldquo;{selectedSentenceText}&rdquo;
+        </p>
+        <div className="mt-4 flex flex-wrap justify-center gap-2">
+          {onRetry && (
+            <Button
+              variant="default"
+              size="sm"
+              onClick={onRetry}
+              className="gap-1.5 font-bold text-xs bg-ecto-green text-white hover:bg-[#51bd02] cursor-pointer"
+            >
+              <Sparkles className="size-3.5" /> Bắt đầu phân tích
+            </Button>
+          )}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onOpenAIConfig}
+            className="gap-1.5 font-bold text-xs cursor-pointer"
+          >
+            <Sparkles className="size-3.5" /> Cài đặt AI
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   const vocabCount = data.vocabulary?.length || 0;
   const idiomsCount = data.idiomsAndPhrases?.length || 0;
