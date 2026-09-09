@@ -128,10 +128,15 @@ export async function saveVdocPackage(vdoc: VdocPackage): Promise<void> {
       tx.oncomplete = () => resolve();
       tx.onerror = () => reject(tx.error);
     });
-  } catch (err) {
-    console.warn("IndexedDB save vdoc fallback to memory:", err);
+  } catch {
     memVdocPackages.set(vdoc.id, vdoc);
     memDocuments.set(vdoc.meta.id, vdoc.meta);
+    memProgress.set(vdoc.id, {
+      docId: vdoc.id,
+      activeChunkIndex: vdoc.sessionState.activeChunkIndex,
+      lastSentenceId: vdoc.sessionState.lastReadSentenceId,
+      updatedAt: vdoc.sessionState.lastSavedAt,
+    });
     for (const chunk of vdoc.chunks) {
       memChunks.set(`${vdoc.meta.id}_${chunk.chunkIndex}`, chunk);
     }

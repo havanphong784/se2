@@ -10,6 +10,8 @@ import {
   Save,
   Check,
   Loader2,
+  PanelRightClose,
+  PanelRightOpen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -76,6 +78,7 @@ export default function ReadingPage() {
   const [isImporting, setIsImporting] = useState(false);
   const [isConfigOpen, setIsConfigOpen] = useState(false);
   const [isTocOpen, setIsTocOpen] = useState(false);
+  const [isZenMode, setIsZenMode] = useState(false);
   const [aiConfig, setAiConfig] = useState<ClientAIConfig>(() => getSavedAIConfig());
   const [isSavingSession, setIsSavingSession] = useState(false);
   const [saveSuccessMessage, setSaveSuccessMessage] = useState<string | null>(null);
@@ -385,52 +388,76 @@ export default function ReadingPage() {
   };
 
   return (
-    <div className="mx-auto flex h-[calc(100vh-2rem)] max-w-[1500px] flex-col px-4 py-4 md:px-6">
-      {/* Header bar */}
-      <header className="mb-3 flex shrink-0 flex-wrap items-center justify-between gap-3 rounded-2xl border-2 border-b-4 border-[#e5e5e5] bg-white p-3 md:px-5">
-        <div className="flex items-center gap-3 min-w-0">
+    <div className="mx-auto flex h-[calc(100vh-1.5rem)] max-w-[1600px] flex-col px-3 py-3 md:px-5 md:py-3">
+      {/* Tối ưu Header: Hợp nhất Header và thanh ChunkPaginationBar thành 1 thanh header duy nhất (~52-56px) */}
+      <header className="mb-2.5 flex h-14 shrink-0 items-center justify-between gap-2.5 rounded-2xl border-2 border-b-4 border-[#e5e5e5] bg-white px-3 md:px-4 shadow-xs">
+        {/* Bên trái: Nút Back, Nút Mục lục TOC (kèm badge số chương), Tên tài liệu, Badge số trang/phần */}
+        <div className="flex items-center gap-2 md:gap-3 min-w-0">
           <Link
             href="/"
-            className="flex size-9 shrink-0 items-center justify-center rounded-xl border-2 border-[#e5e5e5] text-ash hover:bg-gray-100 hover:text-charcoal transition-colors"
+            className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-[#e5e5e5] text-ash hover:bg-gray-100 hover:text-charcoal transition-colors"
             title="Quay về trang chủ"
           >
-            <ArrowLeft className="size-4.5" />
+            <ArrowLeft className="size-4" />
           </Link>
 
-          {/* Nút mở Menu Mục lục TOC */}
+          {/* Nút mở Mục lục TOC */}
           <button
+            type="button"
             onClick={() => setIsTocOpen(true)}
-            className="flex size-9 shrink-0 items-center justify-center rounded-xl border-2 border-[#e5e5e5] text-eel-dark-blue hover:bg-[#e5f6fd] hover:text-[#1cb0f6] transition-colors"
-            title="Mở Mục lục &amp; Thư viện tài liệu"
+            className="flex h-8 shrink-0 items-center gap-1.5 rounded-lg border border-[#e5e5e5] px-2 text-xs font-bold text-eel-dark-blue hover:bg-[#e5f6fd] hover:text-[#1cb0f6] transition-colors"
+            title="Mục lục & Thư viện tài liệu"
           >
-            <Menu className="size-4.5" />
+            <Menu className="size-4 text-[#1cb0f6]" />
+            <span className="hidden sm:inline">Mục lục</span>
+            {documentMeta?.toc && documentMeta.toc.length > 0 && (
+              <span className="rounded-full bg-[#e5f6fd] px-1.5 py-0.2 text-[10px] font-black text-[#087db4]">
+                {documentMeta.toc.length}
+              </span>
+            )}
           </button>
 
-          <div className="min-w-0">
-            <div className="flex items-center gap-2">
-              <h1 className="text-base md:text-lg font-black text-eel-dark-blue truncate max-w-xs md:max-w-md">
-                {documentMeta?.title || "Đang tải tài liệu..."}
-              </h1>
-              {documentMeta && (
-                <Badge variant="blue" className="text-[10px] shrink-0">
-                  {documentMeta.totalPages} trang · {documentMeta.totalChunks} phần
-                </Badge>
-              )}
-            </div>
-            <p className="text-[11px] font-bold text-ash truncate">
-              Chỉ mục TOC &amp; Lazy Loading chống đơ · Local AI bóc tách câu từ
-            </p>
-          </div>
+          {/* Tên tài liệu */}
+          <h1
+            className="text-xs sm:text-sm md:text-[15px] font-black text-eel-dark-blue truncate max-w-[130px] sm:max-w-[200px] md:max-w-xs"
+            title={documentMeta?.title || "Tài liệu"}
+          >
+            {documentMeta?.title || "Đang tải tài liệu..."}
+          </h1>
+
+          {/* Badge số trang / phần */}
+          {documentMeta && (
+            <Badge
+              variant="blue"
+              className="hidden xl:inline-flex text-[10px] py-0 px-2 min-h-6 shrink-0"
+            >
+              {documentMeta.totalPages} trang · {documentMeta.totalChunks} phần
+            </Badge>
+          )}
         </div>
 
-        {/* Action Controls */}
-        <div className="flex items-center gap-2 shrink-0">
+        {/* Ở giữa: Bộ điều hướng Chunk phân trang gọn gàng [ < ] Phần X/Y (Trang A-B) [ > ] */}
+        <div className="flex items-center justify-center shrink-0">
+          <ChunkPaginationBar
+            meta={documentMeta}
+            activeChunkIndex={activeChunkIndex}
+            currentChapterTitle={activeChunk?.chapterTitle}
+            startPage={activeChunk?.startPage || 1}
+            endPage={activeChunk?.endPage || 1}
+            onPrevChunk={() => handleSelectChunk(activeChunkIndex - 1)}
+            onNextChunk={() => handleSelectChunk(activeChunkIndex + 1)}
+            onSelectChunkIndex={handleSelectChunk}
+          />
+        </div>
+
+        {/* Bên phải: Nút "Lưu phiên học", "Nhập tài liệu", "Local AI Config", và nút bật/tắt Zen Mode */}
+        <div className="flex items-center gap-1.5 md:gap-2 shrink-0">
           <Button
             variant={saveSuccessMessage ? "default" : "secondary"}
             size="sm"
             onClick={handleSaveSession}
             disabled={isSavingSession || !documentMeta}
-            className={`gap-1.5 font-bold transition-all ${
+            className={`h-8 px-2.5 text-xs font-bold transition-all ${
               saveSuccessMessage
                 ? "border-[#46a302] bg-ecto-green text-white hover:bg-[#51bd02]"
                 : "border-[#e5e5e5] text-charcoal hover:bg-gray-100"
@@ -438,14 +465,14 @@ export default function ReadingPage() {
             title="Lưu phiên học và tiến độ vào IndexedDB (.vdoc)"
           >
             {isSavingSession ? (
-              <Loader2 className="size-4 animate-spin text-[#1cb0f6]" />
+              <Loader2 className="size-3.5 animate-spin text-[#1cb0f6]" />
             ) : saveSuccessMessage ? (
-              <Check className="size-4 text-white" />
+              <Check className="size-3.5 text-white" />
             ) : (
-              <Save className="size-4 text-ecto-green" />
+              <Save className="size-3.5 text-ecto-green" />
             )}
-            <span className="hidden sm:inline">
-              {saveSuccessMessage ? "Đã lưu vào IndexedDB" : "Lưu phiên học"}
+            <span className="hidden xl:inline">
+              {saveSuccessMessage ? "Đã lưu" : "Lưu phiên"}
             </span>
           </Button>
 
@@ -453,65 +480,98 @@ export default function ReadingPage() {
             variant="secondary"
             size="sm"
             onClick={() => setIsImporting(true)}
-            className="gap-1.5 font-bold"
+            className="h-8 px-2.5 text-xs font-bold border-[#e5e5e5] text-charcoal hover:bg-gray-100"
+            title="Nhập tài liệu (Text, PDF, Word, Ảnh)"
           >
-            <FilePlus2 className="size-4" /> Nhập tài liệu
+            <FilePlus2 className="size-3.5 text-[#1cb0f6]" />
+            <span className="hidden lg:inline">Nhập tài liệu</span>
           </Button>
 
           <Button
             variant="outline"
             size="sm"
             onClick={() => setIsConfigOpen(true)}
-            className="gap-1.5 font-bold"
+            className="h-8 px-2.5 text-xs font-bold border-[#e5e5e5] text-charcoal hover:bg-gray-100"
+            title="Cài đặt Local AI Endpoint"
           >
-            <Settings2 className="size-4 text-[#1cb0f6]" />
-            <span className="hidden sm:inline">Local AI:</span>
-            <span className="font-mono text-xs text-charcoal">{aiConfig.model}</span>
+            <Settings2 className="size-3.5 text-[#1cb0f6]" />
+            <span className="hidden xl:inline font-mono text-[11px] text-charcoal">
+              {aiConfig.model}
+            </span>
+          </Button>
+
+          {/* Nút bật / tắt Zen Mode */}
+          <Button
+            variant={isZenMode ? "blue" : "secondary"}
+            size="sm"
+            onClick={() => setIsZenMode((prev) => !prev)}
+            className={`h-8 px-2.5 text-xs font-bold transition-all ${
+              isZenMode
+                ? "border-macaw-blue bg-macaw-blue text-white hover:bg-[#16a5e8]"
+                : "border-[#e5e5e5] text-charcoal hover:bg-gray-100"
+            }`}
+            title={
+              isZenMode
+                ? "Thoát chế độ Zen (Mở lại cột phân tích)"
+                : "Bật chế độ Zen (Thu gọn cột phân tích để tập trung đọc)"
+            }
+          >
+            {isZenMode ? (
+              <PanelRightOpen className="size-3.5" />
+            ) : (
+              <PanelRightClose className="size-3.5" />
+            )}
+            <span className="hidden sm:inline">
+              {isZenMode ? "Thoát Zen" : "Zen Mode"}
+            </span>
           </Button>
         </div>
       </header>
 
-      {/* Thanh điều hướng Chunks & Phân trang */}
-      <div className="mb-3 shrink-0">
-        <ChunkPaginationBar
-          meta={documentMeta}
-          activeChunkIndex={activeChunkIndex}
-          currentChapterTitle={activeChunk?.chapterTitle}
-          startPage={activeChunk?.startPage || 1}
-          endPage={activeChunk?.endPage || 1}
-          onPrevChunk={() => handleSelectChunk(activeChunkIndex - 1)}
-          onNextChunk={() => handleSelectChunk(activeChunkIndex + 1)}
-          onToggleToc={() => setIsTocOpen(!isTocOpen)}
-          onSelectChunkIndex={handleSelectChunk}
-        />
-      </div>
+      {/* Main Content Area (Layout Responsive & Zen Mode) */}
+      <main className="flex-1 overflow-hidden">
+        {isZenMode ? (
+          /* Khi Zen Mode (thu gọn cột phân tích): Cột văn bản tự động căn giữa với độ rộng tối ưu (max-w-4xl) */
+          <div className="mx-auto h-full max-w-4xl transition-all duration-200">
+            <InteractiveReader
+              paragraphs={parsedData.paragraphs}
+              activeSentenceId={activeSentence?.id || null}
+              onSelectSentence={handleAnalyzeSentence}
+              onSaveWordToDeck={handleSaveWordToDeck}
+              contextVocabMap={contextVocabMap}
+              aiPhrases={analysisData?.idiomsAndPhrases}
+            />
+          </div>
+        ) : (
+          /* Khi cột phân tích mở: Tỉ lệ chia cột hài hòa (cột văn bản 7-8 phần, cột phân tích 5-4 phần) */
+          <div className="grid h-full grid-cols-1 gap-3.5 overflow-hidden lg:grid-cols-12 transition-all duration-200">
+            {/* Cột trái: Văn bản đọc */}
+            <section className="flex flex-col h-full lg:col-span-7 xl:col-span-8 overflow-hidden">
+              <InteractiveReader
+                paragraphs={parsedData.paragraphs}
+                activeSentenceId={activeSentence?.id || null}
+                onSelectSentence={handleAnalyzeSentence}
+                onSaveWordToDeck={handleSaveWordToDeck}
+                contextVocabMap={contextVocabMap}
+                aiPhrases={analysisData?.idiomsAndPhrases}
+              />
+            </section>
 
-      {/* Main Content Area (Split View Layout) */}
-      <main className="grid flex-1 grid-cols-1 gap-4 overflow-hidden lg:grid-cols-12">
-        {/* Cột trái: Văn bản gốc & Interactive Highlighter (7/12 cols ~ 58%) */}
-        <section className="flex flex-col h-full lg:col-span-7 overflow-hidden">
-          <InteractiveReader
-            paragraphs={parsedData.paragraphs}
-            activeSentenceId={activeSentence?.id || null}
-            onSelectSentence={handleAnalyzeSentence}
-            onSaveWordToDeck={handleSaveWordToDeck}
-            contextVocabMap={contextVocabMap}
-            aiPhrases={analysisData?.idiomsAndPhrases}
-          />
-        </section>
-
-        {/* Cột phải: Bóc tách câu chi tiết bằng Local AI (5/12 cols ~ 42%) */}
-        <section className="flex flex-col h-full lg:col-span-5 overflow-hidden">
-          <SentenceBreakdownCard
-            data={analysisData}
-            isLoading={isAnalyzing}
-            error={analysisError}
-            selectedSentenceText={activeSentence?.text || null}
-            onRetry={() => activeSentence && handleAnalyzeSentence(activeSentence)}
-            onOpenAIConfig={() => setIsConfigOpen(true)}
-            onSaveWordToDeck={handleSaveWordToDeck}
-          />
-        </section>
+            {/* Cột phải: Bóc tách câu chi tiết bằng Local AI */}
+            <section className="flex flex-col h-full lg:col-span-5 xl:col-span-4 overflow-hidden">
+              <SentenceBreakdownCard
+                data={analysisData}
+                isLoading={isAnalyzing}
+                error={analysisError}
+                selectedSentenceText={activeSentence?.text || null}
+                onRetry={() => activeSentence && handleAnalyzeSentence(activeSentence)}
+                onOpenAIConfig={() => setIsConfigOpen(true)}
+                onSaveWordToDeck={handleSaveWordToDeck}
+                onClosePanel={() => setIsZenMode(true)}
+              />
+            </section>
+          </div>
+        )}
       </main>
 
       {/* Sidebar Mục lục TOC & Thư viện tài liệu */}

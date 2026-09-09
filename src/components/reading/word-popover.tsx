@@ -115,8 +115,14 @@ function WordPopoverContent({
   };
 
   const posDef = POS_STYLES[data.pos] || POS_STYLES.other;
-  const top = data.rect.bottom + 8;
-  const left = Math.max(16, Math.min(window.innerWidth - 340, data.rect.left - 40));
+  const top =
+    typeof window !== "undefined" && data.rect.bottom + 260 > window.innerHeight
+      ? Math.max(16, data.rect.top - 260)
+      : data.rect.bottom + 8;
+  const left =
+    typeof window !== "undefined"
+      ? Math.max(16, Math.min(window.innerWidth - 340, data.rect.left - 40))
+      : data.rect.left;
 
   const phraseBadgeText =
     data.phraseType === "phrasal_verb"

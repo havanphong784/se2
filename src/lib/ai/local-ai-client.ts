@@ -283,6 +283,8 @@ Return only raw JSON. No markdown backticks, no introduction, no conversational 
 
   // Đảm bảo các field bắt buộc có fallback hợp lý
   if (!parsed.sentence) parsed.sentence = sentence;
+  if (!parsed.translationVi) parsed.translationVi = "";
+  if (!parsed.simplifiedEnglish) parsed.simplifiedEnglish = "";
   if (!parsed.grammar) parsed.grammar = { pattern: "Standard Structure", explanation: "Cấu trúc cơ bản", clauses: [] };
   if (!Array.isArray(parsed.grammar.clauses)) parsed.grammar.clauses = [];
   if (!Array.isArray(parsed.vocabulary)) parsed.vocabulary = [];

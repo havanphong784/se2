@@ -110,7 +110,7 @@ export function DocumentImporter({
         await saveStructuredDocument(meta, chunks);
         onImportStructuredComplete(meta, chunks);
       } else if (tab === "docx") {
-        if (!file.name.toLowerCase().endsWith(".docx") && !file.name.toLowerCase().endsWith(".doc")) {
+        if (!file.name.toLowerCase().endsWith(".docx")) {
           throw new Error("Vui lòng chọn file Word định dạng .docx");
         }
         const { meta, chunks } = await extractStructuredDocx(file, 10);
