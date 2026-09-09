@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Volume2, Plus, Check, Loader2, Link2, RotateCw } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { POS_STYLES } from "@/lib/reading/pos-tagger";
 import {
   getCachedWord,
@@ -31,16 +32,22 @@ interface WordPopoverProps {
   onClose?: () => void;
   onSaveToDeck?: (word: string, translation: string, phonetic: string) => Promise<void>;
   onRetry?: (word: string) => void;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
 }
 
 function WordPopoverContent({
   data,
   onSaveToDeck,
   onRetry,
+  onMouseEnter,
+  onMouseLeave,
 }: {
   data: WordPopoverData;
   onSaveToDeck?: (word: string, translation: string, phonetic: string) => Promise<void>;
   onRetry?: (word: string) => void;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
 }) {
   const cached = getCachedWord(data.cleanWord);
   const hasContextMeaning = Boolean(data.contextMeaning?.trim());
@@ -138,10 +145,11 @@ function WordPopoverContent({
   };
 
   const posDef = POS_STYLES[data.pos] || POS_STYLES.other;
-  const top =
-    typeof window !== "undefined" && data.rect.bottom + 260 > window.innerHeight
-      ? Math.max(16, data.rect.top - 260)
-      : data.rect.bottom + 8;
+  const isFlippedAbove =
+    typeof window !== "undefined" && data.rect.bottom + 260 > window.innerHeight;
+  const top = isFlippedAbove
+    ? Math.max(16, data.rect.top - 260)
+    : data.rect.bottom + 8;
   const left =
     typeof window !== "undefined"
       ? Math.max(16, Math.min(window.innerWidth - 340, data.rect.left - 40))
@@ -159,8 +167,21 @@ function WordPopoverContent({
   return (
     <div
       style={{ top: `${top}px`, left: `${left}px` }}
-      className="fixed z-40 w-80 rounded-2xl border-2 border-b-4 border-[#e5e5e5] bg-white p-4 shadow-xl animate-in fade-in zoom-in-95 duration-150"
-      onMouseEnter={(e) => e.stopPropagation()}
+      className={cn(
+        "fixed z-40 w-80 rounded-2xl border-2 border-b-4 border-[#e5e5e5] bg-white p-4 shadow-xl animate-in fade-in zoom-in-95 duration-150",
+        // Cầu nối tàng hình lấp đầy khoảng hở 8px giữa từ vựng và popover
+        isFlippedAbove
+          ? "before:absolute before:-bottom-3 before:inset-x-0 before:h-4 before:content-['']"
+          : "before:absolute before:-top-3 before:inset-x-0 before:h-4 before:content-['']"
+      )}
+      onMouseEnter={(e) => {
+        e.stopPropagation();
+        onMouseEnter?.();
+      }}
+      onMouseLeave={(e) => {
+        e.stopPropagation();
+        onMouseLeave?.();
+      }}
     >
       {/* Header Bar */}
       <div className="flex items-start justify-between gap-2">
@@ -306,7 +327,13 @@ function WordPopoverContent({
   );
 }
 
-export function WordPopover({ data, onSaveToDeck, onRetry }: WordPopoverProps) {
+export function WordPopover({
+  data,
+  onSaveToDeck,
+  onRetry,
+  onMouseEnter,
+  onMouseLeave,
+}: WordPopoverProps) {
   if (!data) return null;
   return (
     <WordPopoverContent
@@ -314,6 +341,8 @@ export function WordPopover({ data, onSaveToDeck, onRetry }: WordPopoverProps) {
       data={data}
       onSaveToDeck={onSaveToDeck}
       onRetry={onRetry}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
     />
   );
 }

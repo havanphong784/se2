@@ -4,9 +4,12 @@ import React, { useState, useRef, useMemo, useEffect } from "react";
 import {
   Check,
   Sparkles,
+  Underline,
+  EyeOff,
   Quote,
   Filter,
-  ChevronDown,
+  Minus,
+  Plus,
 } from "lucide-react";
 import { POS_STYLES } from "@/lib/reading/pos-tagger";
 import { WordPopover, type WordPopoverData } from "./word-popover";
@@ -72,6 +75,10 @@ export function InteractiveReader({
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const filterDropdownRef = useRef<HTMLDivElement>(null);
 
+  // State menu popover tùy chỉnh font & size (Aa)
+  const [isTypographyOpen, setIsTypographyOpen] = useState(false);
+  const typographyRef = useRef<HTMLDivElement>(null);
+
   // Tùy chỉnh công thái học hiển thị (Typography)
   const [fontSize, setFontSize] = useState<FontSize>("base");
   const [fontFamily, setFontFamily] = useState<FontFamily>("sans");
@@ -91,21 +98,29 @@ export function InteractiveReader({
   // Đóng dropdown khi click ra ngoài hoặc bấm Escape
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      const node = event.target as Node;
       if (
         filterDropdownRef.current &&
-        !filterDropdownRef.current.contains(event.target as Node)
+        !filterDropdownRef.current.contains(node)
       ) {
         setIsFilterOpen(false);
+      }
+      if (
+        typographyRef.current &&
+        !typographyRef.current.contains(node)
+      ) {
+        setIsTypographyOpen(false);
       }
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setIsFilterOpen(false);
+        setIsTypographyOpen(false);
       }
     };
 
-    if (isFilterOpen) {
+    if (isFilterOpen || isTypographyOpen) {
       document.addEventListener("mousedown", handleClickOutside);
       window.addEventListener("keydown", handleKeyDown);
     }
@@ -114,7 +129,7 @@ export function InteractiveReader({
       document.removeEventListener("mousedown", handleClickOutside);
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isFilterOpen]);
+  }, [isFilterOpen, isTypographyOpen]);
 
   // Điều hướng câu bằng phím tắt (ArrowUp/ArrowDown hoặc J/K)
   useEffect(() => {
@@ -280,7 +295,21 @@ export function InteractiveReader({
     hoverTimeoutRef.current = setTimeout(() => {
       setHoveredPhraseId(null);
       setPopoverData(null);
-    }, 160);
+    }, 250);
+  };
+
+  const handlePopoverMouseEnter = () => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
+  };
+
+  const handlePopoverMouseLeave = () => {
+    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+    hoverTimeoutRef.current = setTimeout(() => {
+      setHoveredPhraseId(null);
+      setPopoverData(null);
+    }, 200);
   };
 
   // Tính năng Bôi đen tra nhanh (Select-to-Lookup)
@@ -322,210 +351,244 @@ export function InteractiveReader({
   };
 
   return (
-    <div className="relative flex flex-col h-full">
-      {/* Tinh giản Reading Toolbar thành 1 thanh ngang duy nhất (~40px) */}
-      <div className="mb-2.5 flex h-11 shrink-0 items-center justify-between gap-2 rounded-xl border-2 border-[#e5e5e5] bg-white px-3 shadow-xs">
-        {/* Bên trái: Segmented pill chọn chế độ highlight + Dropdown Bộ lọc từ loại */}
-        <div className="flex items-center gap-2 min-w-0">
-          {/* Segmented pill chọn chế độ highlight (Focus - Gạch chân - Tắt) */}
-          <div className="inline-flex items-center rounded-lg border border-[#e5e5e5] bg-[#fafafa] p-0.5 text-xs font-bold shrink-0">
+    <div className="relative flex h-full flex-col rounded-2xl border-2 border-b-4 border-[#e5e5e5] bg-white shadow-xs overflow-hidden">
+      {/* Floating Micro-Pill: Nổi ở góc trên bên phải, chiếm đúng 0px chiều cao trong luồng văn bản */}
+      <div className="absolute top-2.5 right-3.5 z-20 flex items-center gap-1 rounded-xl border border-[#e5e5e5] bg-white/95 p-0.5 shadow-sm backdrop-blur-xs">
+        {/* Segmented control icon gọn gàng (✦ | U | ✕) */}
+        <div className="inline-flex items-center rounded-lg bg-[#f5f5f5] p-0.5 text-xs">
+          <button
+            type="button"
+            onClick={() => setHighlightMode("focus")}
+            className={`flex size-6 items-center justify-center rounded-md transition-all cursor-pointer ${
+              highlightMode === "focus"
+                ? "bg-[#e5f6fd] text-[#1cb0f6] shadow-2xs font-black"
+                : "text-ash hover:text-charcoal"
+            }`}
+            title="Chỉ làm nổi bật câu đang chọn (Focus)"
+          >
+            <Sparkles className="size-3" />
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setHighlightMode("underline")}
+            className={`flex size-6 items-center justify-center rounded-md transition-all cursor-pointer ${
+              highlightMode === "underline"
+                ? "bg-[#f3e8ff] text-[#9333ea] shadow-2xs font-black"
+                : "text-ash hover:text-charcoal"
+            }`}
+            title="Gạch chân màu theo từ loại"
+          >
+            <Underline className="size-3" />
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setHighlightMode("none")}
+            className={`flex size-6 items-center justify-center rounded-md transition-all cursor-pointer ${
+              highlightMode === "none"
+                ? "bg-gray-200 text-charcoal shadow-2xs font-black"
+                : "text-ash hover:text-charcoal"
+            }`}
+            title="Tắt toàn bộ màu từ loại"
+          >
+            <EyeOff className="size-3" />
+          </button>
+        </div>
+
+        {/* Menu Popover/Dropdown: Bộ lọc từ loại (Filter) */}
+        {highlightMode !== "none" && (
+          <div className="relative" ref={filterDropdownRef}>
             <button
               type="button"
-              onClick={() => setHighlightMode("focus")}
-              className={`flex items-center gap-1 rounded-md px-2.5 py-1 transition-all ${
-                highlightMode === "focus"
-                  ? "bg-[#e5f6fd] text-[#1cb0f6] shadow-2xs font-extrabold"
-                  : "text-ash hover:text-charcoal"
+              onClick={() => setIsFilterOpen((prev) => !prev)}
+              className={`inline-flex items-center gap-1 rounded-md border h-6 px-1.5 text-[11px] font-bold transition-all cursor-pointer ${
+                isFilterOpen || activeFilterCount > 0
+                  ? "border-[#bfe9fd] bg-[#f0f9ff] text-[#0284c7]"
+                  : "border-[#e5e5e5] bg-[#fafafa] text-ash hover:text-charcoal"
               }`}
-              title="Chỉ làm nổi bật câu đang chọn (chống rối mắt, dễ tập trung)"
+              title={`Bộ lọc từ loại (${activeFilterCount}/${ALL_POS_TAGS.length})`}
             >
-              <Sparkles className="size-3" />
-              <span>Câu chọn</span>
+              <Filter className="size-3 text-[#1cb0f6]" />
+              <span className="text-[10px] font-black text-[#0369a1]">
+                {activeFilterCount}
+              </span>
             </button>
 
-            <button
-              type="button"
-              onClick={() => setHighlightMode("underline")}
-              className={`rounded-md px-2.5 py-1 transition-all ${
-                highlightMode === "underline"
-                  ? "bg-[#f3e8ff] text-[#9333ea] shadow-2xs font-extrabold"
-                  : "text-ash hover:text-charcoal"
-              }`}
-              title="Chữ đen, gạch chân màu theo từ loại"
-            >
-              Gạch chân
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setHighlightMode("none")}
-              className={`rounded-md px-2 py-1 transition-all ${
-                highlightMode === "none"
-                  ? "bg-gray-200 text-charcoal shadow-2xs font-extrabold"
-                  : "text-ash hover:text-charcoal"
-              }`}
-              title="Tắt toàn bộ màu từ loại"
-            >
-              Tắt
-            </button>
-          </div>
-
-          {/* Menu Popover/Dropdown: Bộ lọc từ loại (Filter) */}
-          {highlightMode !== "none" && (
-            <div className="relative shrink-0" ref={filterDropdownRef}>
-              <button
-                type="button"
-                onClick={() => setIsFilterOpen((prev) => !prev)}
-                className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-bold transition-all ${
-                  isFilterOpen || activeFilterCount > 0
-                    ? "border-[#bfe9fd] bg-[#f0f9ff] text-[#0284c7]"
-                    : "border-[#e5e5e5] bg-[#fafafa] text-ash hover:text-charcoal"
-                }`}
-                title="Bật/tắt các từ loại cần tô màu"
-              >
-                <Filter className="size-3.5 text-[#1cb0f6]" />
-                <span className="hidden sm:inline">Bộ lọc</span>
-                <span className="rounded-full bg-[#e0f2fe] px-1.5 py-0.2 text-[10px] font-black text-[#0369a1]">
-                  {activeFilterCount}
-                </span>
-                <ChevronDown
-                  className={`size-3 text-ash transition-transform duration-150 ${
-                    isFilterOpen ? "rotate-180" : ""
-                  }`}
-                />
-              </button>
-
-              {/* Dropdown Popover Content */}
-              {isFilterOpen && (
-                <div className="absolute left-0 top-full z-40 mt-1.5 w-60 rounded-xl border-2 border-[#e5e5e5] bg-white p-2.5 shadow-lg animate-in fade-in zoom-in-95 duration-100">
-                  <div className="flex items-center justify-between border-b border-[#f0f0f0] pb-2 mb-2">
-                    <span className="text-xs font-black uppercase tracking-wider text-eel-dark-blue">
-                      Bộ lọc từ loại ({activeFilterCount}/{ALL_POS_TAGS.length})
-                    </span>
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        type="button"
-                        onClick={() => setAllTags(true)}
-                        className="text-[10px] font-bold text-[#1cb0f6] hover:underline"
-                      >
-                        Bật hết
-                      </button>
-                      <span className="text-gray-300">|</span>
-                      <button
-                        type="button"
-                        onClick={() => setAllTags(false)}
-                        className="text-[10px] font-bold text-ash hover:underline"
-                      >
-                        Tắt hết
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1 max-h-64 overflow-y-auto pr-0.5">
-                    {ALL_POS_TAGS.map((tag) => {
-                      const isEnabled = enabledTags[tag];
-                      const def = POS_STYLES[tag];
-
-                      return (
-                        <button
-                          key={tag}
-                          type="button"
-                          onClick={() => toggleTag(tag)}
-                          className={`flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-xs font-bold transition-colors ${
-                            isEnabled
-                              ? "bg-[#f8fafc] text-charcoal hover:bg-[#f1f5f9]"
-                              : "text-ash hover:bg-gray-50 opacity-60"
-                          }`}
-                        >
-                          <div className="flex items-center gap-2">
-                            <span
-                              className="size-2.5 rounded-full shrink-0"
-                              style={{ backgroundColor: def.textColor }}
-                            />
-                            <span>{def.labelVi}</span>
-                            <span className="text-[10px] font-normal text-ash">
-                              ({def.label})
-                            </span>
-                          </div>
-
-                          <div
-                            className={`flex size-4 items-center justify-center rounded border transition-colors ${
-                              isEnabled
-                                ? "border-[#1cb0f6] bg-[#1cb0f6] text-white"
-                                : "border-[#d4d4d4] bg-white"
-                            }`}
-                          >
-                            {isEnabled && <Check className="size-3 stroke-[3]" />}
-                          </div>
-                        </button>
-                      );
-                    })}
+            {/* Dropdown Popover Content */}
+            {isFilterOpen && (
+              <div className="absolute right-0 top-full z-40 mt-1.5 w-60 rounded-xl border-2 border-[#e5e5e5] bg-white p-2.5 shadow-lg animate-in fade-in zoom-in-95 duration-100">
+                <div className="flex items-center justify-between border-b border-[#f0f0f0] pb-2 mb-2">
+                  <span className="text-xs font-black uppercase tracking-wider text-eel-dark-blue">
+                    Bộ lọc từ loại ({activeFilterCount}/{ALL_POS_TAGS.length})
+                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setAllTags(true)}
+                      className="text-[10px] font-bold text-[#1cb0f6] hover:underline"
+                    >
+                      Bật hết
+                    </button>
+                    <span className="text-gray-300">|</span>
+                    <button
+                      type="button"
+                      onClick={() => setAllTags(false)}
+                      className="text-[10px] font-bold text-ash hover:underline"
+                    >
+                      Tắt hết
+                    </button>
                   </div>
                 </div>
-              )}
+
+                <div className="space-y-1 max-h-64 overflow-y-auto pr-0.5">
+                  {ALL_POS_TAGS.map((tag) => {
+                    const isEnabled = enabledTags[tag];
+                    const def = POS_STYLES[tag];
+
+                    return (
+                      <button
+                        key={tag}
+                        type="button"
+                        onClick={() => toggleTag(tag)}
+                        className={`flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-xs font-bold transition-colors ${
+                          isEnabled
+                            ? "bg-[#f8fafc] text-charcoal hover:bg-[#f1f5f9]"
+                            : "text-ash hover:bg-gray-50 opacity-60"
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span
+                            className="size-2.5 rounded-full shrink-0"
+                            style={{ backgroundColor: def.textColor }}
+                          />
+                          <span>{def.labelVi}</span>
+                          <span className="text-[10px] font-normal text-ash">
+                            ({def.label})
+                          </span>
+                        </div>
+
+                        <div
+                          className={`flex size-4 items-center justify-center rounded border transition-colors ${
+                            isEnabled
+                              ? "border-[#1cb0f6] bg-[#1cb0f6] text-white"
+                              : "border-[#d4d4d4] bg-white"
+                          }`}
+                        >
+                          {isEnabled && <Check className="size-3 stroke-[3]" />}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        <div className="h-3.5 w-px bg-[#e5e5e5] mx-0.5" />
+
+        {/* Nút tùy chỉnh hiển thị Aa (Font & Cỡ chữ) dạng Popover chuẩn E-Reader */}
+        <div className="relative" ref={typographyRef}>
+          <button
+            type="button"
+            onClick={() => setIsTypographyOpen((prev) => !prev)}
+            className={`inline-flex items-center gap-0.5 rounded-md border h-6 px-1.5 text-xs font-bold transition-all cursor-pointer ${
+              isTypographyOpen
+                ? "border-[#bfe9fd] bg-[#f0f9ff] text-[#0284c7]"
+                : "border-[#e5e5e5] bg-[#fafafa] text-charcoal hover:bg-white hover:border-[#1cb0f6]"
+            }`}
+            title="Tùy chỉnh cỡ chữ & phông chữ (Aa)"
+          >
+            <span className="font-serif text-xs font-black leading-none">A</span>
+            <span className="text-[10px] font-bold text-ash leading-none">a</span>
+          </button>
+
+          {/* Popover tùy chỉnh Font & Cỡ chữ */}
+          {isTypographyOpen && (
+            <div className="absolute right-0 top-full z-40 mt-1.5 w-56 rounded-xl border-2 border-[#e5e5e5] bg-white p-3 shadow-xl animate-in fade-in zoom-in-95 duration-100 space-y-3">
+              {/* Phông chữ: Sans vs Serif */}
+              <div>
+                <span className="text-[10.5px] font-black uppercase tracking-wider text-ash block mb-1.5">
+                  Phông chữ
+                </span>
+                <div className="grid grid-cols-2 gap-1 rounded-lg border border-[#e5e5e5] bg-[#fafafa] p-0.5 text-xs font-bold">
+                  <button
+                    type="button"
+                    onClick={() => setFontFamily("sans")}
+                    className={`rounded-md py-1 text-center transition-all cursor-pointer ${
+                      fontFamily === "sans"
+                        ? "bg-white text-eel-dark-blue shadow-2xs font-black"
+                        : "text-ash hover:text-charcoal"
+                    }`}
+                  >
+                    Sans
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFontFamily("serif")}
+                    className={`rounded-md py-1 font-serif text-center transition-all cursor-pointer ${
+                      fontFamily === "serif"
+                        ? "bg-white text-eel-dark-blue shadow-2xs font-black"
+                        : "text-ash hover:text-charcoal"
+                    }`}
+                  >
+                    Serif
+                  </button>
+                </div>
+              </div>
+
+              {/* Cỡ chữ: A- | Cỡ | A+ */}
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-[10.5px] font-black uppercase tracking-wider text-ash">
+                    Cỡ chữ
+                  </span>
+                  <span className="font-mono text-[11px] font-bold text-charcoal">
+                    {fontSize === "sm"
+                      ? "14px"
+                      : fontSize === "base"
+                      ? "16px"
+                      : fontSize === "lg"
+                      ? "18px"
+                      : "20px"}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between rounded-lg border border-[#e5e5e5] bg-[#fafafa] p-1">
+                  <button
+                    type="button"
+                    onClick={decreaseFontSize}
+                    disabled={fontSize === "sm"}
+                    className="flex size-7 items-center justify-center rounded-md bg-white border border-[#e5e5e5] text-charcoal hover:bg-gray-50 disabled:opacity-30 disabled:hover:bg-white transition-colors cursor-pointer disabled:cursor-not-allowed shadow-2xs"
+                    title="Giảm cỡ chữ (A-)"
+                  >
+                    <Minus className="size-3.5" />
+                  </button>
+
+                  <span className="text-xs font-extrabold text-eel-dark-blue uppercase">
+                    {fontSize}
+                  </span>
+
+                  <button
+                    type="button"
+                    onClick={increaseFontSize}
+                    disabled={fontSize === "xl"}
+                    className="flex size-7 items-center justify-center rounded-md bg-white border border-[#e5e5e5] text-charcoal hover:bg-gray-50 disabled:opacity-30 disabled:hover:bg-white transition-colors cursor-pointer disabled:cursor-not-allowed shadow-2xs"
+                    title="Tăng cỡ chữ (A+)"
+                  >
+                    <Plus className="size-3.5" />
+                  </button>
+                </div>
+              </div>
             </div>
           )}
         </div>
-
-        {/* Bên phải: Cụm điều khiển Font (Sans / Serif) và Cỡ chữ (A- / A+) */}
-        <div className="flex items-center gap-2 shrink-0">
-          {/* Font switcher (Sans / Serif) */}
-          <div className="flex items-center rounded-lg border border-[#e5e5e5] bg-[#fafafa] p-0.5 text-xs font-bold">
-            <button
-              type="button"
-              onClick={() => setFontFamily("sans")}
-              className={`rounded-md px-2 py-0.5 transition-all text-xs ${
-                fontFamily === "sans"
-                  ? "bg-white text-eel-dark-blue shadow-2xs font-black"
-                  : "text-ash hover:text-charcoal"
-              }`}
-            >
-              Sans
-            </button>
-            <button
-              type="button"
-              onClick={() => setFontFamily("serif")}
-              className={`rounded-md px-2 py-0.5 font-serif transition-all text-xs ${
-                fontFamily === "serif"
-                  ? "bg-white text-eel-dark-blue shadow-2xs font-black"
-                  : "text-ash hover:text-charcoal"
-              }`}
-            >
-              Serif
-            </button>
-          </div>
-
-          {/* Font size buttons (A- / A+) */}
-          <div className="flex items-center rounded-lg border border-[#e5e5e5] bg-[#fafafa] p-0.5 text-xs font-bold">
-            <button
-              type="button"
-              onClick={decreaseFontSize}
-              disabled={fontSize === "sm"}
-              className="flex size-7 items-center justify-center rounded-md text-ash hover:bg-white hover:text-charcoal disabled:opacity-30 disabled:hover:bg-transparent transition-colors cursor-pointer disabled:cursor-not-allowed"
-              title="Giảm cỡ chữ (A-)"
-            >
-              <span className="text-[11px] font-black">A-</span>
-            </button>
-            <span className="px-1.5 text-[11px] font-mono font-black text-charcoal">
-              {fontSize.toUpperCase()}
-            </span>
-            <button
-              type="button"
-              onClick={increaseFontSize}
-              disabled={fontSize === "xl"}
-              className="flex size-7 items-center justify-center rounded-md text-ash hover:bg-white hover:text-charcoal disabled:opacity-30 disabled:hover:bg-transparent transition-colors cursor-pointer disabled:cursor-not-allowed"
-              title="Tăng cỡ chữ (A+)"
-            >
-              <span className="text-[11px] font-black">A+</span>
-            </button>
-          </div>
-        </div>
       </div>
 
-      {/* Khung đọc tài liệu gốc (Document Flow Area) */}
+      {/* Vùng đọc nội dung cuộn (Document Flow Area) */}
       <div
         onMouseUp={handleMouseUp}
-        className={`flex-1 overflow-y-auto rounded-2xl border-2 border-b-4 border-[#e5e5e5] bg-white p-5 md:p-7 space-y-5 select-text shadow-xs ${
+        className={`flex-1 overflow-y-auto p-5 md:p-7 space-y-5 select-text ${
           fontFamily === "serif" ? "font-serif" : "font-sans"
         }`}
         onClick={() => {
@@ -610,6 +673,8 @@ export function InteractiveReader({
         data={popoverData}
         onClose={() => setPopoverData(null)}
         onSaveToDeck={onSaveWordToDeck}
+        onMouseEnter={handlePopoverMouseEnter}
+        onMouseLeave={handlePopoverMouseLeave}
       />
     </div>
   );
