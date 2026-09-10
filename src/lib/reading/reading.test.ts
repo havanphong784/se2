@@ -141,6 +141,10 @@ The software runs on top of it.`;
 
       assert.equal(draft.sentence, "The technology sector is growing fast.");
       assert.equal(draft.translationVi, "Ngành công nghệ đang phát triển nhanh chóng.");
+      assert.equal(draft.complexity, "simple");
+      assert.ok(draft.skeleton);
+      assert.ok(Array.isArray(draft.chunks));
+      assert.ok(Array.isArray(draft.mentalModelSteps));
       assert.ok(draft.grammar);
       assert.equal(draft.grammar.pattern, "Đang phân tích cấu trúc...");
       assert.deepEqual(draft.vocabulary, []);
@@ -150,21 +154,63 @@ The software runs on top of it.`;
       const { setCachedAnalysis, getCachedAnalysis } = await import("@/lib/ai/local-ai-client");
       const sample = {
         sentence: "Learning languages expands horizons.",
+        complexity: "simple" as const,
         translationVi: "Học ngôn ngữ mở rộng tầm nhìn.",
-        simplifiedEnglish: "Learning new languages helps you learn more.",
-        grammar: { pattern: "Simple Sentence", explanation: "Câu đơn", clauses: [] },
+        coreIdeaVi: "Học ngôn ngữ giúp con người mở rộng tri thức và thế giới quan.",
+        skeleton: {
+          pattern: "S + V + O",
+          parts: [
+            { type: "S" as const, text: "Learning languages", roleVi: "Chủ ngữ" },
+            { type: "V" as const, text: "expands", roleVi: "Động từ" },
+            { type: "O" as const, text: "horizons", roleVi: "Tân ngữ" },
+          ],
+        },
+        chunks: [
+          { chunkText: "Learning languages", meaningVi: "Việc học ngôn ngữ", type: "noun_phrase" },
+          { chunkText: "expands", meaningVi: "mở rộng", type: "verb_phrase" },
+          { chunkText: "horizons", meaningVi: "những chân trời mới", type: "noun_phrase" },
+        ],
+        grammar: {
+          pattern: "Simple Sentence with Gerund Subject",
+          explanation: "Câu đơn với danh động từ đóng vai trò chủ ngữ.",
+          ruleSummary: "V-ing (Singular Subject) + V(s/es) + Object",
+          whyUsedVi: "Tác giả dùng danh động từ để nhấn mạnh hành động học như một trải nghiệm sống.",
+          mechanicVi: "Danh động từ 'Learning' làm chủ ngữ số ít nên động từ 'expands' thêm 's'.",
+          clauses: [],
+        },
         vocabulary: [
-          { term: "horizons", ipa: "/həˈraɪ.zənz/", partOfSpeech: "noun", contextMeaningVi: "tầm nhìn, chân trời", cefr: "B2" as const }
+          {
+            term: "horizons",
+            ipa: "/həˈraɪ.zənz/",
+            partOfSpeech: "noun",
+            contextMeaningVi: "tầm nhìn, chân trời",
+            cefr: "B2" as const,
+            isTechnicalTerm: false,
+            wordFamily: [{ word: "horizontal", partOfSpeech: "adjective" }],
+          },
         ],
         idiomsAndPhrases: [],
+        mentalModelSteps: [
+          "1. Bắt đầu với chủ thể hành động: 'Learning languages' (việc học tiếng).",
+          "2. Nắm bắt động từ tác động: 'expands' (mở rộng).",
+          "3. Tiếp nhận đối tượng: 'horizons' (tầm nhìn, chân trời).",
+        ],
+        simplifiedEnglish: "Learning new languages helps you learn more.",
       };
 
       setCachedAnalysis("Learning languages expands horizons.", sample);
       const cached = getCachedAnalysis("LEARNING LANGUAGES EXPANDS HORIZONS.");
       assert.ok(cached);
       assert.equal(cached?.translationVi, "Học ngôn ngữ mở rộng tầm nhìn.");
+      assert.equal(cached?.coreIdeaVi, "Học ngôn ngữ giúp con người mở rộng tri thức và thế giới quan.");
+      assert.equal(cached?.skeleton?.pattern, "S + V + O");
+      assert.equal(cached?.skeleton?.parts.length, 3);
+      assert.equal(cached?.chunks?.length, 3);
+      assert.equal(cached?.grammar?.whyUsedVi, "Tác giả dùng danh động từ để nhấn mạnh hành động học như một trải nghiệm sống.");
       assert.equal(cached?.vocabulary.length, 1);
       assert.equal(cached?.vocabulary[0].term, "horizons");
+      assert.equal(cached?.vocabulary[0].wordFamily?.[0].word, "horizontal");
+      assert.equal(cached?.mentalModelSteps?.length, 3);
     });
   });
 

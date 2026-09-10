@@ -9,7 +9,7 @@ export const DEFAULT_AI_CONFIG: ClientAIConfig = {
 };
 
 export const LOCAL_STORAGE_AI_KEY = "vocabloom_ai_config";
-export const LOCAL_STORAGE_CACHE_PREFIX = "vocabloom_analysis_cache_";
+export const LOCAL_STORAGE_CACHE_PREFIX = "vocabloom_analysis_cache_v2_";
 
 // L1 In-memory Cache cho kết quả phân tích câu (0ms truy cập)
 const analysisL1Cache = new Map<string, SentenceBreakdownResponse>();
@@ -119,15 +119,26 @@ export function createInstantSentenceDraft(
 ): SentenceBreakdownResponse {
   return {
     sentence,
+    complexity: "simple",
     translationVi: preliminaryTranslation,
-    simplifiedEnglish: "",
+    coreIdeaVi: "",
+    skeleton: {
+      pattern: "Đang phân tích...",
+      parts: [],
+    },
+    chunks: [],
     grammar: {
       pattern: "Đang phân tích cấu trúc...",
       explanation: "AI đang phân tích ngữ pháp, các mệnh đề S-V-O và ngữ cảnh...",
+      ruleSummary: "",
+      whyUsedVi: "",
+      mechanicVi: "",
       clauses: [],
     },
     vocabulary: [],
     idiomsAndPhrases: [],
+    mentalModelSteps: [],
+    simplifiedEnglish: "",
   };
 }
 
@@ -192,7 +203,13 @@ export async function analyzeSentence(
 ): Promise<SentenceBreakdownResponse> {
   // 1. Kiểm tra cache trước
   const cached = getCachedAnalysis(sentence);
-  if (cached && (cached.grammar?.clauses?.length > 0 || cached.simplifiedEnglish)) {
+  if (
+    cached &&
+    (cached.grammar?.clauses?.length > 0 ||
+      (cached.skeleton?.parts && cached.skeleton.parts.length > 0) ||
+      (cached.chunks && cached.chunks.length > 0) ||
+      cached.simplifiedEnglish)
+  ) {
     return cached;
   }
 
@@ -212,43 +229,139 @@ export async function analyzeSentence(
         headers["Authorization"] = `Bearer ${config.apiKey}`;
       }
 
-      // System Prompt tối ưu gọn gàng nhưng KHÔNG giới hạn mảng từ vựng
+      // System Prompt 7 tầng sư phạm sâu sắc
       const systemPrompt = `You are an expert English linguist and teacher for Vocabloom language platform.
-Analyze the target English sentence within the given paragraph context.
-You MUST output strictly a JSON object with this exact structure:
+Analyze the target English sentence within the given paragraph context using a comprehensive 7-layer pedagogical framework:
+Layer 1: Contextual Translation & Core Idea (translationVi, coreIdeaVi)
+Layer 2: Sentence Skeleton S-V-O-A (skeleton: pattern, parts)
+Layer 3: Clause Breakdown (grammar.clauses)
+Layer 4: Natural Semantic Chunking Flow (chunks)
+Layer 5: Key Contextual Vocabulary & Word Family (vocabulary)
+Layer 6: Grammar Structure & Pedagogical "Why" (grammar: pattern, explanation, ruleSummary, whyUsedVi, mechanicVi)
+Layer 7: Natural Mental Model Steps (mentalModelSteps)
+
+PEDAGOGICAL RULES & INSTRUCTIONS:
+1. Adaptive Depth:
+   - Identify "complexity": "micro" | "simple" | "compound" | "complex".
+   - For "micro" sentences (short imperative commands, greetings, exclamations, e.g. "Click here.", "Thank you."): keep breakdown concise and light, do not force artificial complexity.
+2. Preserve IT / Technical Terms:
+   - Do NOT translate established technical/IT terms literally (e.g., API, database, cache, token, request, backend, frontend, framework, middleware, thread). Mark "isTechnicalTerm": true for these items.
+3. Skeleton S-V-O-A (Layer 2):
+   - Provide summary pattern: e.g. "S + V + O", "S + V + C", "S + V + O + A".
+   - Break sentence into core structural parts:
+     - type: "S" (Subject) | "V" (Verb) | "O" (Object) | "C" (Complement) | "A" (Adverbial)
+     - text: corresponding text in the sentence
+     - roleVi: "Chủ ngữ" | "Động từ" | "Tân ngữ" | "Bổ ngữ" | "Trạng ngữ"
+4. Semantic Chunking Flow (Layer 4):
+   - Divide the sentence into natural meaningful chunks in reading order (Noun phrase, Verb phrase, Prepositional phrase, Adverbial phrase, Clause).
+   - Each chunk has: "chunkText" (English chunk), "meaningVi" (natural Vietnamese meaning), "type" ("noun_phrase" | "verb_phrase" | "prepositional_phrase" | "adverbial_phrase" | "clause").
+5. Key Vocabulary & Word Family (Layer 5):
+   - PRESERVE FULL VOCABULARY ARRAY: Do NOT truncate vocabulary, extract all key words/phrases necessary for learner comprehension.
+   - For key terms, include "wordFamily" with 1-3 related words of different parts of speech (e.g. {"word": "analyze", "partOfSpeech": "verb"}).
+   - Provide realistic CEFR level ("A1" | "A2" | "B1" | "B2" | "C1" | "C2").
+6. The "Why" & Mechanics (Layer 6):
+   - "whyUsedVi": Clearly explain WHY the author chose this grammatical structure/tense in this context (what rhetorical effect, focus, or tone it creates).
+   - "mechanicVi": Explain the grammar mechanic (verb agreement, tense reason, participle reduction, passive shift).
+7. Mental Model Steps (Layer 7):
+   - 2-4 sequential steps explaining how a native reader digests this sentence from left to right, helping Vietnamese learners avoid translating backwards.
+
+OUTPUT STRICTLY A VALID JSON OBJECT WITH THIS EXACT FORMAT:
 {
   "sentence": "the original sentence",
-  "translationVi": "accurate natural Vietnamese translation in context",
+  "complexity": "simple | compound | complex | micro",
+  "translationVi": "accurate, natural Vietnamese translation fitting the context",
+  "coreIdeaVi": "concise 1-sentence summary of the core message in Vietnamese",
+  "skeleton": {
+    "pattern": "e.g. S + V + O + A",
+    "parts": [
+      {
+        "type": "S",
+        "text": "The engineering team",
+        "roleVi": "Chủ ngữ"
+      },
+      {
+        "type": "V",
+        "text": "has deployed",
+        "roleVi": "Động từ"
+      },
+      {
+        "type": "O",
+        "text": "the critical security patch",
+        "roleVi": "Tân ngữ"
+      },
+      {
+        "type": "A",
+        "text": "to production servers",
+        "roleVi": "Trạng ngữ"
+      }
+    ]
+  },
+  "chunks": [
+    {
+      "chunkText": "The engineering team",
+      "meaningVi": "Đội ngũ kỹ thuật",
+      "type": "noun_phrase"
+    },
+    {
+      "chunkText": "has deployed",
+      "meaningVi": "đã triển khai",
+      "type": "verb_phrase"
+    },
+    {
+      "chunkText": "the critical security patch",
+      "meaningVi": "bản vá bảo mật quan trọng",
+      "type": "noun_phrase"
+    },
+    {
+      "chunkText": "to production servers",
+      "meaningVi": "lên các máy chủ production",
+      "type": "prepositional_phrase"
+    }
+  ],
   "grammar": {
-    "pattern": "name of key grammar pattern (e.g. Inversion, Relative Clause, Passive Voice, Conditional)",
-    "explanation": "concise educational explanation (1-2 sentences in Vietnamese) of why this structure was used and how it functions",
+    "pattern": "Present Perfect Tense with Prepositional Modifier",
+    "explanation": "Câu diễn tả một hành động vừa hoàn tất trong quá khứ nhưng để lại kết quả trực tiếp ở hiện tại.",
+    "ruleSummary": "S + have/has + V3/ed + O + Prepositional Phrase",
+    "whyUsedVi": "Tác giả dùng thì Hiện tại hoàn thành để nhấn mạnh trạng thái hiện tại của hệ thống sau khi được vá lỗi.",
+    "mechanicVi": "Chủ ngữ số ít 'team' (danh từ tập hợp) đi với 'has deployed', giới từ 'to' chỉ hướng đích.",
     "clauses": [
       {
-        "clauseText": "part of the sentence",
-        "role": "Main Clause | Subordinate Clause | Relative Clause | Adverbial Clause",
-        "subject": "subject of clause",
-        "verb": "verb phrase of clause",
-        "objectOrComplement": "object or complement if any"
+        "clauseText": "The engineering team has deployed the critical security patch to production servers",
+        "role": "Main Clause",
+        "subject": "The engineering team",
+        "verb": "has deployed",
+        "objectOrComplement": "the critical security patch"
       }
     ]
   },
   "vocabulary": [
     {
-      "term": "word from sentence",
-      "ipa": "/phonetic/",
-      "partOfSpeech": "noun | verb | adjective | adverb | etc.",
-      "contextMeaningVi": "meaning of the word specifically in this sentence context",
-      "cefr": "B1 | B2 | C1 | C2"
+      "term": "deployed",
+      "ipa": "/dɪˈplɔɪd/",
+      "partOfSpeech": "verb",
+      "contextMeaningVi": "triển khai, đưa vào hoạt động",
+      "cefr": "B2",
+      "isTechnicalTerm": true,
+      "wordFamily": [
+        { "word": "deployment", "partOfSpeech": "noun" },
+        { "word": "deployable", "partOfSpeech": "adjective" }
+      ]
     }
   ],
   "idiomsAndPhrases": [
     {
-      "phrase": "collocation or idiom",
-      "meaningVi": "Vietnamese explanation"
+      "phrase": "production servers",
+      "meaningVi": "máy chủ môi trường thực tế (production)"
     }
+  ],
+  "mentalModelSteps": [
+    "1. Nắm bắt chủ thể thực hiện: 'The engineering team' (đội ngũ kỹ thuật).",
+    "2. Tiếp nhận hành động hoàn tất: 'has deployed' (vừa hoàn tất triển khai).",
+    "3. Nắm đối tượng tác động: 'the critical security patch' (bản vá bảo mật trọng yếu).",
+    "4. Tiếp nhận đích đến: 'to production servers' (lên hệ thống thực tế)."
   ]
 }
-Be concise, accurate, and educational. Output valid raw JSON only. No markdown backticks, no conversational wrapper.`;
+Be concise, educational, and precise. Output valid raw JSON only. No markdown backticks, no conversational wrapper.`;
 
       const userContent = `Paragraph context: """${contextParagraph}"""\n\nSentence to analyze: """${sentence}"""`;
 
@@ -350,11 +463,98 @@ Be concise, accurate, and educational. Output valid raw JSON only. No markdown b
 
       if (!parsed.sentence) parsed.sentence = sentence;
       if (!parsed.translationVi) parsed.translationVi = "";
+      if (!parsed.coreIdeaVi) parsed.coreIdeaVi = "";
+      if (!parsed.complexity) parsed.complexity = "simple";
       if (!parsed.simplifiedEnglish) parsed.simplifiedEnglish = "";
-      if (!parsed.grammar) parsed.grammar = { pattern: "Standard Structure", explanation: "Cấu trúc câu tiêu chuẩn", clauses: [] };
+
+      // Skeleton fallback
+      if (!parsed.skeleton || typeof parsed.skeleton !== "object") {
+        parsed.skeleton = { pattern: "S + V + O", parts: [] };
+      } else {
+        if (!parsed.skeleton.pattern) parsed.skeleton.pattern = "S + V";
+        if (!Array.isArray(parsed.skeleton.parts)) {
+          parsed.skeleton.parts = [];
+        } else {
+          parsed.skeleton.parts = parsed.skeleton.parts.map((p) => {
+            const rawType = (p.type || "S").toUpperCase() as "S" | "V" | "O" | "C" | "A";
+            const validTypes: Array<"S" | "V" | "O" | "C" | "A"> = ["S", "V", "O", "C", "A"];
+            const type = validTypes.includes(rawType) ? rawType : "S";
+            const defaultRoles: Record<string, string> = {
+              S: "Chủ ngữ",
+              V: "Động từ",
+              O: "Tân ngữ",
+              C: "Bổ ngữ",
+              A: "Trạng ngữ",
+            };
+            return {
+              type,
+              text: p.text || "",
+              roleVi: p.roleVi || defaultRoles[type] || "Thành phần câu",
+            };
+          });
+        }
+      }
+
+      // Semantic chunks fallback
+      if (!Array.isArray(parsed.chunks)) {
+        parsed.chunks = [];
+      } else {
+        parsed.chunks = parsed.chunks.map((c) => ({
+          chunkText: c.chunkText || "",
+          meaningVi: c.meaningVi || "",
+          type: c.type || "noun_phrase",
+        }));
+      }
+
+      // Grammar fallback
+      if (!parsed.grammar || typeof parsed.grammar !== "object") {
+        parsed.grammar = {
+          pattern: "Standard Structure",
+          explanation: "Cấu trúc câu tiêu chuẩn",
+          ruleSummary: "",
+          whyUsedVi: "",
+          mechanicVi: "",
+          clauses: [],
+        };
+      }
+      if (!parsed.grammar.pattern) parsed.grammar.pattern = "Standard Structure";
+      if (!parsed.grammar.explanation) parsed.grammar.explanation = "Cấu trúc câu tiêu chuẩn";
       if (!Array.isArray(parsed.grammar.clauses)) parsed.grammar.clauses = [];
-      if (!Array.isArray(parsed.vocabulary)) parsed.vocabulary = [];
+      if (!parsed.grammar.whyUsedVi) parsed.grammar.whyUsedVi = "";
+      if (!parsed.grammar.mechanicVi) parsed.grammar.mechanicVi = "";
+      if (!parsed.grammar.ruleSummary) parsed.grammar.ruleSummary = "";
+
+      // Vocabulary fallback (preserve full array, safe fallback for items)
+      if (!Array.isArray(parsed.vocabulary)) {
+        parsed.vocabulary = [];
+      } else {
+        parsed.vocabulary = parsed.vocabulary.map((v) => ({
+          ...v,
+          term: v.term || "",
+          ipa: v.ipa || "",
+          partOfSpeech: v.partOfSpeech || "",
+          contextMeaningVi: v.contextMeaningVi || "",
+          isTechnicalTerm: Boolean(v.isTechnicalTerm),
+          wordFamily: Array.isArray(v.wordFamily)
+            ? v.wordFamily.map((wf) => ({
+                word: wf.word || "",
+                partOfSpeech: wf.partOfSpeech || "",
+              }))
+            : [],
+        }));
+      }
+
+      // Idioms fallback
       if (!Array.isArray(parsed.idiomsAndPhrases)) parsed.idiomsAndPhrases = [];
+
+      // Mental model steps fallback
+      if (!Array.isArray(parsed.mentalModelSteps)) {
+        parsed.mentalModelSteps = [];
+      } else {
+        parsed.mentalModelSteps = parsed.mentalModelSteps
+          .map((s) => (typeof s === "string" ? s.trim() : ""))
+          .filter(Boolean);
+      }
 
       // Lưu vào cache L1 & L2
       setCachedAnalysis(sentence, parsed);
