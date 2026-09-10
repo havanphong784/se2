@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useCallback, useEffect } from "react";
+import React, { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -15,6 +15,8 @@ import {
   Expand,
   Shrink,
   Sparkles,
+  Zap,
+  Square,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -39,6 +41,9 @@ import {
   saveStructuredDocument,
   saveVdocPackage,
   buildVdocPackage,
+  saveSentenceAnalysis,
+  getAllAnalysesForDocument,
+  deleteAnalysesByDocument,
 } from "@/lib/reading/indexed-storage";
 import {
   getSavedAIConfig,
@@ -46,6 +51,9 @@ import {
   getCachedAnalysis,
   fetchFastSentenceTranslation,
   createInstantSentenceDraft,
+  primeSentenceAnalysisCache,
+  hasCachedAnalysis,
+  clearSentenceAnalysisCache,
 } from "@/lib/ai/local-ai-client";
 import type {
   SentenceItem,
@@ -88,7 +96,8 @@ export default function ReadingPage() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [aiConfig, setAiConfig] = useState<ClientAIConfig>(() => getSavedAIConfig());
   const [isSavingSession, setIsSavingSession] = useState(false);
-  const [saveSuccessMessage, setSaveSuccessMessage] = useState<string | null>(null);
+  const [isDocumentSaved, setIsDocumentSaved] = useState<boolean>(true);
+  const [analyzedSentencesCount, setAnalyzedSentencesCount] = useState<number>(0);
 
   // Tải tài liệu đã lưu từ IndexedDB khi khởi động
   useEffect(() => {
@@ -108,6 +117,7 @@ export default function ReadingPage() {
             setDocumentMeta(latestDoc);
             setActiveChunkIndex(chunkIdx);
             setActiveChunk(chunk);
+            setIsDocumentSaved(true);
             return;
           }
         }
@@ -125,6 +135,7 @@ export default function ReadingPage() {
           setActiveChunkIndex(0);
           setActiveChunk(chunks[0]);
           setAllSavedDocs([meta]);
+          setIsDocumentSaved(true);
         }
       } catch (err) {
         console.warn("Storage init fallback:", err);
@@ -137,6 +148,29 @@ export default function ReadingPage() {
       mounted = false;
     };
   }, []);
+
+  // Nạp trước (preload) toàn bộ kết quả phân tích câu đã lưu vào L1 RAM cache khi tải/đổi tài liệu
+  useEffect(() => {
+    if (!documentMeta?.id) {
+      setAnalyzedSentencesCount(0);
+      return;
+    }
+
+    let isSubscribed = true;
+    getAllAnalysesForDocument(documentMeta.id)
+      .then((analyses) => {
+        if (!isSubscribed) return;
+        primeSentenceAnalysisCache(analyses);
+        setAnalyzedSentencesCount(Object.keys(analyses).length);
+      })
+      .catch((err) => {
+        console.warn("Could not preload sentence analyses:", err);
+      });
+
+    return () => {
+      isSubscribed = false;
+    };
+  }, [documentMeta?.id]);
 
   // Nội dung raw của Chunk hiện tại
   const rawContent = useMemo(() => {
@@ -253,6 +287,14 @@ export default function ReadingPage() {
           return current;
         });
 
+        // Tự động lưu vào IndexedDB theo tài liệu và tăng số câu đã phân tích
+        if (documentMeta?.id) {
+          saveSentenceAnalysis(documentMeta.id, sentence.text, fullResult).catch((err) => {
+            console.warn("Could not save sentence analysis to IndexedDB:", err);
+          });
+          setAnalyzedSentencesCount((prev) => prev + 1);
+        }
+
         if (fullResult.vocabulary && fullResult.vocabulary.length > 0) {
           setContextVocabMap((prev) => {
             const next = { ...prev };
@@ -269,7 +311,7 @@ export default function ReadingPage() {
         setIsEnriching(false);
       }
     },
-    [aiConfig, parsedData]
+    [aiConfig, parsedData, documentMeta?.id]
   );
 
   // Tự động phân tích câu đầu tiên khi mở bài đọc hoặc đổi chunk nếu chưa có câu nào được chọn
@@ -296,7 +338,7 @@ export default function ReadingPage() {
     if (!nextSentence) return;
 
     // Nếu câu kế tiếp đã được phân tích thì bỏ qua
-    const isCached = Boolean(getCachedAnalysis(nextSentence.text));
+    const isCached = hasCachedAnalysis(nextSentence.text);
     if (isCached) return;
 
     // Chờ 1.5s idle (người dùng đang đọc câu hiện tại) rồi kích hoạt phân tích đón đầu câu N+1
@@ -308,21 +350,142 @@ export default function ReadingPage() {
         ? nextPara.sentences.map((s) => s.text).join(" ")
         : nextSentence.text;
 
-      analyzeSentence(nextSentence.text, nextParaContext, aiConfig).catch(() => {
-        // Bỏ qua lỗi ngầm
-      });
+      analyzeSentence(nextSentence.text, nextParaContext, aiConfig)
+        .then((prefetchResult) => {
+          if (documentMeta?.id && prefetchResult) {
+            saveSentenceAnalysis(documentMeta.id, nextSentence.text, prefetchResult).catch(() => {});
+            setAnalyzedSentencesCount((prev) => prev + 1);
+          }
+        })
+        .catch(() => {
+          // Bỏ qua lỗi ngầm
+        });
     }, 1500);
 
     return () => {
       clearTimeout(timer);
     };
-  }, [activeSentence?.id, parsedData, aiConfig]);
+  }, [activeSentence?.id, parsedData, aiConfig, documentMeta?.id]);
 
   // Tính toán số câu và phần trăm tiến độ đọc của Chunk hiện tại
   const allChunkSentences = useMemo(
     () => parsedData.paragraphs.flatMap((p) => p.sentences),
     [parsedData]
   );
+
+  // Tính toán tiến độ AI của Chunk hiện tại
+  const chunkAnalyzedCount = useMemo(() => {
+    return allChunkSentences.filter((s) => hasCachedAnalysis(s.text)).length;
+  }, [allChunkSentences, analyzedSentencesCount]);
+
+  const chunkAnalyzedPercent = useMemo(() => {
+    if (allChunkSentences.length === 0) return 0;
+    return Math.round((chunkAnalyzedCount / allChunkSentences.length) * 100);
+  }, [chunkAnalyzedCount, allChunkSentences.length]);
+
+  // Hàng đợi Phân tích toàn bộ Chunk (Pre-analyze Chunk Queue)
+  const [isPreanalyzingChunk, setIsPreanalyzingChunk] = useState(false);
+  const [preanalyzeProgress, setPreanalyzeProgress] = useState<{ current: number; total: number }>({
+    current: 0,
+    total: 0,
+  });
+  const abortPreanalyzeRef = useRef<boolean>(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const showToast = useCallback((msg: string) => {
+    setToastMessage(msg);
+    const timer = setTimeout(() => setToastMessage(null), 3000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleStartPreanalyzeChunk = useCallback(async () => {
+    if (isPreanalyzingChunk || !documentMeta?.id) return;
+
+    // Lấy danh sách các câu trong allChunkSentences chưa có cache
+    const unanalyzedSentences = allChunkSentences.filter((s) => !hasCachedAnalysis(s.text));
+    if (unanalyzedSentences.length === 0) {
+      showToast("Phần này đã được AI phân tích 100%!");
+      return;
+    }
+
+    setIsPreanalyzingChunk(true);
+    abortPreanalyzeRef.current = false;
+    setPreanalyzeProgress({ current: 0, total: unanalyzedSentences.length });
+
+    for (let i = 0; i < unanalyzedSentences.length; i++) {
+      if (abortPreanalyzeRef.current) break;
+
+      const s = unanalyzedSentences[i];
+      if (hasCachedAnalysis(s.text)) {
+        setPreanalyzeProgress({ current: i + 1, total: unanalyzedSentences.length });
+        continue;
+      }
+
+      const para = parsedData.paragraphs.find((p) => p.index === s.paragraphIndex);
+      const paraContext = para
+        ? para.sentences.map((sent) => sent.text).join(" ")
+        : s.text;
+
+      try {
+        const result = await analyzeSentence(s.text, paraContext, aiConfig);
+        if (abortPreanalyzeRef.current) break;
+
+        if (documentMeta?.id && result) {
+          await saveSentenceAnalysis(documentMeta.id, s.text, result);
+          setAnalyzedSentencesCount((prev) => prev + 1);
+        }
+
+        if (activeSentence?.id === s.id && result) {
+          setAnalysisData(result);
+        }
+      } catch (err) {
+        console.warn("Preanalyze sentence failed:", s.text, err);
+      }
+
+      setPreanalyzeProgress({ current: i + 1, total: unanalyzedSentences.length });
+
+      if (abortPreanalyzeRef.current) break;
+
+      // Delay ~150ms giữa các request để không làm nghẽn local AI
+      if (i < unanalyzedSentences.length - 1) {
+        await new Promise((resolve) => setTimeout(resolve, 150));
+      }
+    }
+
+    setIsPreanalyzingChunk(false);
+  }, [isPreanalyzingChunk, documentMeta?.id, allChunkSentences, parsedData, aiConfig, activeSentence?.id, showToast]);
+
+  const handleStopPreanalyzeChunk = useCallback(() => {
+    abortPreanalyzeRef.current = true;
+    setIsPreanalyzingChunk(false);
+    showToast("Đã dừng phân tích trước.");
+  }, [showToast]);
+
+  // Tự động dừng pre-analyze khi đổi chunk hoặc đổi tài liệu
+  useEffect(() => {
+    return () => {
+      abortPreanalyzeRef.current = true;
+    };
+  }, [activeChunkIndex, documentMeta?.id]);
+
+  // Xóa toàn bộ cache phân tích AI của tài liệu để phân tích lại từ đầu
+  const handleClearDocumentAnalyses = useCallback(async () => {
+    if (!documentMeta?.id) return;
+    abortPreanalyzeRef.current = true;
+    setIsPreanalyzingChunk(false);
+
+    try {
+      await deleteAnalysesByDocument(documentMeta.id);
+      clearSentenceAnalysisCache();
+      setAnalyzedSentencesCount(0);
+      setAnalysisData(null);
+      showToast("Đã xóa sạch cache phân tích AI của tài liệu!");
+    } catch (err) {
+      console.warn("Could not clear document analyses:", err);
+      showToast("Không thể xóa cache phân tích!");
+    }
+  }, [documentMeta?.id, showToast]);
+
   const currentSentenceIdx = useMemo(() => {
     if (!activeSentence?.id) return 0;
     const idx = allChunkSentences.findIndex((s) => s.id === activeSentence.id);
@@ -430,6 +593,7 @@ export default function ReadingPage() {
         setActiveChunk(chunk);
         setSelectedSentenceId(null);
         setAnalysisData(null);
+        setIsDocumentSaved(true);
       }
     } catch (e) {
       console.warn("Could not switch document:", e);
@@ -463,16 +627,20 @@ export default function ReadingPage() {
     if (!documentMeta) return;
     setIsSavingSession(true);
     try {
-      const allChunks = await getAllDocumentChunks(documentMeta.id);
+      const [allChunks, analyses] = await Promise.all([
+        getAllDocumentChunks(documentMeta.id),
+        getAllAnalysesForDocument(documentMeta.id),
+      ]);
       const vdoc = buildVdocPackage({
         meta: documentMeta,
         chunks: allChunks.length > 0 ? allChunks : activeChunk ? [activeChunk] : [],
         activeChunkIndex,
         lastReadSentenceId: activeSentence?.id,
+        aiAnalysesCache: analyses,
       });
       await saveVdocPackage(vdoc);
-      setSaveSuccessMessage("Đã lưu vào IndexedDB!");
-      setTimeout(() => setSaveSuccessMessage(null), 2500);
+      setIsDocumentSaved(true);
+      showToast("Đã lưu phiên học vào IndexedDB!");
 
       // Cập nhật danh sách tài liệu
       const docs = await getAllDocumentsMeta();
@@ -482,7 +650,7 @@ export default function ReadingPage() {
     } finally {
       setIsSavingSession(false);
     }
-  }, [documentMeta, activeChunk, activeChunkIndex, activeSentence]);
+  }, [documentMeta, activeChunk, activeChunkIndex, activeSentence, showToast]);
 
   // Lưu từ vựng vào Deck của Vocabloom qua API /api/translate/add
   const handleSaveWordToDeck = async (
@@ -530,9 +698,66 @@ export default function ReadingPage() {
     setSelectedSentenceId(null);
     setAnalysisData(null);
     setIsImporting(false);
+    setIsDocumentSaved(true);
 
     // Cập nhật lại danh sách thư viện
     getAllDocumentsMeta().then((list) => setAllSavedDocs(list));
+  };
+
+  // Huy hiệu hiển thị trực quan tiến độ sẵn sàng AI của Chunk hiện tại
+  const renderAiReadinessBadge = () => {
+    if (allChunkSentences.length === 0) return null;
+
+    if (isPreanalyzingChunk) {
+      return (
+        <div className="flex items-center gap-1.5 rounded-xl border border-amber-300 bg-amber-50 px-2 sm:px-2.5 py-1 text-[11px] sm:text-xs font-bold text-amber-800 animate-pulse shrink-0">
+          <Loader2 className="size-3.5 animate-spin text-amber-600 shrink-0" />
+          <span className="hidden md:inline">Đang tải trước</span>
+          <span>
+            {preanalyzeProgress.current}/{preanalyzeProgress.total} câu
+          </span>
+          <button
+            type="button"
+            onClick={handleStopPreanalyzeChunk}
+            className="ml-0.5 rounded bg-amber-200 px-1.5 py-0.2 text-[10px] font-black text-amber-900 hover:bg-amber-300 transition-colors cursor-pointer"
+            title="Dừng phân tích trước"
+          >
+            Dừng
+          </button>
+        </div>
+      );
+    }
+
+    if (chunkAnalyzedPercent === 100) {
+      return (
+        <Badge
+          variant="default"
+          className="text-[10.5px] sm:text-[11px] py-0.5 px-2 sm:px-2.5 shrink-0 bg-[#f7fff1] border-eel-light text-[#438f0e] flex items-center gap-1 cursor-default"
+          title="Tất cả câu trong phần này đã được AI phân tích và lưu vào IndexedDB. Sẵn sàng đọc offline 100%!"
+        >
+          <Zap className="size-3.5 fill-[#438f0e] text-[#438f0e]" />
+          <span className="hidden sm:inline">100% Sẵn sàng offline</span>
+          <span className="sm:hidden">100% offline</span>
+        </Badge>
+      );
+    }
+
+    return (
+      <button
+        type="button"
+        onClick={handleStartPreanalyzeChunk}
+        className="group flex items-center gap-1.5 rounded-xl border border-[#bfe9fd] bg-[#f3fbff] px-2 sm:px-2.5 py-1 text-[11px] sm:text-xs font-bold text-[#087db4] hover:bg-[#e0f2fe] hover:border-[#7dd3fc] transition-all cursor-pointer shrink-0"
+        title="Bấm để AI tự động phân tích trước toàn bộ các câu trong phần này"
+      >
+        <Zap className="size-3.5 text-[#1cb0f6] group-hover:scale-110 transition-transform" />
+        <span>
+          {chunkAnalyzedCount}/{allChunkSentences.length} ({chunkAnalyzedPercent}%)
+        </span>
+        <span className="hidden lg:inline text-[10px] font-extrabold text-[#0284c7] bg-[#e0f2fe] group-hover:bg-[#bae6fd] px-1.5 py-0.5 rounded-md">
+          Phân tích trước
+        </span>
+      </button>
+    );
   };
 
   return (
@@ -575,8 +800,8 @@ export default function ReadingPage() {
             )}
           </div>
 
-          {/* Ở giữa: Bộ điều hướng Chunk phân trang */}
-          <div className="flex items-center justify-center shrink-0">
+          {/* Ở giữa: Bộ điều hướng Chunk phân trang & Huy hiệu AI Readiness */}
+          <div className="flex items-center justify-center gap-2 shrink-0">
             <ChunkPaginationBar
               meta={documentMeta}
               activeChunkIndex={activeChunkIndex}
@@ -587,6 +812,7 @@ export default function ReadingPage() {
               onNextChunk={() => handleSelectChunk(activeChunkIndex + 1)}
               onSelectChunkIndex={handleSelectChunk}
             />
+            {renderAiReadinessBadge()}
           </div>
 
           {/* Bên phải: Nút Fullscreen native & Nút Thoát Focus Mode */}
@@ -660,8 +886,8 @@ export default function ReadingPage() {
             )}
           </div>
 
-          {/* Ở giữa: Bộ điều hướng Chunk phân trang gọn gàng [ < ] Phần X/Y (Trang A-B) [ > ] */}
-          <div className="flex items-center justify-center shrink-0">
+          {/* Ở giữa: Bộ điều hướng Chunk phân trang & Huy hiệu AI Readiness */}
+          <div className="flex items-center justify-center gap-2 shrink-0">
             <ChunkPaginationBar
               meta={documentMeta}
               activeChunkIndex={activeChunkIndex}
@@ -672,26 +898,31 @@ export default function ReadingPage() {
               onNextChunk={() => handleSelectChunk(activeChunkIndex + 1)}
               onSelectChunkIndex={handleSelectChunk}
             />
+            {renderAiReadinessBadge()}
           </div>
 
           {/* Bên phải: Nút "Lưu phiên học", "Nhập tài liệu", "Local AI Config", và nút bật Focus Mode */}
           <div className="flex items-center gap-1.5 md:gap-2 shrink-0">
             <Button
-              variant={saveSuccessMessage ? "default" : "secondary"}
+              variant="secondary"
               size="sm"
               onClick={handleSaveSession}
-              disabled={isSavingSession || !documentMeta}
+              disabled={isSavingSession || !documentMeta || isDocumentSaved}
               className={`flex size-8 shrink-0 items-center justify-center p-0 rounded-lg transition-all ${
-                saveSuccessMessage
-                  ? "border-[#46a302] bg-ecto-green text-white hover:bg-[#51bd02]"
-                  : "border-[#e5e5e5] text-charcoal hover:bg-gray-100"
+                isDocumentSaved
+                  ? "border border-[#a5ed6e] bg-[#f7fff1] text-[#438f0e] cursor-default opacity-90"
+                  : "border-[#e5e5e5] text-charcoal hover:bg-gray-100 cursor-pointer"
               }`}
-              title={saveSuccessMessage ? "Đã lưu phiên học" : "Lưu phiên học và tiến độ vào IndexedDB (.vdoc)"}
+              title={
+                isDocumentSaved
+                  ? "Tài liệu đã được lưu trong IndexedDB (.vdoc)"
+                  : "Lưu phiên học và tiến độ vào IndexedDB (.vdoc)"
+              }
             >
               {isSavingSession ? (
                 <Loader2 className="size-4 animate-spin text-[#1cb0f6]" />
-              ) : saveSuccessMessage ? (
-                <Check className="size-4 text-white" />
+              ) : isDocumentSaved ? (
+                <Check className="size-4 text-[#438f0e]" />
               ) : (
                 <Save className="size-4 text-ecto-green" />
               )}
@@ -779,6 +1010,14 @@ export default function ReadingPage() {
         onDeleteDocument={handleDeleteDocument}
         onNewDocument={() => setIsImporting(true)}
         onSaveCurrentSession={handleSaveSession}
+        isDocumentSaved={isDocumentSaved}
+        analyzedSentencesCount={analyzedSentencesCount}
+        chunkAnalyzedCount={chunkAnalyzedCount}
+        totalChunkSentences={allChunkSentences.length}
+        isPreanalyzingChunk={isPreanalyzingChunk}
+        onStartPreanalyzeChunk={handleStartPreanalyzeChunk}
+        onStopPreanalyzeChunk={handleStopPreanalyzeChunk}
+        onClearDocumentAnalyses={handleClearDocumentAnalyses}
       />
 
       {/* Modal Cài đặt Local AI */}
@@ -797,6 +1036,13 @@ export default function ReadingPage() {
               onCancel={() => setIsImporting(false)}
             />
           </div>
+        </div>
+      )}
+
+      {/* Toast Message thông báo */}
+      {toastMessage && (
+        <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 rounded-xl bg-charcoal/90 text-white px-4 py-2 text-xs font-bold shadow-lg animate-in fade-in slide-in-from-bottom-2">
+          {toastMessage}
         </div>
       )}
     </div>

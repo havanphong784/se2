@@ -110,6 +110,7 @@ export interface SentenceBreakdownResponse {
     parts: SkeletonPart[];
   };
   chunks?: SemanticChunk[]; // Tầng 4: Chia cụm nghĩa tự nhiên
+  clauses?: ClauseBreakdown[];
   grammar: GrammarBreakdown; // Tầng 3 (clauses) & Tầng 6 (why, mechanic)
   vocabulary: ContextualVocab[]; // Tầng 5: Từ vựng + Word family + Tech term
   idiomsAndPhrases: IdiomPhrase[];

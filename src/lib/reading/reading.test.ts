@@ -347,5 +347,87 @@ Organizations must adapt to cognitive automation.`;
       assert.equal(loaded?.meta.title, "Test Document");
       assert.equal(loaded?.chunks.length, chunks.length);
     });
+
+    it("lưu và lấy lại nguyên vẹn phân tích câu bằng saveSentenceAnalysis và getSentenceAnalysis", async () => {
+      const { saveSentenceAnalysis, getSentenceAnalysis } = await import("./indexed-storage");
+      const { createInstantSentenceDraft } = await import("@/lib/ai/local-ai-client");
+
+      const docId = "doc-test-analysis-1";
+      const sentence = "Artificial intelligence transforms language acquisition.";
+      const draft = createInstantSentenceDraft(sentence, "Trí tuệ nhân tạo chuyển đổi việc tiếp thu ngôn ngữ.");
+
+      await saveSentenceAnalysis(docId, sentence, draft);
+      const retrieved = await getSentenceAnalysis(docId, sentence);
+
+      assert.ok(retrieved, "Phân tích câu phải tồn tại trong IndexedDB");
+      assert.equal(retrieved?.sentence, sentence);
+      assert.equal(retrieved?.translationVi, "Trí tuệ nhân tạo chuyển đổi việc tiếp thu ngôn ngữ.");
+      assert.deepEqual(retrieved, draft, "Dữ liệu trả về phải nguyên vẹn so với khi lưu");
+    });
+
+    it("lấy toàn bộ kết quả phân tích câu của tài liệu bằng getAllAnalysesForDocument", async () => {
+      const { saveSentenceAnalysis, getAllAnalysesForDocument } = await import("./indexed-storage");
+      const { createInstantSentenceDraft, getSentenceHash } = await import("@/lib/ai/local-ai-client");
+
+      const docId = "doc-test-analysis-2";
+      const otherDocId = "doc-test-other";
+      const sentence1 = "First sentence for testing.";
+      const sentence2 = "Second sentence for testing.";
+      const otherSentence = "Other doc sentence.";
+
+      const draft1 = createInstantSentenceDraft(sentence1, "Câu đầu tiên để kiểm thử.");
+      const draft2 = createInstantSentenceDraft(sentence2, "Câu thứ hai để kiểm thử.");
+      const draftOther = createInstantSentenceDraft(otherSentence, "Câu của tài liệu khác.");
+
+      await saveSentenceAnalysis(docId, sentence1, draft1);
+      await saveSentenceAnalysis(docId, sentence2, draft2);
+      await saveSentenceAnalysis(otherDocId, otherSentence, draftOther);
+
+      const allAnalyses = await getAllAnalysesForDocument(docId);
+      const hash1 = getSentenceHash(sentence1);
+      const hash2 = getSentenceHash(sentence2);
+      const otherHash = getSentenceHash(otherSentence);
+
+      assert.ok(allAnalyses[hash1], "Phải chứa câu 1");
+      assert.ok(allAnalyses[hash2], "Phải chứa câu 2");
+      assert.equal(allAnalyses[hash1]?.sentence, sentence1);
+      assert.equal(allAnalyses[hash2]?.sentence, sentence2);
+      assert.equal(allAnalyses[otherHash], undefined, "Không được chứa câu của tài liệu khác");
+      assert.equal(Object.keys(allAnalyses).length, 2, "Chỉ được chứa đúng 2 câu của tài liệu này");
+    });
+
+    it("xóa tài liệu (cascade) sẽ xóa sạch toàn bộ các câu phân tích của tài liệu đó", async () => {
+      const { saveSentenceAnalysis, getAllAnalysesForDocument, getSentenceAnalysis, deleteDocument } = await import("./indexed-storage");
+      const { createInstantSentenceDraft } = await import("@/lib/ai/local-ai-client");
+
+      const docId = "doc-test-cascade-delete";
+      const keepDocId = "doc-test-cascade-keep";
+      const sentence = "A sentence to be deleted.";
+      const keepSentence = "A sentence to be kept.";
+
+      const draft = createInstantSentenceDraft(sentence, "Một câu chuẩn bị bị xóa.");
+      const keepDraft = createInstantSentenceDraft(keepSentence, "Một câu cần được giữ lại.");
+
+      await saveSentenceAnalysis(docId, sentence, draft);
+      await saveSentenceAnalysis(keepDocId, keepSentence, keepDraft);
+
+      const beforeDelete = await getSentenceAnalysis(docId, sentence);
+      assert.ok(beforeDelete, "Câu phải tồn tại trước khi xóa");
+
+      // Xóa tài liệu cascade
+      await deleteDocument(docId);
+
+      // Kiểm tra câu đơn lẻ và toàn bộ câu của tài liệu bị xóa
+      const afterDeleteSingle = await getSentenceAnalysis(docId, sentence);
+      assert.equal(afterDeleteSingle, null, "Câu đơn lẻ của doc bị xóa phải biến mất khỏi IndexedDB");
+
+      const afterDeleteAll = await getAllAnalysesForDocument(docId);
+      assert.deepEqual(afterDeleteAll, {}, "Tất cả câu phân tích của tài liệu bị xóa phải rỗng");
+
+      // Tài liệu khác không bị ảnh hưởng
+      const keepResult = await getSentenceAnalysis(keepDocId, keepSentence);
+      assert.ok(keepResult, "Câu của tài liệu khác không được bị xóa");
+      assert.equal(keepResult?.sentence, keepSentence);
+    });
   });
 });
