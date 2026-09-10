@@ -5,9 +5,10 @@ import type {
   VdocSavedWord,
   SentenceBreakdownResponse,
 } from "@/types/reading";
+import { getSentenceHash } from "@/lib/ai/local-ai-client";
 
 const DB_NAME = "vocabloom_reading_v2";
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 
 interface StoredChunkRecord {
   docId: string;
@@ -22,11 +23,20 @@ interface ReadingProgressRecord {
   updatedAt: number;
 }
 
+export interface StoredSentenceAnalysis {
+  docId: string;
+  sentenceHash: string;
+  sentenceText: string;
+  analysis: SentenceBreakdownResponse;
+  updatedAt: number;
+}
+
 // In-memory fallback trong trường hợp trình duyệt chặn IndexedDB (Private Browsing)
 const memDocuments = new Map<string, StructuredDocumentMeta>();
 const memChunks = new Map<string, DocumentChunk>();
 const memProgress = new Map<string, ReadingProgressRecord>();
 const memVdocPackages = new Map<string, VdocPackage>();
+const memSentenceAnalyses = new Map<string, StoredSentenceAnalysis>();
 
 let dbPromise: Promise<IDBDatabase> | null = null;
 
@@ -68,6 +78,14 @@ function getDb(): Promise<IDBDatabase> {
         if (!db.objectStoreNames.contains("vdoc_packages")) {
           db.createObjectStore("vdoc_packages", { keyPath: "id" });
         }
+
+        // 5. Store lưu kết quả phân tích câu AI theo từng tài liệu
+        if (!db.objectStoreNames.contains("sentence_analyses")) {
+          const analysisStore = db.createObjectStore("sentence_analyses", {
+            keyPath: ["docId", "sentenceHash"],
+          });
+          analysisStore.createIndex("docId", "docId", { unique: false });
+        }
       };
 
       request.onsuccess = () => {
@@ -90,7 +108,7 @@ export async function saveVdocPackage(vdoc: VdocPackage): Promise<void> {
   try {
     const db = await getDb();
     const tx = db.transaction(
-      ["vdoc_packages", "documents", "chunks", "reading_progress"],
+      ["vdoc_packages", "documents", "chunks", "reading_progress", "sentence_analyses"],
       "readwrite"
     );
 
@@ -98,6 +116,7 @@ export async function saveVdocPackage(vdoc: VdocPackage): Promise<void> {
     const docStore = tx.objectStore("documents");
     const chunkStore = tx.objectStore("chunks");
     const progressStore = tx.objectStore("reading_progress");
+    const analysisStore = tx.objectStore("sentence_analyses");
 
     // 1. Lưu bản đóng gói vdoc hoàn chỉnh
     vdocStore.put(vdoc);
@@ -124,6 +143,23 @@ export async function saveVdocPackage(vdoc: VdocPackage): Promise<void> {
     };
     progressStore.put(progressRecord);
 
+    // 5. Đồng bộ hóa các câu đã phân tích nếu có
+    if (vdoc.aiAnalysesCache) {
+      for (const [key, analysis] of Object.entries(vdoc.aiAnalysesCache)) {
+        if (!analysis) continue;
+        const targetSentence = analysis.sentence || "";
+        const sentenceHash = targetSentence ? getSentenceHash(targetSentence) : key;
+        const record: StoredSentenceAnalysis = {
+          docId: vdoc.id,
+          sentenceHash,
+          sentenceText: targetSentence || key,
+          analysis,
+          updatedAt: vdoc.sessionState.lastSavedAt,
+        };
+        analysisStore.put(record);
+      }
+    }
+
     return new Promise((resolve, reject) => {
       tx.oncomplete = () => resolve();
       tx.onerror = () => reject(tx.error);
@@ -139,6 +175,20 @@ export async function saveVdocPackage(vdoc: VdocPackage): Promise<void> {
     });
     for (const chunk of vdoc.chunks) {
       memChunks.set(`${vdoc.meta.id}_${chunk.chunkIndex}`, chunk);
+    }
+    if (vdoc.aiAnalysesCache) {
+      for (const [key, analysis] of Object.entries(vdoc.aiAnalysesCache)) {
+        if (!analysis) continue;
+        const targetSentence = analysis.sentence || "";
+        const sentenceHash = targetSentence ? getSentenceHash(targetSentence) : key;
+        memSentenceAnalyses.set(`${vdoc.id}_${sentenceHash}`, {
+          docId: vdoc.id,
+          sentenceHash,
+          sentenceText: targetSentence || key,
+          analysis,
+          updatedAt: vdoc.sessionState.lastSavedAt,
+        });
+      }
     }
   }
 }
@@ -429,13 +479,13 @@ export async function updateReadingProgress(
 }
 
 /**
- * Xóa một tài liệu và toàn bộ chunks, vdoc packages của nó khỏi IndexedDB
+ * Xóa một tài liệu và toàn bộ chunks, vdoc packages, kết quả phân tích câu của nó khỏi IndexedDB (Cascade Delete)
  */
 export async function deleteDocument(docId: string): Promise<void> {
   try {
     const db = await getDb();
     const tx = db.transaction(
-      ["documents", "chunks", "reading_progress", "vdoc_packages"],
+      ["documents", "chunks", "reading_progress", "vdoc_packages", "sentence_analyses"],
       "readwrite"
     );
     tx.objectStore("documents").delete(docId);
@@ -443,13 +493,22 @@ export async function deleteDocument(docId: string): Promise<void> {
     tx.objectStore("vdoc_packages").delete(docId);
 
     const chunkStore = tx.objectStore("chunks");
-    const index = chunkStore.index("docId");
-    const request = index.getAllKeys(docId);
-
-    request.onsuccess = () => {
-      const keys = request.result;
+    const chunkIndex = chunkStore.index("docId");
+    const chunkReq = chunkIndex.getAllKeys(docId);
+    chunkReq.onsuccess = () => {
+      const keys = chunkReq.result;
       for (const key of keys) {
         chunkStore.delete(key);
+      }
+    };
+
+    const sentenceStore = tx.objectStore("sentence_analyses");
+    const sentenceIndex = sentenceStore.index("docId");
+    const sentenceReq = sentenceIndex.getAllKeys(docId);
+    sentenceReq.onsuccess = () => {
+      const keys = sentenceReq.result;
+      for (const key of keys) {
+        sentenceStore.delete(key);
       }
     };
 
@@ -464,6 +523,136 @@ export async function deleteDocument(docId: string): Promise<void> {
     for (const key of memChunks.keys()) {
       if (key.startsWith(`${docId}_`)) {
         memChunks.delete(key);
+      }
+    }
+    for (const [key, record] of memSentenceAnalyses.entries()) {
+      if (record.docId === docId || key.startsWith(`${docId}_`)) {
+        memSentenceAnalyses.delete(key);
+      }
+    }
+  }
+}
+
+/**
+ * Lưu kết quả phân tích câu AI theo từng tài liệu vào IndexedDB
+ */
+export async function saveSentenceAnalysis(
+  docId: string,
+  sentenceText: string,
+  analysis: SentenceBreakdownResponse
+): Promise<void> {
+  const sentenceHash = getSentenceHash(sentenceText);
+  const record: StoredSentenceAnalysis = {
+    docId,
+    sentenceHash,
+    sentenceText,
+    analysis,
+    updatedAt: Date.now(),
+  };
+
+  try {
+    const db = await getDb();
+    const tx = db.transaction("sentence_analyses", "readwrite");
+    const store = tx.objectStore("sentence_analyses");
+    store.put(record);
+
+    return new Promise((resolve, reject) => {
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  } catch {
+    memSentenceAnalyses.set(`${docId}_${sentenceHash}`, record);
+  }
+}
+
+/**
+ * Lấy kết quả phân tích câu AI theo docId và sentenceText từ IndexedDB
+ */
+export async function getSentenceAnalysis(
+  docId: string,
+  sentenceText: string
+): Promise<SentenceBreakdownResponse | null> {
+  const sentenceHash = getSentenceHash(sentenceText);
+  try {
+    const db = await getDb();
+    const tx = db.transaction("sentence_analyses", "readonly");
+    const store = tx.objectStore("sentence_analyses");
+    const request = store.get([docId, sentenceHash]);
+
+    return new Promise((resolve, reject) => {
+      request.onsuccess = () => {
+        const record = request.result as StoredSentenceAnalysis | undefined;
+        resolve(record ? record.analysis : null);
+      };
+      request.onerror = () => reject(request.error);
+    });
+  } catch {
+    const record = memSentenceAnalyses.get(`${docId}_${sentenceHash}`);
+    return record ? record.analysis : null;
+  }
+}
+
+/**
+ * Lấy toàn bộ kết quả phân tích câu của một tài liệu từ IndexedDB dưới dạng dictionary { [sentenceHash]: analysis }
+ */
+export async function getAllAnalysesForDocument(
+  docId: string
+): Promise<Record<string, SentenceBreakdownResponse>> {
+  try {
+    const db = await getDb();
+    const tx = db.transaction("sentence_analyses", "readonly");
+    const store = tx.objectStore("sentence_analyses");
+    const index = store.index("docId");
+    const request = index.getAll(docId);
+
+    return new Promise((resolve, reject) => {
+      request.onsuccess = () => {
+        const records = (request.result as StoredSentenceAnalysis[]) || [];
+        const result: Record<string, SentenceBreakdownResponse> = {};
+        for (const record of records) {
+          result[record.sentenceHash] = record.analysis;
+        }
+        resolve(result);
+      };
+      request.onerror = () => reject(request.error);
+    });
+  } catch {
+    const result: Record<string, SentenceBreakdownResponse> = {};
+    for (const record of memSentenceAnalyses.values()) {
+      if (record.docId === docId) {
+        result[record.sentenceHash] = record.analysis;
+      }
+    }
+    return result;
+  }
+}
+
+/**
+ * Xóa toàn bộ kết quả phân tích câu của một tài liệu khỏi IndexedDB
+ */
+export async function deleteAnalysesByDocument(docId: string): Promise<void> {
+  try {
+    const db = await getDb();
+    const tx = db.transaction("sentence_analyses", "readwrite");
+    const store = tx.objectStore("sentence_analyses");
+    const index = store.index("docId");
+    const request = index.getAllKeys(docId);
+
+    request.onsuccess = () => {
+      const keys = request.result;
+      for (const key of keys) {
+        store.delete(key);
+      }
+    };
+
+    return new Promise((resolve, reject) => {
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  } catch {
+    for (const [key, record] of memSentenceAnalyses.entries()) {
+      if (record.docId === docId || key.startsWith(`${docId}_`)) {
+        memSentenceAnalyses.delete(key);
       }
     }
   }

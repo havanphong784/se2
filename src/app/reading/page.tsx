@@ -15,6 +15,7 @@ import {
   Expand,
   Shrink,
   Sparkles,
+  Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -39,6 +40,8 @@ import {
   saveStructuredDocument,
   saveVdocPackage,
   buildVdocPackage,
+  saveSentenceAnalysis,
+  getAllAnalysesForDocument,
 } from "@/lib/reading/indexed-storage";
 import {
   getSavedAIConfig,
@@ -46,6 +49,8 @@ import {
   getCachedAnalysis,
   fetchFastSentenceTranslation,
   createInstantSentenceDraft,
+  primeSentenceAnalysisCache,
+  hasCachedAnalysis,
 } from "@/lib/ai/local-ai-client";
 import type {
   SentenceItem,
@@ -89,6 +94,7 @@ export default function ReadingPage() {
   const [aiConfig, setAiConfig] = useState<ClientAIConfig>(() => getSavedAIConfig());
   const [isSavingSession, setIsSavingSession] = useState(false);
   const [saveSuccessMessage, setSaveSuccessMessage] = useState<string | null>(null);
+  const [analyzedSentencesCount, setAnalyzedSentencesCount] = useState<number>(0);
 
   // Tải tài liệu đã lưu từ IndexedDB khi khởi động
   useEffect(() => {
@@ -137,6 +143,29 @@ export default function ReadingPage() {
       mounted = false;
     };
   }, []);
+
+  // Nạp trước (preload) toàn bộ kết quả phân tích câu đã lưu vào L1 RAM cache khi tải/đổi tài liệu
+  useEffect(() => {
+    if (!documentMeta?.id) {
+      setAnalyzedSentencesCount(0);
+      return;
+    }
+
+    let isSubscribed = true;
+    getAllAnalysesForDocument(documentMeta.id)
+      .then((analyses) => {
+        if (!isSubscribed) return;
+        primeSentenceAnalysisCache(analyses);
+        setAnalyzedSentencesCount(Object.keys(analyses).length);
+      })
+      .catch((err) => {
+        console.warn("Could not preload sentence analyses:", err);
+      });
+
+    return () => {
+      isSubscribed = false;
+    };
+  }, [documentMeta?.id]);
 
   // Nội dung raw của Chunk hiện tại
   const rawContent = useMemo(() => {
@@ -253,6 +282,14 @@ export default function ReadingPage() {
           return current;
         });
 
+        // Tự động lưu vào IndexedDB theo tài liệu và tăng số câu đã phân tích
+        if (documentMeta?.id) {
+          saveSentenceAnalysis(documentMeta.id, sentence.text, fullResult).catch((err) => {
+            console.warn("Could not save sentence analysis to IndexedDB:", err);
+          });
+          setAnalyzedSentencesCount((prev) => prev + 1);
+        }
+
         if (fullResult.vocabulary && fullResult.vocabulary.length > 0) {
           setContextVocabMap((prev) => {
             const next = { ...prev };
@@ -269,7 +306,7 @@ export default function ReadingPage() {
         setIsEnriching(false);
       }
     },
-    [aiConfig, parsedData]
+    [aiConfig, parsedData, documentMeta?.id]
   );
 
   // Tự động phân tích câu đầu tiên khi mở bài đọc hoặc đổi chunk nếu chưa có câu nào được chọn
@@ -296,7 +333,7 @@ export default function ReadingPage() {
     if (!nextSentence) return;
 
     // Nếu câu kế tiếp đã được phân tích thì bỏ qua
-    const isCached = Boolean(getCachedAnalysis(nextSentence.text));
+    const isCached = hasCachedAnalysis(nextSentence.text);
     if (isCached) return;
 
     // Chờ 1.5s idle (người dùng đang đọc câu hiện tại) rồi kích hoạt phân tích đón đầu câu N+1
@@ -308,15 +345,22 @@ export default function ReadingPage() {
         ? nextPara.sentences.map((s) => s.text).join(" ")
         : nextSentence.text;
 
-      analyzeSentence(nextSentence.text, nextParaContext, aiConfig).catch(() => {
-        // Bỏ qua lỗi ngầm
-      });
+      analyzeSentence(nextSentence.text, nextParaContext, aiConfig)
+        .then((prefetchResult) => {
+          if (documentMeta?.id && prefetchResult) {
+            saveSentenceAnalysis(documentMeta.id, nextSentence.text, prefetchResult).catch(() => {});
+            setAnalyzedSentencesCount((prev) => prev + 1);
+          }
+        })
+        .catch(() => {
+          // Bỏ qua lỗi ngầm
+        });
     }, 1500);
 
     return () => {
       clearTimeout(timer);
     };
-  }, [activeSentence?.id, parsedData, aiConfig]);
+  }, [activeSentence?.id, parsedData, aiConfig, documentMeta?.id]);
 
   // Tính toán số câu và phần trăm tiến độ đọc của Chunk hiện tại
   const allChunkSentences = useMemo(
@@ -463,12 +507,16 @@ export default function ReadingPage() {
     if (!documentMeta) return;
     setIsSavingSession(true);
     try {
-      const allChunks = await getAllDocumentChunks(documentMeta.id);
+      const [allChunks, analyses] = await Promise.all([
+        getAllDocumentChunks(documentMeta.id),
+        getAllAnalysesForDocument(documentMeta.id),
+      ]);
       const vdoc = buildVdocPackage({
         meta: documentMeta,
         chunks: allChunks.length > 0 ? allChunks : activeChunk ? [activeChunk] : [],
         activeChunkIndex,
         lastReadSentenceId: activeSentence?.id,
+        aiAnalysesCache: analyses,
       });
       await saveVdocPackage(vdoc);
       setSaveSuccessMessage("Đã lưu vào IndexedDB!");

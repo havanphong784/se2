@@ -107,6 +107,33 @@ export function setCachedAnalysis(sentence: string, analysis: SentenceBreakdownR
 }
 
 /**
+ * Nạp hàng loạt kết quả phân tích vào L1 RAM cache (0ms truy cập)
+ */
+export function primeSentenceAnalysisCache(
+  analyses: Record<string, SentenceBreakdownResponse>
+): void {
+  if (!analyses || typeof analyses !== "object") return;
+  for (const [key, item] of Object.entries(analyses)) {
+    if (!item) continue;
+    const targetSentence = item.sentence?.trim() ? item.sentence : "";
+    const hash = targetSentence ? getSentenceHash(targetSentence) : key;
+    analysisL1Cache.set(hash, item);
+    if (key && key !== hash) {
+      analysisL1Cache.set(key, item);
+    }
+  }
+}
+
+/**
+ * Kiểm tra xem câu đã có trong cache L1 hoặc L2 chưa
+ */
+export function hasCachedAnalysis(sentence: string): boolean {
+  const hash = getSentenceHash(sentence);
+  if (analysisL1Cache.has(hash)) return true;
+  return Boolean(getCachedAnalysis(sentence));
+}
+
+/**
  * Lấy bản dịch câu siêu tốc (~100ms) qua API nội bộ để hiển thị bản nháp tức thì
  */
 export async function fetchFastSentenceTranslation(sentence: string): Promise<string> {
