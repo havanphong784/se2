@@ -42,6 +42,25 @@ export interface ClauseBreakdown {
   objectOrComplement?: string;
 }
 
+export type SentenceComplexity = "micro" | "compound" | "complex" | "simple";
+
+export interface SkeletonPart {
+  type: "S" | "V" | "O" | "C" | "A";
+  text: string;
+  roleVi: string; // "Chủ ngữ" | "Động từ" | "Tân ngữ" | "Bổ ngữ" | "Trạng ngữ"
+}
+
+export interface SemanticChunk {
+  chunkText: string;
+  meaningVi: string;
+  type: "noun_phrase" | "verb_phrase" | "prepositional_phrase" | "adverbial_phrase" | "clause" | string;
+}
+
+export interface WordFamilyItem {
+  word: string;
+  partOfSpeech: string;
+}
+
 export interface ContextualVocab {
   term: string;
   ipa: string;
@@ -49,6 +68,17 @@ export interface ContextualVocab {
   contextMeaningVi: string;
   cefr?: "A1" | "A2" | "B1" | "B2" | "C1" | "C2" | string;
   synonyms?: string[];
+  isTechnicalTerm?: boolean;
+  wordFamily?: WordFamilyItem[];
+}
+
+export interface GrammarBreakdown {
+  pattern: string;
+  explanation: string;
+  ruleSummary?: string;
+  whyUsedVi?: string; // Lý do tác giả dùng cấu trúc này trong ngữ cảnh
+  mechanicVi?: string; // Cơ chế cấu tạo (ví dụ chia động từ số ít, thì...)
+  clauses: ClauseBreakdown[];
 }
 
 export interface DetectedPhrase {
@@ -72,15 +102,19 @@ export interface IdiomPhrase {
 
 export interface SentenceBreakdownResponse {
   sentence: string;
+  complexity?: SentenceComplexity;
   translationVi: string;
-  simplifiedEnglish: string;
-  grammar: {
+  coreIdeaVi?: string; // Tầng 1: Ý chính cốt lõi ngắn gọn
+  skeleton?: { // Tầng 2: Khung câu S-V-O-A
     pattern: string;
-    explanation: string;
-    clauses: ClauseBreakdown[];
+    parts: SkeletonPart[];
   };
-  vocabulary: ContextualVocab[];
+  chunks?: SemanticChunk[]; // Tầng 4: Chia cụm nghĩa tự nhiên
+  grammar: GrammarBreakdown; // Tầng 3 (clauses) & Tầng 6 (why, mechanic)
+  vocabulary: ContextualVocab[]; // Tầng 5: Từ vựng + Word family + Tech term
   idiomsAndPhrases: IdiomPhrase[];
+  mentalModelSteps?: string[]; // Tầng 7: Hướng dẫn tư duy đọc hiểu tự nhiên
+  simplifiedEnglish?: string;
 }
 
 export interface ClientAIConfig {
