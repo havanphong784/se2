@@ -9,6 +9,7 @@ import {
   Clock,
   Trash2,
   Bookmark,
+  Check,
   X,
   Plus,
   Zap,
@@ -32,6 +33,7 @@ interface DocumentTocSidebarProps {
   onDeleteDocument?: (docId: string) => void;
   onNewDocument?: () => void;
   onSaveCurrentSession?: () => void;
+  isDocumentSaved?: boolean;
   analyzedSentencesCount?: number;
   chunkAnalyzedCount?: number;
   totalChunkSentences?: number;
@@ -53,6 +55,7 @@ export function DocumentTocSidebar({
   onDeleteDocument,
   onNewDocument,
   onSaveCurrentSession,
+  isDocumentSaved = false,
   analyzedSentencesCount = 0,
   chunkAnalyzedCount = 0,
   totalChunkSentences,
@@ -332,9 +335,22 @@ export function DocumentTocSidebar({
           {onSaveCurrentSession && (
             <button
               onClick={onSaveCurrentSession}
-              className="flex w-full items-center justify-center gap-1.5 rounded-xl border-2 border-ecto-green bg-[#f7fff1] py-2.5 text-xs font-black text-[#438f0e] hover:bg-[#ebfcdb] transition-colors"
+              disabled={isDocumentSaved}
+              className={`flex w-full items-center justify-center gap-1.5 rounded-xl border-2 py-2.5 text-xs font-black transition-colors ${
+                isDocumentSaved
+                  ? "border-[#a5ed6e] bg-[#f7fff1] text-[#438f0e] cursor-default opacity-85"
+                  : "border-ecto-green bg-[#f7fff1] text-[#438f0e] hover:bg-[#ebfcdb] cursor-pointer"
+              }`}
             >
-              <Bookmark className="size-4 text-ecto-green" /> Lưu phiên học hiện tại (.vdoc)
+              {isDocumentSaved ? (
+                <>
+                  <Check className="size-4 text-[#438f0e]" /> Đã lưu trong thư viện (.vdoc)
+                </>
+              ) : (
+                <>
+                  <Bookmark className="size-4 text-ecto-green" /> Lưu phiên học hiện tại (.vdoc)
+                </>
+              )}
             </button>
           )}
 

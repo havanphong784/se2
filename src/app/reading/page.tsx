@@ -96,7 +96,7 @@ export default function ReadingPage() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [aiConfig, setAiConfig] = useState<ClientAIConfig>(() => getSavedAIConfig());
   const [isSavingSession, setIsSavingSession] = useState(false);
-  const [saveSuccessMessage, setSaveSuccessMessage] = useState<string | null>(null);
+  const [isDocumentSaved, setIsDocumentSaved] = useState<boolean>(true);
   const [analyzedSentencesCount, setAnalyzedSentencesCount] = useState<number>(0);
 
   // Tải tài liệu đã lưu từ IndexedDB khi khởi động
@@ -117,6 +117,7 @@ export default function ReadingPage() {
             setDocumentMeta(latestDoc);
             setActiveChunkIndex(chunkIdx);
             setActiveChunk(chunk);
+            setIsDocumentSaved(true);
             return;
           }
         }
@@ -134,6 +135,7 @@ export default function ReadingPage() {
           setActiveChunkIndex(0);
           setActiveChunk(chunks[0]);
           setAllSavedDocs([meta]);
+          setIsDocumentSaved(true);
         }
       } catch (err) {
         console.warn("Storage init fallback:", err);
@@ -591,6 +593,7 @@ export default function ReadingPage() {
         setActiveChunk(chunk);
         setSelectedSentenceId(null);
         setAnalysisData(null);
+        setIsDocumentSaved(true);
       }
     } catch (e) {
       console.warn("Could not switch document:", e);
@@ -636,8 +639,8 @@ export default function ReadingPage() {
         aiAnalysesCache: analyses,
       });
       await saveVdocPackage(vdoc);
-      setSaveSuccessMessage("Đã lưu vào IndexedDB!");
-      setTimeout(() => setSaveSuccessMessage(null), 2500);
+      setIsDocumentSaved(true);
+      showToast("Đã lưu phiên học vào IndexedDB!");
 
       // Cập nhật danh sách tài liệu
       const docs = await getAllDocumentsMeta();
@@ -647,7 +650,7 @@ export default function ReadingPage() {
     } finally {
       setIsSavingSession(false);
     }
-  }, [documentMeta, activeChunk, activeChunkIndex, activeSentence]);
+  }, [documentMeta, activeChunk, activeChunkIndex, activeSentence, showToast]);
 
   // Lưu từ vựng vào Deck của Vocabloom qua API /api/translate/add
   const handleSaveWordToDeck = async (
@@ -695,6 +698,7 @@ export default function ReadingPage() {
     setSelectedSentenceId(null);
     setAnalysisData(null);
     setIsImporting(false);
+    setIsDocumentSaved(true);
 
     // Cập nhật lại danh sách thư viện
     getAllDocumentsMeta().then((list) => setAllSavedDocs(list));
@@ -900,21 +904,25 @@ export default function ReadingPage() {
           {/* Bên phải: Nút "Lưu phiên học", "Nhập tài liệu", "Local AI Config", và nút bật Focus Mode */}
           <div className="flex items-center gap-1.5 md:gap-2 shrink-0">
             <Button
-              variant={saveSuccessMessage ? "default" : "secondary"}
+              variant="secondary"
               size="sm"
               onClick={handleSaveSession}
-              disabled={isSavingSession || !documentMeta}
+              disabled={isSavingSession || !documentMeta || isDocumentSaved}
               className={`flex size-8 shrink-0 items-center justify-center p-0 rounded-lg transition-all ${
-                saveSuccessMessage
-                  ? "border-[#46a302] bg-ecto-green text-white hover:bg-[#51bd02]"
-                  : "border-[#e5e5e5] text-charcoal hover:bg-gray-100"
+                isDocumentSaved
+                  ? "border border-[#a5ed6e] bg-[#f7fff1] text-[#438f0e] cursor-default opacity-90"
+                  : "border-[#e5e5e5] text-charcoal hover:bg-gray-100 cursor-pointer"
               }`}
-              title={saveSuccessMessage ? "Đã lưu phiên học" : "Lưu phiên học và tiến độ vào IndexedDB (.vdoc)"}
+              title={
+                isDocumentSaved
+                  ? "Tài liệu đã được lưu trong IndexedDB (.vdoc)"
+                  : "Lưu phiên học và tiến độ vào IndexedDB (.vdoc)"
+              }
             >
               {isSavingSession ? (
                 <Loader2 className="size-4 animate-spin text-[#1cb0f6]" />
-              ) : saveSuccessMessage ? (
-                <Check className="size-4 text-white" />
+              ) : isDocumentSaved ? (
+                <Check className="size-4 text-[#438f0e]" />
               ) : (
                 <Save className="size-4 text-ecto-green" />
               )}
@@ -1002,6 +1010,7 @@ export default function ReadingPage() {
         onDeleteDocument={handleDeleteDocument}
         onNewDocument={() => setIsImporting(true)}
         onSaveCurrentSession={handleSaveSession}
+        isDocumentSaved={isDocumentSaved}
         analyzedSentencesCount={analyzedSentencesCount}
         chunkAnalyzedCount={chunkAnalyzedCount}
         totalChunkSentences={allChunkSentences.length}
