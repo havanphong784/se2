@@ -46,6 +46,14 @@ interface SentenceBreakdownCardProps {
   onClosePanel?: () => void;
 }
 
+const ROLE_MAP: Record<string, string> = {
+  S: "Chủ ngữ",
+  V: "Động từ",
+  O: "Tân ngữ",
+  C: "Bổ ngữ",
+  A: "Trạng ngữ",
+};
+
 const SKELETON_ROLE_CONFIG: Record<
   string,
   { label: string; shortLabel: string; badgeClass: string; boxClass: string }
