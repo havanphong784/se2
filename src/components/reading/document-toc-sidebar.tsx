@@ -11,6 +11,10 @@ import {
   Bookmark,
   X,
   Plus,
+  Zap,
+  RotateCcw,
+  Square,
+  Sparkles,
 } from "lucide-react";
 import type {
   StructuredDocumentMeta,
@@ -28,6 +32,14 @@ interface DocumentTocSidebarProps {
   onDeleteDocument?: (docId: string) => void;
   onNewDocument?: () => void;
   onSaveCurrentSession?: () => void;
+  analyzedSentencesCount?: number;
+  chunkAnalyzedCount?: number;
+  totalChunkSentences?: number;
+  allChunkSentencesCount?: number;
+  isPreanalyzingChunk?: boolean;
+  onStartPreanalyzeChunk?: () => void;
+  onStopPreanalyzeChunk?: () => void;
+  onClearDocumentAnalyses?: () => void;
 }
 
 export function DocumentTocSidebar({
@@ -41,6 +53,14 @@ export function DocumentTocSidebar({
   onDeleteDocument,
   onNewDocument,
   onSaveCurrentSession,
+  analyzedSentencesCount = 0,
+  chunkAnalyzedCount = 0,
+  totalChunkSentences,
+  allChunkSentencesCount,
+  isPreanalyzingChunk = false,
+  onStartPreanalyzeChunk,
+  onStopPreanalyzeChunk,
+  onClearDocumentAnalyses,
 }: DocumentTocSidebarProps) {
   const [tab, setTab] = useState<"toc" | "history">("toc");
 
@@ -51,6 +71,12 @@ export function DocumentTocSidebar({
     100,
     Math.round(((activeChunkIndex + 1) / totalChunks) * 100)
   );
+
+  const totalSentences = totalChunkSentences ?? allChunkSentencesCount ?? 0;
+  const chunkPercent =
+    totalSentences > 0
+      ? Math.min(100, Math.round((chunkAnalyzedCount / totalSentences) * 100))
+      : 0;
 
   return (
     <>
@@ -132,6 +158,114 @@ export function DocumentTocSidebar({
               Phần {activeChunkIndex + 1} / {totalChunks}
             </span>
             <span>{documentMeta.totalPages} trang tổng cộng</span>
+          </div>
+        </div>
+      )}
+
+      {/* Khối Trạng thái AI & Offline */}
+      {tab === "toc" && documentMeta && (
+        <div className="border-b border-[#eeeeee] bg-[#f8fafc] p-3 space-y-2.5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5 text-xs font-black text-eel-dark-blue">
+              <Zap className="size-3.5 text-[#1cb0f6] fill-[#1cb0f6]" />
+              <span>Trạng thái AI &amp; Offline</span>
+            </div>
+            <span
+              className={`rounded-full px-2 py-0.5 text-[10px] font-black ${
+                chunkPercent === 100
+                  ? "bg-[#f7fff1] text-[#438f0e] border border-eel-light"
+                  : isPreanalyzingChunk
+                  ? "bg-amber-100 text-amber-800 border border-amber-300 animate-pulse"
+                  : "bg-blue-50 text-[#087db4] border border-[#bfe9fd]"
+              }`}
+            >
+              {chunkPercent === 100
+                ? "Sẵn sàng 100%"
+                : isPreanalyzingChunk
+                ? "Đang phân tích"
+                : `${chunkPercent}%`}
+            </span>
+          </div>
+
+          {/* Thanh progress nhỏ và thông số câu trong phần này */}
+          <div>
+            <div className="flex items-center justify-between text-[11px] font-bold text-charcoal mb-1">
+              <span>Độ sẵn sàng AI:</span>
+              <span className="font-mono text-[#087db4]">
+                {chunkAnalyzedCount}/{totalSentences} câu trong phần này ({chunkPercent}%)
+              </span>
+            </div>
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#e2e8f0]">
+              <div
+                className={`h-full transition-all duration-300 ${
+                  chunkPercent === 100 ? "bg-ecto-green" : "bg-[#1cb0f6]"
+                }`}
+                style={{ width: `${chunkPercent}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Tổng số câu đã phân tích toàn tài liệu */}
+          <div className="flex items-center justify-between text-[10.5px] font-semibold text-ash">
+            <span>Tổng số câu đã phân tích toàn tài liệu:</span>
+            <span className="font-mono font-bold text-charcoal">
+              {analyzedSentencesCount} câu
+            </span>
+          </div>
+
+          {/* Nút hành động */}
+          <div className="pt-0.5 space-y-1.5">
+            {isPreanalyzingChunk ? (
+              <button
+                type="button"
+                onClick={onStopPreanalyzeChunk}
+                className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-red-300 bg-red-50 py-2 text-xs font-bold text-red-600 hover:bg-red-100 hover:border-red-400 transition-colors cursor-pointer shadow-xs"
+              >
+                <Square className="size-3.5 fill-red-600 text-red-600" />
+                <span>Đang phân tích... (Bấm để dừng)</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={onStartPreanalyzeChunk}
+                disabled={chunkPercent === 100}
+                className={`flex w-full items-center justify-center gap-1.5 rounded-xl border py-2 text-xs font-bold transition-all shadow-xs ${
+                  chunkPercent === 100
+                    ? "border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed"
+                    : "border-[#1cb0f6] bg-[#1cb0f6] text-white hover:bg-[#16a5e8] cursor-pointer active:translate-y-0.5"
+                }`}
+              >
+                <Zap className={`size-3.5 ${chunkPercent === 100 ? "text-gray-400" : "text-white fill-white"}`} />
+                <span>
+                  {chunkPercent === 100
+                    ? "Đã sẵn sàng offline phần này"
+                    : "⚡ Phân tích trước toàn bộ phần này"}
+                </span>
+              </button>
+            )}
+
+            {/* Nút làm mới / xóa cache AI của tài liệu */}
+            {onClearDocumentAnalyses && (
+              <button
+                type="button"
+                onClick={() => {
+                  if (
+                    confirm(
+                      `Bạn có chắc muốn xóa sạch toàn bộ cache phân tích AI của tài liệu "${
+                        documentMeta.title || "này"
+                      }" trong IndexedDB để phân tích lại từ đầu?`
+                    )
+                  ) {
+                    onClearDocumentAnalyses();
+                  }
+                }}
+                className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white py-1.5 text-[11px] font-bold text-ash hover:text-red-600 hover:border-red-200 hover:bg-red-50/50 transition-colors cursor-pointer"
+                title="Xóa cache phân tích AI đã lưu của tài liệu này"
+              >
+                <RotateCcw className="size-3 text-current" />
+                <span>Làm mới / Xóa cache AI của tài liệu</span>
+              </button>
+            )}
           </div>
         </div>
       )}

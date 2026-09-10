@@ -134,6 +134,29 @@ export function hasCachedAnalysis(sentence: string): boolean {
 }
 
 /**
+ * Xóa sạch toàn bộ cache phân tích câu (L1 RAM cache và L2 localStorage)
+ */
+export function clearSentenceAnalysisCache(): void {
+  analysisL1Cache.clear();
+  inFlightAnalysis.clear();
+  if (typeof window === "undefined") return;
+  try {
+    const keysToRemove: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith(LOCAL_STORAGE_CACHE_PREFIX)) {
+        keysToRemove.push(key);
+      }
+    }
+    for (const key of keysToRemove) {
+      localStorage.removeItem(key);
+    }
+  } catch (e) {
+    console.warn("Failed to clear localStorage analysis cache", e);
+  }
+}
+
+/**
  * Lấy bản dịch câu siêu tốc (~100ms) qua API nội bộ để hiển thị bản nháp tức thì
  */
 export async function fetchFastSentenceTranslation(sentence: string): Promise<string> {
