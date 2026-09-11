@@ -15,7 +15,6 @@ import {
   Zap,
   RotateCcw,
   Square,
-  Sparkles,
 } from "lucide-react";
 import type {
   StructuredDocumentMeta,
