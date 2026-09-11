@@ -60,6 +60,7 @@ export function DocumentImporter({
   const [title, setTitle] = useState("");
   const [loading, setLoading] = useState(false);
   const [ocrProgress, setOcrProgress] = useState<{ percent: number; status: string } | null>(null);
+  const [pdfProgress, setPdfProgress] = useState<{ percent: number; message: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -104,7 +105,10 @@ export function DocumentImporter({
         if (!file.name.toLowerCase().endsWith(".pdf")) {
           throw new Error("Vui lòng chọn file có định dạng .pdf");
         }
-        const { meta, chunks } = await extractStructuredPdf(file, 10);
+        setPdfProgress({ percent: 5, message: "Đang nạp file PDF..." });
+        const { meta, chunks } = await extractStructuredPdf(file, 10, undefined, (p) => {
+          setPdfProgress({ percent: p.percent, message: p.message || `Đang xử lý trang ${p.current}/${p.total}` });
+        });
         meta.title = fileName.replace(/\.pdf$/i, "");
         meta.originalFileName = fileName;
         await saveStructuredDocument(meta, chunks);
@@ -305,6 +309,21 @@ export function DocumentImporter({
             <p className="mt-1 max-w-md text-xs font-semibold leading-relaxed text-ash">
               Hệ thống sẽ tự động bóc tách Mục lục (TOC), chia tài liệu thành từng gói 10 trang để Lazy Load mượt mà, không bao giờ bị đơ trình duyệt.
             </p>
+
+            {loading && pdfProgress && (
+              <div className="mt-4 w-full max-w-sm">
+                <div className="flex justify-between text-xs font-bold text-eel-dark-blue mb-1">
+                  <span>{pdfProgress.message}</span>
+                  <span>{pdfProgress.percent}%</span>
+                </div>
+                <div className="h-2 w-full overflow-hidden rounded-full bg-[#e5e5e5]">
+                  <div
+                    className="h-full bg-[#1cb0f6] transition-all duration-300 ease-out"
+                    style={{ width: `${pdfProgress.percent}%` }}
+                  />
+                </div>
+              </div>
+            )}
 
             <Button
               variant="blue"

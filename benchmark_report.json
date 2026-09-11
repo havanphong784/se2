@@ -1,0 +1,101 @@
+{
+  "timestamp": "2026-09-11T10:57:52.849Z",
+  "aiAnalysis": [
+    {
+      "scenario": "Scenario 1: Simple & Direct Command/Definition",
+      "sentence": "An operating system acts as an intermediary between computer users and computer hardware.",
+      "latencyMs": 13256.11,
+      "model": "ag/gemini-3.8-flash-high",
+      "complexity": "simple",
+      "translationVi": "Hệ điều hành đóng vai trò như một cầu nối trung gian giữa người dùng máy tính và phần cứng (hardware).",
+      "coreIdeaVi": "Hệ điều hành là cầu nối trung gian giữa người dùng và phần cứng máy tính.",
+      "skeletonPattern": "S + V + A",
+      "skeletonPartsCount": 3,
+      "chunksCount": 3,
+      "clausesCount": 1,
+      "vocabCount": 4,
+      "vocabWithIpaCount": 1,
+      "hasGrammarMechanic": true,
+      "mentalModelStepsCount": 3,
+      "schemaValid": true
+    },
+    {
+      "scenario": "Scenario 2: Compound Academic Sentence with Contrast",
+      "sentence": "Modern superscalar processors, however, can issue multiple independent instructions per clock cycle to maximize throughput.",
+      "latencyMs": 15316.38,
+      "model": "ag/gemini-3.8-flash-high",
+      "complexity": "simple",
+      "translationVi": "Tuy nhiên, các processor superscalar hiện đại có thể phát (issue) nhiều instruction độc lập trong mỗi clock cycle nhằm tối đa hóa throughput.",
+      "coreIdeaVi": "Các processor hiện đại có thể phát nhiều lệnh độc lập trong một chu kỳ xung nhịp để tăng tối đa hiệu suất.",
+      "skeletonPattern": "S + V + O + A + A",
+      "skeletonPartsCount": 5,
+      "chunksCount": 5,
+      "clausesCount": 1,
+      "vocabCount": 5,
+      "vocabWithIpaCount": 3,
+      "hasGrammarMechanic": true,
+      "mentalModelStepsCount": 4,
+      "schemaValid": true
+    },
+    {
+      "scenario": "Scenario 3: Complex OS Concept with Dependent Relative Clauses",
+      "sentence": "To appreciate the role that an operating system plays in a modern computer, it is useful to consider the physical machine on which software executes.",
+      "latencyMs": 19769.04,
+      "model": "ag/gemini-3.8-flash-high",
+      "complexity": "complex",
+      "translationVi": "Để hiểu rõ vai trò của một hệ điều hành trong máy tính hiện đại, việc xem xét cỗ máy vật lý nơi phần mềm thực thi là rất hữu ích.",
+      "coreIdeaVi": "Muốn hiểu vai trò của hệ điều hành, trước hết cần xem xét phần cứng vật lý nơi phần mềm chạy trên đó.",
+      "skeletonPattern": "A + S + V + C + Real S",
+      "skeletonPartsCount": 5,
+      "chunksCount": 6,
+      "clausesCount": 3,
+      "vocabCount": 4,
+      "vocabWithIpaCount": 2,
+      "hasGrammarMechanic": true,
+      "mentalModelStepsCount": 3,
+      "schemaValid": true
+    },
+    {
+      "scenario": "Scenario 4: Heavy Technical Engineering Sentence with Collocations",
+      "sentence": "Deploying these complex virtual memory architectures on resource-constrained embedded systems, however, presents substantial engineering bottlenecks.",
+      "latencyMs": 17505.55,
+      "model": "ag/gemini-3.8-flash-high",
+      "complexity": "simple",
+      "translationVi": "Tuy nhiên, việc triển khai các kiến trúc bộ nhớ ảo phức tạp này trên các hệ thống nhúng bị giới hạn tài nguyên lại đặt ra những rào cản kỹ thuật đáng kể.",
+      "coreIdeaVi": "Triển khai kiến trúc bộ nhớ phức tạp lên thiết bị nhúng hạn chế tài nguyên gây ra nhiều trở ngại kỹ thuật lớn.",
+      "skeletonPattern": "S + V + O",
+      "skeletonPartsCount": 3,
+      "chunksCount": 4,
+      "clausesCount": 1,
+      "vocabCount": 5,
+      "vocabWithIpaCount": 1,
+      "hasGrammarMechanic": true,
+      "mentalModelStepsCount": 4,
+      "schemaValid": true
+    }
+  ],
+  "txtImport": {
+    "fileName": "PART_ONE_VERBATIM.txt",
+    "fileSizeKb": 19.46,
+    "extractTimeMs": 1.89,
+    "totalChunks": 1,
+    "totalWords": 2867,
+    "tocCount": 2
+  },
+  "pdfImport": {
+    "fileName": "[1] Modern Operating Systems 4th Edition--Andrew Tanenbaum.pdf",
+    "fileSizeMb": 5.22,
+    "extractTimeMs": 2846.28,
+    "totalPages": 1137,
+    "totalChunks": 114,
+    "totalWords": 470140,
+    "tocCount": 523,
+    "avgChunkParseTimeMs": 66.1
+  },
+  "hoverLookup": {
+    "posTaggerAvgMs": 0.438,
+    "phraseMatcherAvgMs": 0.858,
+    "dictLookupAvgMs": 0.004,
+    "testedSentencesCount": 100
+  }
+}

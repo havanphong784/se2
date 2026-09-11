@@ -3,6 +3,14 @@ import { describe, it } from "node:test";
 import { tagSentenceWords } from "./pos-tagger";
 import { segmentText } from "./text-segmenter";
 import { getSentenceHash } from "@/lib/ai/local-ai-client";
+import { buildSlidingWindowContext } from "./context-window";
+import {
+  repairTruncatedJson,
+  safeParseSentenceBreakdown,
+  enrichSentenceBreakdown,
+  ROLE_MAP,
+} from "@/lib/ai/json-repair";
+import { setCachedWord } from "./dictionary-cache";
 
 describe("Smart Reading Utilities", () => {
   describe("POS Tagger", () => {
@@ -581,6 +589,301 @@ Organizations must adapt to cognitive automation.`;
       assert.ok(pageText.includes("# CHAPTER 1"));
       assert.ok(pageText.includes("First line of text with international collaboration."));
       assert.ok(pageText.includes("Second paragraph starts here."));
+    });
+  });
+
+  describe("Context Feeding & Sliding Window", () => {
+    it("hỗ trợ câu đầu tiên (không có câu trước) và câu sau", () => {
+      const sentences = [
+        "First sentence of the text.",
+        "Second sentence following it.",
+        "Third sentence here.",
+      ];
+      const result = buildSlidingWindowContext(sentences, 0);
+
+      assert.ok(result.includes("<context_before></context_before>"), "Câu đầu tiên không có context_before");
+      assert.ok(result.includes("<target_sentence>\nFirst sentence of the text.\n</target_sentence>"));
+      assert.ok(result.includes("<context_after>\nSecond sentence following it.\n</context_after>"));
+      assert.ok(result.includes("<client_hints></client_hints>"));
+    });
+
+    it("hỗ trợ câu cuối cùng (không có câu sau) và 1-2 câu trước", () => {
+      const sentences = [
+        "Sentence number one.",
+        "Sentence number two.",
+        "Sentence number three (last).",
+      ];
+      const result = buildSlidingWindowContext(sentences, 2);
+
+      assert.ok(
+        result.includes("<context_before>\nSentence number one. Sentence number two.\n</context_before>")
+      );
+      assert.ok(result.includes("<target_sentence>\nSentence number three (last).\n</target_sentence>"));
+      assert.ok(result.includes("<context_after></context_after>"), "Câu cuối cùng không có context_after");
+    });
+
+    it("sliding window 1-2 câu trước xuyên suốt các paragraph", () => {
+      const allSentences = [
+        { id: "s1", text: "Paragraph 1 Sentence 1.", paragraphIndex: 0, tokens: [] },
+        { id: "s2", text: "Paragraph 1 Sentence 2.", paragraphIndex: 0, tokens: [] },
+        { id: "s3", text: "Paragraph 2 Sentence 1.", paragraphIndex: 1, tokens: [] },
+        { id: "s4", text: "Paragraph 2 Sentence 2.", paragraphIndex: 1, tokens: [] },
+      ];
+
+      // Chọn câu s3 (câu đầu tiên của paragraph 2)
+      const result = buildSlidingWindowContext(allSentences, 2);
+
+      // Phải lấy được 2 câu trước đó từ paragraph 1
+      assert.ok(
+        result.includes("<context_before>\nParagraph 1 Sentence 1. Paragraph 1 Sentence 2.\n</context_before>"),
+        "Sliding window phải xuyên paragraph lấy đủ 2 câu trước"
+      );
+      assert.ok(result.includes("<target_sentence>\nParagraph 2 Sentence 1.\n</target_sentence>"));
+      assert.ok(result.includes("<context_after>\nParagraph 2 Sentence 2.\n</context_after>"));
+    });
+
+    it("mớm client_hints với danh sách detected phrases", () => {
+      const sentences = ["He decided to turn down the offer."];
+      const detectedPhrases = [
+        { cleanPhrase: "turn down", phraseText: "turn down" },
+        "the offer",
+      ];
+      const result = buildSlidingWindowContext(sentences, 0, detectedPhrases);
+
+      assert.ok(result.includes("<client_hints>\nDetected phrases: turn down, the offer\n</client_hints>"));
+    });
+  });
+
+  describe("JSON Repair & Fault-Tolerant Parsing", () => {
+    it("vá JSON bị cắt cụt giữa chừng trong chuỗi (unfinished string)", () => {
+      const brokenJson = '{"complexity": "simple", "translationVi": "Đây là bản dịch đang dở';
+      const repaired = repairTruncatedJson(brokenJson);
+
+      const parsed = JSON.parse(repaired);
+      assert.equal(parsed.complexity, "simple");
+      assert.equal(parsed.translationVi, "Đây là bản dịch đang dở");
+    });
+
+    it("vá JSON lồng nhau bị cắt cụt (unclosed nested objects and arrays)", () => {
+      const brokenJson =
+        '{"coreIdeaVi": "Học tiếng Anh", "skeleton": {"pattern": "S+V", "parts": [{"type": "S", "text": "Learning"';
+      const repaired = repairTruncatedJson(brokenJson);
+
+      const parsed = JSON.parse(repaired);
+      assert.equal(parsed.coreIdeaVi, "Học tiếng Anh");
+      assert.equal(parsed.skeleton?.pattern, "S+V");
+      assert.equal(parsed.skeleton?.parts?.[0]?.text, "Learning");
+    });
+
+    it("vá JSON có dấu phẩy treo ở cuối (dangling comma)", () => {
+      const brokenJson = '{"complexity": "simple", "chunks": [{"chunkText": "run fast"}, ';
+      const repaired = repairTruncatedJson(brokenJson);
+
+      const parsed = JSON.parse(repaired);
+      assert.equal(parsed.chunks.length, 1);
+      assert.equal(parsed.chunks[0].chunkText, "run fast");
+    });
+
+    it("vá JSON bị cắt cụt ở key dở dang bằng cơ chế backtrack", () => {
+      const brokenJson = '{"translationVi": "Bản dịch", "whyUsed';
+      const repaired = repairTruncatedJson(brokenJson);
+
+      const parsed = JSON.parse(repaired);
+      assert.equal(parsed.translationVi, "Bản dịch");
+      assert.equal(parsed.whyUsed, undefined);
+    });
+
+    it("bóc tách khối markdown code block ```json", () => {
+      const wrapped = '```json\n{"translationVi": "Thành công"}\n```';
+      const repaired = repairTruncatedJson(wrapped);
+
+      const parsed = JSON.parse(repaired);
+      assert.equal(parsed.translationVi, "Thành công");
+    });
+
+    it("trả về {} an toàn cho chuỗi rỗng hoặc không chứa cấu trúc JSON", () => {
+      assert.equal(repairTruncatedJson(""), "{}");
+      assert.equal(repairTruncatedJson("502 Bad Gateway error from proxy"), "{}");
+    });
+  });
+
+  describe("Safe Parse Sentence Breakdown & Fallback", () => {
+    it("tự động điền đầy đủ fallback an toàn khi JSON hỏng hoàn toàn, không bao giờ crash", () => {
+      const targetSentence = "Artificial intelligence empowers human capability.";
+      const brokenRaw = "Internal Server Error 500: Model failed to respond";
+
+      const result = safeParseSentenceBreakdown(brokenRaw, targetSentence);
+
+      assert.equal(result.sentence, targetSentence);
+      assert.equal(result.complexity, "simple");
+      assert.equal(result.translationVi, "");
+      assert.equal(result.skeleton?.pattern, "S + V + O");
+      assert.ok(Array.isArray(result.skeleton?.parts));
+      assert.ok(Array.isArray(result.chunks));
+      assert.ok(Array.isArray(result.clauses));
+      assert.ok(result.grammar);
+      assert.equal(result.grammar.pattern, "Standard Structure");
+      assert.ok(Array.isArray(result.vocabulary));
+      assert.ok(Array.isArray(result.idiomsAndPhrases));
+      assert.ok(Array.isArray(result.mentalModelSteps));
+    });
+
+    it("bù đắp các trường bị thiếu trong JSON dở dang", () => {
+      const partialJson = JSON.stringify({
+        translationVi: "Bản dịch thử nghiệm",
+        coreIdeaVi: "Ý chính ngắn gọn",
+      });
+
+      const result = safeParseSentenceBreakdown(partialJson, "Test sentence.");
+
+      assert.equal(result.sentence, "Test sentence.");
+      assert.equal(result.translationVi, "Bản dịch thử nghiệm");
+      assert.equal(result.coreIdeaVi, "Ý chính ngắn gọn");
+      assert.equal(result.skeleton?.pattern, "S + V + O");
+      assert.deepEqual(result.vocabulary, []);
+    });
+  });
+
+  describe("Client-side IPA & roleVi Enrichment", () => {
+    it("tự động tra và gán phiên âm IPA chuẩn từ dictionary-cache cho từ vựng", () => {
+      setCachedWord("horizons", { phonetic: "/həˈraɪ.zənz/" });
+
+      const breakdown = safeParseSentenceBreakdown(
+        JSON.stringify({
+          translationVi: "Mở rộng tầm nhìn",
+          vocabulary: [
+            {
+              term: "horizons",
+              partOfSpeech: "noun",
+              contextMeaningVi: "chân trời, tầm nhìn",
+            },
+          ],
+        }),
+        "Learning languages expands horizons."
+      );
+
+      assert.equal(breakdown.vocabulary.length, 1);
+      assert.equal(breakdown.vocabulary[0].term, "horizons");
+      assert.equal(
+        breakdown.vocabulary[0].ipa,
+        "/həˈraɪ.zənz/",
+        "Phải tự động lấy IPA từ dictionary-cache nếu AI không trả về"
+      );
+    });
+
+    it("gán đúng roleVi cho skeleton.parts theo ROLE_MAP", () => {
+      const breakdown = safeParseSentenceBreakdown(
+        JSON.stringify({
+          skeleton: {
+            pattern: "S + V + O + A + C",
+            parts: [
+              { type: "S", text: "Developers" },
+              { type: "V", text: "build" },
+              { type: "O", text: "software" },
+              { type: "A", text: "efficiently" },
+              { type: "C", text: "reliable" },
+            ],
+          },
+        }),
+        "Developers build software efficiently reliable."
+      );
+
+      assert.equal(breakdown.skeleton?.parts[0].roleVi, ROLE_MAP["S"]);
+      assert.equal(breakdown.skeleton?.parts[1].roleVi, ROLE_MAP["V"]);
+      assert.equal(breakdown.skeleton?.parts[2].roleVi, ROLE_MAP["O"]);
+      assert.equal(breakdown.skeleton?.parts[3].roleVi, ROLE_MAP["A"]);
+      assert.equal(breakdown.skeleton?.parts[4].roleVi, ROLE_MAP["C"]);
+    });
+
+    it("enrichSentenceBreakdown giữ nguyên roleVi và IPA nếu đã có sẵn", () => {
+      const customBreakdown = {
+        sentence: "He runs.",
+        complexity: "simple" as const,
+        translationVi: "Anh ấy chạy.",
+        skeleton: {
+          pattern: "S + V",
+          parts: [{ type: "S" as const, text: "He", roleVi: "Chủ từ đặc biệt" }],
+        },
+        grammar: {
+          pattern: "S + V",
+          explanation: "",
+          clauses: [],
+        },
+        vocabulary: [
+          {
+            term: "runs",
+            ipa: "/rʌnz_custom/",
+            partOfSpeech: "verb",
+            contextMeaningVi: "chạy",
+          },
+        ],
+        idiomsAndPhrases: [],
+      };
+
+      const enriched = enrichSentenceBreakdown(customBreakdown);
+      assert.equal(enriched.skeleton?.parts[0].roleVi, "Chủ từ đặc biệt");
+      assert.equal(enriched.vocabulary[0].ipa, "/rʌnz_custom/");
+    });
+  });
+
+  describe("Offline Lexicon & Tech Vocabulary Cache", () => {
+    it("nạp sẵn từ vựng chuyên ngành CS/OS với IPA và nghĩa chuẩn", async () => {
+      const { seedOfflineLexicon, getCachedWord } = await import("./dictionary-cache");
+      seedOfflineLexicon();
+
+      const os = getCachedWord("operating system");
+      assert.ok(os);
+      assert.equal(os.phonetic, "/ˈɑːpəreɪtɪŋ ˈsɪstəm/");
+      assert.equal(os.translationVi, "hệ điều hành");
+
+      const throughput = getCachedWord("throughput");
+      assert.ok(throughput);
+      assert.equal(throughput.phonetic, "/ˈθruːpʊt/");
+
+      const superscalar = getCachedWord("superscalar");
+      assert.ok(superscalar);
+      assert.equal(superscalar.phonetic, "/ˌsuːpərˈskeɪlər/");
+    });
+  });
+
+  describe("Speculative Prefetch Queue", () => {
+    it("quản lý hàng đợi và hỗ trợ hủy (cancel) an toàn", async () => {
+      const { SpeculativePrefetchQueue } = await import("./prefetch-queue");
+      let prefetchedCount = 0;
+
+      const queue = new SpeculativePrefetchQueue({
+        debounceMs: 50,
+        maxLookahead: 2,
+        onSentencePrefetched: () => {
+          prefetchedCount++;
+        },
+      });
+
+      assert.equal(queue.getIsRunning(), false);
+
+      const mockSentences = [
+        { id: "s1", text: "Sentence 1.", cleanText: "Sentence 1.", paragraphIndex: 0, orderInParagraph: 0, wordCount: 2, tokens: [] },
+        { id: "s2", text: "Sentence 2.", cleanText: "Sentence 2.", paragraphIndex: 0, orderInParagraph: 1, wordCount: 2, tokens: [] },
+        { id: "s3", text: "Sentence 3.", cleanText: "Sentence 3.", paragraphIndex: 0, orderInParagraph: 2, wordCount: 2, tokens: [] },
+      ];
+
+      queue.enqueue(
+        mockSentences,
+        0,
+        {
+          provider: "local_tunnel",
+          baseUrl: "http://localhost:11434/v1",
+          model: "qwen2.5:3b",
+          temperature: 0.1,
+          autoAnalyzeOnClick: true,
+        },
+        "doc-test"
+      );
+
+      assert.equal(queue.getIsRunning(), true);
+      queue.cancel();
+      assert.equal(queue.getIsRunning(), false);
+      assert.equal(prefetchedCount, 0);
     });
   });
 });

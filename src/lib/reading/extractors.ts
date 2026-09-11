@@ -725,22 +725,41 @@ export async function extractTextFromPdf(
   return structured.chunks.map((c) => c.rawText).join("\n\n");
 }
 
+export interface PdfExtractionProgress {
+  stage: "loading" | "parsing_pages" | "sorting_layout" | "building_chunks" | "complete";
+  current: number;
+  total: number;
+  percent: number;
+  message?: string;
+}
+
 /**
- * Trích xuất có cấu trúc từ file PDF dựa trên phân tích hình học (Layout & Geometry-Aware PDF Extraction):
+ * Trích xuất PDF có cấu trúc cao cấp dựa trên hình học (Layout & Geometry-Aware PDF Extraction)
  * - Thu thập TextItem kèm tọa độ [x, y, width, height], fontSize từ transform matrix.
  * - Header/Footer Filter: Lọc bỏ header, footer, số trang lặp lại ở mép trên/dưới.
  * - Multi-column Sorting (XY-Cut): Tách các cột văn bản theo rãnh khoảng cách x, đọc hết cột 1 mới sang cột 2.
  * - Dehyphenation: Khử đứt đoạn từ khi bị gãy dòng có gạch nối.
  * - Typography Clustering: Phân loại Heading Level 1, 2, 3 chuẩn xác cho Table of Contents và Paragraph Blocks.
  * - Chia trang & phân chunk (mỗi chunk 10 trang để lazy load), giữ đúng interface StructuredDocumentMeta và DocumentChunk[].
+ * - Non-blocking event loop yielding & Progress Callback.
  */
 export async function extractStructuredPdf(
   fileOrBuffer: File | ArrayBuffer | Uint8Array,
-  pagesPerChunk: number = PAGES_PER_CHUNK
+  pagesPerChunk: number = PAGES_PER_CHUNK,
+  maxPages?: number,
+  onProgress?: (progress: PdfExtractionProgress) => void
 ): Promise<{
   meta: StructuredDocumentMeta;
   chunks: DocumentChunk[];
 }> {
+  onProgress?.({
+    stage: "loading",
+    current: 0,
+    total: 100,
+    percent: 5,
+    message: "Đang nạp dữ liệu nhị phân PDF...",
+  });
+
   let buffer: ArrayBuffer;
   if (fileOrBuffer instanceof File) {
     buffer = await fileOrBuffer.arrayBuffer();
@@ -757,7 +776,10 @@ export async function extractStructuredPdf(
 
   // 1. Tải Document Proxy từ unpdf
   const proxy = await getDocumentProxy(uint8);
-  const totalPages = Math.max(1, proxy.numPages);
+  const totalPages = Math.max(
+    1,
+    Math.min(proxy.numPages, maxPages && maxPages > 0 ? maxPages : proxy.numPages)
+  );
 
   // 2. Thu thập TextItem đầy đủ tọa độ [x, y, width, height] và fontSize cho từng trang
   const rawPagesItems: PdfGeometryItem[][] = [];
@@ -781,6 +803,18 @@ export async function extractStructuredPdf(
       viewport.height
     );
     rawPagesItems.push(pageItems);
+
+    if (pageNum % 10 === 0 || pageNum === totalPages) {
+      onProgress?.({
+        stage: "parsing_pages",
+        current: pageNum,
+        total: totalPages,
+        percent: Math.round(5 + (pageNum / totalPages) * 50),
+        message: `Đang quét tọa độ trang ${pageNum}/${totalPages}...`,
+      });
+      // Yield to event loop để tránh block UI
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    }
   }
 
   const totalTextItems = rawPagesItems.reduce((acc, items) => acc + items.length, 0);
@@ -951,6 +985,14 @@ export async function extractStructuredPdf(
     createdAt: Date.now(),
     updatedAt: Date.now(),
   };
+
+  onProgress?.({
+    stage: "complete",
+    current: totalPages,
+    total: totalPages,
+    percent: 100,
+    message: "Hoàn tất trích xuất cấu trúc tài liệu!",
+  });
 
   return { meta, chunks };
 }
