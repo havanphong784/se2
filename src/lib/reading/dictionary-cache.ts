@@ -1,3 +1,5 @@
+import { CORE_TECH_LEXICON } from "./offline-lexicon";
+
 export interface DictResult {
   phonetic?: string;
   definition?: string;
@@ -10,6 +12,23 @@ const l1Cache = new Map<string, DictResult>();
 
 // L2 Storage Prefix
 const L2_CACHE_PREFIX = "vocabloom_dict_v2_";
+
+// Nạp tự động Offline Lexicon vào L1 Cache ngay khi khởi động module
+let isOfflineLexiconSeeded = false;
+export function seedOfflineLexicon(customLexicon?: Record<string, DictResult>): void {
+  if (isOfflineLexiconSeeded && !customLexicon) return;
+  const target = customLexicon || CORE_TECH_LEXICON;
+  for (const [key, val] of Object.entries(target)) {
+    const clean = key.toLowerCase().trim();
+    if (!l1Cache.has(clean)) {
+      l1Cache.set(clean, val);
+    }
+  }
+  isOfflineLexiconSeeded = true;
+}
+
+// Khởi chạy nạp ngay
+seedOfflineLexicon();
 
 // In-flight Request Deduplication: Tránh gửi nhiều request cùng lúc cho 1 từ
 const inFlightRequests = new Map<string, Promise<DictResult>>();

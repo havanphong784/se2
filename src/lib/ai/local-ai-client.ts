@@ -1,15 +1,16 @@
 import type {
   ClientAIConfig,
+  DetectedPhrase,
   SentenceBreakdownResponse,
 } from "@/types/reading";
+import {
+  ROLE_MAP,
+  enrichSentenceBreakdown,
+  repairTruncatedJson,
+  safeParseSentenceBreakdown,
+} from "./json-repair";
 
-export const ROLE_MAP: Record<string, string> = {
-  S: "Chủ ngữ",
-  V: "Động từ",
-  O: "Tân ngữ",
-  C: "Bổ ngữ",
-  A: "Trạng ngữ",
-};
+export { ROLE_MAP, enrichSentenceBreakdown, repairTruncatedJson, safeParseSentenceBreakdown };
 
 export const DEFAULT_AI_CONFIG: ClientAIConfig = {
   provider: "local_tunnel",
@@ -27,6 +28,166 @@ const analysisL1Cache = new Map<string, SentenceBreakdownResponse>();
 
 // In-flight Deduplication: Tránh gửi nhiều request cùng lúc cho cùng một câu
 const inFlightAnalysis = new Map<string, Promise<SentenceBreakdownResponse>>();
+
+/**
+ * System Prompt súc tích (< 180 tokens) tập trung giải thích ngữ pháp và tư duy đọc hiểu tự nhiên
+ */
+export const SYSTEM_PROMPT = `You are a bilingual English-Vietnamese linguist for Vocabloom reading assistant.
+Analyze <target_sentence> considering <context_before> and <context_after> in natural Vietnamese.
+RULES:
+1. Technical Terms: Keep IT/tech terms in English (CPU, RAM, API, cache...).
+2. Return ONLY a valid JSON object with these EXACT keys:
+{
+  "complexity": "simple" | "compound" | "complex",
+  "translationVi": "Bản dịch tiếng Việt tự nhiên",
+  "coreIdeaVi": "Ý chính của câu trong 1 câu ngắn",
+  "simplifiedEnglish": "Viết lại bằng tiếng Anh đơn giản",
+  "skeleton": {
+    "pattern": "S + V + O + A",
+    "parts": [{"type": "S", "text": "..."}, {"type": "V", "text": "..."}]
+  },
+  "chunks": [{"chunkText": "...", "meaningVi": "...", "type": "noun_phrase" | "verb_phrase" | "prep_phrase"}],
+  "clauses": [{"clauseText": "...", "role": "Main Clause", "subject": "...", "verb": "...", "objectOrComplement": "..."}],
+  "grammar": {
+    "ruleSummary": "Tên cấu trúc",
+    "whyUsedVi": "Mục đích sử dụng của tác giả",
+    "mechanicVi": "Giải thích cơ chế ngữ pháp"
+  },
+  "vocabulary": [{"term": "...", "meaningVi": "...", "type": "noun", "contextNoteVi": "..."}],
+  "mentalModelSteps": [{"stepNumber": 1, "anchorText": "...", "actionVi": "...", "cognitiveWhyVi": "..."}]
+}`;
+
+/**
+ * Strict JSON Schema tương thích OpenAI & Ollama Structured Output
+ * Tinh gọn: bỏ 'sentence' (client tự map), bỏ 'ipa' (client map từ dictionary-cache),
+ * bỏ 'wordFamily' bắt buộc, nén output còn ~400-500 tokens.
+ */
+export const SENTENCE_BREAKDOWN_JSON_SCHEMA = {
+  name: "sentence_breakdown",
+  strict: true,
+  schema: {
+    type: "object",
+    properties: {
+      complexity: {
+        type: "string",
+        enum: ["micro", "simple", "compound", "complex"],
+        description: "Sentence grammatical complexity",
+      },
+      translationVi: {
+        type: "string",
+        description: "Natural Vietnamese contextual translation",
+      },
+      coreIdeaVi: {
+        type: "string",
+        description: "Core meaning in 1 concise Vietnamese sentence",
+      },
+      skeleton: {
+        type: "object",
+        properties: {
+          pattern: { type: "string", description: "e.g. S + V + O + A" },
+          parts: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                type: { type: "string", enum: ["S", "V", "O", "C", "A"] },
+                text: { type: "string" },
+              },
+              required: ["type", "text"],
+              additionalProperties: false,
+            },
+          },
+        },
+        required: ["pattern", "parts"],
+        additionalProperties: false,
+      },
+      chunks: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            chunkText: { type: "string" },
+            meaningVi: { type: "string" },
+            type: { type: "string" },
+          },
+          required: ["chunkText", "meaningVi", "type"],
+          additionalProperties: false,
+        },
+      },
+      clauses: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            clauseText: { type: "string" },
+            role: { type: "string" },
+            subject: { type: "string" },
+            verb: { type: "string" },
+            objectOrComplement: { type: "string" },
+          },
+          required: ["clauseText", "role", "subject", "verb", "objectOrComplement"],
+          additionalProperties: false,
+        },
+      },
+      vocabulary: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            term: { type: "string" },
+            partOfSpeech: { type: "string" },
+            contextMeaningVi: { type: "string" },
+            cefr: { type: "string" },
+            isTechnicalTerm: { type: "boolean" },
+          },
+          required: ["term", "partOfSpeech", "contextMeaningVi", "isTechnicalTerm"],
+          additionalProperties: false,
+        },
+      },
+      idiomsAndPhrases: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            phrase: { type: "string" },
+            meaningVi: { type: "string" },
+          },
+          required: ["phrase", "meaningVi"],
+          additionalProperties: false,
+        },
+      },
+      grammar: {
+        type: "object",
+        properties: {
+          pattern: { type: "string" },
+          explanation: { type: "string" },
+          ruleSummary: { type: "string" },
+          whyUsedVi: { type: "string" },
+          mechanicVi: { type: "string" },
+        },
+        required: ["pattern", "explanation", "whyUsedVi", "mechanicVi"],
+        additionalProperties: false,
+      },
+      mentalModelSteps: {
+        type: "array",
+        items: { type: "string" },
+      },
+    },
+    required: [
+      "complexity",
+      "translationVi",
+      "coreIdeaVi",
+      "skeleton",
+      "chunks",
+      "clauses",
+      "vocabulary",
+      "idiomsAndPhrases",
+      "grammar",
+      "mentalModelSteps",
+    ],
+    additionalProperties: false,
+  },
+};
 
 /**
  * Lấy cấu hình AI đã lưu trong localStorage hoặc trả về mặc định
@@ -255,12 +416,14 @@ export async function testAIConnection(
 }
 
 /**
- * Gọi AI phân tích bóc tách câu chuyên sâu (có Request Deduplication & In-Memory Cache)
+ * Gọi AI phân tích bóc tách câu chuyên sâu với Sliding Window Context & Strict Output Schema
+ * (hỗ trợ Client-side Enrichment, safeParse và Request Deduplication)
  */
 export async function analyzeSentence(
   sentence: string,
-  contextParagraph: string,
-  config: ClientAIConfig
+  contextOrWindow: string,
+  config: ClientAIConfig,
+  detectedPhrases?: Array<DetectedPhrase | string>
 ): Promise<SentenceBreakdownResponse> {
   // 1. Kiểm tra cache trước
   const cached = getCachedAnalysis(sentence);
@@ -290,59 +453,46 @@ export async function analyzeSentence(
         headers["Authorization"] = `Bearer ${config.apiKey}`;
       }
 
-      // System Prompt Schema-First súc tích
-      const systemPrompt = `You are a bilingual English-Vietnamese linguist for Vocabloom. Analyze the target sentence in context to teach the learner HOW to understand its structure.
-
-RULES:
-1. Technical Terms: Keep IT/tech terms in English (API, database, cache, token...). Mark isTechnicalTerm: true.
-2. Adaptive: For short/micro commands, keep clauses and wordFamily minimal.
-3. Grammar: Focus on "why" the author used this pattern and the underlying mechanic.
-4. Language: Explanations, meanings, and mental steps must be in natural Vietnamese.
-
-OUTPUT ONLY RAW JSON MATCHING THIS SCHEMA:
-{
-  "sentence": "string",
-  "complexity": "micro" | "simple" | "compound" | "complex",
-  "translationVi": "string (natural Vietnamese)",
-  "coreIdeaVi": "string (1 concise sentence)",
-  "skeleton": {
-    "pattern": "e.g. S + V + O + A",
-    "parts": [{ "type": "S" | "V" | "O" | "C" | "A", "text": "string" }]
-  },
-  "chunks": [{ "chunkText": "string", "meaningVi": "string", "type": "noun_phrase" | "verb_phrase" | "prepositional_phrase" | "clause" }],
-  "clauses": [{ "clauseText": "string", "role": "string", "subject": "string", "verb": "string", "objectOrComplement": "string" }],
-  "vocabulary": [{
-    "term": "string",
-    "ipa": "string",
-    "partOfSpeech": "string",
-    "contextMeaningVi": "string",
-    "cefr": "A1" | "A2" | "B1" | "B2" | "C1" | "C2",
-    "isTechnicalTerm": boolean,
-    "wordFamily": [{ "word": "string", "partOfSpeech": "string" }]
-  }],
-  "idiomsAndPhrases": [{ "phrase": "string", "meaningVi": "string" }],
-  "grammar": {
-    "pattern": "string",
-    "explanation": "string",
-    "ruleSummary": "string",
-    "whyUsedVi": "string",
-    "mechanicVi": "string"
-  },
-  "mentalModelSteps": ["string (2-4 left-to-right reading steps)"]
-}
-No markdown backticks, no explanations outside JSON.`;
-
-      const userContent = `Paragraph context: """${contextParagraph}"""\n\nSentence to analyze: """${sentence}"""`;
+      // Xây dựng User Prompt với XML Tags
+      let userContent: string;
+      if (contextOrWindow.includes("<target_sentence>")) {
+        userContent = contextOrWindow;
+        // Nếu đã có XML nhưng chưa có client_hints và caller truyền detectedPhrases:
+        if (
+          !userContent.includes("<client_hints>") &&
+          detectedPhrases &&
+          detectedPhrases.length > 0
+        ) {
+          const phraseNames = detectedPhrases
+            .map((p) => (typeof p === "string" ? p.trim() : p.cleanPhrase || p.phraseText || ""))
+            .filter(Boolean);
+          if (phraseNames.length > 0) {
+            userContent += `\n<client_hints>\nDetected phrases: ${phraseNames.join(", ")}\n</client_hints>`;
+          }
+        }
+      } else {
+        const phraseNames = (detectedPhrases || [])
+          .map((p) => (typeof p === "string" ? p.trim() : p.cleanPhrase || p.phraseText || ""))
+          .filter(Boolean);
+        const hintsTag =
+          phraseNames.length > 0
+            ? `\n<client_hints>\nDetected phrases: ${phraseNames.join(", ")}\n</client_hints>`
+            : "\n<client_hints></client_hints>";
+        userContent = `<context_before>\n${contextOrWindow}\n</context_before>\n<target_sentence>\n${sentence}\n</target_sentence>\n<context_after></context_after>${hintsTag}`;
+      }
 
       const requestBody: Record<string, unknown> = {
         model: config.model,
         temperature: config.temperature ?? 0.1,
         stream: false,
         messages: [
-          { role: "system", content: systemPrompt },
+          { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: userContent },
         ],
-        response_format: { type: "json_object" },
+        response_format: {
+          type: "json_schema",
+          json_schema: SENTENCE_BREAKDOWN_JSON_SCHEMA,
+        },
       };
 
       let res = await fetch(endpoint, {
@@ -352,16 +502,30 @@ No markdown backticks, no explanations outside JSON.`;
         signal: AbortSignal.timeout(30000), // Timeout 30s
       });
 
-      // Nếu proxy/endpoint trả về lỗi 400 (ví dụ 9Router hoặc Gemini không hỗ trợ response_format), thử lại không kèm response_format
+      // Fallback 1: Nếu endpoint trả về 400 (không hỗ trợ json_schema), thử lại với type: "json_object"
       if (!res.ok && res.status === 400 && requestBody.response_format) {
-        const retryBody = { ...requestBody };
-        delete retryBody.response_format;
+        const retryBody = {
+          ...requestBody,
+          response_format: { type: "json_object" },
+        };
         res = await fetch(endpoint, {
           method: "POST",
           headers,
           body: JSON.stringify(retryBody),
           signal: AbortSignal.timeout(30000),
         });
+
+        // Fallback 2: Nếu proxy vẫn 400, bỏ hoàn toàn response_format
+        if (!res.ok && res.status === 400) {
+          const fallbackBody: Record<string, unknown> = { ...requestBody };
+          delete fallbackBody.response_format;
+          res = await fetch(endpoint, {
+            method: "POST",
+            headers,
+            body: JSON.stringify(fallbackBody),
+            signal: AbortSignal.timeout(30000),
+          });
+        }
       }
 
       if (!res.ok) {
@@ -377,6 +541,7 @@ No markdown backticks, no explanations outside JSON.`;
       let rawContent = "";
       const trimmed = responseText.trim();
 
+      // Xử lý cả response stream SSE lẫn JSON trực tiếp
       if (trimmed.startsWith("data:") || trimmed.includes("\ndata:")) {
         const lines = trimmed.split("\n");
         for (const line of lines) {
@@ -392,7 +557,7 @@ No markdown backticks, no explanations outside JSON.`;
               "";
             rawContent += delta;
           } catch {
-            // ignore chunk
+            // bỏ qua chunk lỗi
           }
         }
       } else {
@@ -412,133 +577,14 @@ No markdown backticks, no explanations outside JSON.`;
         throw new Error("Không nhận được nội dung phân tích từ AI.");
       }
 
-      let cleanJson = rawContent
-        .replace(/^```(?:json)?\s*/i, "")
-        .replace(/\s*```$/i, "")
-        .trim();
-
-      const firstBrace = cleanJson.indexOf("{");
-      const lastBrace = cleanJson.lastIndexOf("}");
-      if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
-        cleanJson = cleanJson.slice(firstBrace, lastBrace + 1);
-      }
-
-      let parsed: SentenceBreakdownResponse;
-      try {
-        parsed = JSON.parse(cleanJson);
-      } catch {
-        throw new Error(`AI không trả về JSON hợp lệ: ${cleanJson.slice(0, 150)}...`);
-      }
-
-      if (!parsed.sentence) parsed.sentence = sentence;
-      if (!parsed.translationVi) parsed.translationVi = "";
-      if (!parsed.coreIdeaVi) parsed.coreIdeaVi = "";
-      if (!parsed.complexity) parsed.complexity = "simple";
-      if (!parsed.simplifiedEnglish) parsed.simplifiedEnglish = "";
-
-      // Skeleton fallback & tự động bù đắp roleVi cho từng part nếu thiếu
-      if (!parsed.skeleton || typeof parsed.skeleton !== "object") {
-        parsed.skeleton = { pattern: "S + V + O", parts: [] };
-      } else {
-        if (!parsed.skeleton.pattern) parsed.skeleton.pattern = "S + V";
-        if (!Array.isArray(parsed.skeleton.parts)) {
-          parsed.skeleton.parts = [];
-        } else {
-          parsed.skeleton.parts = parsed.skeleton.parts.map((p) => {
-            const rawType = (p.type || "S").toUpperCase() as "S" | "V" | "O" | "C" | "A";
-            const validTypes: Array<"S" | "V" | "O" | "C" | "A"> = ["S", "V", "O", "C", "A"];
-            const type = validTypes.includes(rawType) ? rawType : "S";
-            return {
-              type,
-              text: p.text || "",
-              roleVi: p.roleVi || ROLE_MAP[type] || "Thành phần câu",
-            };
-          });
-        }
-      }
-
-      // Semantic chunks fallback
-      if (!Array.isArray(parsed.chunks)) {
-        parsed.chunks = [];
-      } else {
-        parsed.chunks = parsed.chunks.map((c) => ({
-          chunkText: c.chunkText || "",
-          meaningVi: c.meaningVi || "",
-          type: c.type || "noun_phrase",
-        }));
-      }
-
-      // Grammar fallback
-      if (!parsed.grammar || typeof parsed.grammar !== "object") {
-        parsed.grammar = {
-          pattern: "Standard Structure",
-          explanation: "Cấu trúc câu tiêu chuẩn",
-          ruleSummary: "",
-          whyUsedVi: "",
-          mechanicVi: "",
-          clauses: [],
-        };
-      }
-      if (!parsed.grammar.pattern) parsed.grammar.pattern = "Standard Structure";
-      if (!parsed.grammar.explanation) parsed.grammar.explanation = "Cấu trúc câu tiêu chuẩn";
-      if (!parsed.grammar.whyUsedVi) parsed.grammar.whyUsedVi = "";
-      if (!parsed.grammar.mechanicVi) parsed.grammar.mechanicVi = "";
-      if (!parsed.grammar.ruleSummary) parsed.grammar.ruleSummary = "";
-
-      // Tự động ánh xạ clauses: Nếu LLM trả về parsed.clauses ở root level hoặc parsed.grammar.clauses, đảm bảo gán đúng vào parsed.grammar.clauses
-      const rootClauses = parsed.clauses;
-      const rawClauses =
-        Array.isArray(rootClauses) && rootClauses.length > 0
-          ? rootClauses
-          : Array.isArray(parsed.grammar.clauses)
-            ? parsed.grammar.clauses
-            : [];
-
-      parsed.grammar.clauses = rawClauses.map((c) => ({
-        clauseText: c.clauseText || "",
-        role: c.role || "Main Clause",
-        subject: c.subject || "",
-        verb: c.verb || "",
-        objectOrComplement: c.objectOrComplement || "",
-      }));
-      parsed.clauses = parsed.grammar.clauses;
-
-      // Vocabulary fallback (preserve full array, safe fallback for items)
-      if (!Array.isArray(parsed.vocabulary)) {
-        parsed.vocabulary = [];
-      } else {
-        parsed.vocabulary = parsed.vocabulary.map((v) => ({
-          ...v,
-          term: v.term || "",
-          ipa: v.ipa || "",
-          partOfSpeech: v.partOfSpeech || "",
-          contextMeaningVi: v.contextMeaningVi || "",
-          isTechnicalTerm: Boolean(v.isTechnicalTerm),
-          wordFamily: Array.isArray(v.wordFamily)
-            ? v.wordFamily.map((wf) => ({
-                word: wf.word || "",
-                partOfSpeech: wf.partOfSpeech || "",
-              }))
-            : [],
-        }));
-      }
-
-      // Idioms fallback
-      if (!Array.isArray(parsed.idiomsAndPhrases)) parsed.idiomsAndPhrases = [];
-
-      // Mental model steps fallback
-      if (!Array.isArray(parsed.mentalModelSteps)) {
-        parsed.mentalModelSteps = [];
-      } else {
-        parsed.mentalModelSteps = parsed.mentalModelSteps
-          .map((s) => (typeof s === "string" ? s.trim() : ""))
-          .filter(Boolean);
-      }
+      // Safe parse + repair JSON bị cắt cụt + client-side enrichment
+      const parsed = safeParseSentenceBreakdown(rawContent, sentence);
+      const enriched = enrichSentenceBreakdown(parsed);
 
       // Lưu vào cache L1 & L2
-      setCachedAnalysis(sentence, parsed);
+      setCachedAnalysis(sentence, enriched);
 
-      return parsed;
+      return enriched;
     } finally {
       inFlightAnalysis.delete(hash);
     }

@@ -27,9 +27,11 @@ import { AIConfigModal } from "@/components/reading/ai-config-modal";
 import { DocumentTocSidebar } from "@/components/reading/document-toc-sidebar";
 import { ChunkPaginationBar } from "@/components/reading/chunk-pagination-bar";
 import { segmentText } from "@/lib/reading/text-segmenter";
-import { prefetchDocumentWords } from "@/lib/reading/dictionary-cache";
+import { prefetchDocumentWords, seedOfflineLexicon } from "@/lib/reading/dictionary-cache";
 import { detectPhrasesInSentence } from "@/lib/reading/phrase-matcher";
 import { extractStructuredText } from "@/lib/reading/extractors";
+import { buildSlidingWindowContext } from "@/lib/reading/context-window";
+import { SpeculativePrefetchQueue } from "@/lib/reading/prefetch-queue";
 import {
   getAllDocumentsMeta,
   getDocumentChunk,
@@ -98,8 +100,21 @@ export default function ReadingPage() {
   const [isDocumentSaved, setIsDocumentSaved] = useState<boolean>(true);
   const [analyzedSentencesCount, setAnalyzedSentencesCount] = useState<number>(0);
 
-  // Tải tài liệu đã lưu từ IndexedDB khi khởi động
+  // Khởi tạo Speculative Prefetch Queue đón đầu câu N+1, N+2
+  const [prefetchQueue] = useState(
+    () =>
+      new SpeculativePrefetchQueue({
+        debounceMs: 1200,
+        maxLookahead: 2,
+        onSentencePrefetched: () => {
+          setAnalyzedSentencesCount((prev) => prev + 1);
+        },
+      })
+  );
+
+  // Tải tài liệu đã lưu từ IndexedDB và nạp Offline Lexicon khi khởi động
   useEffect(() => {
+    seedOfflineLexicon();
     let mounted = true;
 
     async function initStorage() {
@@ -229,12 +244,6 @@ export default function ReadingPage() {
       setSelectedSentenceId(sentence.id);
       setAnalysisError(null);
 
-      // Tìm ngữ cảnh paragraph của câu
-      const para = parsedData.paragraphs.find((p) => p.index === sentence.paragraphIndex);
-      const paraContext = para
-        ? para.sentences.map((s) => s.text).join(" ")
-        : sentence.text;
-
       // 1. Kiểm tra cache đã có kết quả hoàn chỉnh chưa
       const cached = getCachedAnalysis(sentence.text);
       if (cached && (cached.grammar?.clauses?.length > 0 || cached.simplifiedEnglish)) {
@@ -276,7 +285,21 @@ export default function ReadingPage() {
 
       // 3. Chạy AI phân tích chuyên sâu (ngữ pháp, mệnh đề S-V-O, từ vựng) ở background
       try {
-        const fullResult = await analyzeSentence(sentence.text, paraContext, aiConfig);
+        const allSentences = parsedData.paragraphs.flatMap((p) => p.sentences);
+        const currentIndex = allSentences.findIndex((s) => s.id === sentence.id);
+        const detected = detectPhrasesInSentence(sentence.text, sentence.tokens);
+        const slidingContext = buildSlidingWindowContext(
+          allSentences,
+          currentIndex !== -1 ? currentIndex : 0,
+          detected.phrases
+        );
+
+        const fullResult = await analyzeSentence(
+          sentence.text,
+          slidingContext,
+          aiConfig,
+          detected.phrases
+        );
         setAnalysisData((current) => {
           if (!current || current.sentence === sentence.text) {
             return fullResult;
@@ -323,46 +346,25 @@ export default function ReadingPage() {
     }
   }, [parsedData, selectedSentenceId, handleAnalyzeSentence]);
 
-  // Speculative Prefetching: Tự động phân tích đón đầu câu N+1 khi người dùng dừng đọc ở câu N
+  // Speculative Prefetching Queue: Tự động phân tích đón đầu các câu N+1, N+2 khi người dùng đọc câu N
   useEffect(() => {
     if (!activeSentence?.id || !parsedData) return;
 
     const allSentences = parsedData.paragraphs.flatMap((p) => p.sentences);
     const currentIndex = allSentences.findIndex((s) => s.id === activeSentence.id);
-    if (currentIndex === -1 || currentIndex >= allSentences.length - 1) return;
+    if (currentIndex === -1) return;
 
-    const nextSentence = allSentences[currentIndex + 1];
-    if (!nextSentence) return;
-
-    // Nếu câu kế tiếp đã được phân tích thì bỏ qua
-    const isCached = hasCachedAnalysis(nextSentence.text);
-    if (isCached) return;
-
-    // Chờ 1.5s idle (người dùng đang đọc câu hiện tại) rồi kích hoạt phân tích đón đầu câu N+1
-    const timer = setTimeout(() => {
-      const nextPara = parsedData.paragraphs.find(
-        (p) => p.index === nextSentence.paragraphIndex
-      );
-      const nextParaContext = nextPara
-        ? nextPara.sentences.map((s) => s.text).join(" ")
-        : nextSentence.text;
-
-      analyzeSentence(nextSentence.text, nextParaContext, aiConfig)
-        .then((prefetchResult) => {
-          if (documentMeta?.id && prefetchResult) {
-            saveSentenceAnalysis(documentMeta.id, nextSentence.text, prefetchResult).catch(() => {});
-            setAnalyzedSentencesCount((prev) => prev + 1);
-          }
-        })
-        .catch(() => {
-          // Bỏ qua lỗi ngầm
-        });
-    }, 1500);
+    prefetchQueue.enqueue(
+      allSentences,
+      currentIndex,
+      aiConfig,
+      documentMeta?.id
+    );
 
     return () => {
-      clearTimeout(timer);
+      prefetchQueue.cancel();
     };
-  }, [activeSentence?.id, parsedData, aiConfig, documentMeta?.id]);
+  }, [activeSentence?.id, parsedData, aiConfig, documentMeta?.id, prefetchQueue]);
 
   // Tính toán số câu và phần trăm tiến độ đọc của Chunk hiện tại
   const allChunkSentences = useMemo(
@@ -418,13 +420,16 @@ export default function ReadingPage() {
         continue;
       }
 
-      const para = parsedData.paragraphs.find((p) => p.index === s.paragraphIndex);
-      const paraContext = para
-        ? para.sentences.map((sent) => sent.text).join(" ")
-        : s.text;
+      const sIndex = allChunkSentences.findIndex((item) => item.id === s.id);
+      const sDetected = detectPhrasesInSentence(s.text, s.tokens);
+      const sContextWindow = buildSlidingWindowContext(
+        allChunkSentences,
+        sIndex !== -1 ? sIndex : 0,
+        sDetected.phrases
+      );
 
       try {
-        const result = await analyzeSentence(s.text, paraContext, aiConfig);
+        const result = await analyzeSentence(s.text, sContextWindow, aiConfig, sDetected.phrases);
         if (abortPreanalyzeRef.current) break;
 
         if (documentMeta?.id && result) {
@@ -450,7 +455,7 @@ export default function ReadingPage() {
     }
 
     setIsPreanalyzingChunk(false);
-  }, [isPreanalyzingChunk, documentMeta, allChunkSentences, parsedData, aiConfig, activeSentence, showToast]);
+  }, [isPreanalyzingChunk, documentMeta, allChunkSentences, aiConfig, activeSentence, showToast]);
 
   const handleStopPreanalyzeChunk = useCallback(() => {
     abortPreanalyzeRef.current = true;
