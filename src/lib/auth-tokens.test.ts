@@ -6,6 +6,7 @@ import {
   createAccessToken,
   createRefreshToken,
   hashRefreshToken,
+  refreshCookieOptions,
   verifyAccessToken,
 } from "./auth-tokens";
 import { REFRESH_GRACE_PERIOD_MS } from "./auth-sessions";
@@ -44,5 +45,12 @@ test("refresh tokens are unique and stored only as stable hashes", async () => {
   assert.notEqual(first, second);
   assert.equal((await hashRefreshToken(first)).length, 64);
   assert.equal(await hashRefreshToken(first), await hashRefreshToken(first));
-  assert.equal(REFRESH_GRACE_PERIOD_MS, 30_000);
+  assert.equal(REFRESH_GRACE_PERIOD_MS, 120_000);
+});
+
+test("refresh cookie options uses lax sameSite and httpOnly", () => {
+  const options = refreshCookieOptions();
+  assert.equal(options.httpOnly, true);
+  assert.equal(options.sameSite, "lax");
+  assert.equal(options.path, "/");
 });

@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { ArrowRight, Lock, Mail, Sprout } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -11,7 +10,6 @@ import { useAuth } from "@/components/auth-provider";
 import { Input } from "@/components/ui/input";
 
 export default function LoginPage() {
-  const router = useRouter();
   const { setSession } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -43,8 +41,8 @@ export default function LoginPage() {
 
       setSession(data);
       const next = new URLSearchParams(window.location.search).get("next");
-      router.push(next?.startsWith("/") && !next.startsWith("//") ? next : "/");
-      router.refresh();
+      const target = next?.startsWith("/") && !next.startsWith("//") ? next : "/";
+      window.location.assign(target);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Đã có lỗi xảy ra.");
     } finally {

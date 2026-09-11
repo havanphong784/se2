@@ -66,7 +66,7 @@ export function refreshCookieOptions(maxAge = REFRESH_TOKEN_TTL_SECONDS) {
   return {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "strict" as const,
+    sameSite: "lax" as const,
     maxAge,
     path: "/",
   };

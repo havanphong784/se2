@@ -15,7 +15,7 @@ export type RefreshSession = {
   expiresAt: Date;
 };
 
-export const REFRESH_GRACE_PERIOD_MS = 30_000;
+export const REFRESH_GRACE_PERIOD_MS = 120_000;
 
 export async function createRefreshSession(db: Db, userId: string): Promise<RefreshSession> {
   const token = createRefreshToken();
