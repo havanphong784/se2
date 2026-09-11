@@ -430,4 +430,157 @@ Organizations must adapt to cognitive automation.`;
       assert.equal(keepResult?.sentence, keepSentence);
     });
   });
+
+  describe("Layout & Geometry-Aware PDF Extraction", () => {
+    it("trích xuất đúng tọa độ và cỡ chữ từ transform matrix của PDF.js", async () => {
+      const { extractGeometryItemsFromPage } = await import("./extractors");
+
+      const rawItems = [
+        {
+          str: "Title Heading",
+          transform: [18, 0, 0, 18, 50, 750], // font 18, x=50, baseline y=750
+          width: 150,
+          height: 18,
+        },
+        {
+          str: "Body paragraph text.",
+          transform: [12, 0, 0, 12, 50, 700], // font 12, x=50, baseline y=700
+          width: 200,
+          height: 12,
+        },
+      ];
+
+      const pageHeight = 800;
+      const items = extractGeometryItemsFromPage(rawItems, pageHeight);
+
+      assert.equal(items.length, 2);
+      assert.equal(items[0].fontSize, 18);
+      assert.equal(items[0].x, 50);
+      assert.equal(items[0].y, 800 - 750 - 18); // top-down y = 32
+      assert.equal(items[1].fontSize, 12);
+      assert.equal(items[1].y, 800 - 700 - 12); // top-down y = 88
+    });
+
+    it("lọc bỏ running header, footer và số trang ở mép trang", async () => {
+      const { filterHeadersAndFooters } = await import("./extractors");
+
+      const page1 = [
+        { str: "Chapter 1: Foundations", x: 50, y: 20, width: 150, height: 10, fontSize: 10 }, // header (y=20 < 45)
+        { str: "Content of page 1.", x: 50, y: 150, width: 200, height: 12, fontSize: 12 },
+        { str: "- 1 -", x: 250, y: 760, width: 30, height: 10, fontSize: 10 }, // page number (y=760 > 736)
+      ];
+
+      const page2 = [
+        { str: "Chapter 1: Foundations", x: 50, y: 20, width: 150, height: 10, fontSize: 10 }, // recurring header
+        { str: "Content of page 2.", x: 50, y: 150, width: 200, height: 12, fontSize: 12 },
+        { str: "Page 2", x: 250, y: 760, width: 40, height: 10, fontSize: 10 }, // page number
+      ];
+
+      const filtered = filterHeadersAndFooters([page1, page2], 800);
+
+      assert.equal(filtered[0].length, 1);
+      assert.equal(filtered[0][0].str, "Content of page 1.");
+
+      assert.equal(filtered[1].length, 1);
+      assert.equal(filtered[1][0].str, "Content of page 2.");
+    });
+
+    it("sắp xếp thứ tự đọc chính xác cho bố cục 2 cột (XY-Cut column sorting)", async () => {
+      const { sortItemsIntoReadingOrder } = await import("./extractors");
+
+      // Cột 1: x in [50..220], Cột 2: x in [280..450] (Rãnh gutter x=220..280)
+      const twoColumnItems = [
+        { str: "Col1 Line 1", x: 50, y: 100, width: 150, height: 12, fontSize: 12 },
+        { str: "Col2 Line 1", x: 280, y: 100, width: 150, height: 12, fontSize: 12 },
+        { str: "Col1 Line 2", x: 50, y: 130, width: 150, height: 12, fontSize: 12 },
+        { str: "Col2 Line 2", x: 280, y: 130, width: 150, height: 12, fontSize: 12 },
+      ];
+
+      const sorted = sortItemsIntoReadingOrder(twoColumnItems, 500);
+      const texts = sorted.map((i) => i.str);
+
+      // Phải đọc hết Cột 1 rồi mới sang Cột 2
+      assert.deepEqual(texts, [
+        "Col1 Line 1",
+        "Col1 Line 2",
+        "Col2 Line 1",
+        "Col2 Line 2",
+      ]);
+    });
+
+    it("bảo toàn tiêu đề toàn trang (full-width header) nằm trên bố cục 2 cột", async () => {
+      const { sortItemsIntoReadingOrder } = await import("./extractors");
+
+      const itemsWithTitle = [
+        { str: "Main Article Title", x: 50, y: 40, width: 380, height: 20, fontSize: 20 }, // full width
+        { str: "Left paragraph line 1", x: 50, y: 100, width: 150, height: 12, fontSize: 12 },
+        { str: "Right paragraph line 1", x: 280, y: 100, width: 150, height: 12, fontSize: 12 },
+        { str: "Left paragraph line 2", x: 50, y: 120, width: 150, height: 12, fontSize: 12 },
+      ];
+
+      const sorted = sortItemsIntoReadingOrder(itemsWithTitle, 500);
+      const texts = sorted.map((i) => i.str);
+
+      assert.equal(texts[0], "Main Article Title");
+      assert.equal(texts[1], "Left paragraph line 1");
+      assert.equal(texts[2], "Left paragraph line 2");
+      assert.equal(texts[3], "Right paragraph line 1");
+    });
+
+    it("khử ngắt từ có dấu gạch nối cuối dòng (dehyphenateText)", async () => {
+      const { dehyphenateText } = await import("./extractors");
+
+      const input = "The algo-\nrithm improves perfor-\nmance significantly.";
+      const result = dehyphenateText(input);
+
+      assert.equal(result, "The algorithm improves performance significantly.");
+    });
+
+    it("tính đúng dominant font size và phân loại cấp độ heading", async () => {
+      const { computeDominantFontSize, classifyTypography } = await import("./extractors");
+
+      const pageItems = [
+        { str: "Big Chapter Title", x: 50, y: 50, width: 200, height: 24, fontSize: 24 }, // 17 chars
+        { str: "Section Header", x: 50, y: 100, width: 150, height: 16, fontSize: 16 }, // 14 chars
+        { str: "This is a long body paragraph text that constitutes the majority of document words.", x: 50, y: 150, width: 400, height: 12, fontSize: 12 }, // 84 chars
+        { str: "Another line of body text.", x: 50, y: 170, width: 200, height: 12, fontSize: 12 }, // 26 chars
+      ];
+
+      const dominant = computeDominantFontSize(pageItems);
+      assert.equal(dominant, 12, "Cỡ chữ chủ đạo phải là 12pt");
+
+      const h1 = classifyTypography(24, dominant, "Big Chapter Title");
+      assert.equal(h1.isHeading, true);
+      assert.equal(h1.headingLevel, 1);
+
+      const h2 = classifyTypography(16, dominant, "Section Header");
+      assert.equal(h2.isHeading, true);
+      assert.equal(h2.headingLevel, 2);
+
+      const body = classifyTypography(12, dominant, "This is regular body text.");
+      assert.equal(body.isHeading, false);
+    });
+
+    it("tổng hợp dòng thành khối văn bản và đề mục hoàn chỉnh (assemblePageText)", async () => {
+      const { assemblePageText } = await import("./extractors");
+
+      const sortedItems = [
+        { str: "CHAPTER 1", x: 50, y: 40, width: 100, height: 18, fontSize: 18 },
+        { str: "First line of text with inter-", x: 50, y: 80, width: 200, height: 12, fontSize: 12 },
+        { str: "national collaboration.", x: 50, y: 95, width: 180, height: 12, fontSize: 12 },
+        { str: "Second paragraph starts here.", x: 50, y: 130, width: 220, height: 12, fontSize: 12 }, // gap Y lớn -> paragraph mới
+      ];
+
+      const dominant = 12;
+      const { pageText, headings } = assemblePageText(sortedItems, dominant);
+
+      assert.equal(headings.length, 1);
+      assert.equal(headings[0].title, "CHAPTER 1");
+      assert.equal(headings[0].level, 1);
+
+      assert.ok(pageText.includes("# CHAPTER 1"));
+      assert.ok(pageText.includes("First line of text with international collaboration."));
+      assert.ok(pageText.includes("Second paragraph starts here."));
+    });
+  });
 });

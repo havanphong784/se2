@@ -16,7 +16,6 @@ import {
   Shrink,
   Sparkles,
   Zap,
-  Square,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -151,13 +150,11 @@ export default function ReadingPage() {
 
   // Nạp trước (preload) toàn bộ kết quả phân tích câu đã lưu vào L1 RAM cache khi tải/đổi tài liệu
   useEffect(() => {
-    if (!documentMeta?.id) {
-      setAnalyzedSentencesCount(0);
-      return;
-    }
+    const docId = documentMeta?.id;
+    if (!docId) return;
 
     let isSubscribed = true;
-    getAllAnalysesForDocument(documentMeta.id)
+    getAllAnalysesForDocument(docId)
       .then((analyses) => {
         if (!isSubscribed) return;
         primeSentenceAnalysisCache(analyses);
@@ -311,7 +308,7 @@ export default function ReadingPage() {
         setIsEnriching(false);
       }
     },
-    [aiConfig, parsedData, documentMeta?.id]
+    [aiConfig, parsedData, documentMeta]
   );
 
   // Tự động phân tích câu đầu tiên khi mở bài đọc hoặc đổi chunk nếu chưa có câu nào được chọn
@@ -376,7 +373,7 @@ export default function ReadingPage() {
   // Tính toán tiến độ AI của Chunk hiện tại
   const chunkAnalyzedCount = useMemo(() => {
     return allChunkSentences.filter((s) => hasCachedAnalysis(s.text)).length;
-  }, [allChunkSentences, analyzedSentencesCount]);
+  }, [allChunkSentences]);
 
   const chunkAnalyzedPercent = useMemo(() => {
     if (allChunkSentences.length === 0) return 0;
@@ -453,7 +450,7 @@ export default function ReadingPage() {
     }
 
     setIsPreanalyzingChunk(false);
-  }, [isPreanalyzingChunk, documentMeta?.id, allChunkSentences, parsedData, aiConfig, activeSentence?.id, showToast]);
+  }, [isPreanalyzingChunk, documentMeta, allChunkSentences, parsedData, aiConfig, activeSentence, showToast]);
 
   const handleStopPreanalyzeChunk = useCallback(() => {
     abortPreanalyzeRef.current = true;
@@ -484,7 +481,7 @@ export default function ReadingPage() {
       console.warn("Could not clear document analyses:", err);
       showToast("Không thể xóa cache phân tích!");
     }
-  }, [documentMeta?.id, showToast]);
+  }, [documentMeta, showToast]);
 
   const currentSentenceIdx = useMemo(() => {
     if (!activeSentence?.id) return 0;

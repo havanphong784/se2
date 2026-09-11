@@ -1,5 +1,4 @@
 import type {
-  ClauseBreakdown,
   ClientAIConfig,
   SentenceBreakdownResponse,
 } from "@/types/reading";
