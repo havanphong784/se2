@@ -39,16 +39,20 @@ export async function POST(request: Request) {
       displayName: cleanName,
       passwordHash: await hashPassword(password),
     }).returning({ id: users.id });
-    const token = await createVerificationToken(db, user.id);
+    const { token, otpCode } = await createVerificationToken(db, user.id);
 
     try {
-      await sendVerificationEmail(cleanEmail, token);
+      await sendVerificationEmail(cleanEmail, { token, otpCode });
     } catch (error) {
       await db.delete(users).where(eq(users.id, user.id));
       throw error;
     }
 
-    return NextResponse.json({ success: true, message: "Đăng ký thành công. Vui lòng kiểm tra email để kích hoạt tài khoản." }, { status: 201, headers: noStoreHeaders });
+    return NextResponse.json({
+      success: true,
+      email: cleanEmail,
+      message: "Đăng ký thành công. Vui lòng kiểm tra email để nhận mã OTP hoặc kích hoạt tài khoản.",
+    }, { status: 201, headers: noStoreHeaders });
   } catch (error) {
     if (error && typeof error === "object" && "code" in error && error.code === "23505") {
       return NextResponse.json({ error: "Email này đã được sử dụng." }, { status: 400, headers: noStoreHeaders });

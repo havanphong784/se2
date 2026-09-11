@@ -41,6 +41,7 @@ export const emailVerificationTokens = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     tokenHash: text("token_hash").notNull(),
+    otpHash: text("otp_hash"),
     expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
     consumedAt: timestamp("consumed_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
@@ -48,6 +49,7 @@ export const emailVerificationTokens = pgTable(
   (table) => [
     unique("email_verification_tokens_token_hash_unique").on(table.tokenHash),
     index("email_verification_tokens_user_id_idx").on(table.userId),
+    index("email_verification_tokens_user_otp_idx").on(table.userId, table.otpHash),
     index("email_verification_tokens_expires_at_idx").on(table.expiresAt),
   ],
 ).enableRLS();

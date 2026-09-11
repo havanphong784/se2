@@ -32,7 +32,8 @@ export async function POST(request: Request) {
   if (!user) return response();
 
   try {
-    await sendVerificationEmail(user.email, await createVerificationToken(db, user.id));
+    const { token, otpCode } = await createVerificationToken(db, user.id);
+    await sendVerificationEmail(user.email, { token, otpCode });
   } catch (error) {
     console.error("Verification resend error:", error);
   }
