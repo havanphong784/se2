@@ -343,7 +343,10 @@ export function SentenceBreakdownCard({
   const vocabCount = data.vocabulary?.length || 0;
   const idiomsCount = data.idiomsAndPhrases?.length || 0;
   const skeletonParts = data.skeleton?.parts || [];
-  const clauses = data.grammar?.clauses || [];
+  const clauses =
+    (data.clauses && data.clauses.length > 0)
+      ? data.clauses
+      : data.grammar?.clauses || [];
   const chunks = data.chunks || [];
   const mentalModelSteps = data.mentalModelSteps || [];
   const complexityConfig = data.complexity ? COMPLEXITY_CONFIG[data.complexity] : null;

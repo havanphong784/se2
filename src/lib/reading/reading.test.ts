@@ -220,6 +220,186 @@ The software runs on top of it.`;
       assert.equal(cached?.vocabulary[0].wordFamily?.[0].word, "horizontal");
       assert.equal(cached?.mentalModelSteps?.length, 3);
     });
+
+    it("isCompleteSentenceAnalysis từ chối createInstantSentenceDraft (trả về false)", async () => {
+      const { createInstantSentenceDraft, isCompleteSentenceAnalysis } = await import("@/lib/ai/local-ai-client");
+      const draft = createInstantSentenceDraft("The technology sector is growing fast.", "Ngành công nghệ đang phát triển nhanh chóng.");
+      assert.equal(isCompleteSentenceAnalysis(draft), false);
+      assert.equal(isCompleteSentenceAnalysis(null), false);
+      assert.equal(isCompleteSentenceAnalysis(undefined), false);
+    });
+
+    it("isCompleteSentenceAnalysis chấp nhận kết quả phân tích AI hoàn chỉnh (trả về true)", async () => {
+      const { isCompleteSentenceAnalysis } = await import("@/lib/ai/local-ai-client");
+      const completeAnalysis = {
+        sentence: "The quick brown fox jumps over the lazy dog.",
+        translationVi: "Con cáo nâu nhanh nhẹn nhảy qua con chó lười.",
+        coreIdeaVi: "Hành động con cáo nhảy qua con chó.",
+        skeleton: {
+          pattern: "S + V + A",
+          parts: [
+            { type: "S" as const, text: "The quick brown fox", roleVi: "Chủ ngữ" },
+            { type: "V" as const, text: "jumps", roleVi: "Động từ" },
+            { type: "A" as const, text: "over the lazy dog", roleVi: "Trạng ngữ" },
+          ],
+        },
+        clauses: [
+          {
+            clauseText: "The quick brown fox jumps over the lazy dog",
+            role: "Main Clause",
+            subject: "The quick brown fox",
+            verb: "jumps",
+            objectOrComplement: "over the lazy dog",
+          },
+        ],
+        grammar: {
+          pattern: "S + V + A",
+          explanation: "Câu đơn",
+          ruleSummary: "",
+          whyUsedVi: "",
+          mechanicVi: "",
+          clauses: [
+            {
+              clauseText: "The quick brown fox jumps over the lazy dog",
+              role: "Main Clause",
+              subject: "The quick brown fox",
+              verb: "jumps",
+              objectOrComplement: "over the lazy dog",
+            },
+          ],
+        },
+        chunks: [],
+        vocabulary: [],
+        idiomsAndPhrases: [],
+      };
+      assert.equal(isCompleteSentenceAnalysis(completeAnalysis), true);
+    });
+
+    it("safeParseSentenceBreakdown gán đúng mệnh đề cho cả result.clauses và result.grammar.clauses", () => {
+      const rawJson = JSON.stringify({
+        sentence: "Although it was raining, they went for a hike.",
+        translationVi: "Dù trời mưa, họ vẫn đi leo núi.",
+        clauses: [
+          {
+            clauseText: "Although it was raining",
+            role: "Adverbial Clause of Concession",
+            subject: "it",
+            verb: "was raining",
+            objectOrComplement: "",
+          },
+          {
+            clauseText: "they went for a hike",
+            role: "Main Clause",
+            subject: "they",
+            verb: "went",
+            objectOrComplement: "for a hike",
+          },
+        ],
+        grammar: {
+          pattern: "Complex Sentence",
+          ruleSummary: "Concession Clause with Although",
+          whyUsedVi: "Thể hiện sự đối lập giữa thời tiết và hành động",
+          mechanicVi: "Mệnh đề trạng ngữ đi trước mệnh đề chính",
+        },
+      });
+
+      const result = safeParseSentenceBreakdown(rawJson, "Although it was raining, they went for a hike.");
+      assert.ok(result.clauses);
+      assert.equal(result.clauses.length, 2);
+      assert.equal(result.clauses[0].clauseText, "Although it was raining");
+      assert.ok(result.grammar.clauses);
+      assert.equal(result.grammar.clauses.length, 2);
+      assert.equal(result.grammar.clauses[0].clauseText, "Although it was raining");
+      assert.deepEqual(result.clauses, result.grammar.clauses);
+    });
+
+    it("analyzeSentence trả về ngay kết quả từ cache L1 mà không gọi network nếu isCompleteSentenceAnalysis(cached) === true", async () => {
+      const { analyzeSentence, setCachedAnalysis } = await import("@/lib/ai/local-ai-client");
+
+      const testSentence = "Cache hit verification sentence.";
+      const cachedData = {
+        sentence: testSentence,
+        translationVi: "Câu kiểm tra nhận diện cache.",
+        coreIdeaVi: "Kiểm tra cache L1 hit không gọi mạng.",
+        skeleton: {
+          pattern: "S + V + O",
+          parts: [{ type: "S" as const, text: "Cache", roleVi: "Chủ ngữ" }],
+        },
+        clauses: [],
+        grammar: {
+          pattern: "Simple",
+          explanation: "Test",
+          ruleSummary: "",
+          whyUsedVi: "",
+          mechanicVi: "",
+          clauses: [],
+        },
+        chunks: [],
+        vocabulary: [],
+        idiomsAndPhrases: [],
+      };
+
+      setCachedAnalysis(testSentence, cachedData);
+
+      // Cấu hình AI với baseUrl không tồn tại để chứng minh nếu gọi network sẽ văng lỗi ngay
+      const dummyConfig = {
+        provider: "local_tunnel" as const,
+        baseUrl: "http://invalid-endpoint-that-would-fail:9999/v1",
+        model: "mock-model",
+        temperature: 0.1,
+      };
+
+      // Nếu analyzeSentence chạm tới network thì sẽ throw do URL không tồn tại
+      const result = await analyzeSentence(testSentence, "Context", dummyConfig);
+      assert.equal(result.sentence, testSentence);
+      assert.equal(result.translationVi, "Câu kiểm tra nhận diện cache.");
+      assert.equal(result.coreIdeaVi, "Kiểm tra cache L1 hit không gọi mạng.");
+    });
+
+    it("hasCachedAnalysis trả về false đối với câu mới hoặc draft, và trả về true khi đã có phân tích hoàn chỉnh", async () => {
+      const {
+        hasCachedAnalysis,
+        setCachedAnalysis,
+        createInstantSentenceDraft,
+        clearSentenceAnalysisCache,
+      } = await import("@/lib/ai/local-ai-client");
+
+      clearSentenceAnalysisCache();
+
+      const newSentence = "Brand new sentence that has never been analyzed.";
+      // 1. Câu hoàn toàn mới
+      assert.equal(hasCachedAnalysis(newSentence), false);
+
+      // 2. Câu chỉ có instant draft trong cache
+      const draft = createInstantSentenceDraft(newSentence, "Bản nháp tạm");
+      setCachedAnalysis(newSentence, draft);
+      assert.equal(hasCachedAnalysis(newSentence), false, "Draft không được coi là đã phân tích");
+
+      // 3. Câu có phân tích hoàn chỉnh
+      const complete = {
+        sentence: newSentence,
+        translationVi: "Bản dịch hoàn chỉnh",
+        coreIdeaVi: "Ý chính hoàn chỉnh",
+        skeleton: {
+          pattern: "S + V",
+          parts: [{ type: "S" as const, text: "Brand new sentence", roleVi: "Chủ ngữ" }],
+        },
+        clauses: [],
+        grammar: {
+          pattern: "S + V",
+          explanation: "Câu hoàn chỉnh",
+          ruleSummary: "",
+          whyUsedVi: "",
+          mechanicVi: "",
+          clauses: [],
+        },
+        chunks: [],
+        vocabulary: [],
+        idiomsAndPhrases: [],
+      };
+      setCachedAnalysis(newSentence, complete);
+      assert.equal(hasCachedAnalysis(newSentence), true, "Phân tích hoàn chỉnh phải trả về true");
+    });
   });
 
   describe("Dictionary Cache", () => {

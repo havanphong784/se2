@@ -1,6 +1,7 @@
 import type {
   ClauseBreakdown,
   ContextualVocab,
+  GrammarBreakdown,
   IdiomPhrase,
   SemanticChunk,
   SentenceBreakdownResponse,
@@ -172,6 +173,15 @@ export function enrichSentenceBreakdown(
   breakdown: SentenceBreakdownResponse
 ): SentenceBreakdownResponse {
   if (!breakdown) return breakdown;
+
+  // Đồng bộ clauses giữa root và grammar để tương thích cả 2 cách truy cập
+  if (breakdown.clauses && breakdown.clauses.length > 0 && (!breakdown.grammar?.clauses || breakdown.grammar.clauses.length === 0)) {
+    if (breakdown.grammar) {
+      breakdown.grammar.clauses = breakdown.clauses;
+    }
+  } else if ((!breakdown.clauses || breakdown.clauses.length === 0) && breakdown.grammar?.clauses && breakdown.grammar.clauses.length > 0) {
+    breakdown.clauses = breakdown.grammar.clauses;
+  }
 
   // 1. Enrich roleVi cho skeleton.parts
   if (breakdown.skeleton?.parts && Array.isArray(breakdown.skeleton.parts)) {
@@ -438,7 +448,7 @@ export function safeParseSentenceBreakdown(
       }
     | undefined;
 
-  const grammar = {
+  const grammar: GrammarBreakdown = {
     pattern:
       typeof grammarObj?.pattern === "string" && grammarObj.pattern.trim()
         ? grammarObj.pattern.trim()

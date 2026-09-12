@@ -285,12 +285,34 @@ export function primeSentenceAnalysisCache(
 }
 
 /**
- * Kiểm tra xem câu đã có trong cache L1 hoặc L2 chưa
+ * Kiểm tra xem một đối tượng phân tích câu có phải là kết quả AI hoàn chỉnh
+ * hay chỉ là bản nháp tạm thời (Instant Draft).
+ */
+export function isCompleteSentenceAnalysis(
+  analysis: SentenceBreakdownResponse | null | undefined
+): boolean {
+  if (!analysis) return false;
+  if (analysis.skeleton?.pattern === "Đang phân tích...") return false;
+  if (analysis.grammar?.pattern === "Đang phân tích cấu trúc...") return false;
+  return Boolean(
+    (analysis.clauses && analysis.clauses.length > 0) ||
+      (analysis.grammar?.clauses && analysis.grammar.clauses.length > 0) ||
+      (analysis.skeleton?.parts && analysis.skeleton.parts.length > 0) ||
+      (analysis.chunks && analysis.chunks.length > 0) ||
+      (analysis.vocabulary && analysis.vocabulary.length > 0) ||
+      analysis.coreIdeaVi ||
+      analysis.grammar?.whyUsedVi ||
+      analysis.grammar?.mechanicVi ||
+      analysis.simplifiedEnglish
+  );
+}
+
+/**
+ * Kiểm tra xem câu đã có phân tích hoàn chỉnh trong cache L1 hoặc L2 chưa
  */
 export function hasCachedAnalysis(sentence: string): boolean {
-  const hash = getSentenceHash(sentence);
-  if (analysisL1Cache.has(hash)) return true;
-  return Boolean(getCachedAnalysis(sentence));
+  const cached = getCachedAnalysis(sentence);
+  return isCompleteSentenceAnalysis(cached);
 }
 
 /**
@@ -427,14 +449,8 @@ export async function analyzeSentence(
 ): Promise<SentenceBreakdownResponse> {
   // 1. Kiểm tra cache trước
   const cached = getCachedAnalysis(sentence);
-  if (
-    cached &&
-    (cached.grammar?.clauses?.length > 0 ||
-      (cached.skeleton?.parts && cached.skeleton.parts.length > 0) ||
-      (cached.chunks && cached.chunks.length > 0) ||
-      cached.simplifiedEnglish)
-  ) {
-    return cached;
+  if (isCompleteSentenceAnalysis(cached)) {
+    return cached!;
   }
 
   // 2. Request Deduplication: Nếu câu này đang được phân tích ở request khác, dùng chung Promise

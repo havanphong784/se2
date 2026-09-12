@@ -43,6 +43,7 @@ import {
   saveVdocPackage,
   buildVdocPackage,
   saveSentenceAnalysis,
+  getSentenceAnalysis,
   getAllAnalysesForDocument,
   deleteAnalysesByDocument,
 } from "@/lib/reading/indexed-storage";
@@ -50,11 +51,13 @@ import {
   getSavedAIConfig,
   analyzeSentence,
   getCachedAnalysis,
+  setCachedAnalysis,
   fetchFastSentenceTranslation,
   createInstantSentenceDraft,
   primeSentenceAnalysisCache,
   hasCachedAnalysis,
   clearSentenceAnalysisCache,
+  isCompleteSentenceAnalysis,
 } from "@/lib/ai/local-ai-client";
 import type {
   SentenceItem,
@@ -244,16 +247,26 @@ export default function ReadingPage() {
       setSelectedSentenceId(sentence.id);
       setAnalysisError(null);
 
-      // 1. Kiểm tra cache đã có kết quả hoàn chỉnh chưa
-      const cached = getCachedAnalysis(sentence.text);
-      if (cached && (cached.grammar?.clauses?.length > 0 || cached.simplifiedEnglish)) {
-        setAnalysisData(cached);
+      // 1. Kiểm tra cache đã có kết quả hoàn chỉnh chưa (L1 RAM -> L2 LocalStorage -> IndexedDB)
+      let cached = getCachedAnalysis(sentence.text);
+      if (!isCompleteSentenceAnalysis(cached) && documentMeta?.id) {
+        try {
+          const idbCached = await getSentenceAnalysis(documentMeta.id, sentence.text);
+          if (isCompleteSentenceAnalysis(idbCached)) {
+            setCachedAnalysis(sentence.text, idbCached!);
+            cached = idbCached;
+          }
+        } catch {}
+      }
+
+      if (isCompleteSentenceAnalysis(cached)) {
+        setAnalysisData(cached!);
         setIsAnalyzing(false);
         setIsEnriching(false);
-        if (cached.vocabulary && cached.vocabulary.length > 0) {
+        if (cached!.vocabulary && cached!.vocabulary.length > 0) {
           setContextVocabMap((prev) => {
             const next = { ...prev };
-            cached.vocabulary.forEach((v) => {
+            cached!.vocabulary.forEach((v) => {
               next[v.term.toLowerCase()] = { meaning: v.contextMeaningVi, ipa: v.ipa };
             });
             return next;
@@ -375,7 +388,7 @@ export default function ReadingPage() {
   // Tính toán tiến độ AI của Chunk hiện tại
   const chunkAnalyzedCount = useMemo(() => {
     return allChunkSentences.filter((s) => hasCachedAnalysis(s.text)).length;
-  }, [allChunkSentences]);
+  }, [allChunkSentences, analyzedSentencesCount]);
 
   const chunkAnalyzedPercent = useMemo(() => {
     if (allChunkSentences.length === 0) return 0;

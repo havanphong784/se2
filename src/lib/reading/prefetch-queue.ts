@@ -1,7 +1,11 @@
 import type { ClientAIConfig, SentenceItem } from "@/types/reading";
 import { buildSlidingWindowContext } from "./context-window";
 import { detectPhrasesInSentence } from "./phrase-matcher";
-import { analyzeSentence, hasCachedAnalysis } from "@/lib/ai/local-ai-client";
+import {
+  analyzeSentence,
+  hasCachedAnalysis,
+  isCompleteSentenceAnalysis,
+} from "@/lib/ai/local-ai-client";
 import { saveSentenceAnalysis } from "./indexed-storage";
 
 export interface PrefetchQueueOptions {
@@ -107,7 +111,7 @@ export class SpeculativePrefetchQueue {
 
           if (signal.aborted) break;
 
-          if (documentId && result) {
+          if (documentId && result && isCompleteSentenceAnalysis(result)) {
             await saveSentenceAnalysis(documentId, sentence.text, result).catch(() => {});
           }
 
