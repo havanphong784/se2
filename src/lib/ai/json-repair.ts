@@ -230,22 +230,13 @@ export function enrichSentenceBreakdown(
 }
 
 /**
- * Bóc tách, repair và validate schema cho SentenceBreakdownResponse,
+ * Bóc tách và validate schema cho một đối tượng SentenceBreakdownResponse đơn lẻ,
  * tự động bù đắp fallback cho mọi trường thiếu để UI không bao giờ bị crash.
  */
-export function safeParseSentenceBreakdown(
-  rawText: string,
+export function parseSingleBreakdownObject(
+  parsed: Record<string, unknown>,
   targetSentence: string = ""
 ): SentenceBreakdownResponse {
-  let parsed: Record<string, unknown> = {};
-
-  try {
-    const repaired = repairTruncatedJson(rawText);
-    parsed = JSON.parse(repaired);
-  } catch {
-    parsed = {};
-  }
-
   if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
     parsed = {};
   }
@@ -602,4 +593,177 @@ export function safeParseSentenceBreakdown(
   };
 
   return enrichSentenceBreakdown(result);
+}
+
+/**
+ * Bóc tách, repair và validate schema cho SentenceBreakdownResponse,
+ * tự động bù đắp fallback cho mọi trường thiếu để UI không bao giờ bị crash.
+ */
+export function safeParseSentenceBreakdown(
+  rawText: string,
+  targetSentence: string = ""
+): SentenceBreakdownResponse {
+  let parsed: Record<string, unknown> = {};
+
+  try {
+    const repaired = repairTruncatedJson(rawText);
+    parsed = JSON.parse(repaired);
+  } catch {
+    parsed = {};
+  }
+
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+    parsed = {};
+  }
+
+  return parseSingleBreakdownObject(parsed, targetSentence);
+}
+
+/**
+ * Bóc tách, repair và validate schema cho danh sách SentenceBreakdownResponse theo đoạn văn (Batching).
+ * Tự động sửa chữa JSON, map đúng câu mục tiêu và fallback an toàn cho từng câu bị thiếu.
+ */
+export function safeParseParagraphBreakdown(
+  rawText: string,
+  targetSentences: string[] = []
+): SentenceBreakdownResponse[] {
+  let parsed: unknown = {};
+
+  try {
+    const repaired = repairTruncatedJson(rawText);
+    parsed = JSON.parse(repaired);
+  } catch {
+    parsed = {};
+  }
+
+  let items: unknown[] = [];
+  if (Array.isArray(parsed)) {
+    items = parsed;
+  } else if (parsed && typeof parsed === "object") {
+    const obj = parsed as Record<string, unknown>;
+    if (Array.isArray(obj.analyses)) {
+      items = obj.analyses;
+    } else if (Array.isArray(obj.sentences)) {
+      items = obj.sentences;
+    } else if (Array.isArray(obj.data)) {
+      items = obj.data;
+    } else if (Array.isArray(obj.results)) {
+      items = obj.results;
+    }
+  }
+
+  // Nếu không chỉ định targetSentences, bóc tách toàn bộ items có được
+  if (!targetSentences || targetSentences.length === 0) {
+    return items.map((item, idx) => {
+      const itemObj =
+        item && typeof item === "object" ? (item as Record<string, unknown>) : {};
+      const sentenceText =
+        typeof itemObj.sentence === "string" ? itemObj.sentence : `Sentence ${idx + 1}`;
+      return enrichSentenceBreakdown(parseSingleBreakdownObject(itemObj, sentenceText));
+    });
+  }
+
+  const normalizeForMatch = (s: string) =>
+    s
+      .toLowerCase()
+      .replace(/[^\p{L}\p{N}]/gu, " ")
+      .trim()
+      .replace(/\s+/g, " ");
+
+  const usedItemIndices = new Set<number>();
+  const results: SentenceBreakdownResponse[] = [];
+
+  for (let tIdx = 0; tIdx < targetSentences.length; tIdx++) {
+    const target = targetSentences[tIdx];
+    const normTarget = normalizeForMatch(target);
+
+    // 1. Tìm item chưa dùng khớp chính xác hoặc tương đối theo thuộc tính sentence
+    let matchedItemIndex = -1;
+
+    for (let i = 0; i < items.length; i++) {
+      if (usedItemIndices.has(i)) continue;
+      const it = items[i];
+      if (it && typeof it === "object") {
+        const itSentence = (it as Record<string, unknown>).sentence;
+        if (typeof itSentence === "string" && itSentence.trim()) {
+          const normIt = normalizeForMatch(itSentence);
+          if (normIt === normTarget) {
+            matchedItemIndex = i;
+            break;
+          }
+          if (
+            normTarget.length > 10 &&
+            normIt.length > 10 &&
+            (normTarget.includes(normIt) || normIt.includes(normTarget))
+          ) {
+            matchedItemIndex = i;
+            break;
+          }
+        }
+      }
+    }
+
+    // 2. Nếu không khớp theo text, thử khớp theo thứ tự index (target[tIdx] <-> items[tIdx])
+    if (matchedItemIndex === -1) {
+      if (tIdx < items.length && !usedItemIndices.has(tIdx)) {
+        const candidate = items[tIdx];
+        if (candidate && typeof candidate === "object") {
+          const candidateSentence = (candidate as Record<string, unknown>).sentence;
+          const isBetterMatchForOther =
+            typeof candidateSentence === "string" &&
+            targetSentences.some(
+              (otherTarget, otherIdx) =>
+                otherIdx !== tIdx &&
+                normalizeForMatch(otherTarget) === normalizeForMatch(candidateSentence)
+            );
+
+          if (!isBetterMatchForOther) {
+            matchedItemIndex = tIdx;
+          }
+        }
+      }
+    }
+
+    // 3. Nếu vẫn chưa tìm thấy, lấy item chưa dùng đầu tiên mà không match tốt hơn cho các câu còn lại
+    if (matchedItemIndex === -1) {
+      for (let i = 0; i < items.length; i++) {
+        if (!usedItemIndices.has(i)) {
+          const candidate = items[i];
+          const candidateSentence =
+            candidate && typeof candidate === "object"
+              ? (candidate as Record<string, unknown>).sentence
+              : undefined;
+          const isMatchForRemaining =
+            typeof candidateSentence === "string" &&
+            targetSentences
+              .slice(tIdx + 1)
+              .some(
+                (remTarget) =>
+                  normalizeForMatch(remTarget) === normalizeForMatch(candidateSentence)
+              );
+
+          if (!isMatchForRemaining) {
+            matchedItemIndex = i;
+            break;
+          }
+        }
+      }
+    }
+
+    if (matchedItemIndex !== -1) {
+      usedItemIndices.add(matchedItemIndex);
+      const rawItemObj =
+        items[matchedItemIndex] && typeof items[matchedItemIndex] === "object"
+          ? (items[matchedItemIndex] as Record<string, unknown>)
+          : {};
+      const parsedObj = parseSingleBreakdownObject(rawItemObj, target);
+      results.push(enrichSentenceBreakdown(parsedObj));
+    } else {
+      // Fallback an toàn nếu model không trả về đủ câu
+      const fallbackObj = parseSingleBreakdownObject({}, target);
+      results.push(enrichSentenceBreakdown(fallbackObj));
+    }
+  }
+
+  return results;
 }

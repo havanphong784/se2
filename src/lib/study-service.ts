@@ -304,10 +304,28 @@ export async function submitStudyEvent(
         ),
       )
       .limit(1);
-    if (!session || session.status === "abandoned") {
-      throw new StudyServiceError("Phiên học không còn hoạt động.", 409);
+    if (!session) {
+      throw new StudyServiceError("Không tìm thấy phiên học.", 404);
     }
     if (session.status === "completed" || !session.phase) return;
+
+    if (session.status === "abandoned") {
+      const reactivateNow = new Date();
+      await tx
+        .update(studySessions)
+        .set({
+          status: "active",
+          abandonedAt: null,
+          lastActivityAt: reactivateNow,
+          updatedAt: reactivateNow,
+        })
+        .where(eq(studySessions.id, session.id));
+      session.status = "active";
+      session.abandonedAt = null;
+      session.lastActivityAt = reactivateNow;
+      session.updatedAt = reactivateNow;
+    }
+
     if (session.phase !== input.phase) {
       const currentOrder = PHASE_ORDER[session.phase] ?? 0;
       const inputOrder = PHASE_ORDER[input.phase] ?? 0;

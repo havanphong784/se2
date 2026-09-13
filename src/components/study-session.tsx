@@ -105,6 +105,7 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
   const [answer, setAnswer] = useState("");
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [pendingWrites, setPendingWrites] = useState<PendingWrite[]>([]);
+  const [isRetrying, setIsRetrying] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [autoSpeakEnabled, setAutoSpeakEnabled] = useState(
@@ -337,27 +338,37 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
   }
 
   async function retryFailedWrites(items: PendingWrite[]) {
+    if (isRetrying) return;
+    setIsRetrying(true);
     setError(null);
-    for (const item of items) {
-      setPendingWrites((pending) =>
-        pending.map((entry) =>
-          entry.eventId === item.eventId ? { ...entry, failed: false } : entry,
-        ),
-      );
-      try {
-        await sendCompletion(item);
-        setPendingWrites((pending) =>
-          pending.filter((entry) => entry.eventId !== item.eventId),
-        );
-      } catch (caught) {
+    try {
+      for (const item of items) {
         setPendingWrites((pending) =>
           pending.map((entry) =>
-            entry.eventId === item.eventId ? { ...entry, failed: true } : entry,
+            entry.eventId === item.eventId ? { ...entry, failed: false } : entry,
           ),
         );
-        setError(caught instanceof Error ? caught.message : "Không thể lưu câu trả lời.");
-        break;
+        try {
+          await sendCompletion(item);
+          setPendingWrites((pending) => {
+            const next = pending.filter((entry) => entry.eventId !== item.eventId);
+            if (next.every((entry) => !entry.failed)) {
+              setError(null);
+            }
+            return next;
+          });
+        } catch (caught) {
+          setPendingWrites((pending) =>
+            pending.map((entry) =>
+              entry.eventId === item.eventId ? { ...entry, failed: true } : entry,
+            ),
+          );
+          setError(caught instanceof Error ? caught.message : "Không thể lưu câu trả lời.");
+          break;
+        }
       }
+    } finally {
+      setIsRetrying(false);
     }
   }
 
@@ -527,13 +538,25 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
               </div>
             )}
             {failedWrites.length > 0 && (
-              <Button
-                size="lg"
-                className="mt-6"
-                onClick={() => void retryFailedWrites(failedWrites)}
-              >
-                Thử lại
-              </Button>
+              <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
+                <Button
+                  size="lg"
+                  disabled={isRetrying}
+                  onClick={() => void retryFailedWrites(failedWrites)}
+                >
+                  {isRetrying ? "Đang lưu lại..." : "Thử lại"}
+                </Button>
+                <Link
+                  href={deck ? `/vocabulary/${deck.slug}` : "/vocabulary"}
+                  onClick={() => {
+                    setPendingWrites([]);
+                    setError(null);
+                  }}
+                  className={buttonVariants({ variant: "secondary", size: "lg" })}
+                >
+                  Bỏ qua & Về thư viện
+                </Link>
+              </div>
             )}
           </CardContent>
         </Card>

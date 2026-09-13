@@ -2,15 +2,25 @@ import type {
   ClientAIConfig,
   DetectedPhrase,
   SentenceBreakdownResponse,
+  WordToken,
 } from "@/types/reading";
 import {
   ROLE_MAP,
   enrichSentenceBreakdown,
+  parseSingleBreakdownObject,
   repairTruncatedJson,
+  safeParseParagraphBreakdown,
   safeParseSentenceBreakdown,
 } from "./json-repair";
 
-export { ROLE_MAP, enrichSentenceBreakdown, repairTruncatedJson, safeParseSentenceBreakdown };
+export {
+  ROLE_MAP,
+  enrichSentenceBreakdown,
+  parseSingleBreakdownObject,
+  repairTruncatedJson,
+  safeParseParagraphBreakdown,
+  safeParseSentenceBreakdown,
+};
 
 export const DEFAULT_AI_CONFIG: ClientAIConfig = {
   provider: "local_tunnel",
@@ -185,6 +195,185 @@ export const SENTENCE_BREAKDOWN_JSON_SCHEMA = {
       "grammar",
       "mentalModelSteps",
     ],
+    additionalProperties: false,
+  },
+};
+
+/**
+ * System Prompt chuyên cho phân tích danh sách các câu theo đoạn văn (Paragraph Batching)
+ */
+export const PARAGRAPH_SYSTEM_PROMPT = `You are a bilingual English-Vietnamese linguist for Vocabloom reading assistant.
+Analyze each sentence in <paragraph> in natural Vietnamese.
+RULES:
+1. Technical Terms: Keep IT/tech terms in English (CPU, RAM, API, cache...).
+2. Return ONLY a valid JSON object with key 'analyses': an array containing breakdown objects for each sentence.
+Each breakdown object must contain:
+{
+  "sentence": "Exact original sentence text",
+  "complexity": "simple" | "compound" | "complex",
+  "translationVi": "Bản dịch tiếng Việt tự nhiên",
+  "coreIdeaVi": "Ý chính của câu trong 1 câu ngắn",
+  "simplifiedEnglish": "Viết lại bằng tiếng Anh đơn giản",
+  "skeleton": {
+    "pattern": "S + V + O + A",
+    "parts": [{"type": "S", "text": "..."}, {"type": "V", "text": "..."}]
+  },
+  "chunks": [{"chunkText": "...", "meaningVi": "...", "type": "noun_phrase" | "verb_phrase" | "prep_phrase"}],
+  "clauses": [{"clauseText": "...", "role": "Main Clause", "subject": "...", "verb": "...", "objectOrComplement": "..."}],
+  "grammar": {
+    "pattern": "Tên cấu trúc",
+    "explanation": "Giải thích ngữ pháp",
+    "ruleSummary": "Tên cấu trúc",
+    "whyUsedVi": "Mục đích sử dụng",
+    "mechanicVi": "Giải thích cơ chế ngữ pháp"
+  },
+  "vocabulary": [{"term": "...", "partOfSpeech": "noun", "contextMeaningVi": "...", "isTechnicalTerm": false}],
+  "idiomsAndPhrases": [{"phrase": "...", "meaningVi": "..."}],
+  "mentalModelSteps": ["1. ..."]
+}`;
+
+/**
+ * Strict JSON Schema tương thích OpenAI & Ollama Structured Output cho Paragraph Batching
+ */
+export const PARAGRAPH_BREAKDOWN_JSON_SCHEMA = {
+  name: "paragraph_breakdown",
+  strict: true,
+  schema: {
+    type: "object",
+    properties: {
+      analyses: {
+        type: "array",
+        description: "Array of sentence breakdown analyses",
+        items: {
+          type: "object",
+          properties: {
+            sentence: {
+              type: "string",
+              description: "The original sentence being analyzed",
+            },
+            complexity: {
+              type: "string",
+              enum: ["micro", "simple", "compound", "complex"],
+              description: "Sentence grammatical complexity",
+            },
+            translationVi: {
+              type: "string",
+              description: "Natural Vietnamese contextual translation",
+            },
+            coreIdeaVi: {
+              type: "string",
+              description: "Core meaning in 1 concise Vietnamese sentence",
+            },
+            skeleton: {
+              type: "object",
+              properties: {
+                pattern: { type: "string", description: "e.g. S + V + O + A" },
+                parts: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      type: { type: "string", enum: ["S", "V", "O", "C", "A"] },
+                      text: { type: "string" },
+                    },
+                    required: ["type", "text"],
+                    additionalProperties: false,
+                  },
+                },
+              },
+              required: ["pattern", "parts"],
+              additionalProperties: false,
+            },
+            chunks: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  chunkText: { type: "string" },
+                  meaningVi: { type: "string" },
+                  type: { type: "string" },
+                },
+                required: ["chunkText", "meaningVi", "type"],
+                additionalProperties: false,
+              },
+            },
+            clauses: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  clauseText: { type: "string" },
+                  role: { type: "string" },
+                  subject: { type: "string" },
+                  verb: { type: "string" },
+                  objectOrComplement: { type: "string" },
+                },
+                required: ["clauseText", "role", "subject", "verb", "objectOrComplement"],
+                additionalProperties: false,
+              },
+            },
+            vocabulary: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  term: { type: "string" },
+                  partOfSpeech: { type: "string" },
+                  contextMeaningVi: { type: "string" },
+                  cefr: { type: "string" },
+                  isTechnicalTerm: { type: "boolean" },
+                },
+                required: ["term", "partOfSpeech", "contextMeaningVi", "isTechnicalTerm"],
+                additionalProperties: false,
+              },
+            },
+            idiomsAndPhrases: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  phrase: { type: "string" },
+                  meaningVi: { type: "string" },
+                },
+                required: ["phrase", "meaningVi"],
+                additionalProperties: false,
+              },
+            },
+            grammar: {
+              type: "object",
+              properties: {
+                pattern: { type: "string" },
+                explanation: { type: "string" },
+                ruleSummary: { type: "string" },
+                whyUsedVi: { type: "string" },
+                mechanicVi: { type: "string" },
+              },
+              required: ["pattern", "explanation", "whyUsedVi", "mechanicVi"],
+              additionalProperties: false,
+            },
+            mentalModelSteps: {
+              type: "array",
+              items: { type: "string" },
+            },
+          },
+          required: [
+            "sentence",
+            "complexity",
+            "translationVi",
+            "coreIdeaVi",
+            "skeleton",
+            "chunks",
+            "clauses",
+            "vocabulary",
+            "idiomsAndPhrases",
+            "grammar",
+            "mentalModelSteps",
+          ],
+          additionalProperties: false,
+        },
+      },
+    },
+    required: ["analyses"],
     additionalProperties: false,
   },
 };
@@ -608,4 +797,198 @@ export async function analyzeSentence(
 
   inFlightAnalysis.set(hash, fetchPromise);
   return fetchPromise;
+}
+
+/**
+ * Phân tích AI theo Đoạn văn (Paragraph Batching):
+ * Gom 3-4 câu trong đoạn văn để phân tích trong một request duy nhất.
+ * Tiết kiệm 60-75% token, giảm số lượng request và tự động fallback về câu đơn nếu có lỗi.
+ */
+export async function analyzeParagraph(
+  sentences: Array<{ id: string; text: string; tokens?: WordToken[] }>,
+  config: ClientAIConfig
+): Promise<Record<string, SentenceBreakdownResponse>> {
+  const results: Record<string, SentenceBreakdownResponse> = {};
+
+  if (!sentences || sentences.length === 0) {
+    return results;
+  }
+
+  // 1. Lọc các câu đã có trong cache hoàn chỉnh (L1 RAM hoặc L2 LocalStorage)
+  const uncached: Array<{ id: string; text: string; tokens?: WordToken[] }> = [];
+  for (const s of sentences) {
+    const cached = getCachedAnalysis(s.text);
+    if (isCompleteSentenceAnalysis(cached)) {
+      results[s.text] = cached!;
+    } else {
+      uncached.push(s);
+    }
+  }
+
+  // Nếu tất cả đã có cache: trả về ngay kết quả từ cache (0ms)
+  if (uncached.length === 0) {
+    return results;
+  }
+
+  // Nếu chỉ có 1 câu chưa cache: gọi analyzeSentence và lưu cache
+  if (uncached.length === 1) {
+    const single = uncached[0];
+    try {
+      const singleRes = await analyzeSentence(single.text, single.text, config);
+      if (singleRes && isCompleteSentenceAnalysis(singleRes)) {
+        setCachedAnalysis(single.text, singleRes);
+        results[single.text] = singleRes;
+      }
+    } catch (err) {
+      console.warn(`analyzeParagraph single fallback failed for "${single.text}":`, err);
+    }
+    return results;
+  }
+
+  // Nếu có nhiều câu chưa cache: thực hiện request Batching
+  try {
+    const endpoint = `${config.baseUrl.replace(/\/+$/, "")}/chat/completions`;
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+    if (config.apiKey) {
+      headers["Authorization"] = `Bearer ${config.apiKey}`;
+    }
+
+    const xmlSentences = uncached
+      .map((s) => `  <sentence id="${s.id}">${s.text}</sentence>`)
+      .join("\n");
+    const userContent = `<paragraph>\n${xmlSentences}\n</paragraph>`;
+
+    const requestBody: Record<string, unknown> = {
+      model: config.model,
+      temperature: config.temperature ?? 0.1,
+      stream: false,
+      messages: [
+        { role: "system", content: PARAGRAPH_SYSTEM_PROMPT },
+        { role: "user", content: userContent },
+      ],
+      response_format: {
+        type: "json_schema",
+        json_schema: PARAGRAPH_BREAKDOWN_JSON_SCHEMA,
+      },
+    };
+
+    let res = await fetch(endpoint, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(requestBody),
+      signal: AbortSignal.timeout(45000), // Timeout 45s cho batch
+    });
+
+    // Fallback 1: Nếu endpoint trả về 400 (không hỗ trợ json_schema), thử lại với type: "json_object"
+    if (!res.ok && res.status === 400 && requestBody.response_format) {
+      const retryBody = {
+        ...requestBody,
+        response_format: { type: "json_object" },
+      };
+      res = await fetch(endpoint, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(retryBody),
+        signal: AbortSignal.timeout(45000),
+      });
+
+      // Fallback 2: Nếu proxy vẫn 400, bỏ hoàn toàn response_format
+      if (!res.ok && res.status === 400) {
+        const fallbackBody: Record<string, unknown> = { ...requestBody };
+        delete fallbackBody.response_format;
+        res = await fetch(endpoint, {
+          method: "POST",
+          headers,
+          body: JSON.stringify(fallbackBody),
+          signal: AbortSignal.timeout(45000),
+        });
+      }
+    }
+
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error(`AI Paragraph Batch Request Failed (${res.status}): ${errText.slice(0, 200)}`);
+    }
+
+    const responseText = await res.text();
+    if (!responseText || !responseText.trim()) {
+      throw new Error("Mô hình AI trả về kết quả rỗng cho paragraph batch.");
+    }
+
+    let rawContent = "";
+    const trimmed = responseText.trim();
+
+    // Xử lý cả response stream SSE lẫn JSON trực tiếp
+    if (trimmed.startsWith("data:") || trimmed.includes("\ndata:")) {
+      const lines = trimmed.split("\n");
+      for (const line of lines) {
+        const cleanLine = line.trim();
+        if (!cleanLine.startsWith("data:")) continue;
+        const jsonStr = cleanLine.slice(5).trim();
+        if (jsonStr === "[DONE]" || !jsonStr) continue;
+        try {
+          const chunk = JSON.parse(jsonStr);
+          const delta =
+            chunk.choices?.[0]?.delta?.content ??
+            chunk.choices?.[0]?.message?.content ??
+            "";
+          rawContent += delta;
+        } catch {
+          // bỏ qua chunk lỗi
+        }
+      }
+    } else {
+      try {
+        const json = JSON.parse(trimmed);
+        rawContent =
+          json.choices?.[0]?.message?.content ??
+          json.choices?.[0]?.text ??
+          json.content ??
+          "";
+      } catch {
+        rawContent = trimmed;
+      }
+    }
+
+    if (!rawContent || !rawContent.trim()) {
+      throw new Error("Không nhận được nội dung phân tích paragraph từ AI.");
+    }
+
+    const targetTexts = uncached.map((s) => s.text);
+    const parsedList = safeParseParagraphBreakdown(rawContent, targetTexts);
+
+    for (let i = 0; i < uncached.length; i++) {
+      const s = uncached[i];
+      const item = parsedList[i];
+      if (item && isCompleteSentenceAnalysis(item)) {
+        setCachedAnalysis(s.text, item);
+        results[s.text] = item;
+      }
+    }
+  } catch (batchErr) {
+    console.warn(
+      "Paragraph batch request failed, falling back to sequential analyzeSentence:",
+      batchErr
+    );
+  }
+
+  // Fallback an toàn: nếu bất kỳ câu nào trong uncached chưa có phân tích hoàn chỉnh,
+  // tự động gọi analyzeSentence đơn lẻ cho câu đó để đảm bảo không làm gián đoạn người dùng
+  for (const s of uncached) {
+    if (!results[s.text] || !isCompleteSentenceAnalysis(results[s.text])) {
+      try {
+        const single = await analyzeSentence(s.text, s.text, config);
+        if (single && isCompleteSentenceAnalysis(single)) {
+          setCachedAnalysis(s.text, single);
+          results[s.text] = single;
+        }
+      } catch (err) {
+        console.warn(`Fallback analyzeSentence failed for "${s.text}":`, err);
+      }
+    }
+  }
+
+  return results;
 }

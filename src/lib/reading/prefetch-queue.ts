@@ -2,7 +2,9 @@ import type { ClientAIConfig, SentenceItem } from "@/types/reading";
 import { buildSlidingWindowContext } from "./context-window";
 import { detectPhrasesInSentence } from "./phrase-matcher";
 import {
+  analyzeParagraph,
   analyzeSentence,
+  getCachedAnalysis,
   hasCachedAnalysis,
   isCompleteSentenceAnalysis,
 } from "@/lib/ai/local-ai-client";
@@ -76,7 +78,7 @@ export class SpeculativePrefetchQueue {
   }
 
   /**
-   * Xử lý tuần tự từng câu trong danh sách candidate
+   * Xử lý tuần tự hoặc theo nhóm (Batch) từng cụm câu trong danh sách candidate
    */
   private async processQueue(
     allSentences: SentenceItem[],
@@ -90,35 +92,99 @@ export class SpeculativePrefetchQueue {
     const signal = this.activeAbortController.signal;
 
     try {
-      for (const { sentence, index } of candidates) {
+      // Lọc các ứng viên chưa có phân tích hoàn chỉnh trong cache
+      const uncachedCandidates = candidates.filter(
+        (c) => !hasCachedAnalysis(c.sentence.text)
+      );
+
+      if (uncachedCandidates.length === 0) {
+        return;
+      }
+
+      // Gom các ứng viên thành các cụm câu liền kề nhau
+      const clusters: Array<Array<{ sentence: SentenceItem; index: number }>> = [];
+      let currentCluster: Array<{ sentence: SentenceItem; index: number }> = [];
+
+      for (let i = 0; i < uncachedCandidates.length; i++) {
+        const item = uncachedCandidates[i];
+        if (currentCluster.length === 0) {
+          currentCluster.push(item);
+        } else {
+          const prev = currentCluster[currentCluster.length - 1];
+          if (item.index === prev.index + 1) {
+            currentCluster.push(item);
+          } else {
+            clusters.push(currentCluster);
+            currentCluster = [item];
+          }
+        }
+      }
+      if (currentCluster.length > 0) {
+        clusters.push(currentCluster);
+      }
+
+      for (const cluster of clusters) {
         if (signal.aborted) break;
-        if (hasCachedAnalysis(sentence.text)) continue;
 
-        const detected = detectPhrasesInSentence(sentence.text, sentence.tokens);
-        const contextWindow = buildSlidingWindowContext(
-          allSentences,
-          index,
-          detected.phrases
-        );
+        // Nếu có >= 2 câu liền kề chưa cache: sử dụng analyzeParagraph
+        if (cluster.length >= 2) {
+          try {
+            const batchSentences = cluster.map((c) => ({
+              id: c.sentence.id,
+              text: c.sentence.text,
+              tokens: c.sentence.tokens,
+            }));
 
-        try {
-          const result = await analyzeSentence(
-            sentence.text,
-            contextWindow,
-            aiConfig,
+            const resultMap = await analyzeParagraph(batchSentences, aiConfig);
+
+            for (const { sentence } of cluster) {
+              if (signal.aborted) break;
+              const res = resultMap[sentence.text] || getCachedAnalysis(sentence.text);
+              if (res && isCompleteSentenceAnalysis(res)) {
+                if (documentId) {
+                  await saveSentenceAnalysis(documentId, sentence.text, res).catch(() => {});
+                }
+                this.onSentencePrefetched?.(sentence.id, sentence.text);
+              }
+            }
+          } catch (err) {
+            if (!signal.aborted) {
+              for (const { sentence } of cluster) {
+                this.onError?.(err, sentence.text);
+              }
+            }
+          }
+        } else {
+          // Xử lý câu đơn lẻ
+          const { sentence, index } = cluster[0];
+          if (hasCachedAnalysis(sentence.text)) continue;
+
+          const detected = detectPhrasesInSentence(sentence.text, sentence.tokens);
+          const contextWindow = buildSlidingWindowContext(
+            allSentences,
+            index,
             detected.phrases
           );
 
-          if (signal.aborted) break;
+          try {
+            const result = await analyzeSentence(
+              sentence.text,
+              contextWindow,
+              aiConfig,
+              detected.phrases
+            );
 
-          if (documentId && result && isCompleteSentenceAnalysis(result)) {
-            await saveSentenceAnalysis(documentId, sentence.text, result).catch(() => {});
-          }
+            if (signal.aborted) break;
 
-          this.onSentencePrefetched?.(sentence.id, sentence.text);
-        } catch (err) {
-          if (!signal.aborted) {
-            this.onError?.(err, sentence.text);
+            if (documentId && result && isCompleteSentenceAnalysis(result)) {
+              await saveSentenceAnalysis(documentId, sentence.text, result).catch(() => {});
+            }
+
+            this.onSentencePrefetched?.(sentence.id, sentence.text);
+          } catch (err) {
+            if (!signal.aborted) {
+              this.onError?.(err, sentence.text);
+            }
           }
         }
       }

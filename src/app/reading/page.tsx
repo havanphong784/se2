@@ -49,6 +49,7 @@ import {
 } from "@/lib/reading/indexed-storage";
 import {
   getSavedAIConfig,
+  analyzeParagraph,
   analyzeSentence,
   getCachedAnalysis,
   setCachedAnalysis,
@@ -424,51 +425,115 @@ export default function ReadingPage() {
     abortPreanalyzeRef.current = false;
     setPreanalyzeProgress({ current: 0, total: unanalyzedSentences.length });
 
-    for (let i = 0; i < unanalyzedSentences.length; i++) {
+    // Gom các câu unanalyzed thành các batch tối đa 3-4 câu (ưu tiên các câu cùng paragraph)
+    const MAX_BATCH_SIZE = 4;
+    const batches: SentenceItem[][] = [];
+    let currentBatch: SentenceItem[] = [];
+
+    for (const paragraph of parsedData.paragraphs) {
+      const unanalyzedInPara = paragraph.sentences.filter((s) => !hasCachedAnalysis(s.text));
+      if (unanalyzedInPara.length === 0) continue;
+
+      if (currentBatch.length > 0 && currentBatch.length + unanalyzedInPara.length <= MAX_BATCH_SIZE) {
+        currentBatch.push(...unanalyzedInPara);
+      } else {
+        if (currentBatch.length > 0) {
+          batches.push(currentBatch);
+          currentBatch = [];
+        }
+        for (let i = 0; i < unanalyzedInPara.length; i += MAX_BATCH_SIZE) {
+          const slice = unanalyzedInPara.slice(i, i + MAX_BATCH_SIZE);
+          if (slice.length < MAX_BATCH_SIZE && i + MAX_BATCH_SIZE >= unanalyzedInPara.length) {
+            currentBatch = slice;
+          } else {
+            batches.push(slice);
+          }
+        }
+      }
+    }
+    if (currentBatch.length > 0) {
+      batches.push(currentBatch);
+    }
+
+    if (batches.length === 0 && unanalyzedSentences.length > 0) {
+      for (let i = 0; i < unanalyzedSentences.length; i += MAX_BATCH_SIZE) {
+        batches.push(unanalyzedSentences.slice(i, i + MAX_BATCH_SIZE));
+      }
+    }
+
+    let processedCount = 0;
+    const totalCount = unanalyzedSentences.length;
+
+    for (let bIndex = 0; bIndex < batches.length; bIndex++) {
       if (abortPreanalyzeRef.current) break;
 
-      const s = unanalyzedSentences[i];
-      if (hasCachedAnalysis(s.text)) {
-        setPreanalyzeProgress({ current: i + 1, total: unanalyzedSentences.length });
+      const batch = batches[bIndex];
+      const toAnalyze = batch.filter((s) => !hasCachedAnalysis(s.text));
+
+      if (toAnalyze.length === 0) {
+        processedCount += batch.length;
+        setPreanalyzeProgress({
+          current: Math.min(processedCount, totalCount),
+          total: totalCount,
+        });
         continue;
       }
 
-      const sIndex = allChunkSentences.findIndex((item) => item.id === s.id);
-      const sDetected = detectPhrasesInSentence(s.text, s.tokens);
-      const sContextWindow = buildSlidingWindowContext(
-        allChunkSentences,
-        sIndex !== -1 ? sIndex : 0,
-        sDetected.phrases
-      );
-
       try {
-        const result = await analyzeSentence(s.text, sContextWindow, aiConfig, sDetected.phrases);
+        const batchParam = toAnalyze.map((s) => ({
+          id: s.id,
+          text: s.text,
+          tokens: s.tokens,
+        }));
+        const resultMap = await analyzeParagraph(batchParam, aiConfig);
         if (abortPreanalyzeRef.current) break;
 
-        if (documentMeta?.id && result) {
-          await saveSentenceAnalysis(documentMeta.id, s.text, result);
-          setAnalyzedSentencesCount((prev) => prev + 1);
+        let batchSuccessCount = 0;
+        for (const s of toAnalyze) {
+          const res = resultMap[s.text] || getCachedAnalysis(s.text);
+          if (res && isCompleteSentenceAnalysis(res)) {
+            if (documentMeta?.id) {
+              await saveSentenceAnalysis(documentMeta.id, s.text, res);
+              batchSuccessCount++;
+            }
+
+            if (activeSentence?.id === s.id) {
+              setAnalysisData(res);
+            }
+          }
         }
 
-        if (activeSentence?.id === s.id && result) {
-          setAnalysisData(result);
+        if (batchSuccessCount > 0) {
+          setAnalyzedSentencesCount((prev) => prev + batchSuccessCount);
         }
       } catch (err) {
-        console.warn("Preanalyze sentence failed:", s.text, err);
+        console.warn("Preanalyze batch failed:", err);
       }
 
-      setPreanalyzeProgress({ current: i + 1, total: unanalyzedSentences.length });
+      processedCount += batch.length;
+      setPreanalyzeProgress({
+        current: Math.min(processedCount, totalCount),
+        total: totalCount,
+      });
 
       if (abortPreanalyzeRef.current) break;
 
-      // Delay ~150ms giữa các request để không làm nghẽn local AI
-      if (i < unanalyzedSentences.length - 1) {
+      // Delay ~150ms giữa các batch để không làm nghẽn local AI
+      if (bIndex < batches.length - 1) {
         await new Promise((resolve) => setTimeout(resolve, 150));
       }
     }
 
     setIsPreanalyzingChunk(false);
-  }, [isPreanalyzingChunk, documentMeta, allChunkSentences, aiConfig, activeSentence, showToast]);
+  }, [
+    isPreanalyzingChunk,
+    documentMeta,
+    allChunkSentences,
+    parsedData,
+    aiConfig,
+    activeSentence,
+    showToast,
+  ]);
 
   const handleStopPreanalyzeChunk = useCallback(() => {
     abortPreanalyzeRef.current = true;

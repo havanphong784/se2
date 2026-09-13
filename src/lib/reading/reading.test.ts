@@ -7,6 +7,8 @@ import { buildSlidingWindowContext } from "./context-window";
 import {
   repairTruncatedJson,
   safeParseSentenceBreakdown,
+  safeParseParagraphBreakdown,
+  parseSingleBreakdownObject,
   enrichSentenceBreakdown,
   ROLE_MAP,
 } from "@/lib/ai/json-repair";
@@ -399,6 +401,151 @@ The software runs on top of it.`;
       };
       setCachedAnalysis(newSentence, complete);
       assert.equal(hasCachedAnalysis(newSentence), true, "Phân tích hoàn chỉnh phải trả về true");
+    });
+  });
+
+  describe("Paragraph Batching Analysis", () => {
+    it("analyzeParagraph trả về ngay lập tức các câu đã có trong cache L1 mà không cần gọi network", async () => {
+      const { analyzeParagraph, setCachedAnalysis } = await import("@/lib/ai/local-ai-client");
+
+      const s1 = "First cached sentence for batch.";
+      const s2 = "Second cached sentence for batch.";
+
+      const analysis1 = {
+        sentence: s1,
+        complexity: "simple" as const,
+        translationVi: "Bản dịch câu một trong cache.",
+        coreIdeaVi: "Ý chính một.",
+        skeleton: { pattern: "S + V", parts: [{ type: "S" as const, text: "First", roleVi: "Chủ ngữ" }] },
+        chunks: [],
+        clauses: [],
+        grammar: { pattern: "S + V", explanation: "", clauses: [] },
+        vocabulary: [],
+        idiomsAndPhrases: [],
+        mentalModelSteps: [],
+        simplifiedEnglish: "",
+      };
+
+      const analysis2 = {
+        sentence: s2,
+        complexity: "compound" as const,
+        translationVi: "Bản dịch câu hai trong cache.",
+        coreIdeaVi: "Ý chính hai.",
+        skeleton: { pattern: "S + V + O", parts: [{ type: "S" as const, text: "Second", roleVi: "Chủ ngữ" }] },
+        chunks: [],
+        clauses: [],
+        grammar: { pattern: "S + V + O", explanation: "", clauses: [] },
+        vocabulary: [],
+        idiomsAndPhrases: [],
+        mentalModelSteps: [],
+        simplifiedEnglish: "",
+      };
+
+      setCachedAnalysis(s1, analysis1);
+      setCachedAnalysis(s2, analysis2);
+
+      // URL không hợp lệ: nếu có request mạng sẽ ném lỗi ngay
+      const dummyConfig = {
+        provider: "local_tunnel" as const,
+        baseUrl: "http://endpoint-does-not-exist-and-should-not-be-called:9999/v1",
+        model: "mock-model",
+        temperature: 0.1,
+      };
+
+      const results = await analyzeParagraph(
+        [
+          { id: "s1", text: s1 },
+          { id: "s2", text: s2 },
+        ],
+        dummyConfig
+      );
+
+      assert.ok(results[s1]);
+      assert.equal(results[s1].translationVi, "Bản dịch câu một trong cache.");
+      assert.ok(results[s2]);
+      assert.equal(results[s2].translationVi, "Bản dịch câu hai trong cache.");
+    });
+
+    it("analyzeParagraph phân tách và trả về dictionary chuẩn { [sentenceText]: SentenceBreakdownResponse }", async () => {
+      const { analyzeParagraph } = await import("@/lib/ai/local-ai-client");
+
+      const s1 = "The sun sets in the west.";
+      const s2 = "The moon rises in the night sky.";
+
+      const mockResponse = {
+        choices: [
+          {
+            message: {
+              content: JSON.stringify({
+                analyses: [
+                  {
+                    sentence: s1,
+                    complexity: "simple",
+                    translationVi: "Mặt trời lặn ở phía tây.",
+                    coreIdeaVi: "Mặt trời lặn ở hướng tây.",
+                    skeleton: { pattern: "S + V + A", parts: [{ type: "S", text: "The sun" }] },
+                    chunks: [{ chunkText: "The sun", meaningVi: "Mặt trời", type: "noun_phrase" }],
+                    clauses: [{ clauseText: s1, role: "Main Clause" }],
+                    grammar: { pattern: "S + V + A", explanation: "Câu đơn chỉ sự thật hiển nhiên" },
+                    vocabulary: [{ term: "west", contextMeaningVi: "phía tây", isTechnicalTerm: false }],
+                    idiomsAndPhrases: [],
+                    mentalModelSteps: ["1. Xác định chủ ngữ 'The sun'"],
+                  },
+                  {
+                    sentence: s2,
+                    complexity: "simple",
+                    translationVi: "Mặt trăng mọc trên bầu trời đêm.",
+                    coreIdeaVi: "Mặt trăng mọc vào ban đêm.",
+                    skeleton: { pattern: "S + V + A", parts: [{ type: "S", text: "The moon" }] },
+                    chunks: [{ chunkText: "The moon", meaningVi: "Mặt trăng", type: "noun_phrase" }],
+                    clauses: [{ clauseText: s2, role: "Main Clause" }],
+                    grammar: { pattern: "S + V + A", explanation: "Câu đơn miêu tả hiện tượng" },
+                    vocabulary: [{ term: "rises", contextMeaningVi: "mọc lên", isTechnicalTerm: false }],
+                    idiomsAndPhrases: [],
+                    mentalModelSteps: ["1. Xác định chủ ngữ 'The moon'"],
+                  },
+                ],
+              }),
+            },
+          },
+        ],
+      };
+
+      const originalFetch = globalThis.fetch;
+      globalThis.fetch = async () =>
+        new Response(JSON.stringify(mockResponse), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+
+      try {
+        const config = {
+          provider: "local_tunnel" as const,
+          baseUrl: "http://localhost:11434/v1",
+          model: "qwen2.5:3b",
+          temperature: 0.1,
+        };
+
+        const results = await analyzeParagraph(
+          [
+            { id: "batch_1", text: s1 },
+            { id: "batch_2", text: s2 },
+          ],
+          config
+        );
+
+        assert.ok(results[s1], "Phải có kết quả cho câu 1");
+        assert.equal(results[s1].sentence, s1);
+        assert.equal(results[s1].translationVi, "Mặt trời lặn ở phía tây.");
+        assert.equal(results[s1].coreIdeaVi, "Mặt trời lặn ở hướng tây.");
+
+        assert.ok(results[s2], "Phải có kết quả cho câu 2");
+        assert.equal(results[s2].sentence, s2);
+        assert.equal(results[s2].translationVi, "Mặt trăng mọc trên bầu trời đêm.");
+        assert.equal(results[s2].coreIdeaVi, "Mặt trăng mọc vào ban đêm.");
+      } finally {
+        globalThis.fetch = originalFetch;
+      }
     });
   });
 
@@ -921,6 +1068,116 @@ Organizations must adapt to cognitive automation.`;
       assert.equal(result.coreIdeaVi, "Ý chính ngắn gọn");
       assert.equal(result.skeleton?.pattern, "S + V + O");
       assert.deepEqual(result.vocabulary, []);
+    });
+  });
+
+  describe("Safe Parse Paragraph Breakdown (Batching)", () => {
+    it("xử lý JSON chuẩn dạng { analyses: [...] }", () => {
+      const jsonStr = JSON.stringify({
+        analyses: [
+          {
+            sentence: "First sentence of paragraph.",
+            complexity: "simple",
+            translationVi: "Câu đầu tiên của đoạn văn.",
+            coreIdeaVi: "Ý chính câu một.",
+            skeleton: {
+              pattern: "S + V + O",
+              parts: [
+                { type: "S", text: "First sentence" },
+                { type: "V", text: "of" },
+              ],
+            },
+          },
+          {
+            sentence: "Second sentence follows naturally.",
+            complexity: "compound",
+            translationVi: "Câu thứ hai tiếp nối tự nhiên.",
+            coreIdeaVi: "Ý chính câu hai.",
+            skeleton: {
+              pattern: "S + V + A",
+              parts: [
+                { type: "S", text: "Second sentence" },
+                { type: "V", text: "follows" },
+              ],
+            },
+          },
+        ],
+      });
+
+      const targets = ["First sentence of paragraph.", "Second sentence follows naturally."];
+      const results = safeParseParagraphBreakdown(jsonStr, targets);
+
+      assert.equal(results.length, 2);
+      assert.equal(results[0].sentence, "First sentence of paragraph.");
+      assert.equal(results[0].translationVi, "Câu đầu tiên của đoạn văn.");
+      assert.equal(results[0].complexity, "simple");
+      assert.equal(results[1].sentence, "Second sentence follows naturally.");
+      assert.equal(results[1].translationVi, "Câu thứ hai tiếp nối tự nhiên.");
+      assert.equal(results[1].complexity, "compound");
+    });
+
+    it("xử lý JSON dạng mảng trần [...]", () => {
+      const jsonStr = JSON.stringify([
+        {
+          sentence: "Sentence one.",
+          translationVi: "Câu số một.",
+        },
+        {
+          sentence: "Sentence two.",
+          translationVi: "Câu số hai.",
+        },
+      ]);
+
+      const targets = ["Sentence one.", "Sentence two."];
+      const results = safeParseParagraphBreakdown(jsonStr, targets);
+
+      assert.equal(results.length, 2);
+      assert.equal(results[0].sentence, "Sentence one.");
+      assert.equal(results[0].translationVi, "Câu số một.");
+      assert.equal(results[1].sentence, "Sentence two.");
+      assert.equal(results[1].translationVi, "Câu số hai.");
+    });
+
+    it("khôi phục an toàn mảng JSON bị cắt cụt giữa chừng", () => {
+      // Chuỗi JSON bị cắt cụt dở dang ở câu thứ 2
+      const truncatedJson = `{"analyses":[{"sentence":"Alpha sentence.","translationVi":"Câu alpha."},{"sentence":"Beta sentence.","translationVi":"Câu`;
+
+      const targets = ["Alpha sentence.", "Beta sentence.", "Gamma sentence."];
+      const results = safeParseParagraphBreakdown(truncatedJson, targets);
+
+      assert.equal(results.length, 3, "Phải luôn trả về đủ số câu cho targets");
+      assert.equal(results[0].sentence, "Alpha sentence.");
+      assert.equal(results[0].translationVi, "Câu alpha.");
+      assert.equal(results[1].sentence, "Beta sentence.");
+      // Câu thứ 3 không có trong JSON dở dang nên nhận fallback an toàn không crash
+      assert.equal(results[2].sentence, "Gamma sentence.");
+      assert.ok(results[2].skeleton);
+      assert.ok(Array.isArray(results[2].chunks));
+    });
+
+    it("map đúng từng câu theo mảng targetSentences", () => {
+      // Model trả về thứ tự câu 2 trước, câu 1 sau
+      const swappedJson = JSON.stringify({
+        analyses: [
+          {
+            sentence: "Second target sentence.",
+            translationVi: "Bản dịch câu hai.",
+          },
+          {
+            sentence: "First target sentence.",
+            translationVi: "Bản dịch câu một.",
+          },
+        ],
+      });
+
+      const targets = ["First target sentence.", "Second target sentence."];
+      const results = safeParseParagraphBreakdown(swappedJson, targets);
+
+      assert.equal(results.length, 2);
+      assert.equal(results[0].sentence, "First target sentence.");
+      assert.equal(results[0].translationVi, "Bản dịch câu một.");
+      assert.equal(results[1].sentence, "Second target sentence.");
+      assert.equal(results[1].translationVi, "Bản dịch câu hai.");
     });
   });
 

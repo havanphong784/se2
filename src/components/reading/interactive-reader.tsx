@@ -163,16 +163,22 @@ export function InteractiveReader({
 
       let nextSentence: SentenceItem | undefined;
       if (isDown) {
-        if (currentIndex === -1 || currentIndex >= allSentences.length - 1) {
+        if (currentIndex === -1) {
           nextSentence = allSentences[0];
-        } else {
+        } else if (currentIndex < allSentences.length - 1) {
           nextSentence = allSentences[currentIndex + 1];
+        } else {
+          // Đã ở câu cuối cùng, giữ nguyên không nhảy về đầu trang
+          return;
         }
       } else if (isUp) {
-        if (currentIndex <= 0) {
+        if (currentIndex === -1) {
           nextSentence = allSentences[allSentences.length - 1];
-        } else {
+        } else if (currentIndex > 0) {
           nextSentence = allSentences[currentIndex - 1];
+        } else {
+          // Đã ở câu đầu tiên, giữ nguyên không nhảy về cuối trang
+          return;
         }
       }
 
@@ -611,19 +617,7 @@ export function InteractiveReader({
 
             return (
               <HeadingTag key={block.id} className={headingClasses}>
-                {block.sentences.map((sent) => (
-                  <span
-                    key={sent.id}
-                    id={`sentence-${sent.id}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onSelectSentence(sent);
-                    }}
-                    className="cursor-pointer hover:text-[#1cb0f6] transition-colors"
-                  >
-                    {sent.text}
-                  </span>
-                ))}
+                {renderSentenceList(block.sentences)}
               </HeadingTag>
             );
           }
