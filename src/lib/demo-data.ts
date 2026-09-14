@@ -198,3 +198,15 @@ export function deckProgress(deck: VocabularyDeck) {
     learnedPercent: Math.round((learned / deck.words.length) * 100),
   };
 }
+
+export function isDeckAvailable(
+  index: number,
+  progress: { percent: number; learned?: number },
+  prevDeckProgress: { percent: number; learnedPercent?: number } | null,
+): boolean {
+  const started = progress.percent > 0 || (progress.learned ?? 0) > 0;
+  const prevFinished =
+    prevDeckProgress !== null &&
+    (prevDeckProgress.percent >= 100 || (prevDeckProgress.learnedPercent ?? 0) >= 100);
+  return index === 0 || started || prevFinished;
+}

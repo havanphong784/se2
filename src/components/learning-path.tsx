@@ -16,23 +16,26 @@ export function LearningPath({ decks }: { decks: VocabularyDeck[] }) {
     >
       {decks.map((deck, index) => {
         const progress = deckProgress(deck);
-        const started = progress.percent > 0;
+        const isCompleted = progress.percent >= 100;
+        const started = progress.percent > 0 || progress.learned > 0;
         const prevDeckProgress = index > 0 ? deckProgress(decks[index - 1]) : null;
-        const available =
-          index === 0 || (prevDeckProgress !== null && prevDeckProgress.percent >= 100);
+        const prevFinished =
+          prevDeckProgress !== null &&
+          (prevDeckProgress.percent >= 100 || prevDeckProgress.learnedPercent >= 100);
+        const available = index === 0 || started || prevFinished;
 
         return (
           <li key={deck.id} className="relative flex gap-4">
             <span
               className={`relative z-10 grid size-14 shrink-0 place-items-center rounded-xl border-2 text-xl ${
-                progress.percent >= 100
+                isCompleted
                   ? "border-ecto-green bg-ecto-green text-white"
                   : available
                     ? "border-lingot-lime bg-white text-[#438f0e]"
                     : "border-[#dedede] bg-white text-[#aaaaaa]"
               }`}
             >
-              {progress.percent >= 100 ? (
+              {isCompleted ? (
                 <Check className="size-6" strokeWidth={3} />
               ) : available ? (
                 <Sprout className="size-6" strokeWidth={2.5} />
@@ -63,7 +66,8 @@ export function LearningPath({ decks }: { decks: VocabularyDeck[] }) {
                   aria-label={`Mở bộ từ ${deck.title}`}
                   className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-xl font-extrabold text-macaw-blue underline decoration-2 underline-offset-4 focus-visible:ring-4 focus-visible:ring-macaw-blue/20 md:mt-0"
                 >
-                  {started ? "Tiếp tục" : "Bắt đầu"} <ArrowRight className="size-4" />
+                  {isCompleted ? "Ôn tập" : started ? "Tiếp tục" : "Bắt đầu"}{" "}
+                  <ArrowRight className="size-4" />
                 </Link>
               ) : (
                 <span className="mt-3 inline-flex min-h-11 items-center text-sm font-extrabold text-[#aaaaaa] md:mt-0">
