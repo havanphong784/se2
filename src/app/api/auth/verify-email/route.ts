@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 
 import { getDb } from "@/db";
+import { clientIp, isRateLimited } from "@/lib/auth-rate-limit";
 import { noStoreHeaders } from "@/lib/auth-tokens";
-import { consumeVerificationToken } from "@/lib/email-verification";
+import { consumeVerificationToken, hashEmailVerificationToken } from "@/lib/email-verification";
 
 export async function POST(request: Request) {
   const body = (await request.json().catch(() => null)) as {
@@ -37,6 +38,21 @@ export async function POST(request: Request) {
     return NextResponse.json(
       { error: "Cơ sở dữ liệu tạm thời không khả dụng." },
       { status: 503, headers: noStoreHeaders },
+    );
+  }
+
+  const ip = clientIp(request) ?? "unknown";
+  const targetKey = email ?? (token ? hashEmailVerificationToken(token) : ip);
+
+  if (
+    await isRateLimited(db, [
+      { scope: "verify-otp-ip", key: ip, maxAttempts: 20, windowSeconds: 15 * 60 },
+      { scope: "verify-otp-target", key: targetKey, maxAttempts: 10, windowSeconds: 15 * 60 },
+    ])
+  ) {
+    return NextResponse.json(
+      { error: "Quá nhiều lần thử xác thực. Vui lòng thử lại sau 15 phút." },
+      { status: 429, headers: noStoreHeaders },
     );
   }
 

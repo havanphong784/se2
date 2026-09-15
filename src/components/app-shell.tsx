@@ -46,6 +46,8 @@ export function AppShell({
 }) {
   const pathname = usePathname();
   const inPractice = pathname.startsWith("/vocabulary/practice");
+  const isAuthPage = pathname === "/login" || pathname === "/register" || pathname === "/verify-email";
+  const hideNavigation = isAuthPage || inPractice;
   const { user } = useAuth();
   const { data: streak } = useStreak();
   const streakDays = streak?.current ?? initialStreakDays ?? 0;
@@ -59,7 +61,7 @@ export function AppShell({
         Bỏ qua đến nội dung chính
       </a>
 
-      {!inPractice && (
+      {!hideNavigation && (
         <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 border-r-2 border-[#ededed] bg-white lg:flex lg:flex-col">
           <div className="flex h-20 items-center px-7">
             <Link href="/" aria-label="VocaBloom - Trang tổng quan">
@@ -121,7 +123,7 @@ export function AppShell({
         </aside>
       )}
 
-      {!inPractice && (
+      {!hideNavigation && (
         <header className="fixed inset-x-0 top-0 z-40 flex h-16 items-center justify-between border-b-2 border-[#ededed] bg-white px-3 sm:px-4 lg:hidden">
           <Link href="/" aria-label="VocaBloom - Trang tổng quan">
             <BrandName compact />
@@ -153,13 +155,13 @@ export function AppShell({
         transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
         className={cn(
           "min-h-svh",
-          !inPractice && "pb-24 pt-16 lg:pb-0 lg:pl-64 lg:pt-0",
+          !hideNavigation && "pb-24 pt-16 lg:pb-0 lg:pl-64 lg:pt-0",
         )}
       >
         {children}
       </motion.main>
 
-      {!inPractice && (
+      {!hideNavigation && (
         <nav
           aria-label="Điều hướng di động"
           className="fixed inset-x-0 bottom-0 z-40 grid h-[76px] grid-cols-5 border-t-2 border-[#ededed] bg-white px-1 pb-[env(safe-area-inset-bottom)] lg:hidden"

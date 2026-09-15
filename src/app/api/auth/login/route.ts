@@ -5,7 +5,7 @@ import { getDb } from "@/db";
 import { users } from "@/db/schema";
 import { createRefreshSession } from "@/lib/auth-sessions";
 import { hashPassword, needsPasswordRehash, verifyPassword } from "@/lib/auth-crypto";
-import { clientIp, isRateLimited } from "@/lib/auth-rate-limit";
+import { clientIp, isRateLimited, resetRateLimit } from "@/lib/auth-rate-limit";
 import {
   createAccessToken,
   noStoreHeaders,
@@ -34,10 +34,11 @@ export async function POST(request: Request) {
     }
 
     const cleanEmail = email.trim().toLowerCase();
-    if (await isRateLimited(db, [
+    const loginLimits = [
       { scope: "login-ip", key: clientIp(request) ?? cleanEmail, maxAttempts: 20, windowSeconds: 15 * 60 },
       { scope: "login-email", key: cleanEmail, maxAttempts: 10, windowSeconds: 15 * 60 },
-    ])) {
+    ];
+    if (await isRateLimited(db, loginLimits)) {
       return NextResponse.json(
         { error: "Quá nhiều lần đăng nhập. Vui lòng thử lại sau." },
         { status: 429, headers: noStoreHeaders },
@@ -63,6 +64,8 @@ export async function POST(request: Request) {
         { status: 403, headers: noStoreHeaders },
       );
     }
+
+    await resetRateLimit(db, loginLimits);
 
     if (needsPasswordRehash(user.passwordHash)) {
       await db

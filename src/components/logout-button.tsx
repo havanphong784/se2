@@ -1,14 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
 
 import { buttonVariants } from "@/components/ui/button";
 import { useAuth } from "@/components/auth-provider";
 
 export function LogoutButton() {
-  const router = useRouter();
   const { clearSession } = useAuth();
   const [loading, setLoading] = useState(false);
 
@@ -17,8 +15,7 @@ export function LogoutButton() {
     try {
       await fetch("/api/auth/logout", { method: "POST", credentials: "same-origin" });
       clearSession();
-      router.push("/login");
-      router.refresh();
+      window.location.assign("/login");
     } catch (error) {
       console.error("Logout error:", error);
     } finally {

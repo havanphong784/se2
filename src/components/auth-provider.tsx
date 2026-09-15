@@ -3,6 +3,10 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
+import { Loader2, RefreshCw } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export type AuthUser = { id: string; email: string; displayName: string };
 type AuthResponse = { accessToken: string; user: AuthUser };
@@ -88,6 +92,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const isPublicPage = pathname === "/login" || pathname === "/register" || pathname === "/verify-email";
   const [user, setUser] = useState<AuthUser | null>(null);
   const [ready, setReady] = useState(isPublicPage);
+  const [hasTransientError, setHasTransientError] = useState(false);
+  const [isRetrying, setIsRetrying] = useState(false);
   const accessTokenRef = useRef<string | null>(null);
   const refreshTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const generationRef = useRef(0);
@@ -98,6 +104,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     accessTokenRef.current = null;
     lastRefreshAtRef.current = 0;
     setUser(null);
+    setHasTransientError(false);
     if (refreshTimer.current) {
       clearTimeout(refreshTimer.current);
       refreshTimer.current = null;
@@ -141,9 +148,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (generation !== generationRef.current) return;
         if (outcome.kind === "success") {
           applySession(outcome.session, generation);
+          setHasTransientError(false);
         } else if (outcome.kind === "unauthorized") {
           expireSession(generation);
         } else {
+          setHasTransientError(true);
           scheduleRefresh(generation, REFRESH_RETRY_DELAY);
         }
       }, delay);
@@ -154,6 +163,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       accessTokenRef.current = session.accessToken;
       lastRefreshAtRef.current = Date.now();
       setUser(session.user);
+      setHasTransientError(false);
       scheduleRefresh(generation);
       return true;
     };
@@ -168,15 +178,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [applySession],
   );
 
+  const retryRefresh = useCallback(async () => {
+    setIsRetrying(true);
+    const generation = generationRef.current;
+    const outcome = await refreshSession();
+    if (generation !== generationRef.current) {
+      setIsRetrying(false);
+      return;
+    }
+    if (outcome.kind === "success") {
+      applySession(outcome.session, generation);
+      setHasTransientError(false);
+    } else if (outcome.kind === "unauthorized") {
+      redirectToLogin();
+    } else {
+      setHasTransientError(true);
+      scheduleRefresh(generation, REFRESH_RETRY_DELAY);
+    }
+    setIsRetrying(false);
+    setReady(true);
+  }, [applySession, redirectToLogin, scheduleRefresh]);
+
   useEffect(() => {
     if (isPublicPage) return;
     const generation = generationRef.current;
     if (accessTokenRef.current) return;
     void refreshSession().then((outcome) => {
       if (generation !== generationRef.current) return;
-      if (outcome.kind === "success") applySession(outcome.session, generation);
-      else if (outcome.kind === "unauthorized") redirectToLogin();
-      else scheduleRefresh(generation, REFRESH_RETRY_DELAY);
+      if (outcome.kind === "success") {
+        applySession(outcome.session, generation);
+        setHasTransientError(false);
+      } else if (outcome.kind === "unauthorized") {
+        redirectToLogin();
+      } else {
+        setHasTransientError(true);
+        scheduleRefresh(generation, REFRESH_RETRY_DELAY);
+      }
       setReady(true);
     });
   }, [applySession, isPublicPage, pathname, redirectToLogin, scheduleRefresh]);
@@ -188,9 +225,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const generation = generationRef.current;
       void refreshSession().then((outcome) => {
         if (generation !== generationRef.current) return;
-        if (outcome.kind === "success") applySession(outcome.session, generation);
-        else if (outcome.kind === "unauthorized") expireSession(generation);
-        else scheduleRefresh(generation, REFRESH_RETRY_DELAY);
+        if (outcome.kind === "success") {
+          applySession(outcome.session, generation);
+          setHasTransientError(false);
+        } else if (outcome.kind === "unauthorized") {
+          expireSession(generation);
+        } else {
+          setHasTransientError(true);
+          scheduleRefresh(generation, REFRESH_RETRY_DELAY);
+        }
       });
     }
 
@@ -237,8 +280,61 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     () => ({ user, ready, setSession, clearSession, authFetch }),
     [authFetch, clearSession, ready, setSession, user],
   );
-  const showChildren = isPublicPage || (ready && user);
-  return <AuthContext.Provider value={value}>{showChildren ? children : null}</AuthContext.Provider>;
+
+  let content: React.ReactNode = null;
+
+  if (isPublicPage || (ready && user)) {
+    content = children;
+  } else if (hasTransientError) {
+    content = (
+      <div className="flex min-h-screen items-center justify-center bg-[#f7f7f7] p-6 text-charcoal">
+        <div className="flex w-full max-w-sm flex-col items-center gap-4 rounded-xl border-2 border-[#ededed] bg-white p-6 text-center">
+          <div className="grid size-12 place-items-center rounded-xl bg-amber-50 text-amber-600">
+            <RefreshCw className={cn("size-6", isRetrying && "animate-spin")} />
+          </div>
+          <div className="space-y-1">
+            <h3 className="text-base font-extrabold text-charcoal">Đang kết nối lại phiên học...</h3>
+            <p className="text-xs font-bold text-ash">
+              Không thể kết nối với máy chủ. Hệ thống sẽ tự động thử lại sau ít phút hoặc bạn có thể thử lại ngay.
+            </p>
+          </div>
+          <div className="flex w-full flex-col gap-2 pt-2">
+            <Button
+              onClick={() => void retryRefresh()}
+              disabled={isRetrying}
+              className="w-full justify-center"
+            >
+              {isRetrying ? (
+                <>
+                  <Loader2 className="size-4 animate-spin" /> Đang kết nối...
+                </>
+              ) : (
+                "Thử lại ngay"
+              )}
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={redirectToLogin}
+              className="w-full justify-center"
+            >
+              Về trang đăng nhập
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  } else {
+    content = (
+      <div className="flex min-h-screen items-center justify-center bg-[#f7f7f7] p-6 text-charcoal">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="size-8 animate-spin text-ecto-green" />
+          <p className="text-sm font-extrabold text-ash">Đang kiểm tra phiên đăng nhập...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return <AuthContext.Provider value={value}>{content}</AuthContext.Provider>;
 }
 
 export function useAuth() {

@@ -20,6 +20,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/components/auth-provider";
 import { InteractiveReader } from "@/components/reading/interactive-reader";
 import { SentenceBreakdownCard } from "@/components/reading/sentence-breakdown-card";
 import { DocumentImporter } from "@/components/reading/document-importer";
@@ -89,6 +90,7 @@ Key architectural dimensions include:
 As cognitive automation accelerates, professionals must transition from procedural execution to strategic direction. Cultivating continuous learning habits will determine long-term adaptability in competitive industries.`;
 
 export default function ReadingPage() {
+  const { authFetch } = useAuth();
   const [documentMeta, setDocumentMeta] = useState<StructuredDocumentMeta | null>(null);
   const [activeChunk, setActiveChunk] = useState<DocumentChunk | null>(null);
   const [activeChunkIndex, setActiveChunkIndex] = useState<number>(0);
@@ -739,7 +741,7 @@ export default function ReadingPage() {
     phonetic: string
   ) => {
     try {
-      const res = await fetch("/api/translate/add", {
+      const res = await authFetch("/api/translate/add", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
