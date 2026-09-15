@@ -294,7 +294,7 @@ export async function submitStudyEvent(
       return;
     }
 
-    const [session] = await tx
+    let [session] = await tx
       .select()
       .from(studySessions)
       .where(
@@ -304,9 +304,59 @@ export async function submitStudyEvent(
         ),
       )
       .limit(1);
+
     if (!session) {
-      throw new StudyServiceError("Không tìm thấy phiên học.", 404);
+      const [existingSession] = await tx
+        .select()
+        .from(studySessions)
+        .where(eq(studySessions.id, input.sessionId))
+        .limit(1);
+
+      const now = new Date();
+      if (existingSession) {
+        const nextPhase = existingSession.phase ?? input.phase;
+        await tx
+          .update(studySessions)
+          .set({
+            userId,
+            status: "active",
+            phase: nextPhase,
+            abandonedAt: null,
+            lastActivityAt: now,
+            updatedAt: now,
+          })
+          .where(eq(studySessions.id, input.sessionId));
+
+        session = {
+          ...existingSession,
+          userId,
+          status: "active",
+          phase: nextPhase,
+          abandonedAt: null,
+          lastActivityAt: now,
+          updatedAt: now,
+        };
+      } else {
+        const mode = input.phase === "flashcard" ? "learn" : "review";
+        const [recoveredSession] = await tx
+          .insert(studySessions)
+          .values({
+            id: input.sessionId,
+            userId,
+            mode,
+            status: "active",
+            phase: input.phase,
+            requestedSize: 10,
+            selectedSize: 10,
+            startedAt: now,
+            lastActivityAt: now,
+            updatedAt: now,
+          })
+          .returning();
+        session = recoveredSession;
+      }
     }
+
     if (session.status === "completed" || !session.phase) return;
 
     if (session.status === "abandoned") {
@@ -335,7 +385,7 @@ export async function submitStudyEvent(
       throw new StudyServiceError("Bước học không còn hoạt động.", 409);
     }
 
-    const [sessionWord] = await tx
+    let [sessionWord] = await tx
       .select({
         id: studySessionWords.id,
         term: words.term,
@@ -354,7 +404,56 @@ export async function submitStudyEvent(
         ),
       )
       .limit(1);
-    if (!sessionWord) throw new StudyServiceError("Từ không thuộc phiên học.", 404);
+
+    if (!sessionWord) {
+      const [word] = await tx
+        .select({
+          id: words.id,
+          term: words.term,
+          translation: words.translation,
+        })
+        .from(words)
+        .where(eq(words.id, input.wordId))
+        .limit(1);
+
+      if (!word) {
+        throw new StudyServiceError("Từ không thuộc phiên học.", 404);
+      }
+
+      const [{ maxPosition }] = await tx
+        .select({
+          maxPosition: sql<number | null>`max(${studySessionWords.position})`,
+        })
+        .from(studySessionWords)
+        .where(eq(studySessionWords.sessionId, input.sessionId));
+
+      const position = maxPosition !== null && maxPosition !== undefined ? maxPosition + 1 : 0;
+
+      const [insertedSessionWord] = await tx
+        .insert(studySessionWords)
+        .values({
+          sessionId: input.sessionId,
+          wordId: input.wordId,
+          position,
+        })
+        .returning({
+          id: studySessionWords.id,
+          flashcardCompletedAt: studySessionWords.flashcardCompletedAt,
+          multipleChoiceCompletedAt: studySessionWords.multipleChoiceCompletedAt,
+          typingCompletedAt: studySessionWords.typingCompletedAt,
+          hadIncorrectAttempt: studySessionWords.hadIncorrectAttempt,
+        });
+
+      sessionWord = {
+        id: insertedSessionWord.id,
+        term: word.term,
+        translation: word.translation,
+        flashcardCompletedAt: insertedSessionWord.flashcardCompletedAt,
+        multipleChoiceCompletedAt: insertedSessionWord.multipleChoiceCompletedAt,
+        typingCompletedAt: insertedSessionWord.typingCompletedAt,
+        hadIncorrectAttempt: insertedSessionWord.hadIncorrectAttempt,
+      };
+    }
 
     const completion =
       input.phase === "flashcard"
@@ -549,6 +648,50 @@ export async function submitStudyEvent(
       await updateDailyActivity(tx, userId, now, {
         learned: 0,
         reviewed: Number(firstAttempt),
+        correct: 1,
+        xp: 10,
+      });
+    } else if (session.mode === "review") {
+      const schedule = scheduleLearnedWord(now);
+      await tx
+        .insert(wordProgress)
+        .values({
+          userId,
+          wordId: input.wordId,
+          status: schedule.status,
+          mastery: 25,
+          learnedAt: now,
+          reviewStage: schedule.reviewStage,
+          intervalDays: schedule.intervalDays,
+          correctCount: 1,
+          lastReviewedAt: now,
+          nextReviewAt: schedule.nextReviewAt,
+        })
+        .onConflictDoUpdate({
+          target: [wordProgress.userId, wordProgress.wordId],
+          set: {
+            status: schedule.status,
+            mastery: 25,
+            learnedAt: now,
+            reviewStage: schedule.reviewStage,
+            intervalDays: schedule.intervalDays,
+            correctCount: sql`${wordProgress.correctCount} + 1`,
+            lastReviewedAt: now,
+            nextReviewAt: schedule.nextReviewAt,
+            reviewCompletedAt: null,
+            updatedAt: now,
+          },
+        });
+      await tx
+        .update(studySessions)
+        .set({
+          reviewedCount: sql`${studySessions.reviewedCount} + 1`,
+          xpEarned: sql`${studySessions.xpEarned} + 10`,
+        })
+        .where(eq(studySessions.id, session.id));
+      await updateDailyActivity(tx, userId, now, {
+        learned: 0,
+        reviewed: 1,
         correct: 1,
         xp: 10,
       });

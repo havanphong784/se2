@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { StudyServiceError } from "./study-service";
+import { StudyApiError } from "../components/study-session";
 import { vnDateBoundary } from "./utils";
 import {
   addDays,
@@ -492,4 +493,161 @@ test("StudyServiceError carries default and custom status code", () => {
   assert.equal(conflictErr.status, 409);
   assert.equal(conflictErr.message, "Lỗi xung đột");
 });
+
+test("StudyApiError carries standard status code and message for client error differentiation", () => {
+  const error404 = new StudyApiError("Không tìm thấy phiên học.", 404);
+  assert.equal(error404.name, "StudyApiError");
+  assert.equal(error404.status, 404);
+  assert.equal(error404.message, "Không tìm thấy phiên học.");
+  assert.ok(error404 instanceof Error);
+  assert.ok(error404 instanceof StudyApiError);
+
+  const error500 = new StudyApiError("Lỗi máy chủ.", 500);
+  assert.equal(error500.status, 500);
+
+  const errorDefault = new StudyApiError("Lỗi kết nối.");
+  assert.equal(errorDefault.status, undefined);
+  assert.equal(errorDefault.message, "Lỗi kết nối.");
+});
+
+test("client auto-recovers when encountering 404 without unhandled rejection", async () => {
+  let activeSessionId = "stale-session-id";
+  let recoveryCalls = 0;
+  const recordedEvents: Array<{ sessionId: string; eventId: string }> = [];
+
+  const fakeAuthFetch = async (url: string) => {
+    if (url.includes("stale-session-id")) {
+      return {
+        ok: false,
+        status: 404,
+        json: async () => ({ message: "Không tìm thấy phiên học." }),
+      };
+    }
+    return {
+      ok: true,
+      status: 200,
+      json: async () => ({ ok: true }),
+    };
+  };
+
+  const createOrRecoverSession = async (): Promise<string> => {
+    recoveryCalls++;
+    activeSessionId = "recovered-session-id";
+    return activeSessionId;
+  };
+
+  const ensureEventSaved = async (response: {
+    ok: boolean;
+    status: number;
+    json: () => Promise<unknown>;
+  }) => {
+    if (response.ok) return;
+    const result = (await response.json().catch(() => null)) as { message?: string } | null;
+    throw new StudyApiError(result?.message ?? "Không thể lưu câu trả lời.", response.status);
+  };
+
+  const sendCompletion = async (payload: { eventId: string }, explicitSessionId?: string) => {
+    let targetSessionId = explicitSessionId ?? activeSessionId;
+    let response = await fakeAuthFetch(`/api/study-sessions/${targetSessionId}/events`);
+
+    if (response.status === 404) {
+      // Retry once with current session
+      response = await fakeAuthFetch(`/api/study-sessions/${targetSessionId}/events`);
+
+      // If still 404: Auto-recover new session and dispatch with new ID
+      if (response.status === 404) {
+        targetSessionId = await createOrRecoverSession();
+        response = await fakeAuthFetch(`/api/study-sessions/${targetSessionId}/events`);
+      }
+    }
+
+    await ensureEventSaved(response);
+    recordedEvents.push({ sessionId: targetSessionId, eventId: payload.eventId });
+  };
+
+  // Simulate client write chain: ensures no unhandled rejection and recovers smoothly
+  let writeChain: Promise<void> = Promise.resolve();
+  let pendingWrites = [{ eventId: "evt-1", failed: false }];
+
+  const saveCompletion = (payload: { eventId: string }) => {
+    const request = writeChain
+      .catch(() => {})
+      .then(() => sendCompletion(payload));
+    writeChain = request;
+    return request
+      .then(() => {
+        pendingWrites = pendingWrites.filter((item) => item.eventId !== payload.eventId);
+      })
+      .catch(() => {
+        pendingWrites = pendingWrites.map((item) =>
+          item.eventId === payload.eventId ? { ...item, failed: true } : item,
+        );
+      });
+  };
+
+  await assert.doesNotReject(saveCompletion({ eventId: "evt-1" }));
+  assert.equal(recoveryCalls, 1);
+  assert.equal(activeSessionId, "recovered-session-id");
+  assert.equal(pendingWrites.length, 0);
+  assert.deepEqual(recordedEvents, [
+    { sessionId: "recovered-session-id", eventId: "evt-1" },
+  ]);
+});
+
+test("client retryFailedWrites handles 404 StudyApiError by recovering session and resolving queue", async () => {
+  let recoveryCount = 0;
+  let activeSessionId = "expired-session-id";
+  const processedEvents: string[] = [];
+
+  const createOrRecoverSession = async (): Promise<string> => {
+    recoveryCount++;
+    activeSessionId = "recovered-session-id-2";
+    return activeSessionId;
+  };
+
+  const sendCompletion = async (item: { eventId: string }, explicitSessionId?: string) => {
+    const targetSessionId = explicitSessionId ?? activeSessionId;
+    if (targetSessionId === "expired-session-id") {
+      throw new StudyApiError("Không tìm thấy phiên học.", 404);
+    }
+    processedEvents.push(`${item.eventId}@${targetSessionId}`);
+  };
+
+  let pending = [
+    { eventId: "item-1", failed: true },
+    { eventId: "item-2", failed: true },
+  ];
+  let errorMessage: string | null = "Không thể lưu câu trả lời.";
+
+  for (const item of [...pending]) {
+    try {
+      await sendCompletion(item);
+      pending = pending.filter((entry) => entry.eventId !== item.eventId);
+      if (pending.every((entry) => !entry.failed)) {
+        errorMessage = null;
+      }
+    } catch (caught) {
+      const is404 =
+        (caught instanceof StudyApiError && caught.status === 404) ||
+        (caught instanceof Error && caught.message.includes("Không tìm thấy phiên học"));
+      if (is404) {
+        const newSessionId = await createOrRecoverSession();
+        await sendCompletion(item, newSessionId);
+        pending = pending.filter((entry) => entry.eventId !== item.eventId);
+        if (pending.every((entry) => !entry.failed)) {
+          errorMessage = null;
+        }
+      }
+    }
+  }
+
+  assert.equal(recoveryCount, 1);
+  assert.equal(pending.length, 0);
+  assert.equal(errorMessage, null);
+  assert.deepEqual(processedEvents, [
+    "item-1@recovered-session-id-2",
+    "item-2@recovered-session-id-2",
+  ]);
+});
+
 

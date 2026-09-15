@@ -89,10 +89,20 @@ async function readSessionJson(response: Response) {
   return result.session;
 }
 
+export class StudyApiError extends Error {
+  constructor(
+    message: string,
+    public status?: number,
+  ) {
+    super(message);
+    this.name = "StudyApiError";
+  }
+}
+
 async function ensureEventSaved(response: Response) {
   if (response.ok) return;
-  const result = (await response.json()) as { message?: string };
-  throw new Error(result.message ?? "Không thể lưu câu trả lời.");
+  const result = (await response.json().catch(() => null)) as { message?: string } | null;
+  throw new StudyApiError(result?.message ?? "Không thể lưu câu trả lời.", response.status);
 }
 
 export function StudySession({ mode, deck }: { mode: StudyMode; deck?: VocabularyDeck }) {
@@ -115,6 +125,12 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
   const feedbackRef = useRef<HTMLDivElement>(null);
   const promptRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const sessionRef = useRef<StudySessionDto | null>(session);
+  const isDiscardedRef = useRef(false);
+
+  useEffect(() => {
+    sessionRef.current = session;
+  }, [session]);
 
   const wordById = useMemo(
     () => new Map(session?.words.map((word) => [word.id, word]) ?? []),
@@ -165,8 +181,11 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
   }, [feedback]);
 
   useEffect(() => {
-    if (pendingWrites.length === 0) return;
-    const preventUnload = (event: BeforeUnloadEvent) => event.preventDefault();
+    if (pendingWrites.length === 0 || isDiscardedRef.current) return;
+    const preventUnload = (event: BeforeUnloadEvent) => {
+      if (isDiscardedRef.current) return;
+      event.preventDefault();
+    };
     window.addEventListener("beforeunload", preventUnload);
     return () => window.removeEventListener("beforeunload", preventUnload);
   }, [pendingWrites.length]);
@@ -277,7 +296,35 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
     setQueue(nextSession.words.filter((word) => !word[completionKey]).map((word) => word.id));
   }
 
+  async function createOrRecoverSession(): Promise<string> {
+    try {
+      const response = await authFetch("/api/study-sessions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mode, deckId: deck?.id, deckSlug: deck?.slug, requestedSize }),
+      });
+      if (response.ok) {
+        const nextSession = await readSessionJson(response);
+        setSession((prev) => (prev ? { ...prev, id: nextSession.id } : nextSession));
+        if (sessionRef.current) {
+          sessionRef.current = { ...sessionRef.current, id: nextSession.id };
+        }
+        return nextSession.id;
+      }
+    } catch {
+      // Fall through to fallback UUID
+    }
+
+    const fallbackId = crypto.randomUUID();
+    setSession((prev) => (prev ? { ...prev, id: fallbackId } : null));
+    if (sessionRef.current) {
+      sessionRef.current = { ...sessionRef.current, id: fallbackId };
+    }
+    return fallbackId;
+  }
+
   async function start() {
+    isDiscardedRef.current = false;
     setSaving(true);
     setError(null);
     try {
@@ -288,6 +335,7 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
       });
       const nextSession = await readSessionJson(response);
       setSession(nextSession);
+      sessionRef.current = nextSession;
       setFlashcardIndex(0);
       resetQueue(nextSession);
     } catch (caught) {
@@ -297,28 +345,58 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
     }
   }
 
-  async function sendCompletion(payload: CompletionPayload) {
-    if (!session) throw new Error("Phiên học chưa bắt đầu.");
-    const response = await authFetch(`/api/study-sessions/${session.id}/events`, {
+  async function sendCompletion(payload: CompletionPayload, explicitSessionId?: string) {
+    if (isDiscardedRef.current) return;
+    let targetSessionId = explicitSessionId ?? sessionRef.current?.id ?? session?.id;
+    if (!targetSessionId) throw new Error("Phiên học chưa bắt đầu.");
+
+    let response = await authFetch(`/api/study-sessions/${targetSessionId}/events`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
       keepalive: true,
     });
+
+    if (response.status === 404) {
+      // Thử retry 1 lần với session hiện tại
+      response = await authFetch(`/api/study-sessions/${targetSessionId}/events`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        keepalive: true,
+      });
+
+      // Nếu vẫn 404: Tự động tạo phiên học mới và gửi lại với session ID mới
+      if (response.status === 404) {
+        targetSessionId = await createOrRecoverSession();
+        response = await authFetch(`/api/study-sessions/${targetSessionId}/events`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+          keepalive: true,
+        });
+      }
+    }
+
     await ensureEventSaved(response);
   }
 
   function saveCompletion(payload: CompletionPayload) {
+    if (isDiscardedRef.current) return;
     setPendingWrites((items) => [
       ...items.filter((item) => item.eventId !== payload.eventId),
       { ...payload, failed: false },
     ]);
     const request = writeChainRef.current
       .catch(() => {})
-      .then(() => sendCompletion(payload));
+      .then(() => {
+        if (isDiscardedRef.current) return;
+        return sendCompletion(payload);
+      });
     writeChainRef.current = request;
     void request
       .then(() => {
+        if (isDiscardedRef.current) return;
         setPendingWrites((items) => {
           const next = items.filter((item) => item.eventId !== payload.eventId);
           if (next.every((item) => !item.failed)) {
@@ -328,6 +406,7 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
         });
       })
       .catch((caught) => {
+        if (isDiscardedRef.current) return;
         setPendingWrites((items) =>
           items.map((item) =>
             item.eventId === payload.eventId ? { ...item, failed: true } : item,
@@ -338,11 +417,12 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
   }
 
   async function retryFailedWrites(items: PendingWrite[]) {
-    if (isRetrying) return;
+    if (isRetrying || isDiscardedRef.current) return;
     setIsRetrying(true);
     setError(null);
     try {
       for (const item of items) {
+        if (isDiscardedRef.current) break;
         setPendingWrites((pending) =>
           pending.map((entry) =>
             entry.eventId === item.eventId ? { ...entry, failed: false } : entry,
@@ -350,6 +430,7 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
         );
         try {
           await sendCompletion(item);
+          if (isDiscardedRef.current) break;
           setPendingWrites((pending) => {
             const next = pending.filter((entry) => entry.eventId !== item.eventId);
             if (next.every((entry) => !entry.failed)) {
@@ -358,6 +439,39 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
             return next;
           });
         } catch (caught) {
+          if (isDiscardedRef.current) break;
+          const is404 =
+            (caught instanceof StudyApiError && caught.status === 404) ||
+            (caught instanceof Error && caught.message.includes("Không tìm thấy phiên học"));
+          if (is404) {
+            try {
+              const newSessionId = await createOrRecoverSession();
+              await sendCompletion(item, newSessionId);
+              if (isDiscardedRef.current) break;
+              setPendingWrites((pending) => {
+                const next = pending.filter((entry) => entry.eventId !== item.eventId);
+                if (next.every((entry) => !entry.failed)) {
+                  setError(null);
+                }
+                return next;
+              });
+              continue;
+            } catch (recoveryErr) {
+              if (isDiscardedRef.current) break;
+              setPendingWrites((pending) =>
+                pending.map((entry) =>
+                  entry.eventId === item.eventId ? { ...entry, failed: true } : entry,
+                ),
+              );
+              setError(
+                recoveryErr instanceof Error
+                  ? recoveryErr.message
+                  : "Không thể lưu câu trả lời.",
+              );
+              break;
+            }
+          }
+
           setPendingWrites((pending) =>
             pending.map((entry) =>
               entry.eventId === item.eventId ? { ...entry, failed: true } : entry,
@@ -370,6 +484,13 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
     } finally {
       setIsRetrying(false);
     }
+  }
+
+  function handleSkipAndExit() {
+    isDiscardedRef.current = true;
+    writeChainRef.current = Promise.resolve();
+    setPendingWrites([]);
+    setError(null);
   }
 
   function nextFlashcard() {
@@ -548,10 +669,7 @@ export function StudySession({ mode, deck }: { mode: StudyMode; deck?: Vocabular
                 </Button>
                 <Link
                   href={deck ? `/vocabulary/${deck.slug}` : "/vocabulary"}
-                  onClick={() => {
-                    setPendingWrites([]);
-                    setError(null);
-                  }}
+                  onClick={handleSkipAndExit}
                   className={buttonVariants({ variant: "secondary", size: "lg" })}
                 >
                   Bỏ qua & Về thư viện
