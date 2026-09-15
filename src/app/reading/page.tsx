@@ -33,6 +33,7 @@ import { detectPhrasesInSentence } from "@/lib/reading/phrase-matcher";
 import { extractStructuredText } from "@/lib/reading/extractors";
 import { buildSlidingWindowContext } from "@/lib/reading/context-window";
 import { SpeculativePrefetchQueue } from "@/lib/reading/prefetch-queue";
+import { SemanticRepairQueue } from "@/lib/reading/repair-queue";
 import {
   getAllDocumentsMeta,
   getDocumentChunk,
@@ -118,6 +119,24 @@ export default function ReadingPage() {
       })
   );
 
+  // Khởi tạo Semantic Repair Queue tự động sửa lỗi typographic giáo trình ở background
+  const [repairQueue] = useState(
+    () =>
+      new SemanticRepairQueue({
+        delayMs: 500,
+        onChunkRepaired: (chunkIndex, repairedText) => {
+          setActiveChunk((current) => {
+            if (!current || current.chunkIndex !== chunkIndex) return current;
+            return {
+              ...current,
+              repairedRawText: repairedText,
+              repairStatus: "completed",
+            };
+          });
+        },
+      })
+  );
+
   // Tải tài liệu đã lưu từ IndexedDB và nạp Offline Lexicon khi khởi động
   useEffect(() => {
     seedOfflineLexicon();
@@ -190,16 +209,48 @@ export default function ReadingPage() {
     };
   }, [documentMeta?.id]);
 
-  // Nội dung raw của Chunk hiện tại
+  // Khởi động Semantic Repair Queue tự động sửa layout giáo trình ở background khi mở tài liệu
+  const activeChunkIndexRef = useRef(activeChunkIndex);
+  useEffect(() => {
+    activeChunkIndexRef.current = activeChunkIndex;
+  }, [activeChunkIndex]);
+
+  useEffect(() => {
+    const docId = documentMeta?.id;
+    if (!docId) return;
+
+    let mounted = true;
+    getAllDocumentChunks(docId)
+      .then((chunks) => {
+        if (!mounted || !chunks || chunks.length === 0) return;
+        repairQueue.start(docId, chunks, activeChunkIndexRef.current, aiConfig);
+      })
+      .catch((err) => {
+        console.warn("SemanticRepairQueue init failed:", err);
+      });
+
+    return () => {
+      mounted = false;
+      repairQueue.cancel();
+    };
+  }, [documentMeta?.id, aiConfig, repairQueue]);
+
+  // Cập nhật ưu tiên sửa chunk khi người dùng chuyển sang chunk khác
+  useEffect(() => {
+    repairQueue.reprioritize(activeChunkIndex);
+  }, [activeChunkIndex, repairQueue]);
+
+  // Nội dung raw của Chunk hiện tại (ưu tiên repairedRawText sau khi AI sửa layout)
   const rawContent = useMemo(() => {
-    return activeChunk?.rawText || SAMPLE_TEXT;
+    return activeChunk?.repairedRawText || activeChunk?.rawText || SAMPLE_TEXT;
   }, [activeChunk]);
 
   // Phân đoạn văn bản của Chunk hiện tại
   const parsedData = useMemo(() => segmentText(rawContent), [rawContent]);
 
-  // Lưu ID của câu đang chọn
+  // Lưu ID và văn bản của câu đang chọn để bảo toàn focus khi AI sửa layout
   const [selectedSentenceId, setSelectedSentenceId] = useState<string | null>(null);
+  const lastSelectedSentenceTextRef = useRef<string | null>(null);
 
   // Derive activeSentence từ parsedData và selectedSentenceId
   const activeSentence = useMemo(() => {
@@ -207,6 +258,49 @@ export default function ReadingPage() {
     if (allSentences.length === 0) return null;
     if (!selectedSentenceId) return allSentences[0];
     return allSentences.find((s) => s.id === selectedSentenceId) || allSentences[0];
+  }, [parsedData, selectedSentenceId]);
+
+  // Lưu lại text của activeSentence mỗi khi người dùng chọn câu mới
+  useEffect(() => {
+    if (activeSentence?.text) {
+      lastSelectedSentenceTextRef.current = activeSentence.text;
+    }
+  }, [activeSentence?.text]);
+
+  // Khi văn bản chunk được sửa layout mượt mà, bảo toàn vị trí câu đang đọc
+  useEffect(() => {
+    const targetText = lastSelectedSentenceTextRef.current;
+    if (!targetText) return;
+
+    const allSentences = parsedData.paragraphs.flatMap((p) => p.sentences);
+    if (allSentences.length === 0) return;
+
+    // 1. Nếu ID cũ vẫn khớp chính xác
+    const currentById = allSentences.find((s) => s.id === selectedSentenceId);
+    if (currentById && currentById.text === targetText) return;
+
+    // 2. Tìm câu có nội dung trùng khớp hoặc bao hàm câu cũ để giữ vững focus
+    const norm = (str: string) => str.toLowerCase().replace(/\s+/g, " ").trim();
+    const targetNorm = norm(targetText);
+
+    const exactMatch = allSentences.find((s) => norm(s.text) === targetNorm);
+    if (exactMatch) {
+      setSelectedSentenceId(exactMatch.id);
+      return;
+    }
+
+    const partialMatch = allSentences.find((s) => {
+      const sNorm = norm(s.text);
+      return (
+        sNorm.length > 15 &&
+        targetNorm.length > 15 &&
+        (sNorm.includes(targetNorm) || targetNorm.includes(sNorm))
+      );
+    });
+
+    if (partialMatch) {
+      setSelectedSentenceId(partialMatch.id);
+    }
   }, [parsedData, selectedSentenceId]);
 
   // Kết quả phân tích và trạng thái
@@ -896,6 +990,17 @@ export default function ReadingPage() {
               onSelectChunkIndex={handleSelectChunk}
             />
             {renderAiReadinessBadge()}
+            {activeChunk?.repairedRawText && (
+              <Badge
+                variant="default"
+                className="text-[10.5px] sm:text-[11px] py-0.5 px-2 sm:px-2.5 shrink-0 bg-[#fefce8] border-amber-300 text-amber-800 flex items-center gap-1 cursor-default shadow-2xs"
+                title="Chunk này đã được Semantic Repair AI tối ưu hóa cấu trúc Markdown và sửa lỗi typographic"
+              >
+                <Zap className="size-3.5 fill-amber-500 text-amber-500" />
+                <span className="hidden sm:inline">⚡ Đã tối ưu layout bằng AI</span>
+                <span className="sm:hidden">⚡ Đã tối ưu layout</span>
+              </Badge>
+            )}
           </div>
 
           {/* Bên phải: Nút Fullscreen native & Nút Thoát Focus Mode */}
@@ -982,6 +1087,17 @@ export default function ReadingPage() {
               onSelectChunkIndex={handleSelectChunk}
             />
             {renderAiReadinessBadge()}
+            {activeChunk?.repairedRawText && (
+              <Badge
+                variant="default"
+                className="text-[10.5px] sm:text-[11px] py-0.5 px-2 sm:px-2.5 shrink-0 bg-[#fefce8] border-amber-300 text-amber-800 flex items-center gap-1 cursor-default shadow-2xs"
+                title="Chunk này đã được Semantic Repair AI tối ưu hóa cấu trúc Markdown và sửa lỗi typographic"
+              >
+                <Zap className="size-3.5 fill-amber-500 text-amber-500" />
+                <span className="hidden sm:inline">⚡ Đã tối ưu layout bằng AI</span>
+                <span className="sm:hidden">⚡ Đã tối ưu layout</span>
+              </Badge>
+            )}
           </div>
 
           {/* Bên phải: Nút "Lưu phiên học", "Nhập tài liệu", "Local AI Config", và nút bật Focus Mode */}

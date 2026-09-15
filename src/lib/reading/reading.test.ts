@@ -1068,6 +1068,52 @@ Organizations must adapt to cognitive automation.`;
       assert.equal(result.skeleton?.pattern, "S + V + O");
       assert.deepEqual(result.vocabulary, []);
     });
+
+    it("bóc tách an toàn socraticQuestion và cefrLevel từ JSON phản hồi AI", () => {
+      const fullJson = JSON.stringify({
+        sentence: "Deep neural networks generalize across diverse domains.",
+        complexity: "complex",
+        cefrLevel: "C1",
+        translationVi: "Các mạng nơ-ron sâu khái quát hóa qua các miền đa dạng.",
+        coreIdeaVi: "Mạng nơ-ron có khả năng tổng quát hóa tốt.",
+        socraticQuestion: {
+          questionVi: "Điều gì cho phép mạng nơ-ron sâu áp dụng trên nhiều lĩnh vực khác nhau?",
+          options: [
+            "Khả năng tổng quát hóa từ các biểu diễn ngữ cảnh",
+            "Cần lập trình thủ công từng luật",
+            "Chỉ giới hạn trong xử lý ảnh",
+            "Tốc độ xung nhịp CPU",
+          ],
+          correctIndex: 0,
+          explanationVi: "Mạng nơ-ron sâu học các đặc trưng ngữ cảnh cho phép tổng quát hóa rộng.",
+        },
+      });
+
+      const result = safeParseSentenceBreakdown(fullJson, "Deep neural networks generalize across diverse domains.");
+      assert.equal(result.cefrLevel, "C1");
+      assert.ok(result.socraticQuestion);
+      assert.equal(result.socraticQuestion.questionVi, "Điều gì cho phép mạng nơ-ron sâu áp dụng trên nhiều lĩnh vực khác nhau?");
+      assert.equal(result.socraticQuestion.options.length, 4);
+      assert.equal(result.socraticQuestion.correctIndex, 0);
+      assert.equal(result.socraticQuestion.explanationVi, "Mạng nơ-ron sâu học các đặc trưng ngữ cảnh cho phép tổng quát hóa rộng.");
+    });
+
+    it("xử lý an toàn khi socraticQuestion bị cắt cụt hoặc thiếu đáp án hợp lệ", () => {
+      const brokenQuizJson = JSON.stringify({
+        sentence: "Simple sentence.",
+        complexity: "simple",
+        cefrLevel: "B1",
+        socraticQuestion: {
+          questionVi: "Câu hỏi dở dang?",
+          options: ["Chỉ có một lựa chọn"], // < 2 options
+          correctIndex: 0,
+        },
+      });
+
+      const result = safeParseSentenceBreakdown(brokenQuizJson, "Simple sentence.");
+      assert.equal(result.cefrLevel, "B1");
+      assert.equal(result.socraticQuestion, undefined);
+    });
   });
 
   describe("Safe Parse Paragraph Breakdown (Batching)", () => {
@@ -1320,6 +1366,124 @@ Organizations must adapt to cognitive automation.`;
       queue.cancel();
       assert.equal(queue.getIsRunning(), false);
       assert.equal(prefetchedCount, 0);
+    });
+  });
+
+  describe("Semantic Repair Queue & Two-Phase Layout Healing", () => {
+    it("gatekeeper shouldRepairChunk: bỏ qua chunk có noiseScore < 2 hoặc đã sửa", async () => {
+      const { shouldRepairChunk } = await import("./repair-queue");
+
+      const cleanChunk = {
+        chunkIndex: 0,
+        startPage: 1,
+        endPage: 2,
+        rawText: "Clean academic text without noise.",
+        noiseScore: 0,
+      };
+      assert.equal(shouldRepairChunk(cleanChunk), false);
+
+      const lowNoiseChunk = {
+        chunkIndex: 1,
+        startPage: 3,
+        endPage: 4,
+        rawText: "Text with trivial formatting.",
+        noiseScore: 1,
+      };
+      assert.equal(shouldRepairChunk(lowNoiseChunk), false);
+
+      const noisyChunk = {
+        chunkIndex: 2,
+        startPage: 5,
+        endPage: 6,
+        rawText: "Noisy text with broken hyphens-\n and glyphs ■",
+        noiseScore: 15,
+      };
+      assert.equal(shouldRepairChunk(noisyChunk), true);
+
+      const completedChunk = {
+        chunkIndex: 3,
+        startPage: 7,
+        endPage: 8,
+        rawText: "Noisy text.",
+        repairedRawText: "Repaired clean text.",
+        repairStatus: "completed" as const,
+        noiseScore: 20,
+      };
+      assert.equal(shouldRepairChunk(completedChunk), false);
+    });
+
+    it("prioritizeChunkIndices: ưu tiên activeChunkIndex đầu tiên, sau đó activeChunkIndex + 1", async () => {
+      const { prioritizeChunkIndices } = await import("./repair-queue");
+
+      // Giả sử có các chunk 0, 1, 2, 3, 4 cần sửa, người dùng đang ở chunk 2
+      const candidateIndices = [0, 1, 2, 3, 4];
+      const activeIdx = 2;
+
+      const order = prioritizeChunkIndices(candidateIndices, activeIdx);
+      // Ưu tiên: 2 đầu tiên, kế đến là 3, sau đó 4, rồi 0, 1
+      assert.equal(order[0], 2);
+      assert.equal(order[1], 3);
+      assert.equal(order[2], 4);
+      assert.equal(order[3], 0);
+      assert.equal(order[4], 1);
+    });
+
+    it("updateDocumentChunk: cập nhật thành công chunk vào storage và đọc lại đúng", async () => {
+      const { updateDocumentChunk, getDocumentChunk } = await import("./indexed-storage");
+
+      const testDocId = "test-doc-repair-" + Date.now();
+      const updatedChunk = {
+        chunkIndex: 0,
+        startPage: 1,
+        endPage: 10,
+        rawText: "Raw text before repair",
+        repairedRawText: "## Repaired Heading\n\nRepaired text after AI.",
+        repairStatus: "completed" as const,
+        noiseScore: 25,
+      };
+
+      await updateDocumentChunk(testDocId, 0, updatedChunk);
+      const retrieved = await getDocumentChunk(testDocId, 0);
+
+      assert.ok(retrieved);
+      assert.equal(retrieved.repairedRawText, "## Repaired Heading\n\nRepaired text after AI.");
+      assert.equal(retrieved.repairStatus, "completed");
+    });
+
+    it("SemanticRepairQueue: quản lý hàng đợi, reprioritize và cancel an toàn", async () => {
+      const { SemanticRepairQueue } = await import("./repair-queue");
+
+      const chunks = [
+        { chunkIndex: 0, startPage: 1, endPage: 2, rawText: "Chunk 0", noiseScore: 10 },
+        { chunkIndex: 1, startPage: 3, endPage: 4, rawText: "Chunk 1", noiseScore: 0 }, // noiseScore < 2 -> skipped
+        { chunkIndex: 2, startPage: 5, endPage: 6, rawText: "Chunk 2", noiseScore: 15 },
+        { chunkIndex: 3, startPage: 7, endPage: 8, rawText: "Chunk 3", noiseScore: 12 },
+      ];
+
+      const queue = new SemanticRepairQueue({ delayMs: 100 });
+      const aiConfig = {
+        provider: "local_tunnel" as const,
+        baseUrl: "http://localhost:11434/v1",
+        model: "test-model",
+      };
+
+      queue.start("doc-queue-test", chunks, 0, aiConfig);
+
+      const pending = queue.getPendingQueue();
+      // Chunk 1 bị bỏ qua vì noiseScore = 0 < 2
+      assert.ok(!pending.includes(1));
+      // Chunk 0 là activeChunkIndex nên đứng đầu
+      assert.equal(pending[0], 0);
+
+      // Thử reprioritize sang chunk 2
+      queue.reprioritize(2);
+      const reordered = queue.getPendingQueue();
+      assert.equal(reordered[0], 2);
+
+      // Cancel dừng hàng đợi an toàn
+      queue.cancel();
+      assert.equal(queue.isRunning(), false);
+      assert.equal(queue.getPendingQueue().length, 0);
     });
   });
 });

@@ -403,6 +403,64 @@ export async function getAllDocumentChunks(
 }
 
 /**
+ * Cập nhật một Chunk của tài liệu vào IndexedDB ('chunks' store và in-memory fallback)
+ */
+export async function updateDocumentChunk(
+  docId: string,
+  chunkIndex: number,
+  updatedChunk: DocumentChunk
+): Promise<void> {
+  // Luôn cập nhật in-memory fallback trước
+  memChunks.set(`${docId}_${chunkIndex}`, updatedChunk);
+  const memVdoc = memVdocPackages.get(docId);
+  if (memVdoc && Array.isArray(memVdoc.chunks)) {
+    const idx = memVdoc.chunks.findIndex((c) => c.chunkIndex === chunkIndex);
+    if (idx !== -1) {
+      memVdoc.chunks[idx] = updatedChunk;
+    } else {
+      memVdoc.chunks.push(updatedChunk);
+      memVdoc.chunks.sort((a, b) => a.chunkIndex - b.chunkIndex);
+    }
+  }
+
+  try {
+    const db = await getDb();
+    const tx = db.transaction(["chunks", "vdoc_packages"], "readwrite");
+    const chunkStore = tx.objectStore("chunks");
+    const vdocStore = tx.objectStore("vdoc_packages");
+
+    const record: StoredChunkRecord = {
+      docId,
+      chunkIndex,
+      chunk: updatedChunk,
+    };
+    chunkStore.put(record);
+
+    const getVdocReq = vdocStore.get(docId);
+    getVdocReq.onsuccess = () => {
+      const vdoc = getVdocReq.result as VdocPackage | undefined;
+      if (vdoc && Array.isArray(vdoc.chunks)) {
+        const idx = vdoc.chunks.findIndex((c) => c.chunkIndex === chunkIndex);
+        if (idx !== -1) {
+          vdoc.chunks[idx] = updatedChunk;
+        } else {
+          vdoc.chunks.push(updatedChunk);
+          vdoc.chunks.sort((a, b) => a.chunkIndex - b.chunkIndex);
+        }
+        vdocStore.put(vdoc);
+      }
+    };
+
+    return new Promise((resolve, reject) => {
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  } catch {
+    // In-memory maps đã được cập nhật ở trên
+  }
+}
+
+/**
  * Cập nhật tiến độ đọc hiện tại của tài liệu
  */
 export async function updateReadingProgress(

@@ -100,9 +100,17 @@ export interface IdiomPhrase {
   meaningVi: string;
 }
 
+export interface SocraticQuestion {
+  questionVi: string;
+  options: string[];
+  correctIndex: number;
+  explanationVi: string;
+}
+
 export interface SentenceBreakdownResponse {
   sentence: string;
   complexity?: SentenceComplexity;
+  cefrLevel?: "A1" | "A2" | "B1" | "B2" | "C1" | "C2" | string;
   translationVi: string;
   coreIdeaVi?: string; // Tầng 1: Ý chính cốt lõi ngắn gọn
   skeleton?: { // Tầng 2: Khung câu S-V-O-A
@@ -116,6 +124,7 @@ export interface SentenceBreakdownResponse {
   idiomsAndPhrases: IdiomPhrase[];
   mentalModelSteps?: string[]; // Tầng 7: Hướng dẫn tư duy đọc hiểu tự nhiên
   simplifiedEnglish?: string;
+  socraticQuestion?: SocraticQuestion;
 }
 
 export interface ClientAIConfig {
@@ -154,6 +163,9 @@ export interface DocumentChunk {
   endPage: number;
   chapterTitle?: string;
   rawText: string;
+  repairedRawText?: string;
+  repairStatus?: "pending" | "repairing" | "completed" | "skipped";
+  noiseScore?: number;
   totalWords?: number;
 }
 

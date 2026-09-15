@@ -7,6 +7,7 @@ import type {
   SentenceBreakdownResponse,
   SentenceComplexity,
   SkeletonPart,
+  SocraticQuestion,
   WordFamilyItem,
 } from "@/types/reading";
 import { getCachedWord } from "@/lib/reading/dictionary-cache";
@@ -253,6 +254,22 @@ export function parseSingleBreakdownObject(
   const complexity: SentenceComplexity = validComplexities.includes(rawComplexity)
     ? rawComplexity
     : "simple";
+
+  // CEFR Level
+  const validCefr: Array<"A1" | "A2" | "B1" | "B2" | "C1" | "C2"> = [
+    "A1",
+    "A2",
+    "B1",
+    "B2",
+    "C1",
+    "C2",
+  ];
+  const rawCefr = String(
+    parsed.cefrLevel || parsed.cefr_level || parsed.cefr || parsed.level || ""
+  ).toUpperCase().trim();
+  const cefrLevel = validCefr.includes(rawCefr as "A1" | "A2" | "B1" | "B2" | "C1" | "C2")
+    ? (rawCefr as "A1" | "A2" | "B1" | "B2" | "C1" | "C2")
+    : undefined;
 
   // Translations and core idea
   const translationVi =
@@ -577,9 +594,70 @@ export function parseSingleBreakdownObject(
         .filter(Boolean)
     : [];
 
+  // Socratic Comprehension Question
+  let socraticQuestion: SocraticQuestion | undefined = undefined;
+  const rawSq = (parsed.socraticQuestion ||
+    parsed.socratic_question ||
+    parsed.comprehension_question ||
+    parsed.quiz) as Record<string, unknown> | undefined;
+
+  if (rawSq && typeof rawSq === "object") {
+    const questionVi =
+      typeof rawSq.questionVi === "string"
+        ? rawSq.questionVi.trim()
+        : typeof rawSq.question === "string"
+          ? rawSq.question.trim()
+          : typeof rawSq.question_vi === "string"
+            ? rawSq.question_vi.trim()
+            : "";
+
+    const rawOptions = rawSq.options || rawSq.choices || rawSq.answers;
+    const options: string[] = Array.isArray(rawOptions)
+      ? rawOptions
+          .map((o) => (typeof o === "string" ? o.trim() : String(o || "").trim()))
+          .filter(Boolean)
+      : [];
+
+    let correctIndex = 0;
+    const rawIndexVal = rawSq.correctIndex ?? rawSq.correct_index ?? rawSq.answerIndex;
+    if (typeof rawIndexVal === "number" && !isNaN(rawIndexVal)) {
+      correctIndex = Math.max(0, Math.min(options.length - 1, Math.round(rawIndexVal)));
+    } else if (typeof rawIndexVal === "string") {
+      const trimmedVal = rawIndexVal.trim();
+      const parsedNum = parseInt(trimmedVal, 10);
+      if (!isNaN(parsedNum)) {
+        correctIndex = Math.max(0, Math.min(options.length - 1, parsedNum));
+      } else {
+        const letterCode = trimmedVal.toUpperCase().charCodeAt(0) - 65;
+        if (letterCode >= 0 && letterCode < options.length) {
+          correctIndex = letterCode;
+        }
+      }
+    }
+
+    const explanationVi =
+      typeof rawSq.explanationVi === "string"
+        ? rawSq.explanationVi.trim()
+        : typeof rawSq.explanation === "string"
+          ? rawSq.explanation.trim()
+          : typeof rawSq.explanation_vi === "string"
+            ? rawSq.explanation_vi.trim()
+            : "";
+
+    if (questionVi && options.length >= 2) {
+      socraticQuestion = {
+        questionVi,
+        options,
+        correctIndex,
+        explanationVi,
+      };
+    }
+  }
+
   const result: SentenceBreakdownResponse = {
     sentence,
     complexity,
+    cefrLevel,
     translationVi,
     coreIdeaVi,
     skeleton,
@@ -590,6 +668,7 @@ export function parseSingleBreakdownObject(
     idiomsAndPhrases,
     mentalModelSteps,
     simplifiedEnglish,
+    socraticQuestion,
   };
 
   return enrichSentenceBreakdown(result);

@@ -46,9 +46,11 @@ export const SYSTEM_PROMPT = `You are a bilingual English-Vietnamese linguist fo
 Analyze <target_sentence> considering <context_before> and <context_after> in natural Vietnamese.
 RULES:
 1. Technical Terms: Keep IT/tech terms in English (CPU, RAM, API, cache...).
-2. Return ONLY a valid JSON object with these EXACT keys:
+2. Socratic Question: Generate a multiple-choice comprehension check for the sentence (when complexity !== 'micro') with questionVi, 3-4 options, correctIndex, and explanationVi.
+3. Return ONLY a valid JSON object with these EXACT keys:
 {
   "complexity": "simple" | "compound" | "complex",
+  "cefrLevel": "A1" | "A2" | "B1" | "B2" | "C1" | "C2",
   "translationVi": "Bản dịch tiếng Việt tự nhiên",
   "coreIdeaVi": "Ý chính của câu trong 1 câu ngắn",
   "simplifiedEnglish": "Viết lại bằng tiếng Anh đơn giản",
@@ -64,7 +66,14 @@ RULES:
     "mechanicVi": "Giải thích cơ chế ngữ pháp"
   },
   "vocabulary": [{"term": "...", "meaningVi": "...", "type": "noun", "contextNoteVi": "..."}],
-  "mentalModelSteps": [{"stepNumber": 1, "anchorText": "...", "actionVi": "...", "cognitiveWhyVi": "..."}]
+  "idiomsAndPhrases": [{"phrase": "...", "meaningVi": "..."}],
+  "mentalModelSteps": [{"stepNumber": 1, "anchorText": "...", "actionVi": "...", "cognitiveWhyVi": "..."}],
+  "socraticQuestion": {
+    "questionVi": "Câu hỏi trắc nghiệm kiểm tra độ hiểu sâu",
+    "options": ["Lựa chọn A", "Lựa chọn B", "Lựa chọn C", "Lựa chọn D"],
+    "correctIndex": 0,
+    "explanationVi": "Giải thích vì sao đáp án đúng dựa vào ngữ cảnh câu"
+  }
 }`;
 
 /**
@@ -83,6 +92,11 @@ export const SENTENCE_BREAKDOWN_JSON_SCHEMA = {
         enum: ["micro", "simple", "compound", "complex"],
         description: "Sentence grammatical complexity",
       },
+      cefrLevel: {
+        type: "string",
+        enum: ["A1", "A2", "B1", "B2", "C1", "C2"],
+        description: "Estimated CEFR grammatical and lexical level of this sentence",
+      },
       translationVi: {
         type: "string",
         description: "Natural Vietnamese contextual translation",
@@ -90,6 +104,10 @@ export const SENTENCE_BREAKDOWN_JSON_SCHEMA = {
       coreIdeaVi: {
         type: "string",
         description: "Core meaning in 1 concise Vietnamese sentence",
+      },
+      simplifiedEnglish: {
+        type: "string",
+        description: "Simplified English rewrite",
       },
       skeleton: {
         type: "object",
@@ -182,6 +200,20 @@ export const SENTENCE_BREAKDOWN_JSON_SCHEMA = {
         type: "array",
         items: { type: "string" },
       },
+      socraticQuestion: {
+        type: "object",
+        properties: {
+          questionVi: { type: "string" },
+          options: {
+            type: "array",
+            items: { type: "string" },
+          },
+          correctIndex: { type: "integer" },
+          explanationVi: { type: "string" },
+        },
+        required: ["questionVi", "options", "correctIndex", "explanationVi"],
+        additionalProperties: false,
+      },
     },
     required: [
       "complexity",
@@ -206,11 +238,13 @@ export const PARAGRAPH_SYSTEM_PROMPT = `You are a bilingual English-Vietnamese l
 Analyze each sentence in <paragraph> in natural Vietnamese.
 RULES:
 1. Technical Terms: Keep IT/tech terms in English (CPU, RAM, API, cache...).
-2. Return ONLY a valid JSON object with key 'analyses': an array containing breakdown objects for each sentence.
+2. Socratic Question: Generate a multiple-choice comprehension check for each sentence (when complexity !== 'micro') with questionVi, 3-4 options, correctIndex, and explanationVi.
+3. Return ONLY a valid JSON object with key 'analyses': an array containing breakdown objects for each sentence.
 Each breakdown object must contain:
 {
   "sentence": "Exact original sentence text",
   "complexity": "simple" | "compound" | "complex",
+  "cefrLevel": "A1" | "A2" | "B1" | "B2" | "C1" | "C2",
   "translationVi": "Bản dịch tiếng Việt tự nhiên",
   "coreIdeaVi": "Ý chính của câu trong 1 câu ngắn",
   "simplifiedEnglish": "Viết lại bằng tiếng Anh đơn giản",
@@ -229,7 +263,13 @@ Each breakdown object must contain:
   },
   "vocabulary": [{"term": "...", "partOfSpeech": "noun", "contextMeaningVi": "...", "isTechnicalTerm": false}],
   "idiomsAndPhrases": [{"phrase": "...", "meaningVi": "..."}],
-  "mentalModelSteps": ["1. ..."]
+  "mentalModelSteps": ["1. ..."],
+  "socraticQuestion": {
+    "questionVi": "Câu hỏi trắc nghiệm kiểm tra độ hiểu sâu",
+    "options": ["Lựa chọn A", "Lựa chọn B", "Lựa chọn C", "Lựa chọn D"],
+    "correctIndex": 0,
+    "explanationVi": "Giải thích vì sao đáp án đúng dựa vào ngữ cảnh câu"
+  }
 }`;
 
 /**
@@ -256,6 +296,11 @@ export const PARAGRAPH_BREAKDOWN_JSON_SCHEMA = {
               enum: ["micro", "simple", "compound", "complex"],
               description: "Sentence grammatical complexity",
             },
+            cefrLevel: {
+              type: "string",
+              enum: ["A1", "A2", "B1", "B2", "C1", "C2"],
+              description: "Estimated CEFR grammatical and lexical level of this sentence",
+            },
             translationVi: {
               type: "string",
               description: "Natural Vietnamese contextual translation",
@@ -263,6 +308,10 @@ export const PARAGRAPH_BREAKDOWN_JSON_SCHEMA = {
             coreIdeaVi: {
               type: "string",
               description: "Core meaning in 1 concise Vietnamese sentence",
+            },
+            simplifiedEnglish: {
+              type: "string",
+              description: "Simplified English rewrite",
             },
             skeleton: {
               type: "object",
@@ -354,6 +403,20 @@ export const PARAGRAPH_BREAKDOWN_JSON_SCHEMA = {
             mentalModelSteps: {
               type: "array",
               items: { type: "string" },
+            },
+            socraticQuestion: {
+              type: "object",
+              properties: {
+                questionVi: { type: "string" },
+                options: {
+                  type: "array",
+                  items: { type: "string" },
+                },
+                correctIndex: { type: "integer" },
+                explanationVi: { type: "string" },
+              },
+              required: ["questionVi", "options", "correctIndex", "explanationVi"],
+              additionalProperties: false,
             },
           },
           required: [
@@ -991,4 +1054,105 @@ export async function analyzeParagraph(
   }
 
   return results;
+}
+
+/**
+ * Specialized Typographer Prompt: Khôi phục cấu trúc Markdown cho giáo trình và tài liệu học thuật bị rách layout.
+ */
+export const TYPOGRAPHER_SYSTEM_PROMPT = `You are a professional textbook layout restoration engineer and typographer.
+Your mission is to restore broken OCR/PDF textbook raw text into clean, structured Markdown.
+RULES:
+1. Fix broken hyphenations, split words (de-hyphenation), and merged/accidental line breaks.
+2. Restore proper markdown headers (##, ###) for chapter/section titles.
+3. Fix list items and bullet points (- item, 1. item).
+4. Preserve technical terms, code snippets, formulas, equations, and exact meaning.
+5. Do NOT summarize, remove information, or invent new content.
+6. Return ONLY the restored clean Markdown text directly, without any wrapping or markdown code fences like \`\`\`markdown.`;
+
+/**
+ * Gọi AI với Specialized Typographer Prompt để khôi phục cấu trúc Markdown của chunk bị rách layout.
+ */
+export async function repairDocumentChunkAI(
+  rawText: string,
+  config: ClientAIConfig
+): Promise<string> {
+  if (!rawText || !rawText.trim()) return rawText;
+
+  const endpoint = `${config.baseUrl.replace(/\/+$/, "")}/chat/completions`;
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  if (config.apiKey) {
+    headers["Authorization"] = `Bearer ${config.apiKey}`;
+  }
+
+  const requestBody = {
+    model: config.model,
+    temperature: config.temperature ?? 0.1,
+    stream: false,
+    messages: [
+      { role: "system", content: TYPOGRAPHER_SYSTEM_PROMPT },
+      {
+        role: "user",
+        content: `Please restore the following textbook raw text into clean Markdown formatting:\n\n${rawText}`,
+      },
+    ],
+  };
+
+  const res = await fetch(endpoint, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(requestBody),
+    signal: AbortSignal.timeout(60000),
+  });
+
+  if (!res.ok) {
+    const errText = await res.text().catch(() => "");
+    throw new Error(`AI Layout Repair Failed (${res.status}): ${errText.slice(0, 200)}`);
+  }
+
+  const responseText = await res.text();
+  if (!responseText || !responseText.trim()) {
+    return rawText;
+  }
+
+  let rawContent = "";
+  const trimmed = responseText.trim();
+
+  // Xử lý cả response stream SSE lẫn JSON trực tiếp
+  if (trimmed.startsWith("data:") || trimmed.includes("\ndata:")) {
+    const lines = trimmed.split("\n");
+    for (const line of lines) {
+      const cleanLine = line.trim();
+      if (!cleanLine.startsWith("data:")) continue;
+      const jsonStr = cleanLine.slice(5).trim();
+      if (jsonStr === "[DONE]" || !jsonStr) continue;
+      try {
+        const chunk = JSON.parse(jsonStr);
+        const delta =
+          chunk.choices?.[0]?.delta?.content ??
+          chunk.choices?.[0]?.message?.content ??
+          "";
+        rawContent += delta;
+      } catch {}
+    }
+  } else {
+    try {
+      const json = JSON.parse(trimmed);
+      rawContent =
+        json.choices?.[0]?.message?.content ??
+        json.choices?.[0]?.text ??
+        json.content ??
+        "";
+    } catch {
+      rawContent = trimmed;
+    }
+  }
+
+  let cleaned = rawContent.trim();
+  // Bỏ code block fences nếu model bọc trong \`\`\`markdown ... \`\`\`
+  cleaned = cleaned.replace(/^```(?:markdown)?\s*\r?\n?/i, "");
+  cleaned = cleaned.replace(/\r?\n?```\s*$/i, "");
+
+  return cleaned.trim() || rawText;
 }

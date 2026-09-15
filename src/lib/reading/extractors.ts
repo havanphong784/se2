@@ -6,6 +6,11 @@ import type {
   DocumentChunk,
   TableOfContentItem,
 } from "@/types/reading";
+import {
+  cleanTextbookArtifacts,
+  calculateChunkNoiseScore,
+} from "./textbook-cleaner";
+import { parseDocxToMarkdown } from "./docx-parser";
 
 const PAGES_PER_CHUNK = 10;
 const WORDS_PER_PAGE_ESTIMATE = 350;
@@ -849,7 +854,8 @@ export async function extractStructuredPdf(
 
     // Gom thành đoạn văn markdown và phát hiện đề mục
     const { pageText, headings } = assemblePageText(sortedItems, dominantFontSize);
-    extractedPages.push(pageText);
+    const cleanedPageText = cleanTextbookArtifacts(pageText);
+    extractedPages.push(cleanedPageText);
 
     if (headings.length > 0) {
       detectedHeadingsByPage.set(pageNum, headings);
@@ -946,6 +952,7 @@ export async function extractStructuredPdf(
 
     // Tìm tiêu đề chương tương ứng với chunk này nếu có
     const chapterToc = tocItems.find((t) => t.chunkIndex === cIdx);
+    const { score: noiseScore } = calculateChunkNoiseScore(rawText);
 
     chunks.push({
       chunkIndex: cIdx,
@@ -953,6 +960,7 @@ export async function extractStructuredPdf(
       endPage,
       chapterTitle: chapterToc?.title,
       rawText,
+      noiseScore,
       totalWords: words,
     });
   }
@@ -1009,7 +1017,7 @@ export async function extractStructuredDocx(
   chunks: DocumentChunk[];
 }> {
   let buffer: ArrayBuffer;
-  if (fileOrBuffer instanceof File) {
+  if (typeof File !== "undefined" && fileOrBuffer instanceof File) {
     buffer = await fileOrBuffer.arrayBuffer();
   } else if (fileOrBuffer instanceof Uint8Array) {
     buffer = fileOrBuffer.buffer.slice(
@@ -1017,18 +1025,26 @@ export async function extractStructuredDocx(
       fileOrBuffer.byteOffset + fileOrBuffer.byteLength
     ) as ArrayBuffer;
   } else {
-    buffer = fileOrBuffer;
+    buffer = fileOrBuffer as ArrayBuffer;
   }
 
-  const conversion = await mammoth.convertToMarkdown({ arrayBuffer: buffer });
-  const markdown = conversion.value.trim();
+  let markdown = "";
+  try {
+    markdown = await parseDocxToMarkdown(buffer);
+  } catch (docxErr) {
+    console.warn("Native DOCX XML parsing failed, falling back to mammoth:", docxErr);
+    const conversion = await mammoth.convertToMarkdown({ arrayBuffer: buffer });
+    markdown = conversion.value.trim();
+  }
 
   if (!markdown) {
     throw new Error("Không thể đọc được nội dung từ file Word (.docx).");
   }
 
+  const cleanedMarkdown = cleanTextbookArtifacts(markdown);
+
   return extractStructuredText(
-    markdown,
+    cleanedMarkdown,
     "Tài liệu Word",
     pagesPerChunk,
     "docx"
@@ -1047,7 +1063,7 @@ export function extractStructuredText(
   meta: StructuredDocumentMeta;
   chunks: DocumentChunk[];
 } {
-  const cleaned = text.replace(/\r\n/g, "\n").trim();
+  const cleaned = cleanTextbookArtifacts(text.replace(/\r\n/g, "\n").trim());
   const allWords = cleaned.split(/\s+/).filter(Boolean);
   const totalWords = allWords.length;
   const totalPages = Math.max(1, Math.ceil(totalWords / WORDS_PER_PAGE_ESTIMATE));
@@ -1128,13 +1144,16 @@ export function extractStructuredText(
       const startPage = currentChunkIndex * pagesPerChunk + 1;
       const endPage = Math.min((currentChunkIndex + 1) * pagesPerChunk, totalPages);
       const chapterToc = tocItems.find((t) => t.chunkIndex === currentChunkIndex);
+      const chunkRawText = currentChunkParagraphs.join("\n\n");
+      const { score: noiseScore } = calculateChunkNoiseScore(chunkRawText);
 
       chunks.push({
         chunkIndex: currentChunkIndex,
         startPage,
         endPage,
         chapterTitle: chapterToc?.title,
-        rawText: currentChunkParagraphs.join("\n\n"),
+        rawText: chunkRawText,
+        noiseScore,
         totalWords: currentChunkWords,
       });
 
@@ -1151,12 +1170,16 @@ export function extractStructuredText(
   const startPage = currentChunkIndex * pagesPerChunk + 1;
   const endPage = totalPages;
   const chapterToc = tocItems.find((t) => t.chunkIndex === currentChunkIndex);
+  const lastChunkRawText = currentChunkParagraphs.join("\n\n");
+  const { score: lastNoiseScore } = calculateChunkNoiseScore(lastChunkRawText);
+
   chunks.push({
     chunkIndex: currentChunkIndex,
     startPage,
     endPage,
     chapterTitle: chapterToc?.title,
-    rawText: currentChunkParagraphs.join("\n\n"),
+    rawText: lastChunkRawText,
+    noiseScore: lastNoiseScore,
     totalWords: currentChunkWords,
   });
 
