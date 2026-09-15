@@ -314,11 +314,13 @@ export async function submitStudyEvent(
 
       const now = new Date();
       if (existingSession) {
+        if (existingSession.userId !== userId) {
+          throw new StudyServiceError("Không tìm thấy phiên học.", 404);
+        }
         const nextPhase = existingSession.phase ?? input.phase;
         await tx
           .update(studySessions)
           .set({
-            userId,
             status: "active",
             phase: nextPhase,
             abandonedAt: null,
@@ -329,7 +331,6 @@ export async function submitStudyEvent(
 
         session = {
           ...existingSession,
-          userId,
           status: "active",
           phase: nextPhase,
           abandonedAt: null,
@@ -413,7 +414,13 @@ export async function submitStudyEvent(
           translation: words.translation,
         })
         .from(words)
-        .where(eq(words.id, input.wordId))
+        .innerJoin(decks, eq(decks.id, words.deckId))
+        .where(
+          and(
+            eq(words.id, input.wordId),
+            or(isNull(decks.ownerId), eq(decks.ownerId, userId)),
+          ),
+        )
         .limit(1);
 
       if (!word) {

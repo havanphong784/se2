@@ -23,9 +23,9 @@ import { getTodayStudyMinutes, isDueForReview, isLearnedToday } from "@/lib/stud
 import { cn } from "@/lib/utils";
 
 export default function VocabularyPage() {
-  const { data: learningRes, isLoading } = useLearningData();
+  const { data: learningRes, isLoading, isError, refetch } = useLearningData();
 
-  if (isLoading || !learningRes) {
+  if (isLoading) {
     return (
       <div className="mx-auto w-full max-w-[1200px] px-5 py-8 md:px-8 lg:py-12 animate-pulse">
         <div className="h-64 bg-gray-100 rounded-xl mb-10" />
@@ -34,6 +34,26 @@ export default function VocabularyPage() {
           <div className="h-44 bg-gray-100 rounded-xl" />
           <div className="h-44 bg-gray-100 rounded-xl" />
           <div className="h-44 bg-gray-100 rounded-xl" />
+        </div>
+      </div>
+    );
+  }
+
+  if (isError || !learningRes) {
+    return (
+      <div className="mx-auto grid min-h-[60svh] w-full max-w-xl place-items-center px-5 py-8">
+        <div role="alert" className="w-full rounded-xl border-2 border-b-4 border-[#ffb4b4] border-b-[#d94e4e] bg-white p-6 text-center">
+          <h1 className="font-display text-2xl font-extrabold text-eel-dark-blue">
+            Chưa tải được khu vườn từ vựng
+          </h1>
+          <p className="mt-2 font-bold text-ash">Kiểm tra kết nối rồi thử lại.</p>
+          <button
+            type="button"
+            onClick={() => void refetch()}
+            className={cn(buttonVariants(), "mt-5")}
+          >
+            Thử lại
+          </button>
         </div>
       </div>
     );

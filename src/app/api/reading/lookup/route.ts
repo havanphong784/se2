@@ -66,7 +66,7 @@ export async function GET(request: Request) {
 
   // Xử lý dịch câu nhanh (Instant sentence translation ~100ms)
   if (rawSentence && rawSentence.trim()) {
-    const text = rawSentence.trim();
+    const text = rawSentence.trim().slice(0, 1000);
     const cacheKey = `sent_${text}`;
     if (serverDictCache.has(cacheKey)) {
       return NextResponse.json(serverDictCache.get(cacheKey)!, { headers: CACHE_HEADERS });
@@ -96,7 +96,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Thiếu tham số word hoặc sentence." }, { status: 400 });
   }
 
-  const word = rawWord.trim().toLowerCase();
+  const word = rawWord.trim().toLowerCase().slice(0, 100);
   const isPhrase = word.includes(" ") || word.includes("-");
 
   // 1. Kiểm tra Server In-Memory Cache (chỉ chấp nhận nếu có bản dịch hoặc định nghĩa)

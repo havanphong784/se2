@@ -86,7 +86,8 @@ export async function POST(request: Request) {
     const uniqueWords = Array.from(
       new Set(
         body.words
-          .map((w) => (typeof w === "string" ? w.trim().toLowerCase() : ""))
+          .slice(0, 100)
+          .map((w) => (typeof w === "string" ? w.trim().toLowerCase().slice(0, 100) : ""))
           .filter((w) => w.length >= 2)
       )
     ).slice(0, 60); // Giới hạn tối đa 60 từ/cụm từ một lần

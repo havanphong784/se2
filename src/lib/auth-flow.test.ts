@@ -13,7 +13,7 @@ import {
   hashOtp,
   hashOtpCode,
 } from "./email-verification";
-import { isRateLimited, resetRateLimit, type Limit } from "./auth-rate-limit";
+import { clientIp, isRateLimited, resetRateLimit, type Limit } from "./auth-rate-limit";
 import {
   createAccessToken,
   createRefreshToken,
@@ -460,6 +460,43 @@ describe("Vocabloom Auth Flow End-to-End Test Suite", () => {
         false,
         "After resetRateLimit, the counter restarts and access is granted",
       );
+    });
+  });
+
+  describe("Client IP Extraction Hardening", () => {
+    it("prioritizes cf-connecting-ip over x-real-ip and x-forwarded-for", () => {
+      const req = new Request("http://localhost:3000/api/auth/login", {
+        headers: {
+          "cf-connecting-ip": "203.0.113.1",
+          "x-real-ip": "198.51.100.2",
+          "x-forwarded-for": "192.0.2.3, 10.0.0.1",
+        },
+      });
+      assert.equal(clientIp(req), "203.0.113.1");
+    });
+
+    it("prioritizes x-real-ip over x-forwarded-for when cf-connecting-ip is absent", () => {
+      const req = new Request("http://localhost:3000/api/auth/login", {
+        headers: {
+          "x-real-ip": "198.51.100.2",
+          "x-forwarded-for": "192.0.2.3, 10.0.0.1",
+        },
+      });
+      assert.equal(clientIp(req), "198.51.100.2");
+    });
+
+    it("falls back to first x-forwarded-for entry when direct headers are absent", () => {
+      const req = new Request("http://localhost:3000/api/auth/login", {
+        headers: {
+          "x-forwarded-for": "192.0.2.3, 10.0.0.1",
+        },
+      });
+      assert.equal(clientIp(req), "192.0.2.3");
+    });
+
+    it("returns null when no IP headers are present", () => {
+      const req = new Request("http://localhost:3000/api/auth/login");
+      assert.equal(clientIp(req), null);
     });
   });
 

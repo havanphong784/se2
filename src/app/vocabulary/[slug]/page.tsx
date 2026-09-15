@@ -18,7 +18,7 @@ type DeckPageProps = { params: Promise<{ slug: string }> };
 
 export default function DeckPage({ params }: DeckPageProps) {
   const { slug } = use(params);
-  const { data: deckRes, isLoading } = useDeck(slug);
+  const { data: deckRes, isLoading, isError, refetch } = useDeck(slug);
 
   if (isLoading) {
     return (
@@ -29,6 +29,26 @@ export default function DeckPage({ params }: DeckPageProps) {
           <div className="h-20 bg-gray-100 rounded-xl" />
           <div className="h-20 bg-gray-100 rounded-xl" />
           <div className="h-20 bg-gray-100 rounded-xl" />
+        </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="mx-auto grid min-h-[60svh] w-full max-w-xl place-items-center px-5 py-8">
+        <div role="alert" className="w-full rounded-xl border-2 border-b-4 border-[#ffb4b4] border-b-[#d94e4e] bg-white p-6 text-center">
+          <h1 className="font-display text-2xl font-extrabold text-eel-dark-blue">
+            Chưa tải được bộ từ
+          </h1>
+          <p className="mt-2 font-bold text-ash">Kiểm tra kết nối rồi thử lại.</p>
+          <button
+            type="button"
+            onClick={() => void refetch()}
+            className="mt-5 inline-flex min-h-11 items-center justify-center rounded-xl bg-ecto-green px-5 py-2.5 text-sm font-black text-white hover:bg-opacity-90"
+          >
+            Thử lại
+          </button>
         </div>
       </div>
     );

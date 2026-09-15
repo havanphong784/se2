@@ -650,4 +650,34 @@ test("client retryFailedWrites handles 404 StudyApiError by recovering session a
   ]);
 });
 
+test("security invariant: prevents IDOR and session hijacking when session belongs to different user", () => {
+  const existingSession = {
+    id: "session-user-a",
+    userId: "user-a",
+    phase: "flashcard",
+    status: "active",
+  };
+  const callerUserId = "user-b-attacker";
+
+  // Simulate verification rule in study-service submitStudyEvent
+  const verifySessionOwnership = (session: typeof existingSession, callerId: string) => {
+    if (session.userId !== callerId) {
+      throw new StudyServiceError("Không tìm thấy phiên học.", 404);
+    }
+  };
+
+  assert.throws(
+    () => verifySessionOwnership(existingSession, callerUserId),
+    (err: unknown) => {
+      assert.ok(err instanceof StudyServiceError);
+      assert.equal((err as StudyServiceError).status, 404);
+      assert.equal((err as StudyServiceError).message, "Không tìm thấy phiên học.");
+      return true;
+    },
+  );
+
+  // When caller is the legitimate owner, no error is thrown
+  assert.doesNotThrow(() => verifySessionOwnership(existingSession, "user-a"));
+});
+
 

@@ -391,6 +391,7 @@ export default function ReadingPage() {
   // Tính toán tiến độ AI của Chunk hiện tại
   const chunkAnalyzedCount = useMemo(() => {
     return allChunkSentences.filter((s) => hasCachedAnalysis(s.text)).length;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allChunkSentences, analyzedSentencesCount]);
 
   const chunkAnalyzedPercent = useMemo(() => {

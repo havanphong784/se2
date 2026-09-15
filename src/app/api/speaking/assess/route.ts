@@ -25,13 +25,20 @@ export async function POST(request: Request) {
   try {
     const formData = await request.formData();
     const audioFile = formData.get("audio") as Blob | null;
-    const expectedText = (formData.get("expectedText") as string) || "";
-    const expectedPhoneme = (formData.get("phoneme") as string) || "";
+    const expectedText = ((formData.get("expectedText") as string) || "").slice(0, 500);
+    const expectedPhoneme = ((formData.get("phoneme") as string) || "").slice(0, 100);
 
-    if (!audioFile) {
+    if (!audioFile || !(audioFile instanceof Blob)) {
       return NextResponse.json(
-        { error: "Không tìm thấy dữ liệu âm thanh" },
+        { error: "Không tìm thấy dữ liệu âm thanh hợp lệ" },
         { status: 400 },
+      );
+    }
+
+    if (audioFile.size > 10 * 1024 * 1024) {
+      return NextResponse.json(
+        { error: "Tệp âm thanh vượt quá giới hạn dung lượng (tối đa 10MB)" },
+        { status: 413 },
       );
     }
 
