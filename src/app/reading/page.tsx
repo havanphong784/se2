@@ -27,6 +27,7 @@ import { DocumentImporter } from "@/components/reading/document-importer";
 import { AIConfigModal } from "@/components/reading/ai-config-modal";
 import { DocumentTocSidebar } from "@/components/reading/document-toc-sidebar";
 import { ChunkPaginationBar } from "@/components/reading/chunk-pagination-bar";
+import { ReaderTooltip } from "@/components/reading/reader-tooltip";
 import { segmentText } from "@/lib/reading/text-segmenter";
 import { prefetchDocumentWords, seedOfflineLexicon } from "@/lib/reading/dictionary-cache";
 import { detectPhrasesInSentence } from "@/lib/reading/phrase-matcher";
@@ -887,53 +888,65 @@ export default function ReadingPage() {
 
     if (isPreanalyzingChunk) {
       return (
-        <div className="flex items-center gap-1.5 rounded-xl border border-amber-300 bg-amber-50 px-2 sm:px-2.5 py-1 text-[11px] sm:text-xs font-bold text-amber-800 animate-pulse shrink-0">
-          <Loader2 className="size-3.5 animate-spin text-amber-600 shrink-0" />
-          <span className="hidden md:inline">Đang tải trước</span>
-          <span>
-            {preanalyzeProgress.current}/{preanalyzeProgress.total} câu
-          </span>
-          <button
-            type="button"
-            onClick={handleStopPreanalyzeChunk}
-            className="ml-0.5 rounded bg-amber-200 px-1.5 py-0.2 text-[10px] font-black text-amber-900 hover:bg-amber-300 transition-colors cursor-pointer"
-            title="Dừng phân tích trước"
-          >
-            Dừng
-          </button>
-        </div>
+        <ReaderTooltip
+          title={`Đang phân tích trước: ${preanalyzeProgress.current}/${preanalyzeProgress.total} câu`}
+          description="AI đang tự động phân tích cấu trúc các câu tiếp theo trong nền để đọc mượt mà 0ms."
+          badge="Đang chạy"
+          badgeVariant="blue"
+        >
+          <div className="flex h-8 items-center gap-1.5 rounded-lg border border-amber-300 bg-amber-50 px-2 text-xs font-bold text-amber-800 animate-pulse shrink-0">
+            <Loader2 className="size-3.5 animate-spin text-amber-600 shrink-0" />
+            <span className="text-[11px] font-black">
+              {Math.round((preanalyzeProgress.current / Math.max(1, preanalyzeProgress.total)) * 100)}%
+            </span>
+            <button
+              type="button"
+              onClick={handleStopPreanalyzeChunk}
+              className="ml-0.5 rounded bg-amber-200 px-1.5 py-0.5 text-[10px] font-black text-amber-900 hover:bg-amber-300 transition-colors cursor-pointer"
+              title="Dừng phân tích trước"
+            >
+              Dừng
+            </button>
+          </div>
+        </ReaderTooltip>
       );
     }
 
     if (chunkAnalyzedPercent === 100) {
       return (
-        <Badge
-          variant="default"
-          className="text-[10.5px] sm:text-[11px] py-0.5 px-2 sm:px-2.5 shrink-0 bg-[#f7fff1] border-eel-light text-[#438f0e] flex items-center gap-1 cursor-default"
-          title="Tất cả câu trong phần này đã được AI phân tích và lưu vào IndexedDB. Sẵn sàng đọc offline 100%!"
+        <ReaderTooltip
+          title="Sẵn sàng đọc offline 100%"
+          description="Tất cả câu trong phần này đã được AI phân tích và lưu vào IndexedDB (.vdoc). Sẵn sàng đọc offline 0ms."
+          badge="Offline 100%"
+          badgeVariant="green"
         >
-          <Zap className="size-3.5 fill-[#438f0e] text-[#438f0e]" />
-          <span className="hidden sm:inline">100% Sẵn sàng offline</span>
-          <span className="sm:hidden">100% offline</span>
-        </Badge>
+          <div className="flex h-8 items-center gap-1 rounded-lg border border-eel-light bg-[#f7fff1] px-2 text-xs font-black text-[#438f0e] shrink-0 cursor-default shadow-2xs">
+            <Zap className="size-3.5 fill-[#438f0e] text-[#438f0e]" />
+            <span className="text-[11px] font-black">100%</span>
+          </div>
+        </ReaderTooltip>
       );
     }
 
     return (
-      <button
-        type="button"
-        onClick={handleStartPreanalyzeChunk}
-        className="group flex items-center gap-1.5 rounded-xl border border-[#bfe9fd] bg-[#f3fbff] px-2 sm:px-2.5 py-1 text-[11px] sm:text-xs font-bold text-[#087db4] hover:bg-[#e0f2fe] hover:border-[#7dd3fc] transition-all cursor-pointer shrink-0"
-        title="Bấm để AI tự động phân tích trước toàn bộ các câu trong phần này"
+      <ReaderTooltip
+        title={`Tiến độ AI: ${chunkAnalyzedCount}/${allChunkSentences.length} câu (${chunkAnalyzedPercent}%)`}
+        description={`Đã phân tích và lưu trữ ${chunkAnalyzedCount} câu trong phần này. Bấm để AI tự động phân tích trước các câu còn lại giúp chuyển câu tức thì 0ms.`}
+        badge={chunkAnalyzedCount > 0 ? "Bấm để tải trước" : "Chưa tải trước"}
+        badgeVariant="blue"
       >
-        <Zap className="size-3.5 text-[#1cb0f6] group-hover:scale-110 transition-transform" />
-        <span>
-          {chunkAnalyzedCount}/{allChunkSentences.length} ({chunkAnalyzedPercent}%)
-        </span>
-        <span className="hidden lg:inline text-[10px] font-extrabold text-[#0284c7] bg-[#e0f2fe] group-hover:bg-[#bae6fd] px-1.5 py-0.5 rounded-md">
-          Phân tích trước
-        </span>
-      </button>
+        <button
+          type="button"
+          onClick={handleStartPreanalyzeChunk}
+          aria-label="Phân tích trước bằng AI"
+          className="group flex h-8 items-center gap-1 rounded-lg border border-[#bfe9fd] bg-[#f3fbff] px-2 text-xs font-black text-[#087db4] hover:bg-[#e0f2fe] hover:border-[#7dd3fc] transition-all cursor-pointer shrink-0 shadow-2xs"
+        >
+          <Zap className="size-3.5 text-[#1cb0f6] group-hover:scale-110 transition-transform" />
+          <span className="text-[11px] font-black">
+            {chunkAnalyzedPercent}%
+          </span>
+        </button>
+      </ReaderTooltip>
     );
   };
 
@@ -991,39 +1004,56 @@ export default function ReadingPage() {
             />
             {renderAiReadinessBadge()}
             {activeChunk?.repairedRawText && (
-              <Badge
-                variant="default"
-                className="text-[10.5px] sm:text-[11px] py-0.5 px-2 sm:px-2.5 shrink-0 bg-[#fefce8] border-amber-300 text-amber-800 flex items-center gap-1 cursor-default shadow-2xs"
-                title="Chunk này đã được Semantic Repair AI tối ưu hóa cấu trúc Markdown và sửa lỗi typographic"
+              <ReaderTooltip
+                title="Bố cục đã tối ưu bằng AI"
+                description="Bố cục văn bản của phần này đã được Semantic Repair AI sửa lỗi rách chữ (kerning), nối từ gãy dòng và chuẩn hóa đề mục/bảng biểu."
+                badge="Layout Clean"
+                badgeVariant="amber"
               >
-                <Zap className="size-3.5 fill-amber-500 text-amber-500" />
-                <span className="hidden sm:inline">⚡ Đã tối ưu layout bằng AI</span>
-                <span className="sm:hidden">⚡ Đã tối ưu layout</span>
-              </Badge>
+                <div
+                  className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-amber-300 bg-[#fefce8] text-amber-800 shadow-2xs cursor-default"
+                  aria-label="Bố cục đã tối ưu bằng AI"
+                >
+                  <Zap className="size-4 fill-amber-500 text-amber-500" />
+                </div>
+              </ReaderTooltip>
             )}
           </div>
 
           {/* Bên phải: Nút Fullscreen native & Nút Thoát Focus Mode */}
           <div className="flex items-center gap-1.5 shrink-0">
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={toggleNativeFullscreen}
-              className="flex size-8 shrink-0 items-center justify-center p-0 rounded-lg border border-[#e5e5e5] text-ash hover:text-charcoal cursor-pointer"
-              title={isFullscreen ? "Thu nhỏ cửa sổ trình duyệt" : "Toàn màn hình trình duyệt"}
+            <ReaderTooltip
+              title={isFullscreen ? "Thu nhỏ cửa sổ" : "Toàn màn hình trình duyệt"}
+              description="Chuyển đổi chế độ toàn màn hình Native của trình duyệt."
+              align="end"
             >
-              {isFullscreen ? <Shrink className="size-4" /> : <Expand className="size-4" />}
-            </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={toggleNativeFullscreen}
+                className="flex size-8 shrink-0 items-center justify-center p-0 rounded-lg border border-[#e5e5e5] text-ash hover:text-charcoal cursor-pointer"
+                aria-label={isFullscreen ? "Thu nhỏ cửa sổ trình duyệt" : "Toàn màn hình trình duyệt"}
+              >
+                {isFullscreen ? <Shrink className="size-4" /> : <Expand className="size-4" />}
+              </Button>
+            </ReaderTooltip>
 
-            <Button
-              variant="default"
-              size="sm"
-              onClick={() => setIsFocusMode(false)}
-              className="flex size-8 shrink-0 items-center justify-center p-0 rounded-lg bg-macaw-blue text-white hover:bg-[#16a5e8] border-b-2 border-b-[#1282b8] active:translate-y-0.5 cursor-pointer"
-              title="Thoát Focus Mode (Phím Esc)"
+            <ReaderTooltip
+              title="Thoát Focus Mode"
+              description="Hiện lại thanh menu và bảng phân tích cú pháp."
+              shortcut="Esc"
+              align="end"
             >
-              <Minimize2 className="size-4" />
-            </Button>
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => setIsFocusMode(false)}
+                className="flex size-8 shrink-0 items-center justify-center p-0 rounded-lg bg-macaw-blue text-white hover:bg-[#16a5e8] border-b-2 border-b-[#1282b8] active:translate-y-0.5 cursor-pointer"
+                aria-label="Thoát Focus Mode"
+              >
+                <Minimize2 className="size-4" />
+              </Button>
+            </ReaderTooltip>
           </div>
         </header>
       ) : (
@@ -1031,29 +1061,41 @@ export default function ReadingPage() {
         <header className="mb-2.5 flex h-14 shrink-0 items-center justify-between gap-2.5 rounded-2xl border-2 border-b-4 border-[#e5e5e5] bg-white px-3 md:px-4 shadow-xs">
           {/* Bên trái: Nút Back, Nút Mục lục TOC (kèm badge số chương), Tên tài liệu, Badge số trang/phần */}
           <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1 overflow-hidden">
-            <Link
-              href="/"
-              className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-[#e5e5e5] text-ash hover:bg-gray-100 hover:text-charcoal transition-colors"
+            <ReaderTooltip
               title="Quay về trang chủ"
+              description="Trở lại màn hình chính của Vocabloom."
+              align="start"
             >
-              <ArrowLeft className="size-4" />
-            </Link>
+              <Link
+                href="/"
+                className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-[#e5e5e5] text-ash hover:bg-gray-100 hover:text-charcoal transition-colors"
+                aria-label="Quay về trang chủ"
+              >
+                <ArrowLeft className="size-4" />
+              </Link>
+            </ReaderTooltip>
 
             {/* Nút mở Mục lục TOC */}
-            <button
-              type="button"
-              onClick={() => setIsTocOpen(true)}
-              className="flex h-8 shrink-0 items-center gap-1.5 rounded-lg border border-[#e5e5e5] px-2 text-xs font-bold text-eel-dark-blue hover:bg-[#e5f6fd] hover:text-[#1cb0f6] transition-colors cursor-pointer"
-              title="Mục lục & Thư viện tài liệu"
+            <ReaderTooltip
+              title="Mục lục & Thư viện"
+              description="Mở danh sách các chương mục và các tài liệu đã lưu."
+              align="start"
             >
-              <Menu className="size-4 text-[#1cb0f6]" />
-              <span className="hidden sm:inline">Mục lục</span>
-              {documentMeta?.toc && documentMeta.toc.length > 0 && (
-                <span className="rounded-full bg-[#e5f6fd] px-1.5 py-0.2 text-[10px] font-black text-[#087db4]">
-                  {documentMeta.toc.length}
-                </span>
-              )}
-            </button>
+              <button
+                type="button"
+                onClick={() => setIsTocOpen(true)}
+                className="flex h-8 shrink-0 items-center gap-1.5 rounded-lg border border-[#e5e5e5] px-2 text-xs font-bold text-eel-dark-blue hover:bg-[#e5f6fd] hover:text-[#1cb0f6] transition-colors cursor-pointer"
+                aria-label="Mục lục & Thư viện tài liệu"
+              >
+                <Menu className="size-4 text-[#1cb0f6]" />
+                <span className="hidden sm:inline">Mục lục</span>
+                {documentMeta?.toc && documentMeta.toc.length > 0 && (
+                  <span className="rounded-full bg-[#e5f6fd] px-1.5 py-0.2 text-[10px] font-black text-[#087db4]">
+                    {documentMeta.toc.length}
+                  </span>
+                )}
+              </button>
+            </ReaderTooltip>
 
             {/* Tên tài liệu */}
             <h1
@@ -1088,79 +1130,113 @@ export default function ReadingPage() {
             />
             {renderAiReadinessBadge()}
             {activeChunk?.repairedRawText && (
-              <Badge
-                variant="default"
-                className="text-[10.5px] sm:text-[11px] py-0.5 px-2 sm:px-2.5 shrink-0 bg-[#fefce8] border-amber-300 text-amber-800 flex items-center gap-1 cursor-default shadow-2xs"
-                title="Chunk này đã được Semantic Repair AI tối ưu hóa cấu trúc Markdown và sửa lỗi typographic"
+              <ReaderTooltip
+                title="Bố cục đã tối ưu bằng AI"
+                description="Bố cục văn bản của phần này đã được Semantic Repair AI sửa lỗi rách chữ (kerning), nối từ gãy dòng và chuẩn hóa đề mục/bảng biểu."
+                badge="Layout Clean"
+                badgeVariant="amber"
               >
-                <Zap className="size-3.5 fill-amber-500 text-amber-500" />
-                <span className="hidden sm:inline">⚡ Đã tối ưu layout bằng AI</span>
-                <span className="sm:hidden">⚡ Đã tối ưu layout</span>
-              </Badge>
+                <div
+                  className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-amber-300 bg-[#fefce8] text-amber-800 shadow-2xs cursor-default"
+                  aria-label="Bố cục đã tối ưu bằng AI"
+                >
+                  <Zap className="size-4 fill-amber-500 text-amber-500" />
+                </div>
+              </ReaderTooltip>
             )}
           </div>
 
           {/* Bên phải: Nút "Lưu phiên học", "Nhập tài liệu", "Local AI Config", và nút bật Focus Mode */}
           <div className="flex items-center gap-1.5 md:gap-2 shrink-0">
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={handleSaveSession}
-              disabled={isSavingSession || !documentMeta || isDocumentSaved}
-              className={`flex size-8 shrink-0 items-center justify-center p-0 rounded-lg transition-all ${
+            <ReaderTooltip
+              title={isDocumentSaved ? "Đã lưu an toàn" : "Lưu phiên học"}
+              description={
                 isDocumentSaved
-                  ? "border border-[#a5ed6e] bg-[#f7fff1] text-[#438f0e] cursor-default opacity-90"
-                  : "border-[#e5e5e5] text-charcoal hover:bg-gray-100 cursor-pointer"
-              }`}
-              title={
-                isDocumentSaved
-                  ? "Tài liệu đã được lưu trong IndexedDB (.vdoc)"
-                  : "Lưu phiên học và tiến độ vào IndexedDB (.vdoc)"
+                  ? "Phiên học, vị trí đọc và toàn bộ phân tích AI đã được đồng bộ vào IndexedDB (.vdoc)."
+                  : "Lưu tài liệu, tiến độ và phân tích câu vào bộ nhớ trình duyệt (.vdoc) để đọc offline."
               }
+              badge={isDocumentSaved ? "vdoc" : undefined}
+              badgeVariant="green"
+              align="end"
             >
-              {isSavingSession ? (
-                <Loader2 className="size-4 animate-spin text-[#1cb0f6]" />
-              ) : isDocumentSaved ? (
-                <Check className="size-4 text-[#438f0e]" />
-              ) : (
-                <Save className="size-4 text-ecto-green" />
-              )}
-            </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={handleSaveSession}
+                disabled={isSavingSession || !documentMeta || isDocumentSaved}
+                className={`flex size-8 shrink-0 items-center justify-center p-0 rounded-lg transition-all ${
+                  isDocumentSaved
+                    ? "border border-[#a5ed6e] bg-[#f7fff1] text-[#438f0e] cursor-default opacity-90"
+                    : "border-[#e5e5e5] text-charcoal hover:bg-gray-100 cursor-pointer"
+                }`}
+                aria-label={
+                  isDocumentSaved
+                    ? "Tài liệu đã được lưu trong IndexedDB (.vdoc)"
+                    : "Lưu phiên học và tiến độ vào IndexedDB (.vdoc)"
+                }
+              >
+                {isSavingSession ? (
+                  <Loader2 className="size-4 animate-spin text-[#1cb0f6]" />
+                ) : isDocumentSaved ? (
+                  <Check className="size-4 text-[#438f0e]" />
+                ) : (
+                  <Save className="size-4 text-ecto-green" />
+                )}
+              </Button>
+            </ReaderTooltip>
 
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => setIsImporting(true)}
-              className="h-8 px-2.5 text-xs font-bold border-[#e5e5e5] text-charcoal hover:bg-gray-100"
-              title="Nhập tài liệu (Text, PDF, Word, Ảnh)"
+            <ReaderTooltip
+              title="Nhập tài liệu mới"
+              description="Tải lên tệp PDF học thuật, Word (.docx), hình ảnh scan OCR hoặc dán văn bản tiếng Anh để bắt đầu đọc."
+              align="end"
             >
-              <FilePlus2 className="size-3.5 text-[#1cb0f6]" />
-              <span className="hidden lg:inline">Nhập tài liệu</span>
-            </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setIsImporting(true)}
+                className="flex size-8 shrink-0 items-center justify-center p-0 rounded-lg border border-[#e5e5e5] text-charcoal hover:bg-gray-100 hover:text-[#1cb0f6] cursor-pointer"
+                aria-label="Nhập tài liệu (Text, PDF, Word, Ảnh)"
+              >
+                <FilePlus2 className="size-4 text-[#1cb0f6]" />
+              </Button>
+            </ReaderTooltip>
 
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsConfigOpen(true)}
-              className="h-8 px-2.5 text-xs font-bold border-[#e5e5e5] text-charcoal hover:bg-gray-100"
-              title="Cài đặt Local AI Endpoint"
+            <ReaderTooltip
+              title="Cấu hình Trợ lý AI"
+              description={`Mô hình: ${aiConfig.model} • Provider: ${aiConfig.provider}. Bấm để điều chỉnh endpoint và nhiệt độ.`}
+              badge={aiConfig.model.split("/").pop() || "AI"}
+              badgeVariant="blue"
+              align="end"
             >
-              <Settings2 className="size-3.5 text-[#1cb0f6]" />
-              <span className="hidden xl:inline font-mono text-[11px] text-charcoal">
-                {aiConfig.model}
-              </span>
-            </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsConfigOpen(true)}
+                className="relative flex size-8 shrink-0 items-center justify-center p-0 rounded-lg border border-[#e5e5e5] text-charcoal hover:bg-gray-100 hover:text-[#1cb0f6] cursor-pointer"
+                aria-label="Cài đặt Local AI Endpoint"
+              >
+                <Settings2 className="size-4 text-[#1cb0f6]" />
+                <span className="absolute top-1.5 right-1.5 size-2 rounded-full bg-emerald-500 ring-2 ring-white" />
+              </Button>
+            </ReaderTooltip>
 
             {/* Nút bật Focus Mode toàn màn hình (chỉ hiển thị icon) */}
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => setIsFocusMode(true)}
-              className="flex size-8 shrink-0 items-center justify-center p-0 rounded-lg border border-[#e5e5e5] text-charcoal hover:bg-[#f0f9ff] hover:border-[#bfe9fd] hover:text-[#0284c7] transition-all cursor-pointer"
-              title="Bật Focus Mode toàn màn hình không xao nhãng (Phím F)"
+            <ReaderTooltip
+              title="Chế độ tập trung (Focus Mode)"
+              description="Ẩn thanh công cụ để đọc toàn màn hình, chỉ làm nổi bật câu đang chọn để chống mỏi mắt."
+              shortcut="F"
+              align="end"
             >
-              <Maximize2 className="size-4 text-[#1cb0f6]" />
-            </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setIsFocusMode(true)}
+                className="flex size-8 shrink-0 items-center justify-center p-0 rounded-lg border border-[#e5e5e5] text-charcoal hover:bg-[#f0f9ff] hover:border-[#bfe9fd] hover:text-[#0284c7] transition-all cursor-pointer"
+                aria-label="Bật chế độ tập trung (Focus Mode - Phím F)"
+              >
+                <Maximize2 className="size-4 text-[#1cb0f6]" />
+              </Button>
+            </ReaderTooltip>
           </div>
         </header>
       )}
