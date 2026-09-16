@@ -69,6 +69,48 @@ export function cancelEnglishSpeech() {
   currentUtterance = null;
 }
 
+export function playAudioUrl(url: string, onEnded?: () => void) {
+  cancelEnglishSpeech();
+  try {
+    const audio = new Audio(url);
+    currentAudio = audio;
+    audio.onended = () => {
+      if (currentAudio === audio) currentAudio = null;
+      onEnded?.();
+    };
+    audio.onerror = () => {
+      if (currentAudio === audio) currentAudio = null;
+      onEnded?.();
+    };
+    audio.play().catch(() => {
+      if (currentAudio === audio) currentAudio = null;
+      onEnded?.();
+    });
+    return audio;
+  } catch {
+    onEnded?.();
+    return null;
+  }
+}
+
+export function speakWord(term: string, audioUrl?: string | null, speed: SpeechSpeed = "normal") {
+  if (audioUrl && typeof audioUrl === "string" && audioUrl.trim()) {
+    cancelEnglishSpeech();
+    try {
+      const audio = new Audio(audioUrl.trim());
+      currentAudio = audio;
+      audio.playbackRate = SPEECH_RATES[speed];
+      audio.play().catch(() => {
+        speakEnglish(term, speed);
+      });
+      return;
+    } catch {
+      // Fallback
+    }
+  }
+  speakEnglish(term, speed);
+}
+
 export function speakEnglish(term: string, speed: SpeechSpeed = "normal") {
   if (!canSpeakEnglish()) return;
   cancelEnglishSpeech();

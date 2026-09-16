@@ -79,6 +79,18 @@ async function fetchEnglishDictionaryDetails(word: string) {
       if (pWithText) phonetic = pWithText.text || "";
     }
 
+    let audioUrl = "";
+    if (entry.phonetics?.length) {
+      const pWithAudio = entry.phonetics.find((p) => p.audio && p.audio.trim());
+      if (pWithAudio?.audio) {
+        audioUrl = pWithAudio.audio.trim();
+        if (audioUrl.startsWith("//")) {
+          audioUrl = `https:${audioUrl}`;
+        }
+      }
+    }
+
+    let definition = "";
     const partsOfSpeechSet = new Set<string>();
     const examples: string[] = [];
 
@@ -90,6 +102,9 @@ async function fetchEnglishDictionaryDetails(word: string) {
         }
         if (m.definitions?.length) {
           for (const d of m.definitions) {
+            if (d.definition && !definition) {
+              definition = d.definition.trim();
+            }
             if (d.example && examples.length < 2) {
               examples.push(d.example);
             }
@@ -100,6 +115,8 @@ async function fetchEnglishDictionaryDetails(word: string) {
 
     return {
       phonetic,
+      audioUrl,
+      definition,
       partsOfSpeech: Array.from(partsOfSpeechSet),
       exampleSentence: examples[0] || "",
     };
@@ -154,6 +171,8 @@ export async function POST(request: Request) {
 
     let dictDetails: {
       phonetic: string;
+      audioUrl: string;
+      definition: string;
       partsOfSpeech: string[];
       exampleSentence: string;
     } | null = null;
@@ -174,6 +193,8 @@ export async function POST(request: Request) {
       direction: body.direction,
       confidence: 1.0,
       phonetic: dictDetails?.phonetic || "",
+      audioUrl: dictDetails?.audioUrl || "",
+      definition: dictDetails?.definition || "",
       partsOfSpeech: dictDetails?.partsOfSpeech || [],
       exampleSentence: dictDetails?.exampleSentence || "",
       exampleTranslation,

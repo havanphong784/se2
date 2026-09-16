@@ -93,7 +93,13 @@ export async function importVocabulary(
       .values(
         importedWords.map((word, index) => ({
           deckId: deck.id,
-          ...word,
+          term: word.term,
+          translation: word.translation,
+          phonetic: word.phonetic,
+          partOfSpeech: word.partOfSpeech,
+          exampleSentence: word.exampleSentence,
+          exampleTranslation: word.exampleTranslation,
+          audioUrl: word.audioUrl ?? null,
           sortOrder: startOrder + index,
         })),
       )

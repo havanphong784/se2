@@ -15,6 +15,7 @@ export type ImportFormat = "csv" | "json";
 export type ImportField = (typeof importFields)[number];
 export type ImportedWord = Omit<Record<ImportField, string>, "partOfSpeech"> & {
   partOfSpeech: string[];
+  audioUrl?: string;
 };
 export type ImportDiagnostic = {
   row: number;

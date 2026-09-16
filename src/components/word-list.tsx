@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import type { VocabularyWord, WordStatus } from "@/lib/demo-data";
-import { speakEnglish } from "@/lib/speech";
+import { speakWord } from "@/lib/speech";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/auth-provider";
 import { useInvalidateAuthData } from "@/lib/hooks/use-queries";
@@ -206,7 +206,7 @@ export function WordList({ words: initialWords }: { words: VocabularyWord[] }) {
                 <div className="flex items-center gap-3.5 md:col-span-4">
                   <button
                     type="button"
-                    onClick={() => speakEnglish(word.term, "slow")}
+                    onClick={() => speakWord(word.term, word.audioUrl, "slow")}
                     aria-label={`Nghe phát âm ${word.term}`}
                     title="Nghe phát âm chuẩn"
                     className="grid size-9 shrink-0 place-items-center rounded-xl border-2 border-[#bfe9fd] border-b-4 border-b-[#8cd2f5] bg-[#f4fbff] text-macaw-blue transition-transform hover:scale-105 active:translate-y-0.5"

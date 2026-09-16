@@ -64,6 +64,13 @@
       "when": 1789137429963,
       "tag": "0008_dazzling_colleen_wing",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1789487748997,
+      "tag": "0009_pink_rocket_racer",
+      "breakpoints": true
     }
   ]
 }

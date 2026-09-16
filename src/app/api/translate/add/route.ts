@@ -19,6 +19,7 @@ type AddWordRequest = {
     partOfSpeech?: string[];
     exampleSentence?: string;
     exampleTranslation?: string;
+    audioUrl?: string;
   };
 };
 
@@ -101,6 +102,7 @@ export async function POST(request: Request) {
         typeof word.exampleSentence === "string" ? word.exampleSentence.trim() : "",
       exampleTranslation:
         typeof word.exampleTranslation === "string" ? word.exampleTranslation.trim() : "",
+      audioUrl: typeof word.audioUrl === "string" ? word.audioUrl.trim() : "",
     };
 
     const targetDestination =

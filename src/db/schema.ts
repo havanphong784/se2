@@ -134,6 +134,7 @@ export const words = pgTable(
     partOfSpeech: text("part_of_speech").array().default(sql`'{}'::text[]`).notNull(),
     exampleSentence: text("example_sentence").notNull(),
     exampleTranslation: text("example_translation").notNull(),
+    audioUrl: text("audio_url"),
     sortOrder: integer("sort_order").default(0).notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()

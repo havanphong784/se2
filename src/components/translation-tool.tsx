@@ -5,7 +5,6 @@ import Link from "next/link";
 import {
   ArrowLeftRight,
   BookOpen,
-  CheckCircle2,
   Clock,
   Copy,
   FolderPlus,
@@ -13,21 +12,19 @@ import {
   Languages,
   Lightbulb,
   Loader2,
-  Plus,
   Sparkles,
   Trash2,
   Volume2,
-  X,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { speakEnglish } from "@/lib/speech";
+import { AddWordDialog } from "@/components/add-word-dialog";
+import { speakWord } from "@/lib/speech";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/auth-provider";
-import { useDecks, useInvalidateAuthData } from "@/lib/hooks/use-queries";
+import { useDecks } from "@/lib/hooks/use-queries";
 
 type PersonalDeck = { id: string; title: string; slug: string };
 
@@ -37,6 +34,7 @@ type TranslationResult = {
   direction: "en-vi" | "vi-en";
   confidence: number | null;
   phonetic?: string;
+  audioUrl?: string;
   partsOfSpeech?: string[];
   exampleSentence?: string;
   exampleTranslation?: string;
@@ -67,7 +65,6 @@ export function TranslationTool({
   decks: PersonalDeck[];
 }) {
   const { authFetch } = useAuth();
-  const invalidateAuthData = useInvalidateAuthData();
   const [direction, setDirection] = useState<"en-vi" | "vi-en">("en-vi");
   const [inputText, setInputText] = useState("");
   const [loading, setLoading] = useState(false);
@@ -75,11 +72,6 @@ export function TranslationTool({
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const translateControllerRef = useRef<AbortController | null>(null);
-  const modalRef = useRef<HTMLDivElement>(null);
-  const modalCloseRef = useRef<HTMLButtonElement>(null);
-  const modalTriggerRef = useRef<HTMLButtonElement>(null);
-  const addingWordRef = useRef(false);
-  const closeModalTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const STORAGE_KEY = "vocabloom_translation_history";
 
@@ -101,7 +93,6 @@ export function TranslationTool({
     return () => {
       active = false;
       translateControllerRef.current?.abort();
-      if (closeModalTimerRef.current) clearTimeout(closeModalTimerRef.current);
     };
   }, []);
 
@@ -133,61 +124,6 @@ export function TranslationTool({
   }, [remoteDecks, initialDecks, createdDecks]);
 
   const [showDeckModal, setShowDeckModal] = useState(false);
-  const [destinationType, setDestinationType] = useState<"existing" | "new">(
-    initialDecks.length > 0 ? "existing" : "new",
-  );
-  const [selectedDeckId, setSelectedDeckId] = useState("");
-  const activeDeckId = selectedDeckId || decks[0]?.id || "";
-  const [newTitle, setNewTitle] = useState("");
-  const [newDescription, setNewDescription] = useState("");
-  const newLevel = "Tự chọn";
-
-  // Editable fields for saving
-  const [customPhonetic, setCustomPhonetic] = useState("");
-  const [customPartsOfSpeech, setCustomPartsOfSpeech] = useState("");
-  const [customExampleSentence, setCustomExampleSentence] = useState("");
-  const [customExampleTranslation, setCustomExampleTranslation] = useState("");
-  const [addingWord, setAddingWord] = useState(false);
-  const [addMessage, setAddMessage] = useState<{
-    type: "success" | "error";
-    text: string;
-  } | null>(null);
-
-  useEffect(() => {
-    if (!showDeckModal) return;
-    const trigger = modalTriggerRef.current;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    modalCloseRef.current?.focus();
-
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape" && !addingWordRef.current) {
-        setShowDeckModal(false);
-        return;
-      }
-      if (event.key !== "Tab") return;
-      const focusable = modalRef.current?.querySelectorAll<HTMLElement>(
-        "button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex='-1'])",
-      );
-      if (!focusable?.length) return;
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
-      }
-    }
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = previousOverflow;
-      trigger?.focus();
-    };
-  }, [showDeckModal]);
 
   function handleSwapDirection() {
     translateControllerRef.current?.abort();
@@ -219,12 +155,6 @@ export function TranslationTool({
       }
       if (translateControllerRef.current !== controller) return;
       setResult(data);
-
-      // Pre-fill modal states with dict details if returned
-      setCustomPhonetic(data.phonetic || "");
-      setCustomPartsOfSpeech(data.partsOfSpeech ? data.partsOfSpeech.join(", ") : "");
-      setCustomExampleSentence(data.exampleSentence || "");
-      setCustomExampleTranslation(data.exampleTranslation || "");
 
       // Add to history
       setHistory((prev) => {
@@ -281,84 +211,12 @@ export function TranslationTool({
 
   function handleSpeak(text: string) {
     if (!text.trim()) return;
-    speakEnglish(text.trim(), "normal");
+    speakWord(text.trim(), result?.audioUrl, "normal");
   }
 
   function handleOpenAddModal() {
     if (!result) return;
-    if (closeModalTimerRef.current) {
-      clearTimeout(closeModalTimerRef.current);
-      closeModalTimerRef.current = null;
-    }
-    setAddMessage(null);
     setShowDeckModal(true);
-  }
-
-  async function handleAddWordToDeck(e: React.FormEvent) {
-    e.preventDefault();
-    if (!result) return;
-    addingWordRef.current = true;
-    setAddingWord(true);
-    setAddMessage(null);
-
-    const term = result.direction === "en-vi" ? result.original : result.translated;
-    const translation = result.direction === "en-vi" ? result.translated : result.original;
-
-    const parts = customPartsOfSpeech
-      .split(",")
-      .map((p) => p.trim())
-      .filter(Boolean);
-
-    const payload = {
-      destination:
-        destinationType === "existing"
-          ? { type: "existing", deckId: activeDeckId }
-          : { type: "new", title: newTitle, description: newDescription, level: newLevel },
-      word: {
-        term,
-        translation,
-        phonetic: customPhonetic,
-        partOfSpeech: parts,
-        exampleSentence: customExampleSentence,
-        exampleTranslation: customExampleTranslation,
-      },
-    };
-
-    try {
-      const response = await authFetch("/api/translate/add", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error?.message || "Không thể thêm từ vào gói.");
-      }
-
-      setAddMessage({ type: "success", text: data.message });
-
-      if (destinationType === "new" && data.deck) {
-        setCreatedDecks((prev) => [data.deck, ...prev]);
-        setSelectedDeckId(data.deck.id);
-        setDestinationType("existing");
-        setNewTitle("");
-        setNewDescription("");
-      }
-      invalidateAuthData();
-      closeModalTimerRef.current = setTimeout(() => {
-        closeModalTimerRef.current = null;
-        setShowDeckModal(false);
-        setAddMessage(null);
-      }, 1500);
-    } catch (err: unknown) {
-      setAddMessage({
-        type: "error",
-        text: err instanceof Error ? err.message : "Lỗi thêm từ vào gói.",
-      });
-    } finally {
-      addingWordRef.current = false;
-      setAddingWord(false);
-    }
   }
 
   const englishTextToSpeak =
@@ -544,7 +402,6 @@ export function TranslationTool({
                     )}
 
                     <Button
-                      ref={modalTriggerRef}
                       type="button"
                       variant="blue"
                       size="sm"
@@ -716,218 +573,22 @@ export function TranslationTool({
 
       {/* Modal dialog for adding word to deck */}
       {showDeckModal && result && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="add-word-dialog-title"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget && !addingWord) setShowDeckModal(false);
+        <AddWordDialog
+          isOpen={showDeckModal}
+          onClose={() => setShowDeckModal(false)}
+          initialWord={{
+            term: result.direction === "en-vi" ? result.original : result.translated,
+            translation: result.direction === "en-vi" ? result.translated : result.original,
+            phonetic: result.phonetic,
+            audioUrl: result.audioUrl,
+            partOfSpeech: result.partsOfSpeech,
+            exampleSentence: result.exampleSentence,
+            exampleTranslation: result.exampleTranslation,
           }}
-        >
-          <Card
-            ref={modalRef}
-            className="max-h-[90vh] w-full max-w-lg overflow-y-auto border-eel-light border-b-4"
-          >
-            <CardHeader className="relative border-b border-[#f0f0f0] bg-[#fbfff8] pr-14">
-              <CardTitle id="add-word-dialog-title" className="flex items-center gap-2 text-xl font-black text-eel-dark-blue">
-                <FolderPlus className="size-5 text-macaw-blue" />
-                Thêm từ vào gói vựng
-              </CardTitle>
-              <button
-                ref={modalCloseRef}
-                type="button"
-                aria-label="Đóng hộp thoại"
-                disabled={addingWord}
-                onClick={() => setShowDeckModal(false)}
-                className="absolute right-4 top-4 grid size-9 place-items-center rounded-xl text-ash hover:bg-[#eeeeee] focus-visible:ring-4 focus-visible:ring-lingot-lime/40"
-              >
-                <X className="size-5" />
-              </button>
-            </CardHeader>
-            <CardContent className="pt-6 space-y-4">
-              {/* Target info preview */}
-              <div className="rounded-xl border-2 border-lingot-lime/70 bg-[#f7fff1] p-3 text-sm">
-                <p className="font-extrabold text-[#438f0e]">
-                  Từ tiếng Anh:{" "}
-                  <span className="text-eel-dark-blue font-black">
-                    {result.direction === "en-vi" ? result.original : result.translated}
-                  </span>
-                </p>
-                <p className="font-extrabold text-[#438f0e]">
-                  Nghĩa tiếng Việt:{" "}
-                  <span className="text-eel-dark-blue font-black">
-                    {result.direction === "en-vi" ? result.translated : result.original}
-                  </span>
-                </p>
-              </div>
-
-              <form onSubmit={handleAddWordToDeck} className="space-y-4">
-                {/* Destination selector */}
-                <div className="space-y-2">
-                  <label className="text-xs font-extrabold uppercase tracking-wider text-ash">
-                    Chọn gói từ
-                  </label>
-                  <div className="grid grid-cols-2 gap-2">
-                    <button
-                      type="button"
-                      disabled={decks.length === 0}
-                      onClick={() => setDestinationType("existing")}
-                      className={cn(
-                        "flex items-center justify-center rounded-xl border-2 p-3 text-sm font-extrabold transition",
-                        destinationType === "existing"
-                          ? "border-ecto-green bg-[#f2ffe9] text-[#438f0e]"
-                          : "border-[#e5e5e5] bg-white text-ash hover:border-ash",
-                      )}
-                    >
-                      Gói hiện có ({decks.length})
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setDestinationType("new")}
-                      className={cn(
-                        "flex items-center justify-center rounded-xl border-2 p-3 text-sm font-extrabold transition",
-                        destinationType === "new"
-                          ? "border-ecto-green bg-[#f2ffe9] text-[#438f0e]"
-                          : "border-[#e5e5e5] bg-white text-ash hover:border-ash",
-                      )}
-                    >
-                      <Plus className="size-4 mr-1" /> Gói mới
-                    </button>
-                  </div>
-                </div>
-
-                {destinationType === "existing" ? (
-                  <div className="space-y-2">
-                    <label className="text-xs font-extrabold uppercase tracking-wider text-ash">
-                      Danh sách gói từ cá nhân
-                    </label>
-                    <select
-                      value={activeDeckId}
-                      onChange={(e) => setSelectedDeckId(e.target.value)}
-                      className="w-full rounded-xl border-2 border-[#e5e5e5] p-3 text-sm font-extrabold text-eel-dark-blue bg-white"
-                    >
-                      {decks.map((deck) => (
-                        <option key={deck.id} value={deck.id}>
-                          {deck.title}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                ) : (
-                  <div className="space-y-3 rounded-xl border-2 border-[#e5e5e5] bg-[#fcfcfc] p-4">
-                    <div>
-                      <label className="text-xs font-extrabold uppercase tracking-wider text-ash">
-                        Tên gói mới *
-                      </label>
-                      <Input
-                        value={newTitle}
-                        onChange={(e) => setNewTitle(e.target.value)}
-                        placeholder="VD: Từ vựng Du lịch 2026"
-                        required
-                        className="mt-1 font-bold"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-xs font-extrabold uppercase tracking-wider text-ash">
-                        Mô tả ngắn
-                      </label>
-                      <Input
-                        value={newDescription}
-                        onChange={(e) => setNewDescription(e.target.value)}
-                        placeholder="Mô tả cho gói từ này…"
-                        className="mt-1 font-bold text-sm"
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {/* Additional optional fields */}
-                <details open className="rounded-xl border-2 border-[#e5e5e5] bg-white p-3 text-xs">
-                  <summary className="font-extrabold text-ash cursor-pointer select-none">
-                    Thông tin từ vựng bổ sung
-                  </summary>
-                  <div className="mt-3 space-y-3 pt-2 border-t border-[#f0f0f0]">
-                    <div className="grid grid-cols-2 gap-2">
-                      <div>
-                        <label className="font-extrabold text-ash">Phiên âm IPA</label>
-                        <Input
-                          value={customPhonetic}
-                          onChange={(e) => setCustomPhonetic(e.target.value)}
-                          placeholder="/.../"
-                          className="mt-1 h-9 text-xs font-bold"
-                        />
-                      </div>
-                      <div>
-                        <label className="font-extrabold text-ash">Loại từ (phân cách phẩy)</label>
-                        <Input
-                          value={customPartsOfSpeech}
-                          onChange={(e) => setCustomPartsOfSpeech(e.target.value)}
-                          placeholder="danh từ, động từ"
-                          className="mt-1 h-9 text-xs font-bold"
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="font-extrabold text-ash">Câu ví dụ (tiếng Anh)</label>
-                      <Input
-                        value={customExampleSentence}
-                        onChange={(e) => setCustomExampleSentence(e.target.value)}
-                        placeholder="Sentence in English…"
-                        className="mt-1 h-9 text-xs font-bold"
-                      />
-                    </div>
-                    <div>
-                      <label className="font-extrabold text-ash">Dịch câu ví dụ (tiếng Việt)</label>
-                      <Input
-                        value={customExampleTranslation}
-                        onChange={(e) => setCustomExampleTranslation(e.target.value)}
-                        placeholder="Dịch câu ví dụ…"
-                        className="mt-1 h-9 text-xs font-bold"
-                      />
-                    </div>
-                  </div>
-                </details>
-
-                {addMessage && (
-                  <div
-                    className={cn(
-                      "rounded-xl border-2 p-3 text-sm font-bold flex items-center gap-2",
-                      addMessage.type === "success"
-                        ? "border-ecto-green bg-[#f2ffe9] text-[#438f0e]"
-                        : "border-[#ff6b6b] bg-[#fff3f3] text-[#b93636]",
-                    )}
-                  >
-                    {addMessage.type === "success" && (
-                      <CheckCircle2 className="size-5 shrink-0" />
-                    )}
-                    {addMessage.text}
-                  </div>
-                )}
-
-                <div className="flex gap-3 justify-end pt-2 border-t border-[#f0f0f0]">
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={() => setShowDeckModal(false)}
-                    disabled={addingWord}
-                  >
-                    Hủy
-                  </Button>
-                  <Button type="submit" disabled={addingWord}>
-                    {addingWord ? (
-                      <>
-                        <Loader2 className="size-4 animate-spin" /> Đang lưu…
-                      </>
-                    ) : (
-                      "Lưu vào gói"
-                    )}
-                  </Button>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
-        </div>
+          onSuccess={(deck) => {
+            setCreatedDecks((prev) => [deck, ...prev]);
+          }}
+        />
       )}
     </div>
   );

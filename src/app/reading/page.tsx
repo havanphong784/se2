@@ -33,7 +33,6 @@ import { prefetchDocumentWords, seedOfflineLexicon } from "@/lib/reading/diction
 import { detectPhrasesInSentence } from "@/lib/reading/phrase-matcher";
 import { extractStructuredText } from "@/lib/reading/extractors";
 import { buildSlidingWindowContext } from "@/lib/reading/context-window";
-import { SpeculativePrefetchQueue } from "@/lib/reading/prefetch-queue";
 import { SemanticRepairQueue } from "@/lib/reading/repair-queue";
 import {
   getAllDocumentsMeta,
@@ -107,18 +106,6 @@ export default function ReadingPage() {
   const [isSavingSession, setIsSavingSession] = useState(false);
   const [isDocumentSaved, setIsDocumentSaved] = useState<boolean>(true);
   const [analyzedSentencesCount, setAnalyzedSentencesCount] = useState<number>(0);
-
-  // Khởi tạo Speculative Prefetch Queue đón đầu câu N+1, N+2
-  const [prefetchQueue] = useState(
-    () =>
-      new SpeculativePrefetchQueue({
-        debounceMs: 1200,
-        maxLookahead: 2,
-        onSentencePrefetched: () => {
-          setAnalyzedSentencesCount((prev) => prev + 1);
-        },
-      })
-  );
 
   // Khởi tạo Semantic Repair Queue tự động sửa lỗi typographic giáo trình ở background
   const [repairQueue] = useState(
@@ -339,8 +326,8 @@ export default function ReadingPage() {
     }
   }, [parsedData]);
 
-  // Phân tích câu đang chọn với cơ chế Instant-First Progressive Loading
-  const handleAnalyzeSentence = useCallback(
+  // Chọn câu & nạp bản dịch nhanh (~80-100ms), không tự động gọi AI phân tích chuyên sâu
+  const handleSelectSentence = useCallback(
     async (sentence: SentenceItem) => {
       setSelectedSentenceId(sentence.id);
       setAnalysisError(null);
@@ -373,11 +360,11 @@ export default function ReadingPage() {
         return;
       }
 
-      // 2. Instant Draft (~100ms): Hiển thị bản nháp tức thì để người dùng đọc hiểu ngay không phải chờ
+      // 2. Chưa có phân tích AI hoàn chỉnh: Hiển thị instant draft và gọi API dịch câu nhanh
       const instantDraft = createInstantSentenceDraft(sentence.text, cached?.translationVi || "");
       setAnalysisData(instantDraft);
       setIsAnalyzing(false);
-      setIsEnriching(true);
+      setIsEnriching(false);
 
       // Nếu chưa có translationVi trong draft, lấy nhanh từ fast translation (< 150ms)
       if (!instantDraft.translationVi) {
@@ -385,16 +372,29 @@ export default function ReadingPage() {
           if (quickTrans) {
             setAnalysisData((current) => {
               if (!current || current.sentence !== sentence.text) return current;
-              return {
+              const updated = {
                 ...current,
                 translationVi: current.translationVi || quickTrans,
               };
+              setCachedAnalysis(sentence.text, updated);
+              return updated;
             });
           }
         });
       }
+    },
+    [documentMeta]
+  );
 
-      // 3. Chạy AI phân tích chuyên sâu (ngữ pháp, mệnh đề S-V-O, từ vựng) ở background
+  // Kích hoạt AI phân tích câu chuyên sâu khi người dùng yêu cầu
+  const handleTriggerAIAnalysis = useCallback(
+    async (targetSentence?: SentenceItem) => {
+      const sentence = targetSentence || activeSentence;
+      if (!sentence) return;
+
+      setIsEnriching(true);
+      setAnalysisError(null);
+
       try {
         const allSentences = parsedData.paragraphs.flatMap((p) => p.sentences);
         const currentIndex = allSentences.findIndex((s) => s.id === sentence.id);
@@ -418,7 +418,8 @@ export default function ReadingPage() {
           return current;
         });
 
-        // Tự động lưu vào IndexedDB theo tài liệu và tăng số câu đã phân tích
+        // Tự động lưu vào IndexedDB và L1 cache theo tài liệu
+        setCachedAnalysis(sentence.text, fullResult);
         if (documentMeta?.id) {
           saveSentenceAnalysis(documentMeta.id, sentence.text, fullResult).catch((err) => {
             console.warn("Could not save sentence analysis to IndexedDB:", err);
@@ -442,40 +443,20 @@ export default function ReadingPage() {
         setIsEnriching(false);
       }
     },
-    [aiConfig, parsedData, documentMeta]
+    [activeSentence, aiConfig, parsedData, documentMeta]
   );
 
-  // Tự động phân tích câu đầu tiên khi mở bài đọc hoặc đổi chunk nếu chưa có câu nào được chọn
+  // Tự động chọn câu đầu tiên khi mở bài đọc hoặc đổi chunk nếu chưa có câu nào được chọn
   useEffect(() => {
     const allSentences = parsedData.paragraphs.flatMap((p) => p.sentences);
     if (allSentences.length > 0 && !selectedSentenceId) {
       const firstSentence = allSentences[0];
       const timer = setTimeout(() => {
-        handleAnalyzeSentence(firstSentence);
+        handleSelectSentence(firstSentence);
       }, 50);
       return () => clearTimeout(timer);
     }
-  }, [parsedData, selectedSentenceId, handleAnalyzeSentence]);
-
-  // Speculative Prefetching Queue: Tự động phân tích đón đầu các câu N+1, N+2 khi người dùng đọc câu N
-  useEffect(() => {
-    if (!activeSentence?.id || !parsedData) return;
-
-    const allSentences = parsedData.paragraphs.flatMap((p) => p.sentences);
-    const currentIndex = allSentences.findIndex((s) => s.id === activeSentence.id);
-    if (currentIndex === -1) return;
-
-    prefetchQueue.enqueue(
-      allSentences,
-      currentIndex,
-      aiConfig,
-      documentMeta?.id
-    );
-
-    return () => {
-      prefetchQueue.cancel();
-    };
-  }, [activeSentence?.id, parsedData, aiConfig, documentMeta?.id, prefetchQueue]);
+  }, [parsedData, selectedSentenceId, handleSelectSentence]);
 
   // Tính toán số câu và phần trăm tiến độ đọc của Chunk hiện tại
   const allChunkSentences = useMemo(
@@ -1249,7 +1230,7 @@ export default function ReadingPage() {
             <InteractiveReader
               paragraphs={parsedData.paragraphs}
               activeSentenceId={activeSentence?.id || null}
-              onSelectSentence={handleAnalyzeSentence}
+              onSelectSentence={handleSelectSentence}
               onSaveWordToDeck={handleSaveWordToDeck}
               contextVocabMap={contextVocabMap}
               aiPhrases={analysisData?.idiomsAndPhrases}
@@ -1264,7 +1245,8 @@ export default function ReadingPage() {
               isEnriching={isEnriching}
               error={analysisError}
               selectedSentenceText={activeSentence?.text || null}
-              onRetry={() => activeSentence && handleAnalyzeSentence(activeSentence)}
+              onRetry={() => activeSentence && handleTriggerAIAnalysis(activeSentence)}
+              onAnalyzeWithAI={() => activeSentence && handleTriggerAIAnalysis(activeSentence)}
               onOpenAIConfig={() => setIsConfigOpen(true)}
               onSaveWordToDeck={handleSaveWordToDeck}
               onClosePanel={isFocusMode ? () => setIsFocusMode(false) : undefined}

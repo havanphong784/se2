@@ -11,6 +11,7 @@ export type VocabularyWord = {
   partOfSpeech: string[];
   exampleSentence: string;
   exampleTranslation: string;
+  audioUrl?: string | null;
   status: WordStatus;
   mastery: number;
   intervalDays: number;

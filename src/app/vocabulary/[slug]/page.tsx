@@ -1,15 +1,16 @@
 "use client";
 
-import { use } from "react";
+import { use, useState } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowRight, BookOpen, Brain, CheckCircle2, Leaf, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen, Brain, CheckCircle2, Leaf, Plus, Sparkles } from "lucide-react";
 
+import { AddWordDialog } from "@/components/add-word-dialog";
 import { CustomPracticeDialog } from "@/components/custom-practice-dialog";
 import { DataSourceNotice } from "@/components/data-source-notice";
 import { WordList } from "@/components/word-list";
 import { Badge } from "@/components/ui/badge";
-import { buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useDeck } from "@/lib/hooks/use-queries";
 import { deckProgress } from "@/lib/demo-data";
@@ -19,6 +20,7 @@ type DeckPageProps = { params: Promise<{ slug: string }> };
 export default function DeckPage({ params }: DeckPageProps) {
   const { slug } = use(params);
   const { data: deckRes, isLoading, isError, refetch } = useDeck(slug);
+  const [isAddWordOpen, setIsAddWordOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -118,6 +120,16 @@ export default function DeckPage({ params }: DeckPageProps) {
             >
               <span>{isStarted ? "Tiếp tục học" : "Bắt đầu học"}</span> <ArrowRight />
             </Link>
+            <Button
+              type="button"
+              variant="secondary"
+              size="lg"
+              onClick={() => setIsAddWordOpen(true)}
+              className="w-full justify-center gap-2 border-2 border-b-4 border-[#e5e5e5] border-b-[#dedede] font-black text-eel-dark-blue hover:border-macaw-blue hover:text-macaw-blue md:w-auto"
+            >
+              <Plus className="size-4 text-macaw-blue" />
+              <span>Thêm từ vựng</span>
+            </Button>
             <CustomPracticeDialog deck={deck} practiceWords={learnedWords} />
           </div>
         </div>
@@ -167,7 +179,7 @@ export default function DeckPage({ params }: DeckPageProps) {
 
       {/* Word List section */}
       <section className="mt-12" aria-labelledby="word-list-title">
-        <div className="mb-6 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-xs font-extrabold uppercase tracking-[0.08em] text-macaw-blue">
               Từ vựng trong chủ đề
@@ -176,13 +188,35 @@ export default function DeckPage({ params }: DeckPageProps) {
               Danh sách từ ({deck.words.length})
             </h2>
           </div>
-          <span className="inline-flex items-center gap-1.5 text-xs font-extrabold text-ash">
-            <BookOpen className="size-4 text-macaw-blue" /> Nhấn biểu tượng loa để nghe phát âm
-          </span>
+          <div className="flex flex-wrap items-center gap-3">
+            <Button
+              type="button"
+              variant="blue"
+              size="sm"
+              onClick={() => setIsAddWordOpen(true)}
+              className="gap-1.5 font-black"
+            >
+              <Plus className="size-4" /> Thêm từ mới
+            </Button>
+            <span className="inline-flex items-center gap-1.5 text-xs font-extrabold text-ash">
+              <BookOpen className="size-4 text-macaw-blue" /> Nhấn biểu tượng loa để nghe phát âm
+            </span>
+          </div>
         </div>
 
         <WordList words={deck.words} />
       </section>
+
+      {/* Add Word Dialog */}
+      <AddWordDialog
+        isOpen={isAddWordOpen}
+        onClose={() => setIsAddWordOpen(false)}
+        defaultDeckId={deck.ownership === "personal" ? deck.id : undefined}
+        defaultDeckTitle={deck.title}
+        onSuccess={() => {
+          void refetch();
+        }}
+      />
     </div>
   );
 }

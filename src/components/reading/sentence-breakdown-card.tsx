@@ -31,6 +31,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { isCompleteSentenceAnalysis } from "@/lib/ai/local-ai-client";
 import type {
   SentenceBreakdownResponse,
   ContextualVocab,
@@ -45,6 +46,7 @@ interface SentenceBreakdownCardProps {
   error: string | null;
   selectedSentenceText: string | null;
   onRetry?: () => void;
+  onAnalyzeWithAI?: () => void;
   onOpenAIConfig: () => void;
   onSaveWordToDeck?: (word: string, translation: string, phonetic: string) => Promise<void>;
   onClosePanel?: () => void;
@@ -108,10 +110,13 @@ export function SentenceBreakdownCard({
   error,
   selectedSentenceText,
   onRetry,
+  onAnalyzeWithAI,
   onOpenAIConfig,
   onSaveWordToDeck,
   onClosePanel,
 }: SentenceBreakdownCardProps) {
+  const isComplete = isCompleteSentenceAnalysis(data);
+
   // Trạng thái 3 tab: "meaning" (Ý nghĩa & Quiz), "syntax" (Cú pháp & Ngữ pháp), "lexicon" (Từ vựng & Tư duy)
   const [activeTab, setActiveTab] = useState<"meaning" | "syntax" | "lexicon">("meaning");
 
@@ -374,7 +379,7 @@ export function SentenceBreakdownCard({
       <div className="border-b border-[#f0f0f0] bg-[#fafafa]/90 p-3 shrink-0">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-1.5 flex-wrap min-w-0">
-            {complexityConfig && (
+            {isComplete && complexityConfig && (
               <span
                 className={`inline-flex items-center rounded-lg border px-2 py-0.5 text-[10.5px] font-extrabold ${complexityConfig.colorClass} shrink-0`}
               >
@@ -386,6 +391,24 @@ export function SentenceBreakdownCard({
               <span className="inline-flex items-center rounded-lg border border-[#bfe9fd] bg-[#e5f6fd] px-2 py-0.5 text-[10.5px] font-black text-[#087db4] shrink-0">
                 CEFR {data.cefrLevel}
               </span>
+            )}
+
+            {!isComplete && (
+              <span className="inline-flex items-center rounded-lg border border-[#bfe9fd] bg-[#f0f9ff] px-2 py-0.5 text-[10.5px] font-black text-[#087db4] shrink-0">
+                Dịch nhanh
+              </span>
+            )}
+
+            {!isComplete && onAnalyzeWithAI && (
+              <button
+                type="button"
+                onClick={onAnalyzeWithAI}
+                disabled={isEnriching}
+                className="inline-flex items-center gap-1 rounded-lg border border-ecto-green bg-[#f7fff1] px-2 py-0.5 text-[10.5px] font-black text-[#438f0e] hover:bg-ecto-green hover:text-white transition-all cursor-pointer disabled:opacity-50"
+              >
+                <Sparkles className="size-3" />
+                <span>Phân tích AI</span>
+              </button>
             )}
 
             {isEnriching && (
@@ -552,6 +575,47 @@ export function SentenceBreakdownCard({
               )}
             </section>
 
+            {/* Box CTA tactile chuẩn Vocabloom khi chưa có phân tích AI */}
+            {!isComplete && (
+              <div className="rounded-xl border-2 border-b-4 border-lingot-lime border-b-[#8ed459] bg-[#f7fff1] p-3.5 shadow-2xs space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-1.5">
+                    <Sparkles className="size-4 text-amber-500 fill-amber-400" />
+                    <h4 className="text-xs font-black uppercase tracking-wider text-[#438f0e]">
+                      Phân tích ngữ pháp chuyên sâu
+                    </h4>
+                  </div>
+                  <span className="rounded-full bg-[#e5f6fd] border border-[#bfe9fd] text-[#087db4] px-2 py-0.5 text-[10px] font-extrabold">
+                    Local AI
+                  </span>
+                </div>
+                <p className="text-xs font-bold text-eel-dark-blue leading-relaxed">
+                  Mổ xẻ khung S-V-O, mệnh đề chính/phụ, từ vựng trọng tâm &amp; câu hỏi đọc hiểu Socratic.
+                </p>
+                {onAnalyzeWithAI && (
+                  <Button
+                    variant="default"
+                    size="sm"
+                    onClick={onAnalyzeWithAI}
+                    disabled={isEnriching}
+                    className="w-full mt-1 gap-2 font-black text-xs cursor-pointer bg-ecto-green border-b-4 border-b-[#46a302] hover:bg-[#51bd02]"
+                  >
+                    {isEnriching ? (
+                      <>
+                        <Loader2 className="size-4 animate-spin text-white" />
+                        <span>Đang phân tích câu...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="size-4 fill-amber-300 text-white" />
+                        <span>Phân tích câu bằng AI</span>
+                      </>
+                    )}
+                  </Button>
+                )}
+              </div>
+            )}
+
             {/* Tiếng Anh đơn giản hóa (Simplified English) với Badge CEFR */}
             {(data.simplifiedEnglish || data.cefrLevel) && (
               <section className="rounded-xl border border-[#bfe9fd] bg-[#f0f9ff] p-3 space-y-2">
@@ -577,130 +641,132 @@ export function SentenceBreakdownCard({
             )}
 
             {/* Socratic Active Comprehension Quiz */}
-            <section className="rounded-xl border-2 border-purple-200 bg-purple-50/30 p-3.5 space-y-3 shadow-2xs">
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-1.5">
-                  <Brain className="size-4 text-purple-600" />
-                  <h4 className="text-xs font-black uppercase tracking-wider text-purple-900">
-                    Socratic Comprehension Quiz
-                  </h4>
+            {(isComplete || isEnriching || data.socraticQuestion) && (
+              <section className="rounded-xl border-2 border-purple-200 bg-purple-50/30 p-3.5 space-y-3 shadow-2xs">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-1.5">
+                    <Brain className="size-4 text-purple-600" />
+                    <h4 className="text-xs font-black uppercase tracking-wider text-purple-900">
+                      Socratic Comprehension Quiz
+                    </h4>
+                  </div>
+                  <span className="rounded-full bg-purple-100 text-purple-800 px-2 py-0.5 text-[10px] font-extrabold">
+                    Đọc hiểu chủ động
+                  </span>
                 </div>
-                <span className="rounded-full bg-purple-100 text-purple-800 px-2 py-0.5 text-[10px] font-extrabold">
-                  Đọc hiểu chủ động
-                </span>
-              </div>
 
-              {data.socraticQuestion ? (
-                <div className="space-y-2.5">
-                  {/* Câu hỏi */}
-                  <p className="text-xs md:text-sm font-bold text-eel-dark-blue leading-relaxed">
-                    {data.socraticQuestion.questionVi}
-                  </p>
+                {data.socraticQuestion ? (
+                  <div className="space-y-2.5">
+                    {/* Câu hỏi */}
+                    <p className="text-xs md:text-sm font-bold text-eel-dark-blue leading-relaxed">
+                      {data.socraticQuestion.questionVi}
+                    </p>
 
-                  {/* Danh sách các lựa chọn */}
-                  <div className="space-y-1.5">
-                    {data.socraticQuestion.options.map((option, optIdx) => {
-                      const isSelected = selectedQuizOption === optIdx;
-                      const hasAnswered = selectedQuizOption !== null;
-                      const isCorrect = optIdx === data.socraticQuestion?.correctIndex;
+                    {/* Danh sách các lựa chọn */}
+                    <div className="space-y-1.5">
+                      {data.socraticQuestion.options.map((option, optIdx) => {
+                        const isSelected = selectedQuizOption === optIdx;
+                        const hasAnswered = selectedQuizOption !== null;
+                        const isCorrect = optIdx === data.socraticQuestion?.correctIndex;
 
-                      let btnClass = "border-gray-200 bg-white hover:border-purple-300 hover:bg-purple-50/40 text-charcoal";
-                      if (hasAnswered) {
-                        if (isCorrect) {
-                          btnClass = "border-emerald-500 bg-emerald-50 text-emerald-900 font-bold shadow-2xs";
-                        } else if (isSelected && !isCorrect) {
-                          btnClass = "border-rose-500 bg-rose-50 text-rose-900 font-bold shadow-2xs";
-                        } else {
-                          btnClass = "border-gray-100 bg-gray-50/70 text-ash opacity-60";
+                        let btnClass = "border-gray-200 bg-white hover:border-purple-300 hover:bg-purple-50/40 text-charcoal";
+                        if (hasAnswered) {
+                          if (isCorrect) {
+                            btnClass = "border-emerald-500 bg-emerald-50 text-emerald-900 font-bold shadow-2xs";
+                          } else if (isSelected && !isCorrect) {
+                            btnClass = "border-rose-500 bg-rose-50 text-rose-900 font-bold shadow-2xs";
+                          } else {
+                            btnClass = "border-gray-100 bg-gray-50/70 text-ash opacity-60";
+                          }
                         }
-                      }
 
-                      return (
-                        <button
-                          key={optIdx}
-                          type="button"
-                          disabled={hasAnswered}
-                          onClick={() => {
-                            if (data?.sentence) {
-                              setSelectedQuizBySentence((prev) => ({
-                                ...prev,
-                                [data.sentence]: optIdx,
-                              }));
-                            }
-                          }}
-                          className={cn(
-                            "w-full text-left flex items-start gap-2.5 rounded-xl border p-2.5 text-xs transition-all cursor-pointer",
-                            btnClass
-                          )}
-                        >
-                          <span
+                        return (
+                          <button
+                            key={optIdx}
+                            type="button"
+                            disabled={hasAnswered}
+                            onClick={() => {
+                              if (data?.sentence) {
+                                setSelectedQuizBySentence((prev) => ({
+                                  ...prev,
+                                  [data.sentence]: optIdx,
+                                }));
+                              }
+                            }}
                             className={cn(
-                              "flex size-5 shrink-0 items-center justify-center rounded-full font-mono text-[10px] font-bold mt-0.5",
-                              hasAnswered && isCorrect
-                                ? "bg-emerald-600 text-white"
-                                : hasAnswered && isSelected && !isCorrect
-                                  ? "bg-rose-600 text-white"
-                                  : "bg-gray-100 text-charcoal"
+                              "w-full text-left flex items-start gap-2.5 rounded-xl border p-2.5 text-xs transition-all cursor-pointer",
+                              btnClass
                             )}
                           >
-                            {hasAnswered && isCorrect ? (
-                              <Check className="size-3" />
-                            ) : hasAnswered && isSelected && !isCorrect ? (
-                              <X className="size-3" />
-                            ) : (
-                              String.fromCharCode(65 + optIdx)
-                            )}
-                          </span>
-                          <span className="flex-1 leading-snug break-words">{option}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  {/* Lời giải thích phản hồi khi đã trả lời */}
-                  {selectedQuizOption !== null && (
-                    <div
-                      className={cn(
-                        "rounded-xl p-3 text-xs border transition-all animate-in fade-in slide-in-from-top-1",
-                        selectedQuizOption === data.socraticQuestion.correctIndex
-                          ? "bg-emerald-50 border-emerald-200 text-emerald-900"
-                          : "bg-rose-50 border-rose-200 text-rose-900"
-                      )}
-                    >
-                      <div className="flex items-center gap-1.5 font-black mb-1">
-                        {selectedQuizOption === data.socraticQuestion.correctIndex ? (
-                          <>
-                            <CheckCircle2 className="size-4 text-emerald-600 shrink-0" />
-                            <span>Chính xác!</span>
-                          </>
-                        ) : (
-                          <>
-                            <AlertCircle className="size-4 text-rose-600 shrink-0" />
-                            <span>Chưa chính xác</span>
-                          </>
-                        )}
-                      </div>
-                      <p className="leading-relaxed font-medium">
-                        {data.socraticQuestion.explanationVi}
-                      </p>
+                            <span
+                              className={cn(
+                                "flex size-5 shrink-0 items-center justify-center rounded-full font-mono text-[10px] font-bold mt-0.5",
+                                hasAnswered && isCorrect
+                                  ? "bg-emerald-600 text-white"
+                                  : hasAnswered && isSelected && !isCorrect
+                                    ? "bg-rose-600 text-white"
+                                    : "bg-gray-100 text-charcoal"
+                              )}
+                            >
+                              {hasAnswered && isCorrect ? (
+                                <Check className="size-3" />
+                              ) : hasAnswered && isSelected && !isCorrect ? (
+                                <X className="size-3" />
+                              ) : (
+                                String.fromCharCode(65 + optIdx)
+                              )}
+                            </span>
+                            <span className="flex-1 leading-snug break-words">{option}</span>
+                          </button>
+                        );
+                      })}
                     </div>
-                  )}
-                </div>
-              ) : isEnriching ? (
-                <div className="flex items-center gap-2 py-2 text-xs font-bold text-ash animate-pulse">
-                  <Loader2 className="size-3.5 animate-spin text-purple-600" />
-                  <span>AI đang soạn câu hỏi đọc hiểu Socratic cho câu này...</span>
-                </div>
-              ) : data.complexity === "micro" ? (
-                <p className="text-xs text-ash italic">
-                  Câu ngắn hoặc mệnh lệnh đơn giản, không yêu cầu câu hỏi đọc hiểu chuyên sâu.
-                </p>
-              ) : (
-                <p className="text-xs text-ash italic">
-                  Chưa có câu hỏi đọc hiểu cho câu này. Hãy bấm Thử lại để AI phân tích.
-                </p>
-              )}
-            </section>
+
+                    {/* Lời giải thích phản hồi khi đã trả lời */}
+                    {selectedQuizOption !== null && (
+                      <div
+                        className={cn(
+                          "rounded-xl p-3 text-xs border transition-all animate-in fade-in slide-in-from-top-1",
+                          selectedQuizOption === data.socraticQuestion.correctIndex
+                            ? "bg-emerald-50 border-emerald-200 text-emerald-900"
+                            : "bg-rose-50 border-rose-200 text-rose-900"
+                        )}
+                      >
+                        <div className="flex items-center gap-1.5 font-black mb-1">
+                          {selectedQuizOption === data.socraticQuestion.correctIndex ? (
+                            <>
+                              <CheckCircle2 className="size-4 text-emerald-600 shrink-0" />
+                              <span>Chính xác!</span>
+                            </>
+                          ) : (
+                            <>
+                              <AlertCircle className="size-4 text-rose-600 shrink-0" />
+                              <span>Chưa chính xác</span>
+                            </>
+                          )}
+                        </div>
+                        <p className="leading-relaxed font-medium">
+                          {data.socraticQuestion.explanationVi}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                ) : isEnriching ? (
+                  <div className="flex items-center gap-2 py-2 text-xs font-bold text-ash animate-pulse">
+                    <Loader2 className="size-3.5 animate-spin text-purple-600" />
+                    <span>AI đang soạn câu hỏi đọc hiểu Socratic cho câu này...</span>
+                  </div>
+                ) : data.complexity === "micro" ? (
+                  <p className="text-xs text-ash italic">
+                    Câu ngắn hoặc mệnh lệnh đơn giản, không yêu cầu câu hỏi đọc hiểu chuyên sâu.
+                  </p>
+                ) : (
+                  <p className="text-xs text-ash italic">
+                    Chưa có câu hỏi đọc hiểu cho câu này. Hãy bấm Thử lại để AI phân tích.
+                  </p>
+                )}
+              </section>
+            )}
           </div>
         )}
 
@@ -708,7 +774,28 @@ export function SentenceBreakdownCard({
         {/* TAB 2: CÚ PHÁP (SKELETON S-V-O-A & CLAUSES & GRAMMAR WHY) */}
         {/* ======================================================== */}
         {activeTab === "syntax" && (
-          <div className="space-y-4">
+          !isComplete && !isEnriching ? (
+            <div className="flex flex-col items-center justify-center p-6 text-center space-y-3 rounded-xl border-2 border-dashed border-[#e5e5e5] bg-[#fafafa]">
+              <Boxes className="size-8 text-[#1cb0f6]" />
+              <div>
+                <h4 className="text-xs font-black text-eel-dark-blue">Chưa phân tích cú pháp câu này</h4>
+                <p className="text-[11.5px] font-bold text-ash mt-0.5">
+                  Bấm nút bên dưới để AI phân tích cấu trúc S-V-O và mệnh đề.
+                </p>
+              </div>
+              {onAnalyzeWithAI && (
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={onAnalyzeWithAI}
+                  className="gap-1.5 font-bold text-xs cursor-pointer bg-ecto-green border-b-4 border-b-[#46a302] hover:bg-[#51bd02]"
+                >
+                  <Sparkles className="size-3.5 fill-amber-300 text-white" /> Phân tích cú pháp với AI
+                </Button>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-4">
             {/* Khung xương câu S-V-O-A */}
             <section className="space-y-2">
               <div className="flex items-center justify-between gap-2">
@@ -877,13 +964,37 @@ export function SentenceBreakdownCard({
               </div>
             </section>
           </div>
+          )
         )}
 
         {/* ======================================================== */}
         {/* TAB 3: TỪ VỰNG & TƯ DUY (SEMANTIC CHUNKS, VOCAB & MENTAL MODEL) */}
         {/* ======================================================== */}
         {activeTab === "lexicon" && (
-          <div className="space-y-4">
+          !isComplete && !isEnriching ? (
+            <div className="flex flex-col items-center justify-center p-6 text-center space-y-3 rounded-xl border-2 border-dashed border-[#e5e5e5] bg-[#fafafa]">
+              <BookMarked className="size-8 text-purple-600" />
+              <div>
+                <h4 className="text-xs font-black text-eel-dark-blue">
+                  Chưa phân tích từ vựng &amp; tư duy đọc
+                </h4>
+                <p className="text-[11.5px] font-bold text-ash mt-0.5">
+                  AI sẽ lọc từ vựng trọng tâm, họ từ và các bước tư duy đọc xuôi.
+                </p>
+              </div>
+              {onAnalyzeWithAI && (
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={onAnalyzeWithAI}
+                  className="gap-1.5 font-bold text-xs cursor-pointer bg-ecto-green border-b-4 border-b-[#46a302] hover:bg-[#51bd02]"
+                >
+                  <Sparkles className="size-3.5 fill-amber-300 text-white" /> Phân tích từ vựng với AI
+                </Button>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-4">
             {/* Semantic Chunks (Đọc nối cụm nghĩa) */}
             <section className="space-y-2">
               <div className="flex items-center justify-between">
@@ -1141,6 +1252,7 @@ export function SentenceBreakdownCard({
               </section>
             )}
           </div>
+          )
         )}
       </div>
     </div>
